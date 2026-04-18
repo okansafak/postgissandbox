@@ -5,6 +5,7 @@ import SpatialMap from '@/components/map/SpatialMap';
 import ResultTable from '@/components/results/ResultTable';
 import ExplainPlan from '@/components/results/ExplainPlan';
 import LessonContent from '@/components/lesson/LessonContent';
+import CurriculumSidebar from '@/components/lesson/CurriculumSidebar';
 
 interface LessonLayoutProps {
   day: string;
@@ -27,12 +28,19 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
         </span>
       </div>
 
-      {/* Ana 2'li panel: sol içerik, sağ editör+harita */}
+      {/* Ana 3'lü panel: sidebar | içerik | editör+harita */}
       <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
-        {/* Sol panel: MDX ders içeriği */}
+        {/* Sidebar: müfredat navigasyonu */}
+        <Panel defaultSize={18} minSize={12} maxSize={28} className="border-r border-border overflow-hidden">
+          <CurriculumSidebar />
+        </Panel>
+
+        <PanelResizeHandle className="w-1 bg-border hover:bg-primary-light transition-colors cursor-col-resize" />
+
+        {/* Orta panel: MDX ders içeriği */}
         <Panel
-          defaultSize={38}
-          minSize={25}
+          defaultSize={34}
+          minSize={22}
           className="overflow-y-auto bg-surface-2 border-r border-border"
         >
           <LessonContent day={day} module={module} lesson={lesson} />
@@ -41,7 +49,7 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
         <PanelResizeHandle className="w-1 bg-border hover:bg-primary-light transition-colors cursor-col-resize" />
 
         {/* Sağ panel: editör üstte, harita/tablo altta */}
-        <Panel defaultSize={62} minSize={40}>
+        <Panel defaultSize={48} minSize={35}>
           <PanelGroup orientation="vertical">
             {/* Sağ üst: SQL editörü */}
             <Panel

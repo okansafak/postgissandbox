@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState, type ComponentType } from 'react';
-import RunnableBlock from './RunnableBlock';
-import { getLessonByRoute } from '@/curriculum/structure';
 import { Link } from 'react-router-dom';
+import RunnableBlock from './RunnableBlock';
+import { getLessonByRoute, getNextLesson, getPrevLesson } from '@/curriculum/structure';
 import { useProgressStore } from '@/store/progressStore';
 
 interface LessonContentProps {
@@ -13,7 +13,6 @@ interface LessonContentProps {
 /** MDX bileşenlerine enjekte edilen global component map */
 const mdxComponents = {
   RunnableBlock,
-  // Markdown heading'leri stillendir
   h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className="text-2xl font-bold text-text mt-6 mb-3" {...props} />
   ),
@@ -64,16 +63,27 @@ const mdxComponents = {
 /** Tüm MDX dosyalarını lazy load için glob */
 const mdxGlob = import.meta.glob<{ default: ComponentType }>('../../content/**/*.mdx');
 
-function buildGlobKey(day: string, mod: string, lesson: string): string {
-  // örnek: ../../content/day-1/module-1/lesson-1-welcome.mdx
-  // lesson parametresi "lesson-1", "lesson-2" vs.
-  const prefixMap: Record<string, string> = {
+/** MDX dosya adı haritası: lesson slug → filename (uzantısız) */
+const LESSON_FILENAME: Record<string, Record<string, string>> = {
+  'module-1': {
     'lesson-1': 'lesson-1-welcome',
     'lesson-2': 'lesson-2-pglite-postgresql-postgis',
     'lesson-3': 'lesson-3-cbs-vector-raster',
     'lesson-4': 'lesson-4-first-map',
-  };
-  const filename = prefixMap[lesson] ?? lesson;
+  },
+  'module-2': {
+    'lesson-1': 'lesson-1-geometry-types',
+    'lesson-2': 'lesson-2-multi-and-collection',
+    'lesson-3': 'lesson-3-wkt-ewkt-geojson',
+    'lesson-4': 'lesson-4-geometry-constructors',
+    'lesson-5': 'lesson-5-geometry-metadata',
+    'lesson-6': 'lesson-6-valid-geometry',
+  },
+};
+
+function buildGlobKey(day: string, mod: string, lesson: string): string {
+  const modMap = LESSON_FILENAME[mod] ?? {};
+  const filename = modMap[lesson] ?? lesson;
   return `../../content/${day}/${mod}/${filename}.mdx`;
 }
 
@@ -105,6 +115,9 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
   const lessonId = meta?.id ?? `${day}-${module}-${lesson}`;
   const completed = isComplete(lessonId);
 
+  const next = meta ? getNextLesson(meta) : null;
+  const prev = meta ? getPrevLesson(meta) : null;
+
   return (
     <div className="p-6 max-w-none">
       {/* Başlık */}
@@ -123,7 +136,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
         </div>
       )}
 
-      {/* İçerik — components prop olarak doğrudan geçilir; MDXProvider gerekmez */}
+      {/* İçerik */}
       {loadError ? (
         <div className="p-4 rounded bg-red-950 text-red-300 text-sm font-mono">{loadError}</div>
       ) : MdxComponent ? (
@@ -134,44 +147,40 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
         <div className="text-text-muted text-sm">Yükleniyor…</div>
       )}
 
-      {/* Tamamla butonu */}
+      {/* Navigasyon + Tamamla butonu */}
       {meta && (
-        <div className="mt-8 pt-6 border-t border-border flex items-center justify-between">
+        <div className="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4">
+          {prev ? (
+            <Link
+              to={`/lesson/day-${prev.day}/module-${prev.module}/${prev.slug}`}
+              className="text-sm text-text-muted hover:text-text"
+            >
+              ← {prev.title}
+            </Link>
+          ) : (
+            <span />
+          )}
+
           <button
             onClick={() => markComplete(lessonId)}
             disabled={completed}
-            className="px-4 py-2 rounded bg-primary hover:bg-primary-light disabled:opacity-50 text-white text-sm transition-colors"
+            className="shrink-0 px-4 py-2 rounded bg-primary hover:bg-primary-light disabled:opacity-50 text-white text-sm transition-colors"
           >
             {completed ? '✅ Tamamlandı' : 'Dersi Tamamla'}
           </button>
-          {/* Sonraki ders linki */}
-          <NextLessonLink day={day} module={module} lesson={lesson} />
+
+          {next ? (
+            <Link
+              to={`/lesson/day-${next.day}/module-${next.module}/${next.slug}`}
+              className="text-sm text-accent hover:underline"
+            >
+              {next.title} →
+            </Link>
+          ) : (
+            <span className="text-xs text-text-muted">Son ders</span>
+          )}
         </div>
       )}
     </div>
-  );
-}
-
-const MODULE_LESSON_COUNT: Record<string, number> = {
-  'day-1-module-1': 4,
-};
-
-function NextLessonLink({ day, module, lesson }: LessonContentProps) {
-  const lessonNum = parseInt(lesson.replace('lesson-', ''), 10);
-  const key = `${day}-${module}`;
-  const count = MODULE_LESSON_COUNT[key] ?? 4;
-
-  if (lessonNum >= count) {
-    return <span className="text-xs text-text-muted">Son ders</span>;
-  }
-
-  const nextLesson = `lesson-${lessonNum + 1}`;
-  return (
-    <Link
-      to={`/lesson/${day}/${module}/${nextLesson}`}
-      className="text-sm text-accent hover:underline"
-    >
-      Sonraki Ders →
-    </Link>
   );
 }

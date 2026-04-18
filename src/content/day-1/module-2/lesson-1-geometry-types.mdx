@@ -1,0 +1,114 @@
+## 🎯 Ne öğreneceksin?
+
+- PostGIS'teki üç temel geometry tipini tanımlayabileceksin: `POINT`, `LINESTRING`, `POLYGON`
+- Her tipi SQL ile oluşturup haritada görebileceksin
+- `ST_GeometryType` ile tip sorgulayabileceksin
+
+---
+
+## 📖 Kavram: Üç Temel Tip
+
+PostGIS, gerçek dünya nesnelerini üç temel geometrik yapıyla modeller:
+
+| Tip | Türkçe | Gerçek Dünya Karşılığı |
+|---|---|---|
+| `POINT` | Nokta | ATM, hastane, POI, GPS konumu |
+| `LINESTRING` | Çizgi / Polizincir | Yol, nehir, rota, kanal |
+| `POLYGON` | Poligon / Alan | İl sınırı, bina ayak izi, parsel |
+
+Her geometrinin **koordinat çifti veya dizisi** vardır:
+- `POINT(28.979 41.015)` → tek koordinat çifti
+- `LINESTRING(28.9 41.0, 29.0 41.0, 29.1 40.9)` → sıralı koordinat listesi
+- `POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))` → kapalı halka
+
+> **Kritik:** Poligonun ilk ve son noktası **aynı olmalıdır** — böylece halka kapanır.
+
+---
+
+## ▶ Canlı Örnek — Üç Tip, Üç Sorgu
+
+<RunnableBlock
+  sql={`SELECT
+  'POINT'      AS tip,
+  ST_GeometryType(ST_MakePoint(28.979, 41.015)) AS type_name,
+  ST_AsText(ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)) AS wkt
+UNION ALL
+SELECT
+  'LINESTRING',
+  ST_GeometryType(ST_GeomFromText('LINESTRING(28.9 41.0, 29.0 41.0, 29.5 40.8)')),
+  ST_AsText(ST_GeomFromText('LINESTRING(28.9 41.0, 29.0 41.0, 29.5 40.8)'))
+UNION ALL
+SELECT
+  'POLYGON',
+  ST_GeometryType(ST_GeomFromText('POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))')),
+  ST_AsText(ST_GeomFromText('POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))'));`}
+  label="Üç tipin WKT gösterimi"
+/>
+
+---
+
+## ▶ Haritada Gör
+
+Bir nokta, bir çizgi ve bir poligonu aynı haritada göster. PostGIS geometry döndürdükçe harita sekmesi render eder:
+
+<RunnableBlock
+  sql={`SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom, 'Nokta' AS label
+UNION ALL
+SELECT ST_SetSRID(ST_GeomFromText('LINESTRING(28.9 41.0, 29.0 41.0, 29.5 40.8)'), 4326), 'Çizgi'
+UNION ALL
+SELECT ST_SetSRID(ST_GeomFromText('POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))'), 4326), 'Alan';`}
+  label="Haritada üç tip"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene
+
+İstanbul - Ankara - İzmir arasında bir `LINESTRING` oluştur:
+
+<RunnableBlock
+  sql={`SELECT ST_SetSRID(
+  ST_GeomFromText('LINESTRING(28.979 41.015, 32.854 39.930, 27.143 38.423)'),
+  4326
+) AS geom;`}
+  label="3 şehri birleştiren çizgi"
+  autoFit
+/>
+
+**Harita** sekmesine geç — Türkiye genelinde bir rota görmelisin.
+
+---
+
+## 🎯 Egzersiz
+
+**Bir kare poligon çiz.** Köşeleri:
+- Sol-alt: (28.9, 41.0)
+- Sağ-alt: (29.0, 41.0)
+- Sağ-üst: (29.0, 41.1)
+- Sol-üst: (28.9, 41.1)
+- Kapat: (28.9, 41.0) ← ilk nokta tekrar
+
+<RunnableBlock
+  sql={`-- İpucu: ST_GeomFromText('POLYGON((...))') — 5 koordinat, ilk = son
+SELECT ST_SetSRID(
+  ST_GeomFromText('POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))'),
+  4326
+) AS geom;`}
+  label="Kare poligon"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Poligon kapanmalı:** `POLYGON((x1 y1, x2 y2, x3 y3, x1 y1))` — son nokta ilk noktayla aynı olmazsa `ERROR: Ring is not closed`.
+2. **WKT'de virgül sırasına dikkat:** `(lon lat, lon lat)` — koordinat içi boşlukla, koordinatlar arası virgülle ayrılır.
+3. **SRID unutma:** `ST_GeomFromText(wkt)` SRID olmadan oluşturur. `ST_SetSRID(..., 4326)` veya `ST_GeomFromText(wkt, 4326)` kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste bu tiplerin **çoklu** versiyonlarını göreceğiz: `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`.

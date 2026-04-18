@@ -1,0 +1,137 @@
+## 🎯 Ne öğreneceksin?
+
+- Geçersiz geometrinin ne olduğunu ve neden oluştuğunu açıklayabileceksin
+- `ST_IsValid` ve `ST_IsValidReason` ile hata tespit edebileceksin
+- `ST_MakeValid` ile bozuk geometriyi onarabıleceksin
+- Poligon validasyon kurallarını sayabileceksin
+
+---
+
+## 📖 Kavram: Geçerli Geometri Nedir?
+
+OGC standardı geometry'nin geçerli olması için kurallar koyar. Bunlar ihlal edilince `ST_IsValid` → `false` döner ve bazı mekansal fonksiyonlar yanlış sonuç verir.
+
+### Sık Geçersizlik Nedenleri
+
+| Sorun | Açıklama | Örnek |
+|---|---|---|
+| Kendi kendini kesen | Polygon kenarları çakışıyor | Kravat (bowtie) şekli |
+| Kapanmamış halka | İlk ≠ Son nokta | `POLYGON((0 0, 1 0, 1 1))` |
+| Ayrık delik | İç halka dış halkayı aşıyor | Delik dışarı taşmış |
+| Tekrarlı nokta | Aynı koordinat üst üste | `LINESTRING(0 0, 0 0, 1 1)` |
+
+---
+
+## ▶ Canlı Örnek — Geçersiz Geometri Tespiti
+
+Kravat (bowtie) şekli — poligon kendini kesiyor:
+
+<RunnableBlock
+  sql={`WITH geomler AS (
+  SELECT 'Geçerli kare' AS ad,
+    ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))') AS geom
+  UNION ALL
+  SELECT 'Kravat (geçersiz)',
+    ST_GeomFromText('POLYGON((0 0, 1 1, 1 0, 0 1, 0 0))')  -- kendi kendini kesiyor
+  UNION ALL
+  SELECT 'Kapanmamış (hata)',
+    ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1))')       -- son nokta eksik
+)
+SELECT
+  ad,
+  ST_IsValid(geom)       AS gecerli_mi,
+  ST_IsValidReason(geom) AS hata_nedeni
+FROM geomler;`}
+  label="Geçerlilik kontrolü"
+/>
+
+---
+
+## ▶ ST_MakeValid ile Onar
+
+`ST_MakeValid` geçersiz geometriyi OGC kurallarına uygun hale getirir. Kravat şekillerini `MULTIPOLYGON`'a böler:
+
+<RunnableBlock
+  sql={`WITH bozuk AS (
+  SELECT ST_GeomFromText('POLYGON((0 0, 1 1, 1 0, 0 1, 0 0))') AS geom
+)
+SELECT
+  ST_IsValid(geom)                     AS onceki_gecerli,
+  ST_IsValid(ST_MakeValid(geom))        AS sonraki_gecerli,
+  ST_GeometryType(ST_MakeValid(geom))   AS onarilan_tip,
+  ST_AsText(ST_MakeValid(geom))         AS onarilan_wkt
+FROM bozuk;`}
+  label="ST_MakeValid ile onarım"
+/>
+
+---
+
+## ▶ Gerçek Veri Senaryosu — Toplu Doğrulama
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS test_parceller (
+  id   SERIAL PRIMARY KEY,
+  geom GEOMETRY(POLYGON, 4326)
+);
+
+INSERT INTO test_parceller (geom) VALUES
+  (ST_SetSRID(ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))'), 4326)),
+  (ST_SetSRID(ST_GeomFromText('POLYGON((0 0, 1 1, 1 0, 0 1, 0 0))'), 4326)),
+  (ST_SetSRID(ST_GeomFromText('POLYGON((2 0, 3 0, 3 1, 2 1, 2 0))'), 4326));
+
+SELECT
+  id,
+  ST_IsValid(geom) AS gecerli,
+  ST_IsValidReason(geom) AS neden
+FROM test_parceller;`}
+  label="Tablo üzerinde doğrulama"
+/>
+
+---
+
+## 🎯 Egzersiz
+
+Verilen 5 noktayı `ST_MakePolygon` ile kapalı poligona çevir ve alan hesapla:
+
+<RunnableBlock
+  sql={`SELECT
+  ST_Area(
+    ST_MakePolygon(
+      ST_MakeLine(ARRAY[
+        ST_MakePoint(28.9, 41.0),
+        ST_MakePoint(29.0, 41.0),
+        ST_MakePoint(29.0, 41.1),
+        ST_MakePoint(28.9, 41.1),
+        ST_MakePoint(28.9, 41.0)
+      ])
+    )::geography
+  ) AS alan_m2,
+  ROUND(
+    ST_Area(
+      ST_MakePolygon(
+        ST_MakeLine(ARRAY[
+          ST_MakePoint(28.9, 41.0),
+          ST_MakePoint(29.0, 41.0),
+          ST_MakePoint(29.0, 41.1),
+          ST_MakePoint(28.9, 41.1),
+          ST_MakePoint(28.9, 41.0)
+        ])
+      )::geography
+    ) / 1e6, 2
+  ) AS alan_km2;`}
+  label="Poligon alanı hesapla"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_IsValid false ≠ hata:** Bazı fonksiyonlar geçersiz geometriyle sessizce yanlış sonuç verir. Her zaman yükleme öncesi `ST_IsValid` kontrolü yap.
+2. **ST_MakeValid orijinal şekli değiştirebilir:** Kravat poligon `MULTIPOLYGON`'a bölünür. Beklediğin sonuç değilse `ST_IsValidDetail` ile detaylı analiz yap.
+3. **ST_Buffer(geom, 0) eski yöntem:** Eski versiyonlarda `ST_Buffer(geom, 0)` geçersizliği düzeltmek için kullanılırdı. Modern PostGIS'te `ST_MakeValid` kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 1.2 tamamlandı! Sırada **Modül 1.3 — SRID ve Projeksiyonlar** var: koordinat sistemleri, EPSG kodları ve `ST_Transform`.

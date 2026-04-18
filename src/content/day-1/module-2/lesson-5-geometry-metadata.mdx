@@ -1,0 +1,120 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_NPoints`, `ST_NumGeometries` ile yapısal bilgi çekebileceksin
+- `ST_SRID`, `ST_CoordDim`, `ST_GeometryType` fonksiyonlarını kullanabileceksin
+- `ST_Envelope` ile sınırlayıcı dikdörtgeni hesaplayabileceksin
+
+---
+
+## 📖 Kavram: Geometry Introspection
+
+Bir geometri hakkında "kaç nokta var?", "hangi tip?", "hangi koordinat sistemi?" gibi soruları yanıtlayan fonksiyonlar:
+
+| Fonksiyon | Açıklama | Örnek Çıktı |
+|---|---|---|
+| `ST_GeometryType(g)` | Tip adı | `ST_LineString` |
+| `ST_SRID(g)` | Koordinat sistemi ID'si | `4326` |
+| `ST_CoordDim(g)` | Koordinat boyutu (2D/3D) | `2` veya `3` |
+| `ST_NPoints(g)` | Toplam nokta sayısı | `5` |
+| `ST_NumGeometries(g)` | MULTI* içindeki parça sayısı | `3` |
+| `ST_IsEmpty(g)` | Boş mu? | `false` |
+| `ST_Envelope(g)` | Sınırlayıcı dikdörtgen (POLYGON) | `POLYGON((...))` |
+| `ST_Extent(g)` | Aggregate sınırlayıcı kutu | `BOX(...)` |
+
+---
+
+## ▶ Canlı Örnek — Bir Geometrinin Tüm Metadata'sı
+
+<RunnableBlock
+  sql={`WITH geom AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('LINESTRING(28.9 41.0, 29.0 41.0, 29.2 40.8, 29.5 40.6, 30.0 40.3)'),
+    4326
+  ) AS g
+)
+SELECT
+  ST_GeometryType(g)  AS tip,
+  ST_SRID(g)          AS srid,
+  ST_CoordDim(g)      AS boyut,
+  ST_NPoints(g)       AS nokta_sayisi,
+  ST_IsEmpty(g)       AS bos_mu,
+  ST_AsText(ST_Envelope(g)) AS envelope_wkt
+FROM geom;`}
+  label="Geometri metadata özeti"
+/>
+
+---
+
+## ▶ ST_Envelope: Sınırlayıcı Kutu
+
+`ST_Envelope` geometriyi kapsayan en küçük dikdörtgeni döndürür. Haritada zoom için kullanışlı:
+
+<RunnableBlock
+  sql={`WITH sehirler AS (
+  SELECT ST_Collect(ARRAY[
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326),
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326),
+    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  ]) AS geom
+)
+SELECT
+  ST_AsText(ST_Envelope(geom)) AS envelope,
+  ST_AsText(geom)              AS noktalar
+FROM sehirler;`}
+  label="3 şehrin sınırlayıcı kutusu"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene
+
+`ST_Extent` bir aggregate — birden fazla satırın toplam bounding box'ını verir:
+
+<RunnableBlock
+  sql={`WITH noktalar AS (
+  SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL SELECT ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL SELECT ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  UNION ALL SELECT ST_SetSRID(ST_MakePoint(36.336, 37.008), 4326)
+)
+SELECT ST_Extent(geom)::text AS turkiye_bbox
+FROM noktalar;`}
+  label="Aggregate bounding box"
+/>
+
+---
+
+## 🎯 Egzersiz
+
+`MULTIPOLYGON` oluştur ve `ST_NumGeometries` ile parça sayısını doğrula:
+
+<RunnableBlock
+  sql={`WITH mp AS (
+  SELECT ST_GeomFromText('MULTIPOLYGON(
+    ((0 0, 1 0, 1 1, 0 1, 0 0)),
+    ((2 0, 3 0, 3 1, 2 1, 2 0)),
+    ((4 0, 5 0, 5 1, 4 1, 4 0))
+  )') AS geom
+)
+SELECT
+  ST_NumGeometries(geom) AS parca_sayisi,
+  ST_NPoints(geom)       AS toplam_nokta,
+  ST_GeometryType(geom)  AS tip
+FROM mp;`}
+  label="MULTIPOLYGON metadata"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_NPoints MULTI tiplerinde tüm parçaları sayar:** `MULTILINESTRING` içindeki her segmentin tüm noktaları toplanır.
+2. **ST_Extent vs ST_Envelope:** `ST_Extent` aggregate (GROUP BY kullanılır), `ST_Envelope` tek geometri için.
+3. **3D geometri:** `ST_CoordDim` → 3 ise Z koordinatı var. `ST_Z(point)` ile Z değerine ulaşabilirsin. 2D fonksiyonlar Z'yi yok sayar.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki ve son derste **geçersiz geometri** problemlerini göreceğiz: neden oluşur, nasıl tespit edilir, nasıl düzeltilir.

@@ -1,0 +1,100 @@
+## 🎯 Ne öğreneceksin?
+
+- `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON` tiplerini açıklayabileceksin
+- `GEOMETRYCOLLECTION`'ın ne işe yaradığını anlayacaksın
+- `ST_Collect` ile ayrı geometrileri birleştirebileceksin
+
+---
+
+## 📖 Kavram: Neden Multi?
+
+Gerçek veri her zaman tek parça olmaz:
+
+| Senaryo | Tek mi? | Çok mu? |
+|---|---|---|
+| Bir şehrin merkezi | `POINT` | — |
+| Birden fazla şube | — | `MULTIPOINT` |
+| Tek yol | `LINESTRING` | — |
+| Kesintili yol (köprü arası) | — | `MULTILINESTRING` |
+| Tek il | `POLYGON` | — |
+| Adalar (İstanbul'un iki yakası) | — | `MULTIPOLYGON` |
+
+**MULTI\*** tipleri aynı türden birden fazla geometriyi **tek kayıtta** tutar. Bu veri normalleştirmesi için kritiktir: bir il kaydı `MULTIPOLYGON` olabilir.
+
+### GEOMETRYCOLLECTION
+
+Farklı türleri aynı anda tutar — nokta + çizgi + alan. Genellikle veri girişinde ya da heterogen analiz sonuçlarında görülür.
+
+---
+
+## ▶ Canlı Örnek — MULTI tipleri
+
+<RunnableBlock
+  sql={`SELECT
+  'MULTIPOINT'      AS tip,
+  ST_AsText(ST_GeomFromText('MULTIPOINT((28.9 41.0),(32.8 39.9),(27.1 38.4))')) AS wkt
+UNION ALL
+SELECT
+  'MULTILINESTRING',
+  ST_AsText(ST_GeomFromText('MULTILINESTRING((28.9 41.0, 29.2 41.0),(29.5 41.0, 30.0 41.0))'))
+UNION ALL
+SELECT
+  'MULTIPOLYGON',
+  ST_AsText(ST_GeomFromText('MULTIPOLYGON(((28.9 41.0,29.0 41.0,29.0 41.1,28.9 41.0)),((29.2 41.0,29.3 41.0,29.3 41.1,29.2 41.0)))'));`}
+  label="MULTI tip örnekleri"
+/>
+
+---
+
+## ▶ ST_Collect: Satırları Birleştir
+
+`ST_Collect(geom)` bir aggregate fonksiyondur — birden fazla satırdaki geometrileri tek `GEOMETRYCOLLECTION` veya `MULTI*`'ya dönüştürür:
+
+<RunnableBlock
+  sql={`WITH sehirler AS (
+  SELECT 'İstanbul' AS ad, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL
+  SELECT 'Ankara',          ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL
+  SELECT 'İzmir',           ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+)
+SELECT
+  ST_GeometryType(ST_Collect(geom)) AS tip,
+  ST_NumGeometries(ST_Collect(geom)) AS parca_sayisi,
+  ST_Collect(geom) AS geom
+FROM sehirler;`}
+  label="ST_Collect ile 3 nokta → MULTIPOINT"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene
+
+`ST_NumGeometries` bir MULTI geometrinin kaç parçadan oluştuğunu döndürür:
+
+<RunnableBlock
+  sql={`SELECT
+  ST_NumGeometries(
+    ST_GeomFromText('MULTIPOLYGON(
+      ((0 0,1 0,1 1,0 1,0 0)),
+      ((2 0,3 0,3 1,2 1,2 0)),
+      ((4 0,5 0,5 1,4 1,4 0))
+    )')
+  ) AS parca_sayisi;`}
+  label="3 parçalı MULTIPOLYGON"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Collect ≠ ST_Union:** `ST_Collect` geometrileri toplar ama **çakışmaları birleştirmez**. `ST_Union` geometrik birleşim yapar (yavaş ama doğru alan toplamı için gerekli).
+2. **GEOMETRYCOLLECTION sorgularda sorun çıkarabilir:** Bazı fonksiyonlar (ör. `ST_Area`) sadece POLYGON/MULTIPOLYGON ile çalışır. Karışık tip gelirse `ST_CollectionExtract` ile filtrele.
+3. **WKT'de MULTIPOINT sözdizimi:** `MULTIPOINT((x1 y1),(x2 y2))` — her nokta parantez içinde.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Bir sonraki derste geometrilerin **metin temsil formatlarını** — WKT, EWKT ve GeoJSON — karşılaştıracağız.

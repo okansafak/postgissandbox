@@ -1,0 +1,116 @@
+## 🎯 Ne öğreneceksin?
+
+- WKT, EWKT ve GeoJSON formatlarını ayırt edebileceksin
+- `ST_AsText`, `ST_AsEWKT`, `ST_AsGeoJSON` fonksiyonlarını kullanabileceksin
+- `ST_GeomFromText` ve `ST_GeomFromGeoJSON` ile dışarıdan geometry okuyabileceksin
+
+---
+
+## 📖 Kavram: Geometry Temsil Formatları
+
+Geometri veritabanında binary olarak saklanır. Ama dışarıyla konuşmak için **metin formatlarına** çevrilir.
+
+### WKT (Well-Known Text)
+
+OGC standardı. İnsan-okunabilir. SRID bilgisi içermez.
+
+```
+POINT(28.979 41.015)
+LINESTRING(28.9 41.0, 29.0 41.0)
+POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))
+```
+
+### EWKT (Extended WKT)
+
+PostGIS'e özgü. SRID bilgisini **başa** ekler.
+
+```
+SRID=4326;POINT(28.979 41.015)
+SRID=4326;LINESTRING(28.9 41.0, 29.0 41.0)
+```
+
+### GeoJSON
+
+Web standartı. JSON formatında. `"type"` ve `"coordinates"` anahtarları.
+
+```json
+{"type":"Point","coordinates":[28.979,41.015]}
+{"type":"LineString","coordinates":[[28.9,41.0],[29.0,41.0]]}
+```
+
+> **GeoJSON'da koordinat sırası:** `[longitude, latitude]` — WKT ile aynı.
+
+---
+
+## ▶ Canlı Örnek — Aynı Geometri, 3 Format
+
+<RunnableBlock
+  sql={`WITH pt AS (
+  SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+)
+SELECT
+  ST_AsText(geom)    AS wkt,
+  ST_AsEWKT(geom)    AS ewkt,
+  ST_AsGeoJSON(geom) AS geojson
+FROM pt;`}
+  label="Bir nokta — 3 format"
+/>
+
+---
+
+## ▶ Metinden Geometry Oluştur
+
+<RunnableBlock
+  sql={`SELECT
+  ST_AsText(ST_GeomFromText('POINT(28.979 41.015)', 4326))       AS wkt_kaynak,
+  ST_AsText(ST_GeomFromEWKT('SRID=4326;POINT(28.979 41.015)'))   AS ewkt_kaynak,
+  ST_AsText(ST_GeomFromGeoJSON('{"type":"Point","coordinates":[28.979,41.015]}')) AS geojson_kaynak;`}
+  label="3 formattan geometry oluştur"
+/>
+
+---
+
+## 🧪 Dene
+
+`ST_AsGeoJSON` 2. parametresiyle ondalık hassasiyeti ayarlayabilirsin:
+
+<RunnableBlock
+  sql={`SELECT
+  ST_AsGeoJSON(ST_SetSRID(ST_MakePoint(28.979123456, 41.015654321), 4326), 3) AS geojson_3_hane,
+  ST_AsGeoJSON(ST_SetSRID(ST_MakePoint(28.979123456, 41.015654321), 4326), 8) AS geojson_8_hane;`}
+  label="GeoJSON hassasiyet kontrolü"
+/>
+
+---
+
+## 🎯 Egzersiz
+
+Aşağıdaki GeoJSON string'inden geometry oluştur ve WKT formatında göster:
+
+```json
+{"type":"LineString","coordinates":[[28.9,41.0],[32.8,39.9],[27.1,38.4]]}
+```
+
+<RunnableBlock
+  sql={`SELECT ST_AsText(
+  ST_SetSRID(
+    ST_GeomFromGeoJSON('{"type":"LineString","coordinates":[[28.9,41.0],[32.8,39.9],[27.1,38.4]]}'),
+    4326
+  )
+) AS wkt_sonucu;`}
+  label="GeoJSON → WKT dönüşümü"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_GeomFromText SRID almaz varsayılan olarak:** `ST_GeomFromText('POINT(...)')` → SRID=-1. Her zaman `ST_GeomFromText('...', 4326)` veya `ST_SetSRID(...)` kullan.
+2. **GeoJSON'da SRID yok:** GeoJSON spesifikasyonu her zaman WGS84 (4326) varsayar. `ST_GeomFromGeoJSON` SRID=4326 set eder.
+3. **EWKT kaynaktan okurken:** `ST_GeomFromEWKT` kullan, `ST_GeomFromText` değil — aksi hâlde SRID kısmı parse hatası verir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Bir sonraki derste `ST_MakeLine`, `ST_MakePolygon` gibi **yapıcı (constructor)** fonksiyonlarla daha karmaşık geometriler oluşturacağız.
