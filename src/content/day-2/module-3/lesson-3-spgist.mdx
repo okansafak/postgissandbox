@@ -1,0 +1,96 @@
+## 🎯 Ne öğreneceksin?
+
+- SP-GIST ile GIST arasındaki yapısal farkı açıklayabileceksin
+- SP-GIST'in hangi durumlarda avantajlı olduğunu söyleyebileceksin
+- `CREATE INDEX USING spgist` sözdizimini yazabileceksin
+
+---
+
+## 📖 Kavram: SP-GIST (Space-Partitioned GIST)
+
+| Özellik | GIST | SP-GIST |
+|---|---|---|
+| Yapı | R-Tree (örtüşen bbox'lar) | Quadtree / K-D tree (bölünmüş uzay) |
+| Örtüşme | Evet | Hayır (bölgeler ayrı) |
+| En iyi tablo | Karma geometri, poligon | Nokta yoğun, uniform dağılım |
+| Indeks boyutu | Daha büyük | Daha küçük |
+| Nokta sorgusu | İyi | Çok iyi |
+| Büyük poligon | İyi | Zayıf |
+
+**Kural:** GPS takip verisi, POI tablosu → SP-GIST dene. Poligon tablolar → GIST.
+
+---
+
+## ▶ Canlı Örnek — SP-GIST İndeks
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS gps_izler (
+  id   SERIAL PRIMARY KEY,
+  arac TEXT,
+  zaman TIMESTAMPTZ,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO gps_izler (arac, zaman, geom)
+SELECT
+  'Araç-' || (1 + i % 10),
+  NOW() - (i || ' minutes')::interval,
+  ST_SetSRID(ST_MakePoint(28.9 + random()*0.5, 40.9 + random()*0.3), 4326)
+FROM generate_series(1, 2000) i
+ON CONFLICT DO NOTHING;
+
+-- SP-GIST indeks
+CREATE INDEX IF NOT EXISTS idx_gps_spgist
+  ON gps_izler USING spgist(geom);
+
+ANALYZE gps_izler;
+
+-- Sorgu planı
+EXPLAIN ANALYZE SELECT COUNT(*) FROM gps_izler
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(29.1, 41.0),4326)::geography,
+  20000);`}
+  label="SP-GIST indeks ile GPS sorgusu"
+/>
+
+---
+
+## ▶ İki İndeksi Karşılaştır
+
+<RunnableBlock
+  sql={`-- GIST indeks de ekle (karşılaştırma için)
+CREATE INDEX IF NOT EXISTS idx_gps_gist
+  ON gps_izler USING gist(geom);
+
+-- İki indeks mevcut
+SELECT indexname, pg_size_pretty(pg_relation_size(indexrelid)) AS boyut
+FROM pg_stat_user_indexes
+WHERE tablename = 'gps_izler';`}
+  label="GIST vs SP-GIST boyutu"
+/>
+
+---
+
+## 🧪 Dene
+
+<RunnableBlock
+  sql={`-- Nokta içinde nokta sorgusu — SP-GIST avantajlı
+SELECT COUNT(*) FROM gps_izler
+WHERE geom && ST_MakeEnvelope(29.0, 40.95, 29.2, 41.1, 4326);`}
+  label="Bounding box sorgusu"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **SP-GIST tüm geometry tipleri için değil:** PostGIS SP-GIST `point`, `box2d` için. `polygon` veya `linestring` sütunlarda GIST kullan.
+2. **Uniform dağılım yoksa GIST daha iyi:** Tüm noktalar tek bölgede kümelenirse SP-GIST quadtree dengesi bozulur — GIST daha stabil.
+3. **BRIN indeks (bonus):** Çok büyük zaman serisi tablolar için `BRIN` de mekansal sütunda kullanılabilir — çok küçük boyut, yeterli performans.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste GIST indeksinin doğrudan kullandığı operatör: **`&&` bounding box kesişimi**.

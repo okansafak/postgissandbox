@@ -1,0 +1,114 @@
+## 🎯 Ne öğreneceksin?
+
+- Partial index ile belirli bir koşul için optimize edilmiş indeks oluşturabileceksin
+- Functional index ile cast'lı sütun sorgularını hızlandırabileceksin
+- Hangi durumda hangi indeks türünün uygun olduğuna karar verebileceksin
+
+---
+
+## 📖 Kavram
+
+### Partial Index
+
+Tablonun yalnızca **belirli bir koşulu sağlayan** satırlarını indeksler. Daha küçük → daha hızlı.
+
+```sql
+-- Sadece aktif kayıtlar için
+CREATE INDEX ON mekanlar USING gist(geom) WHERE aktif = TRUE;
+
+-- Sadece İstanbul için
+CREATE INDEX ON noktalar USING gist(geom)
+  WHERE ST_Contains(
+    ST_MakeEnvelope(28.5,40.8,29.5,41.5,4326), geom
+  );
+```
+
+### Functional Index
+
+Bir **ifade** (expression) üzerine indeks. `geom::geography` gibi cast'ları kapsar.
+
+```sql
+CREATE INDEX ON mekanlar USING gist( (geom::geography) );
+```
+
+---
+
+## ▶ Partial Index: Aktif Mekanlar
+
+<RunnableBlock
+  sql={`-- Tablo: 1000 mekan, yarısı aktif değil
+CREATE TABLE IF NOT EXISTS mekanlar_part (
+  id     SERIAL PRIMARY KEY,
+  ad     TEXT,
+  aktif  BOOLEAN,
+  geom   GEOMETRY(POINT,4326)
+);
+
+INSERT INTO mekanlar_part (ad, aktif, geom)
+SELECT
+  'Mekan-' || i,
+  i % 2 = 0,  -- yarısı aktif
+  ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326)
+FROM generate_series(1,1000) i
+ON CONFLICT DO NOTHING;
+
+ANALYZE mekanlar_part;
+
+-- Partial index: sadece aktif=TRUE
+CREATE INDEX IF NOT EXISTS idx_aktif_geom
+  ON mekanlar_part USING gist(geom)
+  WHERE aktif = TRUE;
+
+-- Plan: aktif=TRUE sorgusunda partial index kullanılır
+EXPLAIN SELECT * FROM mekanlar_part
+WHERE aktif = TRUE
+  AND ST_DWithin(geom::geography,
+    ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 200000);`}
+  label="Partial index sorgu planı"
+/>
+
+---
+
+## ▶ Functional Index: geography Cast
+
+<RunnableBlock
+  sql={`-- geography sorgular için functional index
+CREATE INDEX IF NOT EXISTS idx_mekanlar_geog
+  ON mekanlar_part USING gist( (geom::geography) );
+
+-- Bu indeks şu sorguda kullanılır:
+EXPLAIN SELECT COUNT(*) FROM mekanlar_part
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  100000);`}
+  label="Functional geography index"
+/>
+
+---
+
+## 🧪 Dene — İndeks Boyutları
+
+<RunnableBlock
+  sql={`SELECT
+  indexname,
+  pg_size_pretty(pg_relation_size(indexrelid)) AS boyut
+FROM pg_stat_user_indexes
+WHERE tablename = 'mekanlar_part'
+ORDER BY pg_relation_size(indexrelid) DESC;`}
+  label="İndeks boyutları"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Partial index WHERE sorguyla birebir eşleşmeli:** `WHERE aktif = TRUE` indeksi `WHERE aktif = 't'` sorgusunda kullanılmaz — PostgreSQL koşul eşleşmesine sıkı bakır.
+2. **Functional index parantez gerektirir:** `CREATE INDEX ON t USING gist((geom::geography))` — double parantez zorunlu. Tek parantez syntax hatası.
+3. **INDEX seçimi: planner kararı verir:** İndeks var diye her zaman kullanılmaz. Planner tablo boyutu ve seçicilik oranına göre karar verir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste hangi indekslerin kullanıldığını gösteren sistem tablosu: **`pg_stat_user_indexes`**.

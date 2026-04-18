@@ -1,0 +1,132 @@
+## 🎯 Ne öğreneceksin?
+
+- `PARTITION BY LIST` sözdizimini yazabileceksin
+- Kategorik sütunlara (ülke, şehir, tür) göre bölümleme yapabileceksin
+- Default partition ile beklenmedik değerleri yönetebileceksin
+
+---
+
+## 📖 Kavram: List Partitioning
+
+**Range partitioning:** Sürekli değer aralığı (tarih, sayı)
+**List partitioning:** Ayrık kategoriler (ülke kodu, şehir, tür)
+
+```sql
+CREATE TABLE mekanlar_ulke (
+  id     BIGSERIAL,
+  ulke   CHAR(2) NOT NULL,
+  ad     TEXT,
+  geom   GEOMETRY(POINT, 4326)
+) PARTITION BY LIST (ulke);
+
+CREATE TABLE mekanlar_tr PARTITION OF mekanlar_ulke
+  FOR VALUES IN ('TR');
+
+CREATE TABLE mekanlar_gr PARTITION OF mekanlar_ulke
+  FOR VALUES IN ('GR');
+
+CREATE TABLE mekanlar_other PARTITION OF mekanlar_ulke
+  DEFAULT;
+```
+
+---
+
+## ▶ Canlı Örnek — Şehir Bazlı Partition
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS pois_sehir (
+  id     BIGSERIAL,
+  sehir  TEXT NOT NULL,
+  tur    TEXT,
+  geom   GEOMETRY(POINT, 4326)
+) PARTITION BY LIST (sehir);
+
+CREATE TABLE IF NOT EXISTS pois_istanbul
+  PARTITION OF pois_sehir FOR VALUES IN ('istanbul');
+
+CREATE TABLE IF NOT EXISTS pois_ankara
+  PARTITION OF pois_sehir FOR VALUES IN ('ankara');
+
+CREATE TABLE IF NOT EXISTS pois_izmir
+  PARTITION OF pois_sehir FOR VALUES IN ('izmir');
+
+CREATE TABLE IF NOT EXISTS pois_diger
+  PARTITION OF pois_sehir DEFAULT;
+
+-- Veri ekle
+INSERT INTO pois_sehir (sehir, tur, geom) VALUES
+  ('istanbul', 'restoran', ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)),
+  ('istanbul', 'kafe',     ST_SetSRID(ST_MakePoint(29.021, 41.045), 4326)),
+  ('ankara',   'restoran', ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)),
+  ('izmir',    'kafe',     ST_SetSRID(ST_MakePoint(27.142, 38.423), 4326)),
+  ('bursa',    'restoran', ST_SetSRID(ST_MakePoint(29.061, 40.182), 4326));
+
+SELECT tableoid::regclass AS partition, sehir, COUNT(*) FROM pois_sehir GROUP BY 1, 2;`}
+  label="List partition kurulumu"
+/>
+
+---
+
+## ▶ List Partition Pruning
+
+<RunnableBlock
+  sql={`-- Sadece istanbul partition'ı taranır
+EXPLAIN
+SELECT * FROM pois_sehir
+WHERE sehir = 'istanbul'
+  AND tur = 'restoran';`}
+  label="List partition pruning"
+/>
+
+---
+
+## ▶ Çok Değerli List Partition
+
+<RunnableBlock
+  sql={`-- Birden fazla değeri tek partition'a topla
+CREATE TABLE IF NOT EXISTS pois_ege
+  PARTITION OF pois_sehir FOR VALUES IN ('izmir', 'bodrum', 'marmaris');
+
+-- Ama izmir zaten başka partition'da — bu PGlite'ta hata verebilir
+-- Temizle ve yeniden dene:
+-- DROP TABLE IF EXISTS pois_izmir;
+-- DROP TABLE IF EXISTS pois_ege;
+
+-- Partition üzerine GIST indeks
+CREATE INDEX IF NOT EXISTS idx_pois_ist_geom
+  ON pois_istanbul USING gist(geom);
+
+EXPLAIN ANALYZE
+SELECT * FROM pois_sehir
+WHERE sehir = 'istanbul';`}
+  label="Partition üzerine indeks ve plan"
+/>
+
+---
+
+## 🧪 Dene — Default Partition'a Düşen Kayıtlar
+
+<RunnableBlock
+  sql={`-- 'bursa' default'a düştü
+SELECT tableoid::regclass AS partition, COUNT(*)
+FROM pois_sehir
+GROUP BY 1;
+
+-- Default'taki kayıtlar
+SELECT * FROM pois_diger;`}
+  label="Default partition içeriği"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Default partition var mı?** Yoksa tanımsız değer `INSERT` hatası verir. Her zaman `DEFAULT` partition oluştur.
+2. **List partition çok parçalanırsa:** 100 ülke için 100 partition — planner overhead'i artar. 10-20'den fazla partition için hash partitioning veya range düşün.
+3. **Partition key güncelleme (UPDATE):** `UPDATE SET sehir = 'ankara' WHERE sehir = 'istanbul'` — satır eski partition'dan silinir, yenisine eklenir. PostgreSQL 10 öncesinde bu desteklenmiyordu.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Son ders: **Partition Pruning** — planlayıcının hangi partition'ları atladığını EXPLAIN ile doğrula ve dinamik parametre davranışını anla.

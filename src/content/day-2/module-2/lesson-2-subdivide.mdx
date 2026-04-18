@@ -1,0 +1,110 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Subdivide` ile büyük poligonu küçük parçalara bölebileceksin
+- Büyük geometrilerin GIST indeks verimliliğini neden düşürdüğünü açıklayabileceksin
+- `max_vertices` parametresini doğru ayarlayabileceksin
+
+---
+
+## 📖 Kavram: Büyük Poligon Sorunu
+
+GIST indeksi her geometri için bir **bounding box** saklar. Büyük bir ülke poligonu (ör. Türkiye — binlerce nokta) tüm Türkiye'yi kapsayan dev bir bounding box üretir. Bu bbox Türkiye'yi kesen **her sorguya** yanıt verir — çoğu gereksiz.
+
+**Çözüm:** `ST_Subdivide(geom, max_vertices)` — büyük poligonu 256 noktalı küçük parçalara böler. Her parçanın daha küçük bbox'ı → daha seçici indeks.
+
+```
+1 büyük poligon (10000 nokta) → 40+ küçük parça (her biri ≤256 nokta)
+```
+
+---
+
+## ▶ Canlı Örnek — Subdivide
+
+<RunnableBlock
+  sql={`WITH buyuk_poli AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'POLYGON((26 36, 45 36, 45 42, 26 42, 26 36))'), 4326) AS geom
+),
+-- Yoğun noktalı poligon simüle et: buffer ile köşeler ekle
+detayli AS (
+  SELECT ST_Buffer(geom::geography, 1000)::geometry AS geom FROM buyuk_poli
+)
+SELECT
+  ST_NPoints(geom)                          AS orijinal_nokta,
+  COUNT(*)                                  AS subdivide_parca
+FROM detayli,
+LATERAL (
+  SELECT 1 FROM ST_Subdivide(geom, 64) AS sub
+) sub
+GROUP BY geom;`}
+  label="Subdivide parça sayısı"
+/>
+
+---
+
+## ▶ Subdivide ile Tablo Oluştur
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS buyuk_alan (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POLYGON, 4326)
+);
+
+-- Karmaşık bir poligon simüle et (buffer → çok noktalı)
+INSERT INTO buyuk_alan (ad, geom)
+SELECT
+  'Türkiye kutu',
+  ST_Buffer(
+    ST_SetSRID(ST_GeomFromText('POLYGON((26 36,45 36,45 42,26 42,26 36))'), 4326)::geography,
+    10000
+  )::geometry(POLYGON, 4326)
+ON CONFLICT DO NOTHING;
+
+-- Subdivide tablosu
+CREATE TABLE IF NOT EXISTS buyuk_alan_sub AS
+SELECT id, ad, ST_Subdivide(geom, 128) AS geom
+FROM buyuk_alan;
+
+SELECT
+  (SELECT ST_NPoints(geom) FROM buyuk_alan LIMIT 1) AS orijinal_nokta,
+  COUNT(*) AS parca_sayisi,
+  MAX(ST_NPoints(geom)) AS max_nokta_per_parca
+FROM buyuk_alan_sub;`}
+  label="Subdivide tablosu oluştur"
+/>
+
+---
+
+## 🧪 Dene — Neden 256?
+
+<RunnableBlock
+  sql={`WITH poli AS (
+  SELECT ST_Buffer(
+    ST_SetSRID(ST_MakePoint(29.0, 41.0), 4326)::geography,
+    50000
+  )::geometry AS geom
+)
+SELECT
+  max_v,
+  COUNT(*) AS parca
+FROM poli,
+LATERAL (VALUES (32),(64),(128),(256)) AS t(max_v),
+LATERAL ST_Subdivide(geom, max_v) AS sub
+GROUP BY max_v ORDER BY max_v;`}
+  label="max_vertices etkisi"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Subdivide set döndürür:** `SELECT ST_Subdivide(geom, 128) FROM tablo` → her satır için birden fazla satır üretir. `LATERAL` veya `CREATE TABLE AS` kullan.
+2. **Orijinal tabloyu değiştirme:** Subdivide tablosu ayrı oluşturulur. Orijinal tablo ihtiyaç duyulanabilir (ör. etiket için).
+3. **max_vertices < 8 hatası:** Minimum değer 8. Çok küçük parçalar büyük overhead yaratır — 64-256 arası pratik.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste çizgiler üzerinde konumlandırma: **lineer referanslama**.

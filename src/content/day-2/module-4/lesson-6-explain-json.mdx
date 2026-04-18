@@ -1,0 +1,136 @@
+## 🎯 Ne öğreneceksin?
+
+- `EXPLAIN (FORMAT JSON)` çıktısını parse edip temel metrikleri çıkarabileceksin
+- Hangi node'un en çok zaman harcadığını bulabileceksin
+- `Planning Time` ve `Execution Time` değerlerini yorumlayabileceksin
+
+---
+
+## 📖 Kavram: JSON Plan Formatı
+
+`FORMAT JSON` ile plan hiyerarşik bir JSON objesi olarak döner:
+
+```json
+[{
+  "Plan": {
+    "Node Type": "Aggregate",
+    "Startup Cost": 0.00,
+    "Total Cost": 1234.56,
+    "Plan Rows": 1,
+    "Actual Total Time": 45.2,
+    "Plans": [{
+      "Node Type": "Index Scan",
+      ...
+    }]
+  },
+  "Planning Time": 0.5,
+  "Execution Time": 45.8
+}]
+```
+
+Bu format `explain.depesz.com`, pgAdmin, DBeaver gibi araçlara yapıştırılabilir.
+
+---
+
+## ▶ Canlı Örnek — JSON Plan
+
+<RunnableBlock
+  sql={`EXPLAIN (ANALYZE, FORMAT JSON)
+SELECT COUNT(*)
+FROM noktalar_perf
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  150000
+);`}
+  label="EXPLAIN JSON çıktısı"
+/>
+
+---
+
+## ▶ JSON'dan Metrik Çıkar
+
+<RunnableBlock
+  sql={`-- JSON planı parse et ve temel metrikleri göster
+WITH plan_json AS (
+  SELECT (
+    EXPLAIN (ANALYZE, FORMAT JSON)
+    SELECT COUNT(*) FROM noktalar_perf
+    WHERE ST_DWithin(
+      geom::geography,
+      ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+      150000)
+  )[0] AS plan
+)
+SELECT
+  plan->'Plan'->>'Node Type'             AS kok_node,
+  (plan->'Plan'->>'Total Cost')::numeric AS toplam_maliyet,
+  plan->>'Planning Time'                 AS planlama_ms,
+  plan->>'Execution Time'                AS yurutme_ms
+FROM plan_json;`}
+  label="JSON planından metrik çıkarma"
+/>
+
+---
+
+## ▶ En Pahalı Node'u Bul
+
+<RunnableBlock
+  sql={`-- Recursive CTE ile tüm node'ları düzleştir
+WITH RECURSIVE nodes AS (
+  SELECT (
+    EXPLAIN (ANALYZE, FORMAT JSON)
+    SELECT a.id, COUNT(b.id)
+    FROM noktalar_perf a
+    LEFT JOIN noktalar_perf b
+      ON ST_DWithin(a.geom::geography, b.geom::geography, 5000)
+    WHERE a.id <= 10
+    GROUP BY a.id
+  )[0]->'Plan' AS node
+  UNION ALL
+  SELECT jsonb_array_elements(node->'Plans') FROM nodes
+  WHERE node ? 'Plans'
+)
+SELECT
+  node->>'Node Type'                    AS node_tipi,
+  (node->>'Actual Total Time')::numeric AS ms
+FROM nodes
+WHERE node->>'Actual Total Time' IS NOT NULL
+ORDER BY ms DESC
+LIMIT 10;`}
+  label="En pahalı node — recursive CTE"
+/>
+
+---
+
+## 🧪 Dene — Planning Time Problemi
+
+<RunnableBlock
+  sql={`-- Planlama süresi bazen execution'dan uzun olabilir
+-- Karmaşık sorgu şemasında bu olur
+EXPLAIN (ANALYZE, FORMAT JSON)
+SELECT
+  a.id,
+  ST_AsText(a.geom) AS wkt,
+  COUNT(b.id) AS yakın_nokta
+FROM noktalar_perf a
+JOIN noktalar_perf b
+  ON ST_DWithin(a.geom::geography, b.geom::geography, 1000)
+WHERE a.id BETWEEN 1 AND 5
+GROUP BY a.id, a.geom;`}
+  label="Planlama süresi ölçümü"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **JSON plan `EXPLAIN` sonucunun ilk elementi:** Sonuç bir JSON array'dir — `[0]` ile al.
+2. **`Actual Total Time` cumulative:** Parent node, tüm child node sürelerini içerir. En uzun leaf node asıl darboğazdır.
+3. **PGlite'ta JSON fonksiyonları:** PGlite `->` ve `->>` JSON operatörlerini destekler ama `jsonb_path_query` desteği sınırlı olabilir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 2.4 tamamlandı! Sırada **Modül 2.5 — Büyük Veri ve Partitioning**: VACUUM, tablo partitioning ve partition pruning.

@@ -1,0 +1,102 @@
+## 🎯 Ne öğreneceksin?
+
+- `EXPLAIN` ile `EXPLAIN ANALYZE` arasındaki farkı söyleyebileceksin
+- Plan çıktısının temel anatomisini (node tipi, cost, rows, actual time) okuyabileceksin
+- `BUFFERS` ve `FORMAT JSON` seçeneklerini kullanabileceksin
+
+---
+
+## 📖 Kavram: EXPLAIN vs EXPLAIN ANALYZE
+
+| Komut | Ne yapar? | Sorguyu çalıştırır mı? |
+|---|---|---|
+| `EXPLAIN` | Tahmini plan gösterir | **Hayır** |
+| `EXPLAIN ANALYZE` | Gerçek çalışma süresini ölçer | **Evet** |
+| `EXPLAIN (ANALYZE, BUFFERS)` | + bellek/disk erişim sayısı | Evet |
+| `EXPLAIN (FORMAT JSON)` | Makine-okunabilir çıktı | Hayır (varsayılan ANALYZE'sız) |
+
+**Temel kural:** Yavaş sorguyu debug ederken `EXPLAIN ANALYZE BUFFERS` kullan. Sadece plan görmek istiyorsan `EXPLAIN` yeterli.
+
+---
+
+## 📖 Plan Anatomisi
+
+```
+Seq Scan on noktalar_perf  (cost=0.00..1234.56 rows=50000 width=32)
+                                     ↑           ↑       ↑
+                               başlangıç       tahmini  ortalama
+                               maliyeti        satır    satır
+                               (ilk satır)              boyutu
+                             bitiş maliyeti
+```
+
+`EXPLAIN ANALYZE` ile gerçek değerler de gelir:
+
+```
+  (actual time=0.043..12.345 rows=48923 loops=1)
+               ↑        ↑       ↑        ↑
+            ilk satır  son   gerçek    kaç kez
+            ms         ms    satır     çalıştı
+```
+
+---
+
+## ▶ Canlı Örnek — İlk EXPLAIN ANALYZE
+
+<RunnableBlock
+  sql={`-- Basit bir plan okuyalım
+EXPLAIN ANALYZE
+SELECT COUNT(*)
+FROM noktalar_perf
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+  100000
+);`}
+  label="İlk EXPLAIN ANALYZE"
+/>
+
+---
+
+## ▶ BUFFERS ile Bellek Erişimi
+
+<RunnableBlock
+  sql={`EXPLAIN (ANALYZE, BUFFERS)
+SELECT id, ST_AsText(geom) AS wkt
+FROM noktalar_perf
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography,
+  50000
+)
+LIMIT 10;`}
+  label="EXPLAIN ANALYZE BUFFERS"
+/>
+
+> **Shared hit:** sayfa önbellekten okundu. **Shared read:** diskten okundu. Hit >> Read → önbellek sıcak.
+
+---
+
+## 🧪 Dene — FORMAT JSON
+
+<RunnableBlock
+  sql={`-- JSON formatında plan — araçlar bu formatı kullanır
+EXPLAIN (FORMAT JSON)
+SELECT COUNT(*) FROM noktalar_perf
+WHERE geom && ST_MakeEnvelope(28.5, 40.8, 29.5, 41.5, 4326);`}
+  label="JSON formatında plan"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`EXPLAIN ANALYZE` DML'i gerçekten çalıştırır:** `UPDATE`, `DELETE`, `INSERT` ile kullanırsan veriyi değiştirir. `BEGIN; EXPLAIN ANALYZE ...; ROLLBACK;` yap.
+2. **İlk çalışma yavaş:** Önbellek soğuk, disk okuması fazla. Gerçekçi ölçüm için 2-3 kez çalıştır.
+3. **cost birimi rastgele:** `seq_page_cost=1.0` referansıyla hesaplanır. Farklı konfigürasyonlarda cost değerleri farklı olabilir — kendi başına anlamsız, karşılaştırmalı anlamlı.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste plan tiplerini yakından inceleyeceğiz: **Seq Scan, Index Scan, Bitmap Scan** — ne zaman hangisi?

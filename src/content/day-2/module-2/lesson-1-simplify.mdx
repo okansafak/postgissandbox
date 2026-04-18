@@ -1,0 +1,100 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Simplify` ile geometri boyutunu küçültebileceksin
+- `ST_SimplifyPreserveTopology` ile topoloji bozulmasını önleyebileceksin
+- Web haritası için uygun sadeleştirme toleransını belirleyebileceksin
+
+---
+
+## 📖 Kavram: Neden Sadeleştirme?
+
+Yüksek çözünürlüklü il/ülke sınırları binlerce noktadan oluşur. Web'de küçük ölçekte gösterildiğinde bu detay gereksizdir — ve ağır veri aktarımına yol açar.
+
+**Douglas-Peucker algoritması:** Belirli bir tolerans içindeki noktaları eler.
+
+| Fonksiyon | Topoloji | Kullanım |
+|---|---|---|
+| `ST_Simplify(geom, tol)` | Korumaz | Hızlı, basit render |
+| `ST_SimplifyPreserveTopology(geom, tol)` | Korur | Komşu poligonlar, sınır paylaşımı |
+
+**Tolerans birimi = SRID birimi** — 4326'da derece, UTM'de metre.
+
+---
+
+## ▶ Canlı Örnek — Tolerans Karşılaştırması
+
+<RunnableBlock
+  sql={`WITH karmasik AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'LINESTRING(28.9 41.0, 28.95 41.02, 29.0 41.01, 29.05 41.03,
+                29.1 41.0, 29.15 40.99, 29.2 41.01, 29.25 41.0,
+                29.3 40.98, 29.35 41.0, 29.4 40.99, 29.5 41.0)'),
+    4326) AS geom
+)
+SELECT
+  ST_NPoints(geom)                         AS nokta_orijinal,
+  ST_NPoints(ST_Simplify(geom, 0.05))      AS nokta_simplify_005,
+  ST_NPoints(ST_Simplify(geom, 0.1))       AS nokta_simplify_01,
+  ST_NPoints(ST_SimplifyPreserveTopology(geom,0.05)) AS nokta_spt_005,
+  ST_Simplify(geom, 0.05) AS geom
+FROM karmasik;`}
+  label="Sadeleştirme karşılaştırması"
+  autoFit
+/>
+
+---
+
+## ▶ Topoloji Bozulması Örneği
+
+<RunnableBlock
+  sql={`WITH poli AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'POLYGON((0 0,0.1 0,0.2 0.05,0.3 0,0.4 0.1,0.3 0.2,0.2 0.15,0.1 0.2,0 0.1,0 0))'),
+    4326) AS geom
+)
+SELECT
+  ST_IsValid(geom)                            AS orijinal_gecerli,
+  ST_IsValid(ST_Simplify(geom,0.1))           AS simplify_gecerli,
+  ST_IsValid(ST_SimplifyPreserveTopology(geom,0.1)) AS spt_gecerli,
+  ST_NPoints(geom)                            AS orijinal_nokta,
+  ST_NPoints(ST_Simplify(geom,0.1))           AS simplify_nokta,
+  ST_NPoints(ST_SimplifyPreserveTopology(geom,0.1)) AS spt_nokta
+FROM poli;`}
+  label="ST_Simplify vs PreserveTopology"
+/>
+
+---
+
+## 🎯 Egzersiz — Rota Sadeleştirme
+
+<RunnableBlock
+  sql={`WITH rota AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'LINESTRING(28.979 41.015,29.0 41.0,29.05 40.98,29.1 40.95,
+                29.2 40.9,29.3 40.85,29.5 40.75,29.8 40.6,
+                30.0 40.5,30.3 40.35,30.7 40.2,31.0 40.1)'),
+    4326) AS geom
+)
+SELECT
+  ST_Length(geom::geography)/1000                           AS uzunluk_km,
+  ST_NPoints(geom)                                          AS nokta_sayisi,
+  ST_NPoints(ST_SimplifyPreserveTopology(geom, 0.05))       AS sadeles_nokta,
+  ST_SimplifyPreserveTopology(geom, 0.05)                   AS geom
+FROM rota;`}
+  label="Rota sadeleştirme"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **4326 tolerans = derece:** `ST_Simplify(geom_4326, 100)` → 100 derece = neredeyse tüm noktaları siler. UTM kullanıyorsan metre. 4326 için ~0.001 (≈111m), 0.01 (≈1.1km).
+2. **ST_Simplify poligonu geçersizleştirebilir:** Sonucu `ST_IsValid` ile kontrol et ve gerekirse `ST_MakeValid` uygula.
+3. **Rendering için `ST_SimplifyPreserveTopology` yeter:** Sadece web render için bile topoloji korumalı versiyonu tercih et — maliyeti küçük, güvenliği büyük.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste büyük poligonları verimli sorgulamak için: **`ST_Subdivide`**.

@@ -1,0 +1,124 @@
+## 🎯 Ne öğreneceksin?
+
+- Staging tablosu desenini açıklayabileceksin
+- Ham veriyi temizleyip hedef tabloya aktarabileceksin
+- `ON CONFLICT`, `WHERE` koşulları ve NULL kontrollerini kullanabileceksin
+
+---
+
+## 📖 Kavram: Staging Deseni
+
+Ham veriyi doğrudan hedef tabloya koymak hatalara davetiye çıkarır. **Staging deseni**:
+
+```
+Ham veri → Staging (TEXT) → Temizle/Doğrula → Hedef (geometry)
+```
+
+Avantajları:
+- Ham veri kaybolmaz (rollback imkânı)
+- Dönüşüm hatası orijinali etkilemez
+- Raporlama: kaç satır başarılı/başarısız?
+
+---
+
+## ▶ Tam Staging Akışı
+
+<RunnableBlock
+  sql={`-- 1. Staging tablosu — her şey TEXT
+CREATE TABLE IF NOT EXISTS stg_mekanlar (
+  id         SERIAL,
+  ham_ad     TEXT,
+  ham_tur    TEXT,
+  ham_lon    TEXT,
+  ham_lat    TEXT,
+  yukleme_ts TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Ham veri ekle (gerçekte dosyadan gelir)
+INSERT INTO stg_mekanlar (ham_ad, ham_tur, ham_lon, ham_lat) VALUES
+  ('Sultanahmet Camii', 'cami',    '28.9760',  '41.0055'),
+  ('Aya Sofya',         'müze',    '28.9798',  '41.0082'),
+  ('Kapalıçarşı',       'çarşı',   '28,9670',  '41.0106'),  -- virgüllü ondalık!
+  ('Boğaz Köprüsü',     'köprü',   'hatalı',   '41.0463'),  -- geçersiz lon!
+  ('Dolmabahçe',        'saray',   '29.0012',  NULL);        -- lat yok!
+
+SELECT * FROM stg_mekanlar;`}
+  label="Staging'e ham veri yükle"
+/>
+
+---
+
+## ▶ Doğrulama: Geçerli / Geçersiz Satırlar
+
+<RunnableBlock
+  sql={`SELECT
+  id,
+  ham_ad,
+  CASE
+    WHEN ham_lon IS NULL OR ham_lat IS NULL THEN 'NULL koordinat'
+    WHEN REPLACE(ham_lon,',','.') !~ '^-?[0-9]+\.?[0-9]*$' THEN 'Geçersiz lon'
+    WHEN REPLACE(ham_lat,',','.') !~ '^-?[0-9]+\.?[0-9]*$' THEN 'Geçersiz lat'
+    ELSE 'Geçerli'
+  END AS durum
+FROM stg_mekanlar;`}
+  label="Staging doğrulama raporu"
+/>
+
+---
+
+## ▶ Temiz Satırları Hedef Tabloya Aktar
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS mekanlar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT NOT NULL,
+  tur  TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO mekanlar (ad, tur, geom)
+SELECT
+  ham_ad,
+  ham_tur,
+  ST_SetSRID(
+    ST_MakePoint(
+      REPLACE(ham_lon, ',', '.')::FLOAT,
+      REPLACE(ham_lat, ',', '.')::FLOAT
+    ),
+    4326
+  )
+FROM stg_mekanlar
+WHERE
+  ham_lon IS NOT NULL AND ham_lat IS NOT NULL
+  AND REPLACE(ham_lon,',','.') ~ '^-?[0-9]+\.?[0-9]*$'
+  AND REPLACE(ham_lat,',','.') ~ '^-?[0-9]+\.?[0-9]*$'
+ON CONFLICT DO NOTHING;
+
+-- Kaç satır aktarıldı?
+SELECT COUNT(*) AS hedef_kayit FROM mekanlar;`}
+  label="Temiz satırları aktar"
+/>
+
+---
+
+## ▶ Haritada Gör
+
+<RunnableBlock
+  sql={`SELECT geom, ad AS label FROM mekanlar;`}
+  label="Temizlenen mekanlar haritada"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`::FLOAT` hata fırlatır:** `'hatalı'::FLOAT` → `ERROR`. `REPLACE` + regex koşul ile önce filtrele.
+2. **Staging'i silme:** Yükleme tamamlandıktan sonra staging tablosunu `DROP` yerine `TRUNCATE` yap — şema kalsın, veri gitsin.
+3. **Duplicate kayıtlar:** `ON CONFLICT DO NOTHING` sadece PRIMARY KEY/UNIQUE çakışmasında atlar. Coğrafi duplicate için `ST_DWithin` + EXISTS koşulu kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste tablodaki tüm SRID sorunlarını toplu düzelten yöntem: `ST_SetSRID + ST_Transform` kombinasyonu.

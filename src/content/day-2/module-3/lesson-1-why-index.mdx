@@ -1,0 +1,104 @@
+## 🎯 Ne öğreneceksin?
+
+- B-Tree indeksin neden poligonlarla çalışmadığını açıklayabileceksin
+- GIST indeksinin temel mantığını özetleyebileceksin
+- İndekssiz mekansal sorgunun maliyetini görebileceksin
+
+---
+
+## 📖 Kavram: B-Tree Neden Yetmez?
+
+Klasik B-Tree indeks **sıralı** verileri destekler: sayılar, metinler, tarihler. "28.979 < X < 32.854" gibi aralık sorguları çalışır.
+
+Ama "Bu poligon o poligonla kesişiyor mu?" sorusu **iki boyutlu** — başlangıç/bitiş değeri yoktur. B-Tree bu soru için sequential scan'dan daha iyi yapamaz.
+
+### GIST (Generalized Search Tree)
+
+R-Tree tabanlı mekansal indeks. Her geometri için **bounding box (MBR)** saklar. Sorguda:
+
+1. **Hızlı faz:** bbox'lar kesişiyor mu? (indeks kullanır)
+2. **Kesin faz:** Gerçek geometri testi (indeks sonrası)
+
+```
+İndekssiz: Tüm tabloyu tara → N geometri testi
+İndeksli:  bbox filtresi → k aday → k geometri testi  (k << N)
+```
+
+---
+
+## ▶ Canlı Örnek — İndekssiz Sorgu Maliyeti
+
+<RunnableBlock
+  sql={`-- Test tablosu: 1000 nokta
+CREATE TABLE IF NOT EXISTS noktalar_perf (
+  id   SERIAL PRIMARY KEY,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO noktalar_perf (geom)
+SELECT ST_SetSRID(
+  ST_MakePoint(
+    26 + random() * 19,   -- 26-45 boylam (Türkiye)
+    36 + random() * 6     -- 36-42 enlem
+  ), 4326)
+FROM generate_series(1, 1000);
+
+-- İndekssiz sorgu planı
+EXPLAIN SELECT COUNT(*)
+FROM noktalar_perf
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  100000);`}
+  label="İndekssiz sorgu planı"
+/>
+
+---
+
+## ▶ İndeks Ekle ve Karşılaştır
+
+<RunnableBlock
+  sql={`-- GIST indeks oluştur
+CREATE INDEX IF NOT EXISTS idx_noktalar_perf_geom
+  ON noktalar_perf USING gist(geom);
+
+ANALYZE noktalar_perf;
+
+-- Şimdi aynı sorgunun planı
+EXPLAIN SELECT COUNT(*)
+FROM noktalar_perf
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  100000);`}
+  label="GIST sonrası sorgu planı"
+/>
+
+---
+
+## 🧪 Dene — Kaç Nokta Kapsıyor?
+
+<RunnableBlock
+  sql={`SELECT COUNT(*)
+FROM noktalar_perf
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+  200000  -- 200 km
+);`}
+  label="200 km içindeki nokta sayısı"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **İndeks otomatik kullanılmaz her zaman:** Çok küçük tablolarda planner sequential scan tercih edebilir — bu doğrudur, indeks overhead'i büyük tablolarda karlı.
+2. **ANALYZE unutulursa:** `CREATE INDEX` sonrası `ANALYZE` çalıştırılmazsa planner eski istatistikleri kullanır.
+3. **geography sütun için ayrı indeks:** `geom GEOMETRY(POINT,4326)` sütuna `GIST(geom)` indeks, `geom::geography` sorgusunda da kullanılır — cast indeksi devre dışı bırakmaz.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste GIST indeksi oluşturma detayları ve `CREATE INDEX` sözdizimi.

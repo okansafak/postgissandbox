@@ -1,0 +1,110 @@
+## 🎯 Ne öğreneceksin?
+
+- Sequential Scan, Index Scan ve Bitmap Heap Scan arasındaki farkı açıklayabileceksin
+- Planlayıcının neden bazen index varken seq scan seçtiğini anlayabileceksin
+- `enable_seqscan` ile zorlamalı test yapabileceksin
+
+---
+
+## 📖 Kavram: Üç Temel Scan Tipi
+
+| Scan Tipi | Ne zaman? | Index kullanır mı? |
+|---|---|---|
+| **Seq Scan** | Tablonun büyük bölümü okunacak | Hayır |
+| **Index Scan** | Az satır döndürecek, seçici sorgu | Evet |
+| **Bitmap Heap Scan** | Orta seçicilik; önce index, sonra heap | Evet (Bitmap Index Scan ile) |
+
+**Önemli:** Index var diye index kullanılmaz. Planner cost karşılaştırır:
+- 1000 satırdan 900'ünü okuyacaksan → Seq Scan daha ucuz (random I/O vs sequential I/O)
+- 1000 satırdan 10'unu okuyacaksan → Index Scan daha ucuz
+
+---
+
+## ▶ Seq Scan vs Index Scan
+
+<RunnableBlock
+  sql={`-- Önce hazırlık tablosu (5000 kayıt)
+CREATE TABLE IF NOT EXISTS noktalar_scan (
+  id   SERIAL PRIMARY KEY,
+  tur  TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO noktalar_scan (tur, geom)
+SELECT
+  CASE WHEN i % 100 = 0 THEN 'ozel' ELSE 'normal' END,
+  ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326)
+FROM generate_series(1, 5000) i
+ON CONFLICT DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_scan_geom ON noktalar_scan USING gist(geom);
+ANALYZE noktalar_scan;
+
+-- Büyük seçim → Seq Scan beklenir
+EXPLAIN SELECT COUNT(*) FROM noktalar_scan WHERE tur = 'normal';`}
+  label="Büyük seçim — Seq Scan"
+/>
+
+---
+
+## ▶ Küçük Seçim → Index Scan
+
+<RunnableBlock
+  sql={`-- Küçük alan sorgusu → Index Scan beklenir
+EXPLAIN ANALYZE
+SELECT * FROM noktalar_scan
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  10000  -- 10 km
+);`}
+  label="Küçük alan — Index Scan"
+/>
+
+---
+
+## ▶ Bitmap Heap Scan
+
+<RunnableBlock
+  sql={`-- Orta boyut alan → Bitmap Heap Scan
+EXPLAIN ANALYZE
+SELECT * FROM noktalar_scan
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  500000  -- 500 km — geniş alan
+);`}
+  label="Geniş alan — Bitmap Heap Scan"
+/>
+
+---
+
+## 🧪 Dene — Seq Scan'ı Zorla Kapat
+
+<RunnableBlock
+  sql={`-- Seq scan'ı geçici kapat — planner index'e zorla
+SET enable_seqscan = off;
+
+EXPLAIN ANALYZE
+SELECT COUNT(*) FROM noktalar_scan WHERE tur = 'normal';
+
+-- Geri aç!
+SET enable_seqscan = on;`}
+  label="Seq Scan kapatılınca plan değişir"
+/>
+
+> `SET enable_seqscan = off` sadece test için. Üretimde bu ayarı değiştirme — planner başka kötü kararlar verebilir.
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Planner her zaman doğru değil:** İstatistikler bayatsa yanlış plan seçilir. `ANALYZE` çalıştır.
+2. **Küçük tablo = Seq Scan:** 100 satırlık tablo için index scan overhead'i seq scan'dan pahalıdır. Bu normaldir.
+3. **Bitmap Scan `Recheck Cond`:** `EXPLAIN` çıktısında `Recheck Cond` satırı görürsün — bu index scan sonrası gerçek geometri testinin yapıldığını gösterir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste plan çıktısını daha derinlemesine okuyacağız: **cost ve rows tahmini nasıl yorumlanır?**

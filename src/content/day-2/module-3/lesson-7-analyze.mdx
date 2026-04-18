@@ -1,0 +1,109 @@
+## 🎯 Ne öğreneceksin?
+
+- `ANALYZE` komutunun ne yaptığını ve neden zorunlu olduğunu açıklayabileceksin
+- Sorgu planlayıcısının istatistikleri nasıl kullandığını anlayabileceksin
+- `pg_stats` ile sütun istatistiklerini inceleyebileceksin
+
+---
+
+## 📖 Kavram: Planlayıcı ve İstatistikler
+
+PostgreSQL sorgu planlayıcısı her sorguda şunu sorar: "Sequential scan mi, index scan mı, hash join mı — hangisi daha ucuz?"
+
+Bu kararı vermek için **satır sayısı tahminine** ihtiyacı vardır. Bu tahminler `pg_statistic` sisteminde saklanır ve yalnızca `ANALYZE` ile güncellenir.
+
+```sql
+ANALYZE;                    -- Tüm tablolar
+ANALYZE tablo_adi;          -- Tek tablo
+VACUUM ANALYZE tablo_adi;   -- Ölü satırları temizle + istatistik güncelle
+```
+
+**autovacuum** normalde bunu otomatik yapar — ama büyük toplu yükleme sonrası **manuel** çalıştırmak gerekir.
+
+---
+
+## ▶ Canlı Örnek — Analiz Öncesi vs Sonrası
+
+<RunnableBlock
+  sql={`-- Yeni tablo — henüz ANALYZE yok
+CREATE TABLE IF NOT EXISTS test_analyze (
+  id   SERIAL PRIMARY KEY,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO test_analyze (geom)
+SELECT ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326)
+FROM generate_series(1, 500);
+
+CREATE INDEX IF NOT EXISTS idx_test_analyze ON test_analyze USING gist(geom);
+
+-- Planlayıcı tahminini gör (ANALYZE öncesi — tahmin yanlış olabilir)
+EXPLAIN SELECT COUNT(*) FROM test_analyze
+WHERE ST_DWithin(geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 200000);`}
+  label="ANALYZE öncesi plan tahmini"
+/>
+
+---
+
+## ▶ ANALYZE Çalıştır ve Karşılaştır
+
+<RunnableBlock
+  sql={`ANALYZE test_analyze;
+
+-- Şimdi planlayıcı doğru istatistiklere sahip
+EXPLAIN SELECT COUNT(*) FROM test_analyze
+WHERE ST_DWithin(geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 200000);`}
+  label="ANALYZE sonrası plan tahmini"
+/>
+
+---
+
+## ▶ pg_stats — Sütun İstatistikleri
+
+<RunnableBlock
+  sql={`SELECT
+  tablename,
+  attname AS sutun,
+  null_frac      AS null_orani,
+  n_distinct     AS farkli_deger,
+  most_common_vals
+FROM pg_stats
+WHERE tablename = 'test_analyze'
+  AND attname = 'id'
+LIMIT 5;`}
+  label="pg_stats istatistik görüntüle"
+/>
+
+---
+
+## 🧪 Dene — Büyük Yükleme Sonrası
+
+<RunnableBlock
+  sql={`-- 500 satır daha ekle
+INSERT INTO test_analyze (geom)
+SELECT ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326)
+FROM generate_series(1, 500);
+
+-- Toplam satır sayısı
+SELECT reltuples::bigint AS planlayici_tahmini,
+       (SELECT COUNT(*) FROM test_analyze) AS gercek_sayi
+FROM pg_class WHERE relname = 'test_analyze';
+-- Fark var mı? ANALYZE çalıştırılmadan planlayıcı eski sayıyı bilir`}
+  label="Yükleme sonrası istatistik farkı"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ANALYZE sadece okur, kilitlemez:** `ANALYZE` tablo okurken bile concurrent DML çalışabilir. Güvenle çalıştır.
+2. **CREATE INDEX ANALYZE gerektirmez:** İndeks oluşturulduğunda otomatik küçük bir istatistik güncellemesi yapılır ama tam `ANALYZE` yerini tutmaz.
+3. **default_statistics_target:** Varsayılan 100. Çok geniş dağılımlı sütunlar için `ALTER TABLE t ALTER COLUMN geom SET STATISTICS 500` ile artır.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 2.3 tamamlandı! Sırada **Modül 2.4 — EXPLAIN ANALYZE**: sorgu planını oku, yavaş sorguları tespit et ve düzelt.

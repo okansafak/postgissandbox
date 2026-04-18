@@ -1,0 +1,124 @@
+## 🎯 Ne öğreneceksin?
+
+- Tüm bir tablodaki geometrileri toplu `UPDATE` ile dönüştürebileceksin
+- `ST_SetSRID + ST_Transform` zincirini doğru sırada uygulayabileceksin
+- `ANALYZE` sonrası istatistiklerin neden güncellendiğini açıklayabileceksin
+
+---
+
+## 📖 Kavram: Toplu Dönüşüm
+
+Gerçek veri genellikle karışık gelir:
+- Bazı satırlar SRID=-1 (etiketsiz)
+- Bazıları yanlış SRID ile etiketli
+- Bazıları UTM'de, bazıları 4326'da
+
+**Çözüm:** `UPDATE` + `ST_Transform(ST_SetSRID(geom, kaynak), hedef)`
+
+---
+
+## ▶ Senaryo: Karışık SRID'li Tablo
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS karisik_noktalar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY,
+  kaynak_srid INT
+);
+
+INSERT INTO karisik_noktalar (ad, geom, kaynak_srid) VALUES
+  -- Doğru 4326
+  ('İstanbul', ST_SetSRID(ST_MakePoint(28.979,41.015),4326), 4326),
+  -- SRID eksik
+  ('Ankara',   ST_MakePoint(32.854,39.930),                  -1),
+  -- UTM 36N olması gereken ama etiket yanlış
+  ('Koordinat A', ST_SetSRID(ST_MakePoint(500000,4400000),32636), 32636)
+ON CONFLICT DO NOTHING;
+
+SELECT id, ad, ST_SRID(geom) AS mevcut_srid, ST_AsText(geom) AS geom_text
+FROM karisik_noktalar;`}
+  label="Karışık SRID tablosu"
+/>
+
+---
+
+## ▶ Toplu Düzeltme: SRID=-1 Olanları Etiketle
+
+<RunnableBlock
+  sql={`-- Adım 1: SRID=-1 olanları 4326 olarak etiketle
+UPDATE karisik_noktalar
+SET geom = ST_SetSRID(geom, 4326)
+WHERE ST_SRID(geom) = -1 OR ST_SRID(geom) IS NULL;
+
+-- Adım 2: UTM 36N olanları 4326'ya dönüştür
+UPDATE karisik_noktalar
+SET geom = ST_Transform(geom, 4326)
+WHERE ST_SRID(geom) = 32636;
+
+-- Sonucu kontrol et
+SELECT id, ad, ST_SRID(geom) AS yeni_srid,
+  ROUND(ST_X(geom)::numeric, 4) AS lon,
+  ROUND(ST_Y(geom)::numeric, 4) AS lat
+FROM karisik_noktalar;`}
+  label="Toplu SRID düzeltmesi"
+/>
+
+---
+
+## ▶ ALTER COLUMN ile Tip Kısıtlaması Ekle
+
+<RunnableBlock
+  sql={`-- Tüm geometriler 4326'ya döndükten sonra kısıtlama ekle
+CREATE TABLE IF NOT EXISTS noktalar_typed (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO noktalar_typed (ad, geom)
+SELECT ad, geom::geometry(POINT, 4326)
+FROM karisik_noktalar
+WHERE ST_SRID(geom) = 4326;
+
+-- İstatistikleri güncelle (sorgu planlayıcısı için)
+ANALYZE noktalar_typed;
+
+SELECT COUNT(*) AS aktarilan FROM noktalar_typed;`}
+  label="Typed tabloye aktar + ANALYZE"
+/>
+
+---
+
+## 🧪 Dene — Toplu Transform
+
+<RunnableBlock
+  sql={`-- UTM noktalarını 4326'ya dönüştür
+WITH utm_noktalar AS (
+  SELECT 'A Noktası' AS ad, ST_SetSRID(ST_MakePoint(649000, 4542000), 32635) AS geom
+  UNION ALL SELECT 'B Noktası', ST_SetSRID(ST_MakePoint(651000, 4540000), 32635)
+  UNION ALL SELECT 'C Noktası', ST_SetSRID(ST_MakePoint(647000, 4544000), 32635)
+)
+SELECT
+  ad,
+  ST_AsText(geom)                 AS utm_35n,
+  ST_AsText(ST_Transform(geom,4326)) AS wgs84,
+  ST_Transform(geom,4326)            AS geom
+FROM utm_noktalar;`}
+  label="UTM → WGS84 toplu dönüşüm"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **UPDATE öncesi backup:** `CREATE TABLE backup AS SELECT * FROM tablo` — UPDATE geri alınamaz.
+2. **ANALYZE ne zaman?** Tablo verisinin %10'dan fazlası değişince query planner eski istatistiklerle çalışabilir. Büyük INSERT/UPDATE sonrası `ANALYZE tablo` çalıştır.
+3. **SET geom = ST_Transform(geom, 4326) sonsuz döngü:** Zaten 4326 olan satırlara WHERE koşulu koy — aksi hâlde 4326→4326 dönüşümü zararsız ama gereksiz yavaş.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 2.1 tamamlandı! Sırada **Modül 2.2 — İleri Geometri İşlemleri**: `ST_Simplify`, `ST_Subdivide`, lineer referanslama.

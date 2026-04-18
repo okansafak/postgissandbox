@@ -1,0 +1,102 @@
+## 🎯 Ne öğreneceksin?
+
+- `pg_stat_user_indexes` ile hangi indekslerin kullanıldığını sorgulayabileceksin
+- Kullanılmayan indeksleri tespit edip kaldırabileceksin
+- `pg_indexes` ve `pg_stat_user_tables` ile tablo+indeks sağlığını izleyebileceksin
+
+---
+
+## 📖 Kavram: İndeks Kullanım İzleme
+
+İndeks oluşturdun — ama sorgu planner gerçekten kullanıyor mu? PostgreSQL bunu takip eder:
+
+| Sistem Tablosu | Bilgi |
+|---|---|
+| `pg_stat_user_indexes` | Kaç kez tarandı, kaç satır okundu |
+| `pg_indexes` | İndeks tanımı |
+| `pg_stat_user_tables` | Sequential scan vs index scan sayısı |
+| `pg_relation_size(indexrelid)` | İndeks boyutu (byte) |
+
+---
+
+## ▶ Canlı Örnek — İndeks Kullanım Raporu
+
+<RunnableBlock
+  sql={`SELECT
+  i.indexname,
+  i.indexdef,
+  s.idx_scan                                             AS tarama_sayisi,
+  s.idx_tup_read                                        AS okunan_satir,
+  pg_size_pretty(pg_relation_size(s.indexrelid))        AS boyut
+FROM pg_indexes i
+JOIN pg_stat_user_indexes s
+  ON i.indexname = s.indexname AND i.tablename = s.tablename
+WHERE i.tablename IN ('noktalar_perf','mekanlar_part','gps_izler')
+ORDER BY s.idx_scan DESC;`}
+  label="İndeks kullanım raporu"
+/>
+
+---
+
+## ▶ Sequential Scan Oranı
+
+<RunnableBlock
+  sql={`SELECT
+  relname AS tablo,
+  seq_scan                                        AS seq_scan,
+  idx_scan                                        AS idx_scan,
+  CASE WHEN seq_scan + idx_scan > 0
+    THEN ROUND(idx_scan::numeric/(seq_scan+idx_scan)*100, 1)
+    ELSE 0 END                                    AS idx_oran_pct,
+  n_live_tup                                      AS canli_satir
+FROM pg_stat_user_tables
+WHERE relname IN ('noktalar_perf','mekanlar_part','gps_izler')
+ORDER BY seq_scan DESC;`}
+  label="Tablo tarama istatistikleri"
+/>
+
+---
+
+## ▶ Kullanılmayan İndeksleri Bul
+
+<RunnableBlock
+  sql={`-- idx_scan = 0: hiç kullanılmamış indeksler
+SELECT
+  schemaname,
+  tablename,
+  indexname,
+  pg_size_pretty(pg_relation_size(indexrelid)) AS boyut
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+  AND tablename NOT LIKE 'pg_%'
+ORDER BY pg_relation_size(indexrelid) DESC;`}
+  label="Hiç kullanılmamış indeksler"
+/>
+
+---
+
+## 🧪 Dene — Birkaç Sorgu Çalıştır ve Tekrar İzle
+
+<RunnableBlock
+  sql={`-- Birkaç sorgu çalıştır
+SELECT COUNT(*) FROM noktalar_perf WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 100000);
+SELECT COUNT(*) FROM noktalar_perf WHERE ST_DWithin(geom::geography, ST_SetSRID(ST_MakePoint(32.854,39.930),4326)::geography, 200000);
+
+-- Şimdi istatistiklere tekrar bak
+SELECT indexname, idx_scan FROM pg_stat_user_indexes WHERE tablename='noktalar_perf';`}
+  label="Sorgu sonrası istatistik"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **idx_scan kümülatif:** Sunucu yeniden başlatılınca veya `pg_stat_reset()` çağrılınca sıfırlanır. PGlite'ta sayfa yenilemesinde sıfırlanabilir.
+2. **Yeni indeks başlangıçta 0:** İndeks yeni oluşturuldu ise henüz kullanılmamış olabilir. Birkaç sorgu çalıştır, sonra kontrol et.
+3. **idx_scan 0 ≠ hemen sil:** Bazı indeksler nadiren çalışan raporlar için kritiktir. Silmeden önce kullanım zamanını değerlendir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modülün son dersi: **`ANALYZE` — neden zorunlu?** Sorgu planlayıcısının neden güncel istatistiklere ihtiyacı var?

@@ -1,0 +1,115 @@
+## 🎯 Ne öğreneceksin?
+
+- MVCC ve "ölü satır" kavramını açıklayabileceksin
+- `VACUUM` ile `VACUUM FULL` farkını söyleyebileceksin
+- Tablo bloat'ını `pg_relation_size` ile ölçebileceksin
+
+---
+
+## 📖 Kavram: MVCC ve Bloat
+
+PostgreSQL **MVCC** (Multi-Version Concurrency Control) kullanır: `UPDATE` ve `DELETE` satırları fiziksel olarak hemen silmez, "ölü satır" olarak işaretler. Bu sayede concurrent okuma/yazma çakışmaz.
+
+Ancak ölü satırlar yer kaplar — buna **bloat** denir.
+
+| Komut | Ne yapar? | Kilit alır mı? |
+|---|---|---|
+| `VACUUM` | Ölü satırları işaretler, geri kazanır | Hayır (light lock) |
+| `VACUUM FULL` | Tabloyu yeniden yazar, disk alanı serbest bırakır | Evet (exclusive) |
+| `AUTOVACUUM` | Arka planda otomatik VACUUM | Hayır |
+
+**Kural:** Büyük toplu silme/güncelleme sonrası `VACUUM ANALYZE` çalıştır. `VACUUM FULL` yalnızca kritik disk sıkışmasında — üretimde dikkatli.
+
+---
+
+## ▶ Canlı Örnek — Bloat Oluştur ve Ölç
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS bloat_test (
+  id   SERIAL PRIMARY KEY,
+  geom GEOMETRY(POINT, 4326),
+  veri TEXT
+);
+
+INSERT INTO bloat_test (geom, veri)
+SELECT
+  ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326),
+  repeat('x', 100)
+FROM generate_series(1, 2000);
+
+-- Başlangıç boyutu
+SELECT
+  pg_size_pretty(pg_relation_size('bloat_test')) AS tablo_boyutu,
+  (SELECT COUNT(*) FROM bloat_test) AS satir_sayisi;`}
+  label="Başlangıç boyutu"
+/>
+
+---
+
+## ▶ Sil ve Bloat Gözlemle
+
+<RunnableBlock
+  sql={`-- Yarısını sil
+DELETE FROM bloat_test WHERE id % 2 = 0;
+
+-- Boyut azalmadı! — ölü satırlar hâlâ orada
+SELECT
+  pg_size_pretty(pg_relation_size('bloat_test')) AS tablo_boyutu,
+  (SELECT COUNT(*) FROM bloat_test) AS canli_satir;`}
+  label="Silme sonrası boyut kontrolü"
+/>
+
+---
+
+## ▶ VACUUM Sonrası
+
+<RunnableBlock
+  sql={`VACUUM ANALYZE bloat_test;
+
+-- VACUUM sonrası: yer geri kazanılmış mı?
+SELECT
+  pg_size_pretty(pg_relation_size('bloat_test')) AS tablo_boyutu,
+  n_dead_tup AS olu_satir,
+  n_live_tup AS canli_satir
+FROM pg_stat_user_tables
+WHERE relname = 'bloat_test';`}
+  label="VACUUM sonrası istatistik"
+/>
+
+> `n_dead_tup` sıfıra yakınsa VACUUM işe yaradı. Boyut aynı kalabilir — VACUUM ölü alanı **yeniden kullanılabilir** yapar ama dosyayı küçültmez. `VACUUM FULL` dosyayı küçültür ama kilit alır.
+
+---
+
+## 🧪 Dene — Hangi Tablolar Bloat'lı?
+
+<RunnableBlock
+  sql={`-- Yüksek ölü satır oranına sahip tablolar
+SELECT
+  relname AS tablo,
+  n_live_tup AS canli,
+  n_dead_tup AS olu,
+  CASE WHEN n_live_tup > 0
+    THEN ROUND(n_dead_tup::numeric / n_live_tup * 100, 1)
+    ELSE 0 END AS olu_oran_pct,
+  last_vacuum,
+  last_autovacuum
+FROM pg_stat_user_tables
+WHERE n_live_tup > 0
+ORDER BY olu_oran_pct DESC
+LIMIT 10;`}
+  label="Bloat oranı yüksek tablolar"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`VACUUM FULL` üretimde dikkat:** Exclusive lock alır, tablo sorgulanamaz. Bakım penceresi planla.
+2. **Autovacuum yeterli değilse:** `autovacuum_vacuum_threshold` ve `autovacuum_vacuum_scale_factor` parametrelerini ayarla. Büyük tablolarda scale factor düşür.
+3. **PGlite'ta autovacuum:** PGlite'ta autovacuum arka plan worker çalışmaz — manuel `VACUUM ANALYZE` gerekli.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste çok büyük tablolar için: **Range Partitioning** — zaman damgalı veya sayısal bölümleme.

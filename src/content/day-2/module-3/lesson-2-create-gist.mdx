@@ -1,0 +1,110 @@
+## 🎯 Ne öğreneceksin?
+
+- `CREATE INDEX USING GIST` sözdizimini yazabileceksin
+- Concurrent index oluşturmanın farkını açıklayabileceksin
+- `pg_indexes` ile hangi indekslerin var olduğunu sorgulayabileceksin
+
+---
+
+## 📖 Kavram: CREATE INDEX Sözdizimi
+
+```sql
+-- Temel
+CREATE INDEX idx_ad ON tablo USING gist(geom);
+
+-- Concurrent (tablo kilitlemez, canlı sistemde)
+CREATE INDEX CONCURRENTLY idx_ad ON tablo USING gist(geom);
+
+-- Partial index (koşullu — daha küçük, daha hızlı)
+CREATE INDEX idx_aktif ON tablo USING gist(geom) WHERE aktif = TRUE;
+
+-- Functional index (cast'lı sütun)
+CREATE INDEX idx_geog ON tablo USING gist(geography(geom));
+```
+
+---
+
+## ▶ Canlı Örnek — İndeks Oluştur ve Doğrula
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS mekanlar_idx (
+  id     SERIAL PRIMARY KEY,
+  ad     TEXT,
+  kategori TEXT,
+  aktif  BOOLEAN DEFAULT TRUE,
+  geom   GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO mekanlar_idx (ad, kategori, geom)
+SELECT
+  'Mekan ' || i,
+  (ARRAY['restoran','kafe','otel','market'])[1 + (i % 4)],
+  ST_SetSRID(ST_MakePoint(26 + random()*19, 36 + random()*6), 4326)
+FROM generate_series(1, 500) i
+ON CONFLICT DO NOTHING;
+
+ANALYZE mekanlar_idx;
+
+-- İndeks oluştur
+CREATE INDEX IF NOT EXISTS idx_mekanlar_geom ON mekanlar_idx USING gist(geom);
+
+-- Hangi indeksler var?
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'mekanlar_idx';`}
+  label="GIST indeks oluştur ve doğrula"
+/>
+
+---
+
+## ▶ Partial Index
+
+<RunnableBlock
+  sql={`-- Sadece aktif mekanlar için partial index
+CREATE INDEX IF NOT EXISTS idx_mekanlar_aktif
+  ON mekanlar_idx USING gist(geom)
+  WHERE aktif = TRUE;
+
+-- İndeks istatistikleri
+SELECT
+  schemaname,
+  tablename,
+  indexname,
+  idx_scan   AS kullanim_sayisi,
+  idx_tup_read AS okunan_satir
+FROM pg_stat_user_indexes
+WHERE tablename = 'mekanlar_idx';`}
+  label="Partial index ve istatistikler"
+/>
+
+---
+
+## ▶ Geography Functional Index
+
+<RunnableBlock
+  sql={`-- geography cast'li sorgular için functional index
+CREATE INDEX IF NOT EXISTS idx_mekanlar_geog
+  ON mekanlar_idx USING gist( (geom::geography) );
+
+-- Bu indeks şu sorguyu hızlandırır:
+EXPLAIN SELECT COUNT(*) FROM mekanlar_idx
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  200000);`}
+  label="Geography functional index"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **CONCURRENTLY transaction içinde olmaz:** `CREATE INDEX CONCURRENTLY` bir transaction bloğu içinde çalışmaz. Bağımsız statement olarak çalıştır.
+2. **Partial index WHERE koşulu sorgu WHERE ile eşleşmeli:** `WHERE aktif=TRUE` ile oluşturulan partial index, `WHERE aktif=FALSE` sorgusunda kullanılmaz.
+3. **Çok fazla indeks:** Her INSERT/UPDATE tüm indeksleri günceller. Gereksiz indeksler yazma performansını düşürür. `pg_stat_user_indexes.idx_scan = 0` olanları kaldır.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste **SP-GIST** — nokta yoğun tablolarda ne zaman tercih edilir?

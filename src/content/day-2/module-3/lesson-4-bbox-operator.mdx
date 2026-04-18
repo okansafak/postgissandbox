@@ -1,0 +1,108 @@
+## 🎯 Ne öğreneceksin?
+
+- `&&` bounding box operatörünün ne yaptığını açıklayabileceksin
+- `ST_Intersects` ile `&&` arasındaki iki aşamalı filtrelemeyi anlayabileceksin
+- `~`, `@`, `~=` operatörlerini tanıyabileceksin
+
+---
+
+## 📖 Kavram: İki Aşamalı Filtreleme
+
+PostGIS mekansal sorguları iki aşamada çözer:
+
+**Aşama 1 — Kaba filtre (index scan):** `&&` operatörü — bounding box'lar kesişiyor mu?
+
+**Aşama 2 — Kesin filtre (heap scan):** `ST_Intersects` gibi fonksiyon — gerçek geometri testi.
+
+```sql
+-- ST_Intersects içinde zaten && kullanılır — otomatik
+WHERE ST_Intersects(a.geom, b.geom)
+-- → 1. bbox && → aday listesi → 2. ST_Intersects kesin test
+```
+
+Bunu elle de yapabilirsin:
+
+```sql
+WHERE a.geom && b.geom           -- hızlı kaba filtre
+  AND ST_Intersects(a.geom, b.geom)  -- kesin test
+```
+
+---
+
+## 📖 Bbox Operatörleri
+
+| Operatör | Anlamı |
+|---|---|
+| `A && B` | A ve B'nin bbox'ları kesişiyor |
+| `A ~ B` | A'nın bbox'ı B'yi kapsıyor |
+| `A @ B` | A'nın bbox'ı B tarafından kapsanıyor |
+| `A ~= B` | A ve B'nin bbox'ları eşit |
+| `A &< B` | A'nın bbox'ı B'nin solunda veya örtüşüyor |
+
+---
+
+## ▶ Canlı Örnek — && vs ST_Intersects
+
+<RunnableBlock
+  sql={`WITH alan AS (
+  SELECT ST_SetSRID(ST_GeomFromText('POLYGON((28.8 40.9,29.2 40.9,29.2 41.2,28.8 41.2,28.8 40.9))'), 4326) AS geom
+),
+noktalar AS (
+  SELECT i, ST_SetSRID(ST_MakePoint(28.7 + i*0.1, 41.0), 4326) AS geom
+  FROM generate_series(0,9) i
+)
+SELECT
+  n.i,
+  ROUND(ST_X(n.geom)::numeric,1) AS lon,
+  (n.geom && a.geom)             AS bbox_kesiyor,
+  ST_Intersects(n.geom, a.geom)  AS gercek_kesisim
+FROM noktalar n, alan a
+ORDER BY n.i;`}
+  label="&& vs ST_Intersects farkı"
+/>
+
+> `&&` bbox kesişimini test eder — bazı noktalar bbox içinde olmasına rağmen poligon dışında olabilir. `ST_Intersects` kesin testi yapar.
+
+---
+
+## ▶ ST_MakeEnvelope ile Kutu Sorgusu
+
+<RunnableBlock
+  sql={`-- Belirli bir kutunun içindeki noktaları hızlıca bul
+SELECT COUNT(*) AS istanbul_bolgesi
+FROM noktalar_perf
+WHERE geom && ST_MakeEnvelope(28.5, 40.8, 29.5, 41.5, 4326);`}
+  label="Envelope bbox sorgusu"
+/>
+
+---
+
+## 🧪 Dene — Manuel İki Aşamalı Filtre
+
+<RunnableBlock
+  sql={`-- Önce bbox, sonra kesin test
+SELECT COUNT(*) AS kesin_kesisen
+FROM noktalar_perf np
+WHERE np.geom && ST_Buffer(
+    ST_SetSRID(ST_MakePoint(28.979,41.015),4326),
+    1.0)  -- 1 derece bbox
+  AND ST_DWithin(
+    np.geom::geography,
+    ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+    100000);`}
+  label="Manuel iki aşamalı filtre"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`&&` yanlış pozitif üretir:** Bbox kesişimi gerçek geometri kesişimini garanti etmez. Sadece kaba filtre — her zaman kesin test ekle.
+2. **`&&` GIST kullanır, `ST_Intersects` kullanır ama `ST_Distance <` kullanmaz:** `WHERE ST_Distance(a,b) < x` indeksi bypass eder. `ST_DWithin` kullan.
+3. **Farklı SRID'li `&&`:** `geom_4326 && geom_3857` sonucu anlamsız. SRID eşleştir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **partial index ve functional index** — koşullu ve cast'lı sütunları hızlandır.

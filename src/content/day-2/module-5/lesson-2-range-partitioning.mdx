@@ -1,0 +1,144 @@
+## 🎯 Ne öğreneceksin?
+
+- PostgreSQL declarative partitioning sözdizimini yazabileceksin
+- `PARTITION BY RANGE` ile zaman veya sayısal bölümleme yapabileceksin
+- Partition pruning'in nasıl çalıştığını EXPLAIN ile doğrulayabileceksin
+
+---
+
+## 📖 Kavram: Declarative Partitioning
+
+Büyük tablo (10M+ satır) → sorgu performansı düşer → Çözüm: tabloyu parçalara böl.
+
+**Range Partitioning:** Belirli sütunun değer aralığına göre bölümleme.
+
+```sql
+-- Ana tablo (partition parent)
+CREATE TABLE olcumler (
+  id         BIGSERIAL,
+  zaman      TIMESTAMPTZ NOT NULL,
+  geom       GEOMETRY(POINT, 4326),
+  sicaklik   REAL
+) PARTITION BY RANGE (zaman);
+
+-- Partition'lar
+CREATE TABLE olcumler_2024_q1
+  PARTITION OF olcumler
+  FOR VALUES FROM ('2024-01-01') TO ('2024-04-01');
+```
+
+**Avantaj:** `WHERE zaman BETWEEN '2024-01' AND '2024-04'` → sadece ilgili partition okunur (**partition pruning**).
+
+---
+
+## ▶ Canlı Örnek — GPS Kayıt Partitioning
+
+<RunnableBlock
+  sql={`-- Ana tablo
+CREATE TABLE IF NOT EXISTS gps_kayit (
+  id     BIGSERIAL,
+  arac   TEXT,
+  zaman  TIMESTAMPTZ NOT NULL,
+  geom   GEOMETRY(POINT, 4326)
+) PARTITION BY RANGE (zaman);
+
+-- Aylık partition'lar
+CREATE TABLE IF NOT EXISTS gps_kayit_2024_01
+  PARTITION OF gps_kayit
+  FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
+
+CREATE TABLE IF NOT EXISTS gps_kayit_2024_02
+  PARTITION OF gps_kayit
+  FOR VALUES FROM ('2024-02-01') TO ('2024-03-01');
+
+CREATE TABLE IF NOT EXISTS gps_kayit_2024_03
+  PARTITION OF gps_kayit
+  FOR VALUES FROM ('2024-03-01') TO ('2024-04-01');
+
+-- Veri ekle
+INSERT INTO gps_kayit (arac, zaman, geom)
+SELECT
+  'Araç-' || (1 + i % 5),
+  '2024-01-01'::timestamptz + (i || ' hours')::interval,
+  ST_SetSRID(ST_MakePoint(28.9 + random()*0.5, 40.9 + random()*0.3), 4326)
+FROM generate_series(1, 1500) i;
+
+SELECT tableoid::regclass AS partition, COUNT(*) AS kayit
+FROM gps_kayit
+GROUP BY tableoid;`}
+  label="Range partition kurulumu"
+/>
+
+---
+
+## ▶ Partition Pruning Gözlemle
+
+<RunnableBlock
+  sql={`-- Partition pruning: sadece Ocak partition'ı taranır
+EXPLAIN
+SELECT COUNT(*) FROM gps_kayit
+WHERE zaman BETWEEN '2024-01-01' AND '2024-01-31 23:59:59';`}
+  label="Partition pruning — EXPLAIN"
+/>
+
+> Planda `gps_kayit_2024_02` ve `gps_kayit_2024_03` görünmüyorsa — pruning çalışıyor!
+
+---
+
+## ▶ Partition Üzerine İndeks
+
+<RunnableBlock
+  sql={`-- Her partition'a ayrı GIST indeks
+CREATE INDEX IF NOT EXISTS idx_gps_kayit_01_geom
+  ON gps_kayit_2024_01 USING gist(geom);
+
+CREATE INDEX IF NOT EXISTS idx_gps_kayit_02_geom
+  ON gps_kayit_2024_02 USING gist(geom);
+
+CREATE INDEX IF NOT EXISTS idx_gps_kayit_03_geom
+  ON gps_kayit_2024_03 USING gist(geom);
+
+ANALYZE gps_kayit;
+
+-- Hem zaman hem mekan filtresi → tek partition + index
+EXPLAIN ANALYZE
+SELECT COUNT(*) FROM gps_kayit
+WHERE zaman >= '2024-01-01' AND zaman < '2024-02-01'
+  AND ST_DWithin(
+    geom::geography,
+    ST_SetSRID(ST_MakePoint(29.1, 41.0),4326)::geography,
+    20000);`}
+  label="Partition + GIST indeks birlikte"
+/>
+
+---
+
+## 🧪 Dene — Partition Listesi
+
+<RunnableBlock
+  sql={`-- Hangi partition'lar var, boyutları ne?
+SELECT
+  child.relname AS partition,
+  pg_size_pretty(pg_relation_size(child.oid)) AS boyut,
+  (SELECT COUNT(*) FROM gps_kayit
+   WHERE tableoid = child.oid) AS satir
+FROM pg_inherits
+JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
+JOIN pg_class child  ON pg_inherits.inhrelid  = child.oid
+WHERE parent.relname = 'gps_kayit';`}
+  label="Partition listesi ve boyutları"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Partition key NULL olamaz:** `PARTITION BY RANGE (zaman)` — `zaman IS NULL` veri eklenince hata. Default partition oluştur: `CREATE TABLE gps_kayit_default PARTITION OF gps_kayit DEFAULT;`
+2. **İndeks parent'a eklenmez:** `CREATE INDEX ON gps_kayit` yeni partition'ları kapsamaz. Her partition için veya `pg_partman` extension ile otomatikleştir.
+3. **Çok küçük partition:** Her partition için overhead var. Saatlik partition çoğu senaryoda gereksiz — aylık veya üç aylık yeterli.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **List Partitioning** — ülke, şehir veya kategori bazlı bölümleme.

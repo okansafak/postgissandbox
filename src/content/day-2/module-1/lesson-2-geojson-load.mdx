@@ -1,0 +1,109 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_GeomFromGeoJSON` ile GeoJSON metnini geometry'ye çevirebileceksin
+- GeoJSON özelliklerini tablo sütunlarına eşleyebileceksin
+- `json_array_elements` ile GeoJSON FeatureCollection'ı satırlara açabileceksin
+
+---
+
+## 📖 Kavram: GeoJSON Yükleme
+
+GeoJSON web'in harita formatı. PostGIS doğrudan parse eder:
+
+```sql
+ST_GeomFromGeoJSON('{"type":"Point","coordinates":[28.979,41.015]}')
+```
+
+Gerçek senaryoda: GeoJSON `properties` nesnesinden attribute sütunları çıkarılır.
+
+---
+
+## ▶ Canlı Örnek — Tek Feature
+
+<RunnableBlock
+  sql={`SELECT
+  ST_AsText(
+    ST_SetSRID(
+      ST_GeomFromGeoJSON('{"type":"Point","coordinates":[28.979,41.015]}'),
+      4326
+    )
+  ) AS wkt,
+  ST_SRID(
+    ST_GeomFromGeoJSON('{"type":"Point","coordinates":[28.979,41.015]}')
+  ) AS srid_otomatik;`}
+  label="GeoJSON → geometry"
+/>
+
+> `ST_GeomFromGeoJSON` SRID=4326 otomatik set eder (GeoJSON spesifikasyonu gereği).
+
+---
+
+## ▶ FeatureCollection Yükle
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS geojson_noktalar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  tur  TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+-- JSON içinden feature'ları çıkar
+WITH fc AS (
+  SELECT '{"type":"FeatureCollection","features":[
+    {"type":"Feature","properties":{"ad":"Galata Kulesi","tur":"tarihi"},"geometry":{"type":"Point","coordinates":[28.974,41.026]}},
+    {"type":"Feature","properties":{"ad":"Topkapı Sarayı","tur":"müze"},"geometry":{"type":"Point","coordinates":[28.983,41.011]}},
+    {"type":"Feature","properties":{"ad":"Kız Kulesi","tur":"tarihi"},"geometry":{"type":"Point","coordinates":[29.004,41.021]}}
+  ]}'::json AS fc
+)
+INSERT INTO geojson_noktalar (ad, tur, geom)
+SELECT
+  feat->>'ad'                                                       AS ad,
+  feat->'properties'->>'tur'                                        AS tur,
+  ST_SetSRID(ST_GeomFromGeoJSON(feat->>'geometry'), 4326)            AS geom
+FROM fc,
+     json_array_elements(fc->'features') AS feat(feat)
+ON CONFLICT DO NOTHING;
+
+SELECT id, ad, tur, ST_AsText(geom) AS wkt FROM geojson_noktalar;`}
+  label="FeatureCollection → tablo"
+/>
+
+---
+
+## ▶ Haritada Gör
+
+<RunnableBlock
+  sql={`SELECT geom, ad AS label FROM geojson_noktalar;`}
+  label="GeoJSON noktaları haritada"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — Polygon GeoJSON
+
+<RunnableBlock
+  sql={`SELECT
+  ST_AsText(ST_GeomFromGeoJSON(
+    '{"type":"Polygon","coordinates":[[[28.9,41.0],[29.1,41.0],[29.1,41.1],[28.9,41.1],[28.9,41.0]]]}'
+  )) AS polygon_wkt,
+  ROUND(ST_Area(ST_GeomFromGeoJSON(
+    '{"type":"Polygon","coordinates":[[[28.9,41.0],[29.1,41.0],[29.1,41.1],[28.9,41.1],[28.9,41.0]]]}')
+  ::geography)::numeric / 1e6, 1) AS alan_km2;`}
+  label="GeoJSON Polygon yükle"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **GeoJSON `->` vs `->>`:** `feat->'geometry'` JSON nesnesi, `feat->>'geometry'` metin döner. `ST_GeomFromGeoJSON` metin bekler — `->>'geometry'` kullan.
+2. **İç içe properties:** `properties` nesnesi `{"ad":"..."}` şeklindeyse `feat->'properties'->>'ad'` kullan.
+3. **Çoklu geometry tipleri:** FeatureCollection'da karışık geometri tipleri olabilir. `GEOMETRY` (tip kısıtlamasız) kolonu kullan veya tipi kontrol et.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste temiz veri yüklemede altın standart: **staging tablosu deseni**.

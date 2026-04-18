@@ -63,15 +63,15 @@ const mdxComponents = {
 /** Tüm MDX dosyalarını lazy load için glob */
 const mdxGlob = import.meta.glob<{ default: ComponentType }>('../../content/**/*.mdx');
 
-/** MDX dosya adı haritası: lesson slug → filename (uzantısız) */
+/** MDX dosya adı haritası: "day-N/module-N" → lesson slug → filename */
 const LESSON_FILENAME: Record<string, Record<string, string>> = {
-  'module-1': {
+  'day-1/module-1': {
     'lesson-1': 'lesson-1-welcome',
     'lesson-2': 'lesson-2-pglite-postgresql-postgis',
     'lesson-3': 'lesson-3-cbs-vector-raster',
     'lesson-4': 'lesson-4-first-map',
   },
-  'module-2': {
+  'day-1/module-2': {
     'lesson-1': 'lesson-1-geometry-types',
     'lesson-2': 'lesson-2-multi-and-collection',
     'lesson-3': 'lesson-3-wkt-ewkt-geojson',
@@ -79,7 +79,7 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-5': 'lesson-5-geometry-metadata',
     'lesson-6': 'lesson-6-valid-geometry',
   },
-  'module-3': {
+  'day-1/module-3': {
     'lesson-1': 'lesson-1-why-projections',
     'lesson-2': 'lesson-2-srid-epsg',
     'lesson-3': 'lesson-3-geometry-vs-geography',
@@ -87,14 +87,14 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-5': 'lesson-5-turkey-epsg',
     'lesson-6': 'lesson-6-projection-decision',
   },
-  'module-4': {
+  'day-1/module-4': {
     'lesson-1': 'lesson-1-contains-within',
     'lesson-2': 'lesson-2-intersects-disjoint',
     'lesson-3': 'lesson-3-touches-crosses-overlaps',
     'lesson-4': 'lesson-4-dwithin',
     'lesson-5': 'lesson-5-spatial-join',
   },
-  'module-5': {
+  'day-1/module-5': {
     'lesson-1': 'lesson-1-distance',
     'lesson-2': 'lesson-2-area-length',
     'lesson-3': 'lesson-3-centroid',
@@ -103,10 +103,47 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-6': 'lesson-6-envelope-hull',
     'lesson-7': 'lesson-7-knn',
   },
+  'day-2/module-1': {
+    'lesson-1': 'lesson-1-csv-import',
+    'lesson-2': 'lesson-2-geojson-load',
+    'lesson-3': 'lesson-3-staging-pattern',
+    'lesson-4': 'lesson-4-bulk-transform',
+  },
+  'day-2/module-2': {
+    'lesson-1': 'lesson-1-simplify',
+    'lesson-2': 'lesson-2-subdivide',
+    'lesson-3': 'lesson-3-linear-referencing',
+    'lesson-4': 'lesson-4-closest-point',
+    'lesson-5': 'lesson-5-azimuth',
+  },
+  'day-2/module-3': {
+    'lesson-1': 'lesson-1-why-index',
+    'lesson-2': 'lesson-2-create-gist',
+    'lesson-3': 'lesson-3-spgist',
+    'lesson-4': 'lesson-4-bbox-operator',
+    'lesson-5': 'lesson-5-partial-functional-index',
+    'lesson-6': 'lesson-6-pg-stat-indexes',
+    'lesson-7': 'lesson-7-analyze',
+  },
+  'day-2/module-4': {
+    'lesson-1': 'lesson-1-explain-analyze-basics',
+    'lesson-2': 'lesson-2-seq-index-scan',
+    'lesson-3': 'lesson-3-reading-cost-rows',
+    'lesson-4': 'lesson-4-st-distance-antipattern',
+    'lesson-5': 'lesson-5-function-in-where',
+    'lesson-6': 'lesson-6-explain-json',
+  },
+  'day-2/module-5': {
+    'lesson-1': 'lesson-1-vacuum-bloat',
+    'lesson-2': 'lesson-2-range-partitioning',
+    'lesson-3': 'lesson-3-list-partitioning',
+    'lesson-4': 'lesson-4-partition-pruning',
+  },
 };
 
 function buildGlobKey(day: string, mod: string, lesson: string): string {
-  const modMap = LESSON_FILENAME[mod] ?? {};
+  const dayModKey = `${day}/${mod}`;
+  const modMap = LESSON_FILENAME[dayModKey] ?? {};
   const filename = modMap[lesson] ?? lesson;
   return `../../content/${day}/${mod}/${filename}.mdx`;
 }

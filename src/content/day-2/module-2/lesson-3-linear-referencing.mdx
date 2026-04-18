@@ -1,0 +1,99 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_LineLocatePoint` ile noktanın çizgi üzerindeki konumunu bulabileceksin
+- `ST_LineInterpolatePoint` ile çizgi üzerinde belirli bir konumdaki noktayı bulabileceksin
+- Km bazlı yol konumlandırması yapabileceksin
+
+---
+
+## 📖 Kavram: Lineer Referanslama
+
+"Bu kaza yolun kaçıncı km'sinde?" veya "Araç güzergahın yüzde kaçını tamamladı?" gibi sorular **lineer referanslama** ile yanıtlanır.
+
+| Fonksiyon | Giriş | Çıktı |
+|---|---|---|
+| `ST_LineLocatePoint(line, point)` | Çizgi + Nokta | 0.0–1.0 (oran) |
+| `ST_LineInterpolatePoint(line, frac)` | Çizgi + Oran | Nokta |
+| `ST_LineSubstring(line, start, end)` | Çizgi + Oran aralığı | Alt çizgi |
+
+---
+
+## ▶ Canlı Örnek — Yol Üzerinde Kaza Konumu
+
+<RunnableBlock
+  sql={`WITH yol AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'LINESTRING(28.979 41.015, 30.717 36.896)'),
+    4326) AS geom
+),
+kaza AS (
+  SELECT ST_SetSRID(ST_MakePoint(29.8, 39.8), 4326) AS geom
+)
+SELECT
+  ROUND(ST_Length(yol.geom::geography)::numeric/1000, 0) AS yol_uzunluk_km,
+  ROUND(ST_LineLocatePoint(yol.geom, kaza.geom)::numeric, 3) AS kaza_orani,
+  ROUND((ST_LineLocatePoint(yol.geom, kaza.geom) *
+         ST_Length(yol.geom::geography)/1000)::numeric, 0)  AS kaza_km,
+  kaza.geom
+FROM yol, kaza;`}
+  label="Kaza yolun kaçıncı km'inde?"
+  autoFit
+/>
+
+---
+
+## ▶ Her 100 km'de Bir Noktayı Bul
+
+<RunnableBlock
+  sql={`WITH yol AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'LINESTRING(28.979 41.015, 30.5 40.2, 32.854 39.930)'),
+    4326) AS geom
+),
+uzunluk AS (
+  SELECT ST_Length(geom::geography)/1000 AS km FROM yol
+)
+SELECT
+  ROUND(frac * u.km, 0) AS km_noktasi,
+  ST_LineInterpolatePoint(y.geom, frac) AS geom
+FROM yol y, uzunluk u,
+  generate_series(0, 10) AS t(i),
+  LATERAL (SELECT (i * 100.0 / u.km) AS frac) f
+WHERE frac <= 1.0;`}
+  label="Her 100 km'de bir nokta"
+  autoFit
+/>
+
+---
+
+## ▶ Alt Güzergah: ST_LineSubstring
+
+<RunnableBlock
+  sql={`WITH yol AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'LINESTRING(28.979 41.015, 30.5 40.2, 32.854 39.930)'),
+    4326) AS geom
+)
+SELECT
+  ST_LineSubstring(geom, 0.0, 0.33) AS ilk_ucte_bir,
+  ST_LineSubstring(geom, 0.33, 0.66) AS orta_ucte_bir,
+  ST_LineSubstring(geom, 0.66, 1.0) AS son_ucte_bir,
+  ST_LineSubstring(geom, 0.25, 0.75) AS geom  -- orta yarısı
+FROM yol;`}
+  label="Güzergah alt kesiti"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_LineLocatePoint en yakın noktayı bulur:** Nokta tam çizgi üzerinde olmayabilir — çizgiye en yakın izdüşüm noktası kullanılır.
+2. **Çizgi yönü önemli:** `ST_LineLocatePoint` başlangıç noktasına olan oranı döndürür. Ters yönde oluşturulmuş çizgilerde 0 ve 1 yer değişir.
+3. **geography vs geometry:** Bu fonksiyonlar `geometry` tipinde çalışır. geography input için önce `::geometry` cast yap.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste noktanın bir çizgiye en yakın noktasını bul: **`ST_ClosestPoint` ve `ST_ShortestLine`**.

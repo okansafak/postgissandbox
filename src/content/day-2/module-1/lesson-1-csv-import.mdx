@@ -1,0 +1,118 @@
+## 🎯 Ne öğreneceksin?
+
+- CSV verisini PGlite'ta bir tabloya aktarabileceksin
+- Enlem/boylam sütunlarından geometry sütunu oluşturabileceksin
+- Temiz veri yükleme adımlarını açıklayabileceksin
+
+---
+
+## 📖 Kavram: Tarayıcıda Veri Yükleme
+
+Sunucu tarafı araçları (`COPY`, `psql \copy`, `shp2pgsql`) bu sandboxta doğrudan kullanılamaz. Bunun yerine:
+
+1. **INSERT VALUES** — küçük test verisi için
+2. **Programatik INSERT** — JavaScript'ten PGlite API
+3. **Staging tablosu deseni** — metin olarak yükle, sonra geometry'ye çevir
+
+Bu derste SQL `INSERT` ile bir CSV'yi simüle ederek nokta tablosu oluşturacağız.
+
+---
+
+## ▶ Canlı Örnek — CSV Simülasyonu: Nokta Tablosu
+
+<RunnableBlock
+  sql={`-- Staging tablosu: ham metin
+CREATE TABLE IF NOT EXISTS csv_staging (
+  id       SERIAL,
+  ad       TEXT,
+  lon_text TEXT,
+  lat_text TEXT
+);
+
+-- "CSV satırları" gibi ekle
+INSERT INTO csv_staging (ad, lon_text, lat_text) VALUES
+  ('İstanbul Merkez',  '28.9790', '41.0150'),
+  ('Kadıköy',          '29.0230', '40.9900'),
+  ('Beşiktaş',         '29.0020', '41.0420'),
+  ('Üsküdar',          '29.0150', '41.0230'),
+  ('Şişli',            '28.9880', '41.0600'),
+  ('Fatih',            '28.9400', '41.0130');
+
+SELECT * FROM csv_staging;`}
+  label="Staging tablosu oluştur"
+/>
+
+---
+
+## ▶ Staging → Gerçek Tablo
+
+<RunnableBlock
+  sql={`-- Hedef tablo: geometry sütunu ile
+CREATE TABLE IF NOT EXISTS noktalar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT NOT NULL,
+  geom GEOMETRY(POINT, 4326)
+);
+
+-- Staging'den dönüştürerek aktar
+INSERT INTO noktalar (ad, geom)
+SELECT
+  ad,
+  ST_SetSRID(
+    ST_MakePoint(
+      lon_text::FLOAT,
+      lat_text::FLOAT
+    ),
+    4326
+  )
+FROM csv_staging
+ON CONFLICT DO NOTHING;
+
+SELECT id, ad, ST_AsText(geom) AS wkt FROM noktalar;`}
+  label="Staging → geometry tablosu"
+/>
+
+---
+
+## ▶ Haritada Gör
+
+<RunnableBlock
+  sql={`SELECT geom, ad AS label FROM noktalar;`}
+  label="Nokta tablosunu haritada gör"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — SRID Eksik Veriyi Düzelt
+
+<RunnableBlock
+  sql={`-- SRID'siz yüklenmiş veri senaryosu
+CREATE TABLE IF NOT EXISTS bozuk_noktalar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY  -- SRID yok!
+);
+
+INSERT INTO bozuk_noktalar (ad, geom) VALUES
+  ('Ankara', ST_MakePoint(32.854, 39.930)),
+  ('İzmir',  ST_MakePoint(27.143, 38.423));
+
+-- SRID kontrol et
+SELECT id, ad, ST_SRID(geom) AS srid FROM bozuk_noktalar;`}
+  label="SRID eksik tablo"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Virgüllü ondalık sayı:** Bazı CSV'lerde `28,979` (virgül) gelir. PostgreSQL nokta `.` bekler. `REPLACE(lon_text, ',', '.')::FLOAT` ile düzelt.
+2. **Enlem/boylam yer değişimi:** CSV'de `lat, lon` sırası, PostGIS `ST_MakePoint(lon, lat)` bekler. Sütun adlarını dikkatli kontrol et.
+3. **NULL değerler:** `lon_text` veya `lat_text` NULL ise `ST_MakePoint` NULL döner — `WHERE lon_text IS NOT NULL AND lat_text IS NOT NULL` koşulu ekle.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste GeoJSON formatında veri yüklemeyi göreceğiz: `ST_GeomFromGeoJSON`.

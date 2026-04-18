@@ -1,0 +1,98 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_ClosestPoint` ile bir geometrinin başka bir geometriye en yakın noktasını bulabileceksin
+- `ST_ShortestLine` ile iki geometri arasındaki en kısa çizgiyi çizebileceksin
+- Noktadan yola dik uzaklık hesaplayabileceksin
+
+---
+
+## 📖 Kavram
+
+| Fonksiyon | Döndürür | Kullanım |
+|---|---|---|
+| `ST_ClosestPoint(A, B)` | A üzerindeki B'ye en yakın nokta | Yola en yakın konum |
+| `ST_ShortestLine(A, B)` | İki geometri arası en kısa çizgi | Görsel dik mesafe |
+| `ST_Distance(A, B)` | Minimum mesafe sayısı | Uzaklık hesabı |
+
+`ST_Length(ST_ShortestLine(A,B)) = ST_Distance(A,B)` — her zaman eşit.
+
+---
+
+## ▶ Canlı Örnek — Noktadan Yola Dik
+
+<RunnableBlock
+  sql={`WITH yol AS (
+  SELECT ST_SetSRID(ST_GeomFromText('LINESTRING(28.9 41.0, 29.5 41.0)'), 4326) AS geom
+),
+nokta AS (
+  SELECT ST_SetSRID(ST_MakePoint(29.2, 41.15), 4326) AS geom
+)
+SELECT
+  ST_AsText(ST_ClosestPoint(yol.geom, nokta.geom)) AS yakin_nokta_yolda,
+  ST_AsText(ST_ShortestLine(nokta.geom, yol.geom)) AS kisa_cizgi,
+  ROUND(ST_Distance(nokta.geom::geography, yol.geom::geography)::numeric/1000,2) AS mesafe_km,
+  ST_ShortestLine(nokta.geom, yol.geom)  AS geom
+FROM yol, nokta;`}
+  label="Noktadan yola en kısa çizgi"
+  autoFit
+/>
+
+---
+
+## ▶ Birden Fazla Yola En Yakın
+
+<RunnableBlock
+  sql={`WITH yollar AS (
+  SELECT 1 AS id, 'D-100' AS ad,
+    ST_SetSRID(ST_GeomFromText('LINESTRING(28.8 41.0, 29.3 41.0)'), 4326) AS geom
+  UNION ALL SELECT 2, 'E-5',
+    ST_SetSRID(ST_GeomFromText('LINESTRING(28.8 40.9, 29.3 40.9)'), 4326)
+),
+araç AS (
+  SELECT ST_SetSRID(ST_MakePoint(29.0, 40.95), 4326) AS geom
+)
+SELECT
+  y.ad,
+  ROUND(ST_Distance(a.geom::geography, y.geom::geography)::numeric, 0) AS mesafe_m,
+  ST_ClosestPoint(y.geom, a.geom) AS yakin_nokta
+FROM yollar y, araç a
+ORDER BY ST_Distance(a.geom::geography, y.geom::geography);`}
+  label="Araca en yakın yol"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — Polygon Kenara Uzaklık
+
+<RunnableBlock
+  sql={`WITH bina AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'POLYGON((29.0 41.0, 29.1 41.0, 29.1 41.05, 29.0 41.05, 29.0 41.0))'),
+    4326) AS geom
+),
+nokta AS (
+  SELECT ST_SetSRID(ST_MakePoint(29.15, 41.025), 4326) AS geom
+)
+SELECT
+  ROUND(ST_Distance(n.geom::geography, b.geom::geography)::numeric, 0) AS mesafe_m,
+  ST_AsText(ST_ClosestPoint(b.geom, n.geom)) AS bina_kenari_nokta,
+  ST_ShortestLine(n.geom, b.geom) AS geom
+FROM bina b, nokta n;`}
+  label="Noktadan poligon kenara mesafe"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_ClosestPoint(A,B) ≠ ST_ClosestPoint(B,A):** `ST_ClosestPoint(A,B)` → **A üzerindeki** en yakın nokta. Sıra önemli.
+2. **İçerideki nokta için mesafe sıfır:** Nokta poligonun içindeyse `ST_Distance` → 0, `ST_ShortestLine` → uzunluk 0 nokta.
+3. **3D geometride farklı:** Z koordinatı varsa `ST_3DClosestPoint`, `ST_3DDistance` kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste yön hesabı: **`ST_Azimuth` ve `ST_Angle`**.

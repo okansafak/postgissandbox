@@ -1,0 +1,114 @@
+## 🎯 Ne öğreneceksin?
+
+- WHERE içinde fonksiyon kullanmanın neden yavaşlattığını açıklayabileceksin
+- `ST_X`, `ST_Y`, `ST_SRID` gibi fonksiyonları fonksiyonel index ile hızlandırabileceksin
+- Hangi durumda yeniden yazma (rewrite), hangi durumda functional index gerektiğini söyleyebileceksin
+
+---
+
+## 📖 Kavram: Sargable vs Non-Sargable
+
+**Sargable** (Search ARGument ABLE): Sorgu koşulunun indeksi kullanabilmesi.
+
+```sql
+-- ❌ Non-sargable: fonksiyon sütun üzerinde → full scan
+WHERE ST_X(geom) > 28.0
+
+-- ✅ Sargable: bbox operatörü veya DWithin → index scan
+WHERE geom && ST_MakeEnvelope(28.0, 36.0, 36.0, 42.0, 4326)
+```
+
+**Kural:** Sütunu fonksiyona sarma. Fonksiyonu sabit tarafa taşı veya fonksiyonel index oluştur.
+
+---
+
+## 📖 Yaygın Non-Sargable Kalıplar
+
+| Non-Sargable | Sargable Alternatif |
+|---|---|
+| `ST_X(geom) BETWEEN 28 AND 29` | `geom && ST_MakeEnvelope(28,36,29,42,4326)` |
+| `ST_SRID(geom) = 4326` | Tablo constraint ile garanti et |
+| `ST_AsText(geom) LIKE 'POINT%'` | `GeometryType(geom) = 'POINT'` + index |
+| `date_trunc('day', zaman) = '2024-01-01'` | `zaman >= '2024-01-01' AND zaman < '2024-01-02'` |
+
+---
+
+## ▶ Canlı Örnek — ST_X Non-Sargable
+
+<RunnableBlock
+  sql={`-- Hazırlık
+CREATE TABLE IF NOT EXISTS koordinat_test (
+  id   SERIAL PRIMARY KEY,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO koordinat_test (geom)
+SELECT ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326)
+FROM generate_series(1, 3000)
+ON CONFLICT DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_koord_geom ON koordinat_test USING gist(geom);
+ANALYZE koordinat_test;
+
+-- ❌ ST_X ile filtre — seq scan
+EXPLAIN SELECT COUNT(*) FROM koordinat_test
+WHERE ST_X(geom) BETWEEN 28.0 AND 30.0;`}
+  label="ST_X non-sargable seq scan"
+/>
+
+---
+
+## ▶ Bbox ile Yeniden Yaz
+
+<RunnableBlock
+  sql={`-- ✅ Bbox ile yeniden yaz — index scan
+EXPLAIN SELECT COUNT(*) FROM koordinat_test
+WHERE geom && ST_MakeEnvelope(28.0, 36.0, 30.0, 42.0, 4326);`}
+  label="Bbox rewrite — index scan"
+/>
+
+---
+
+## ▶ Functional Index ile Çöz
+
+<RunnableBlock
+  sql={`-- Sorgular değiştirilemiyorsa → fonksiyonel index
+CREATE INDEX IF NOT EXISTS idx_koord_st_x
+  ON koordinat_test ( (ST_X(geom)) );
+
+-- Şimdi ST_X filtresi index kullanabilir
+EXPLAIN SELECT COUNT(*) FROM koordinat_test
+WHERE ST_X(geom) BETWEEN 28.0 AND 30.0;`}
+  label="Functional index ile ST_X"
+/>
+
+---
+
+## 🧪 Dene — ST_SRID Kontrolü
+
+<RunnableBlock
+  sql={`-- SRID filtresinin planını gör
+EXPLAIN SELECT COUNT(*) FROM koordinat_test
+WHERE ST_SRID(geom) = 4326;
+
+-- Tüm satırlar SRID=4326 ise zaten seq scan normal
+-- Ama CHECK CONSTRAINT ile bunu garantile:
+ALTER TABLE koordinat_test
+  ADD CONSTRAINT IF NOT EXISTS chk_srid
+  CHECK (ST_SRID(geom) = 4326);`}
+  label="SRID koşulu ve constraint"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`ST_AsText` + `LIKE`:** En yavaş kalıp. Geometriyi stringe çevirip string ara — binlerce kez. Asla yapma. Geometry type için `GeometryType()`, koordinat için bbox/DWithin kullan.
+2. **Fonksiyonel index bakımı:** Her `INSERT`/`UPDATE`'te hesaplanır. Çok pahalı expression'lar için maliyeti değerlendir.
+3. **OR ile non-sargable:** `WHERE ST_X(geom) > 28 OR ST_Y(geom) < 40` — iki ayrı non-sargable OR. Çözüm: bbox union veya `ST_Intersects`.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Son ders: **EXPLAIN FORMAT JSON** — araçlarla entegrasyon ve JSON planı programatik analiz.

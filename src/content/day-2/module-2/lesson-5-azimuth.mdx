@@ -1,0 +1,118 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Azimuth` ile iki nokta arasındaki yön açısını hesaplayabileceksin
+- Radyanı dereceye çevirebileceksin
+- Rota üzerindeki her segmentin yönünü tabloya aktarabileceksin
+
+---
+
+## 📖 Kavram: Azimut (Kerteriz)
+
+**Azimut** — Kuzeyden saat yönünde ölçülen açı (radyan).
+
+```
+Kuzey = 0  (veya 2π)
+Doğu  = π/2 ≈ 1.5708
+Güney = π   ≈ 3.1416
+Batı  = 3π/2 ≈ 4.7124
+```
+
+```sql
+ST_Azimuth(baslangic, bitis)  -- radyan döndürür
+DEGREES(ST_Azimuth(...))      -- dereceye çevir
+```
+
+**Pusula yönü** = `DEGREES(ST_Azimuth(...)) % 360`
+
+---
+
+## ▶ Canlı Örnek — Şehirler Arası Yön
+
+<RunnableBlock
+  sql={`WITH sehirler AS (
+  SELECT 'İstanbul' AS ad, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL SELECT 'Ankara',  ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL SELECT 'İzmir',   ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  UNION ALL SELECT 'Trabzon', ST_SetSRID(ST_MakePoint(39.726, 41.002), 4326)
+),
+merkez AS (
+  SELECT geom FROM sehirler WHERE ad = 'İstanbul'
+)
+SELECT
+  s.ad AS hedef,
+  ROUND(DEGREES(ST_Azimuth(m.geom, s.geom))::numeric, 1) AS azimut_derece,
+  CASE
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 337.5 AND 360  THEN 'K'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 0    AND 22.5  THEN 'K'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 22.5 AND 67.5  THEN 'KD'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 67.5 AND 112.5 THEN 'D'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 112.5 AND 157.5 THEN 'GD'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 157.5 AND 202.5 THEN 'G'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 202.5 AND 247.5 THEN 'GB'
+    WHEN DEGREES(ST_Azimuth(m.geom, s.geom)) BETWEEN 247.5 AND 292.5 THEN 'B'
+    ELSE 'KB'
+  END AS yon
+FROM sehirler s, merkez m
+WHERE s.ad <> 'İstanbul';`}
+  label="İstanbul'dan diğer şehirlerin yönü"
+/>
+
+---
+
+## ▶ Rota Segmentlerinin Yönü
+
+<RunnableBlock
+  sql={`WITH rota AS (
+  SELECT ST_SetSRID(ST_GeomFromText(
+    'LINESTRING(28.979 41.015, 30.5 40.5, 32.854 39.930, 35.0 39.5)'),
+    4326) AS geom
+),
+segmentler AS (
+  SELECT
+    i AS segment_no,
+    ST_PointN(geom, i)   AS baslangic,
+    ST_PointN(geom, i+1) AS bitis
+  FROM rota,
+    generate_series(1, ST_NPoints(geom)-1) AS i
+)
+SELECT
+  segment_no,
+  ROUND(DEGREES(ST_Azimuth(baslangic, bitis))::numeric, 1) AS azimut,
+  ROUND(ST_Distance(baslangic::geography, bitis::geography)::numeric/1000, 0) AS km,
+  ST_MakeLine(baslangic, bitis) AS geom
+FROM segmentler;`}
+  label="Rota segment yönleri"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — Pusula Yönü Fonksiyonu
+
+<RunnableBlock
+  sql={`-- Azimut → pusula yönü yardımcı CTE
+WITH test AS (
+  SELECT
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS a,
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326) AS b
+)
+SELECT
+  ROUND(DEGREES(ST_Azimuth(a, b))::numeric, 1) AS azimut_derece,
+  ROUND(ST_Distance(a::geography, b::geography)::numeric/1000, 0) AS mesafe_km
+FROM test;`}
+  label="İstanbul → Ankara azimut"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Azimuth radyan döndürür:** `DEGREES()` veya `ST_Azimuth(...) * 180 / PI()` ile dereceye çevir.
+2. **Aynı nokta için hata:** `ST_Azimuth(P, P)` → NULL döner. Başlangıç ≠ bitiş olmalı.
+3. **geography koordinat düzeni:** `ST_Azimuth` `geometry` tipinde çalışır. geography için önce cast et: `ST_Azimuth(a::geometry, b::geometry)`.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 2.2 tamamlandı! Sırada **Modül 2.3 — Mekansal İndeksler**: GIST, SP-GIST, `&&` operatörü ve partial index.

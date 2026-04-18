@@ -1,0 +1,126 @@
+## 🎯 Ne öğreneceksin?
+
+- `WHERE ST_Distance(...) < x` neden indeks kullanmadığını açıklayabileceksin
+- `ST_DWithin` ile neden her zaman değiştirmen gerektiğini söyleyebileceksin
+- Mesafe filtresinde `geography` ve `geometry` davranış farkını anlayabileceksin
+
+---
+
+## 📖 Kavram: Antipattern
+
+```sql
+-- ❌ YANLIŞ — indeks bypass eder, her satırı hesaplar
+WHERE ST_Distance(geom::geography, ref_point::geography) < 100000
+
+-- ✅ DOĞRU — GIST indeksi kullanır
+WHERE ST_DWithin(geom::geography, ref_point::geography, 100000)
+```
+
+**Neden?** `ST_Distance < x` bir fonksiyon sonucunu karşılaştırır — PostgreSQL bunu index sargable (sargable) görmez ve full scan yapar. `ST_DWithin` ise özel bir operatör ailesidir, GIST operatör sınıfı tarafından index scan'a çevrilir.
+
+---
+
+## 📖 Geography vs Geometry Mesafe
+
+| | `geometry` | `geography` |
+|---|---|---|
+| Mesafe birimi | Koordinat birimi (derece) | Metre |
+| `ST_DWithin(a, b, 100000)` | 100000 derece (dev alan!) | 100 km |
+| Doğruluk | Düzlemsel | Elipsoidal (gerçek dünya) |
+
+**Kural:** Metre cinsinden mesafe → `::geography` cast kullan.
+
+---
+
+## ▶ Canlı Örnek — Antipattern Planı
+
+<RunnableBlock
+  sql={`-- Hazırlık: indeksli tablo
+CREATE TABLE IF NOT EXISTS mesafe_test (
+  id   SERIAL PRIMARY KEY,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO mesafe_test (geom)
+SELECT ST_SetSRID(ST_MakePoint(26+random()*19, 36+random()*6), 4326)
+FROM generate_series(1, 3000)
+ON CONFLICT DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_mesafe_geom ON mesafe_test USING gist(geom);
+ANALYZE mesafe_test;
+
+-- ❌ Antipattern — planı gör
+EXPLAIN ANALYZE
+SELECT COUNT(*) FROM mesafe_test
+WHERE ST_Distance(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography
+) < 200000;`}
+  label="ST_Distance antipattern planı"
+/>
+
+---
+
+## ▶ ST_DWithin ile Karşılaştır
+
+<RunnableBlock
+  sql={`-- ✅ Doğru yol — indeks kullanır
+EXPLAIN ANALYZE
+SELECT COUNT(*) FROM mesafe_test
+WHERE ST_DWithin(
+  geom::geography,
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+  200000
+);`}
+  label="ST_DWithin — indeks kullanan plan"
+/>
+
+---
+
+## ▶ En Yakın N Nokta (KNN)
+
+<RunnableBlock
+  sql={`-- KNN: <-> operatörü GIST indeksi ile çalışır
+SELECT
+  id,
+  ROUND(ST_Distance(
+    geom::geography,
+    ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography
+  )::numeric / 1000, 1) AS km
+FROM mesafe_test
+ORDER BY geom <-> ST_SetSRID(ST_MakePoint(28.979,41.015),4326)
+LIMIT 5;`}
+  label="KNN — en yakın 5 nokta"
+/>
+
+> `<->` operatörü (KNN-GIST) sıralama için indeks kullanır. `ORDER BY ST_Distance(...)` kullanma — tam tarama yapar.
+
+---
+
+## 🧪 Dene — Geometry'de Mesafe Hatası
+
+<RunnableBlock
+  sql={`-- geometry ile ST_DWithin: 1 birim = 1 derece (~111 km ekvatorda)
+-- Bu sorgu aynı mı çalışır?
+SELECT COUNT(*) FROM mesafe_test
+WHERE ST_DWithin(
+  geom,  -- geography cast YOK
+  ST_SetSRID(ST_MakePoint(28.979,41.015),4326),
+  2.0    -- 2 derece ≈ 222 km (ama Türkiye enleminde ~160 km)
+);`}
+  label="Geometry ST_DWithin — derece cinsinden"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`ST_Distance` + `ORDER BY` + `LIMIT`:** Eğer `LIMIT` varsa PostgreSQL bazen index scan'a geçebilir — ama garanti değil. `<->` operatörü güvenli.
+2. **`ST_DWithin` geometry vs geography:** `geometry` versiyon derece, `geography` versiyon metre. Karışık kullanım yanlış sonuç verir.
+3. **Büyük `ST_DWithin` alanı:** 2000 km yarıçapı → neredeyse tüm tablo döner. Bu durumda seq scan normal — yanlış plan değil.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **WHERE yan tümcesinde fonksiyon kullanımı** — neden `WHERE ST_X(geom) > 28` yavaşlatır?
