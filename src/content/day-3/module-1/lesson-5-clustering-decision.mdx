@@ -1,0 +1,120 @@
+## 🎯 Ne öğreneceksin?
+
+- KMeans, DBSCAN ve Grid'in güçlü/zayıf yönlerini karşılaştırabileceksin
+- Proje gereksinimlerine göre doğru yöntemi seçebileceksin
+- Her iki fonksiyonu birlikte (pipeline) kullanabileceksin
+
+---
+
+## 📖 Karar Matrisi
+
+| Soru | KMeans | DBSCAN | Grid |
+|---|---|---|---|
+| Küme sayısı önceden bilinir mi? | ✅ Gerekir | ❌ Otomatik | ❌ Grid boyutuna bağlı |
+| Outlier/gürültü var mı? | ❌ Etkiler | ✅ Dışlar | ➖ Boş hücreler |
+| Düzensiz şekil kümeleri? | ❌ Yuvarlak | ✅ Her şekil | ❌ Kare/altıgen |
+| Görsel yoğunluk haritası? | ❌ | ❌ | ✅ İdeal |
+| Performans (100K+ nokta)? | ✅ Hızlı | ➖ Orta | ➖ Orta |
+| Şube/bölge optimizasyonu? | ✅ İdeal | ❌ | ❌ |
+| Anomali/hotspot tespiti? | ❌ | ✅ İdeal | ➖ Yaklaşık |
+
+---
+
+## ▶ Canlı Örnek — Pipeline: DBSCAN → KMeans
+
+<RunnableBlock
+  sql={`-- 1. DBSCAN ile gürültüyü dışla
+-- 2. Kalan kümeler üzerinde KMeans uygula
+WITH dbscan_result AS (
+  SELECT
+    geom,
+    ST_ClusterDBSCAN(
+      ST_Transform(geom, 3857), 800, 4
+    ) OVER () AS dbscan_cid
+  FROM kaza_noktalari
+),
+clean_points AS (
+  SELECT geom
+  FROM dbscan_result
+  WHERE dbscan_cid IS NOT NULL  -- gürültüsüzler
+)
+SELECT
+  kmeans_id,
+  COUNT(*) AS nokta_sayisi,
+  ST_AsText(ST_Centroid(ST_Collect(geom))) AS merkez
+FROM (
+  SELECT
+    ST_ClusterKMeans(geom, 3) OVER () AS kmeans_id,
+    geom
+  FROM clean_points
+) sub
+GROUP BY kmeans_id
+ORDER BY nokta_sayisi DESC;`}
+  label="DBSCAN + KMeans pipeline"
+/>
+
+---
+
+## ▶ Grid + Hotspot Kombinasyonu
+
+<RunnableBlock
+  sql={`-- Grid yoğunluk haritasından yüksek-yoğunluklu hücreler → KMeans
+WITH bbox AS (
+  SELECT ST_MakeEnvelope(28.5, 40.8, 29.5, 41.3, 4326) AS geom
+),
+dense_cells AS (
+  SELECT g.geom AS cell_geom
+  FROM bbox, ST_SquareGrid(0.05, bbox.geom) g
+  JOIN kaza_noktalari k ON ST_Within(k.geom, g.geom)
+  GROUP BY g.geom
+  HAVING COUNT(k.id) >= 5
+)
+SELECT
+  k.id,
+  ST_AsText(k.geom) AS konum,
+  c.cell_geom
+FROM kaza_noktalari k
+JOIN dense_cells c ON ST_Within(k.geom, c.cell_geom)
+LIMIT 20;`}
+  label="Yoğun hücreler içindeki noktalar"
+/>
+
+---
+
+## 🧪 Dene — Senaryoya Göre Seç
+
+<RunnableBlock
+  sql={`-- Senaryo: 10 dağıtım deposu için bölge optimizasyonu
+-- → KMeans kullan
+SELECT
+  kume_id,
+  COUNT(*) AS nokta_sayisi,
+  ROUND(ST_Distance(
+    ST_Centroid(ST_Collect(geom))::geography,
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography
+  )::numeric / 1000, 1) AS merkeze_km,
+  ST_Centroid(ST_Collect(geom)) AS geom
+FROM (
+  SELECT
+    ST_ClusterKMeans(geom, 10) OVER () AS kume_id,
+    geom
+  FROM kaza_noktalari
+) sub
+GROUP BY kume_id
+ORDER BY merkeze_km;`}
+  label="10 depo bölgesi optimizasyonu"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **"Her şey için DBSCAN" yanılgısı:** DBSCAN parametreler hassas, büyük veri setinde yavaş. Şube bölgelendirme için KMeans daha hızlı ve tahmin edilebilir.
+2. **Grid + mekansal JOIN performansı:** Büyük grid (küçük hücreler) + büyük nokta tablosu → yavaş. GIST indeks ve partition kombinasyonu gerekebilir.
+3. **Kümeleme ≠ karar:** Kümeleme keşifsel analiz aracı. Sonuçlar girdilere (k, eps, grid boyutu) çok duyarlı — domain bilgisiyle doğrula.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 3.1 tamamlandı! Sırada **Modül 3.2 — Ağ Analizi**: pgRouting ile en kısa yol, servis alanı ve güzergah optimizasyonu.

@@ -1,0 +1,131 @@
+## 🎯 Ne öğreneceksin?
+
+- GeoServer ve QGIS için güvenli read-only kullanıcı oluşturabileceksin
+- Şema bazlı yetki modelini yazabileceksin
+- Üretim ortamı güvenlik şablonunu açıklayabileceksin
+
+---
+
+## 📖 Kavram: Read-Only Üretim Kullanıcısı
+
+CBS uygulamaları (GeoServer, QGIS, Grafana) genellikle:
+- Sadece SELECT yetkisi gerektirir
+- Yanlış yapılandırmada INSERT/UPDATE yapabilir → güvenlik açığı
+- Veri değişikliğine izin verilmemeli
+
+**En az yetki şablonu:**
+```sql
+CREATE ROLE geoserver_ro NOLOGIN;
+GRANT CONNECT ON DATABASE cbs TO geoserver_ro;
+GRANT USAGE ON SCHEMA public TO geoserver_ro;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO geoserver_ro;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+  GRANT SELECT ON TABLES TO geoserver_ro;
+
+CREATE ROLE geoserver LOGIN PASSWORD 'güçlü_şifre';
+GRANT geoserver_ro TO geoserver;
+```
+
+---
+
+## ▶ Canlı Örnek — Read-Only Şablon
+
+<RunnableBlock
+  sql={`-- Read-only grup rolü
+CREATE ROLE IF NOT EXISTS ro_kullanici NOLOGIN;
+
+-- Mevcut tüm tablolar için SELECT
+GRANT USAGE ON SCHEMA public TO ro_kullanici;
+
+-- Tek tek tablo yetkisi
+GRANT SELECT ON noktalar_perf TO ro_kullanici;
+GRANT SELECT ON kaza_noktalari TO ro_kullanici;
+GRANT SELECT ON bolge_verileri TO ro_kullanici;
+
+-- Yetki kontrolü
+SELECT
+  table_name,
+  privilege_type
+FROM information_schema.role_table_grants
+WHERE grantee = 'ro_kullanici'
+ORDER BY table_name;`}
+  label="Read-only yetki şablonu"
+/>
+
+---
+
+## ▶ Fonksiyon Çalıştırma Yetkisi
+
+<RunnableBlock
+  sql={`-- Stored function için EXECUTE yetkisi
+-- (PostGIS fonksiyonları public şemada)
+GRANT EXECUTE ON FUNCTION ST_AsGeoJSON(geometry) TO ro_kullanici;
+GRANT EXECUTE ON FUNCTION ST_Distance(geography, geography) TO ro_kullanici;
+
+-- Daha genel: tüm public fonksiyonlar
+-- GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO ro_kullanici;
+
+-- Verilen execute yetkileri
+SELECT
+  routine_name,
+  privilege_type
+FROM information_schema.role_routine_grants
+WHERE grantee = 'ro_kullanici'
+  AND routine_schema = 'public'
+LIMIT 10;`}
+  label="Fonksiyon yetkileri"
+/>
+
+---
+
+## ▶ Güvenlik Denetim Sorgusu
+
+<RunnableBlock
+  sql={`-- Hangi tablolara kim ne yetkiyle erişebilir?
+SELECT
+  grantee,
+  table_schema,
+  table_name,
+  string_agg(privilege_type, ', ' ORDER BY privilege_type) AS yetkiler
+FROM information_schema.role_table_grants
+WHERE table_schema = 'public'
+  AND grantee NOT IN ('postgres', 'PUBLIC', 'pg_monitor')
+  AND grantee NOT LIKE 'pg_%'
+GROUP BY grantee, table_schema, table_name
+ORDER BY grantee, table_name;`}
+  label="Güvenlik denetim raporu"
+/>
+
+---
+
+## 🧪 Dene — Yetki Matrisi
+
+<RunnableBlock
+  sql={`-- Tüm özel rollerin yetki matrisi
+SELECT
+  r.rolname AS rol,
+  r.rolcanlogin AS login,
+  string_agg(DISTINCT m.rolname, ', ') AS uye_oldugu_roller
+FROM pg_roles r
+LEFT JOIN pg_auth_members am ON am.member = r.oid
+LEFT JOIN pg_roles m ON m.oid = am.roleid
+WHERE r.rolname NOT LIKE 'pg_%'
+  AND r.rolname != 'postgres'
+GROUP BY r.rolname, r.rolcanlogin
+ORDER BY r.rolname;`}
+  label="Rol üyelik matrisi"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`ALTER DEFAULT PRIVILEGES`:** Mevcut tablolara `GRANT SELECT ON ALL TABLES` uygular ama sonradan eklenen tablolar için `ALTER DEFAULT PRIVILEGES` zorunlu.
+2. **pg_hba.conf PGlite'ta yok:** Gerçek sistemde bağlantı güvenliği `pg_hba.conf` ile yönetilir. PGlite'ta bu katman yok.
+3. **Şifre politikası:** `pg_password_check` extension ile güçlü şifre zorlama yapılabilir. Varsayılan PostgreSQL şifre kontrolü yapmaz.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 3.4 tamamlandı! Sırada **Modül 3.5 — Production Operasyonu**: pg_dump, replikasyon, PITR ve izleme.

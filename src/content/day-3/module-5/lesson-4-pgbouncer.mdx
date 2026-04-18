@@ -1,0 +1,117 @@
+## 🎯 Ne öğreneceksin?
+
+- PgBouncer'ın ne yaptığını ve neden gerekli olduğunu açıklayabileceksin
+- Session, transaction ve statement pooling modlarını karşılaştırabileceksin
+- PostGIS için hangi pool modunun uygun olduğunu söyleyebileceksin
+
+---
+
+## 📖 Kavram: Bağlantı Havuzu
+
+**Problem:** Her PostgreSQL bağlantısı ~5-10 MB RAM tüketir. 1000 eş zamanlı kullanıcı = 5-10 GB RAM sadece bağlantılara.
+
+**PgBouncer çözümü:**
+- Uygulama → PgBouncer (binlerce bağlantı)
+- PgBouncer → PostgreSQL (100-300 gerçek bağlantı)
+- Havuz: boş bağlantıları bekleyen sorgulara ver
+
+---
+
+## 📖 Pool Modları
+
+| Mod | Bağlantı tutulur | PostGIS uyumu | Kullanım |
+|---|---|---|---|
+| **Session** | Oturum boyunca | Tam uyumlu | Prepared statements, SET |
+| **Transaction** | İşlem boyunca | Çoğunlukla OK | Web uygulaması |
+| **Statement** | Her sorgu | ❌ Multi-statement yok | Çok basit okuma |
+
+**PostGIS için:** Transaction veya Session pooling. Statement pooling kullanma — `ST_*` fonksiyon çağrıları ve prepared statements sorun çıkarır.
+
+---
+
+## ▶ Canlı Örnek — Bağlantı Sayısı İzle
+
+<RunnableBlock
+  sql={`-- Mevcut bağlantı sayısı
+SELECT
+  COUNT(*) AS toplam_baglanti,
+  COUNT(*) FILTER (WHERE state = 'active') AS aktif,
+  COUNT(*) FILTER (WHERE state = 'idle') AS bosta,
+  MAX(EXTRACT(EPOCH FROM (now() - state_change))::int) AS en_uzun_bosta_sn
+FROM pg_stat_activity
+WHERE pid != pg_backend_pid();`}
+  label="Bağlantı durumu"
+/>
+
+---
+
+## ▶ Maksimum Bağlantı Ayarı
+
+<RunnableBlock
+  sql={`-- PostgreSQL bağlantı limitleri
+SELECT
+  name,
+  setting,
+  unit
+FROM pg_settings
+WHERE name IN (
+  'max_connections',
+  'superuser_reserved_connections',
+  'work_mem',
+  'shared_buffers'
+)
+ORDER BY name;`}
+  label="Bağlantı ve bellek ayarları"
+/>
+
+---
+
+## 📖 PgBouncer Konfigürasyon Şablonu
+
+```ini
+# pgbouncer.ini
+[databases]
+cbs_db = host=127.0.0.1 port=5432 dbname=cbs_db
+
+[pgbouncer]
+listen_port = 6432
+listen_addr = 127.0.0.1
+auth_type = md5
+auth_file = /etc/pgbouncer/userlist.txt
+
+pool_mode = transaction        # PostGIS için
+max_client_conn = 1000         # Uygulama bağlantıları
+default_pool_size = 100        # PostgreSQL bağlantıları
+
+# PostGIS uyumluluk
+ignore_startup_parameters = extra_float_digits
+server_reset_query = DISCARD ALL
+```
+
+---
+
+## 🧪 Dene — Idle Bağlantıları Temizle
+
+<RunnableBlock
+  sql={`-- Uzun süredir boşta olan bağlantıları kapat
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'idle'
+  AND state_change < now() - interval '10 minutes'
+  AND pid != pg_backend_pid();`}
+  label="Idle bağlantıları kapat"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Transaction pooling + prepared statements:** PgBouncer transaction modunda prepared statements farklı bağlantıya dağılabilir → hata. `prepare_threshold = 0` ile devre dışı bırak veya session pool kullan.
+2. **PostGIS SET komutları:** `SET search_path`, `SET enable_seqscan` gibi SET komutları transaction pooling'de session'dan session'a geçmez — her sorguda tekrar gönder.
+3. **PgBouncer izleme:** `SHOW POOLS`, `SHOW CLIENTS`, `SHOW SERVERS` komutları PgBouncer admin konsolundan çalıştırılır (port 6432, `pgbouncer` database'e bağlanarak).
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Son ders: **İzleme** — `pg_stat_activity`, cache hit oranı ve dead tuple izleme.

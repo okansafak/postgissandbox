@@ -1,0 +1,139 @@
+## 🎯 Ne öğreneceksin?
+
+- Ham yol geometrisinden düğüm-kenar topolojisi oluşturabileceksin
+- `ST_StartPoint`, `ST_EndPoint` ile kenar uç noktalarını çıkarabileceksin
+- Topoloji doğrulaması yapabileceksin
+
+---
+
+## 📖 Kavram: Topoloji Oluşturma
+
+Ham yol verisi (LineString'ler) → Ağ analizi için düğüm-kenar modeline dönüştürme:
+
+1. Her çizginin başlangıç ve bitiş noktasını bul
+2. Aynı koordinata denk gelen noktaları tek bir düğüm ID ile tanımla
+3. Her çizgiye `source` ve `target` düğüm ID'si ata
+
+`pgr_createTopology` bunu otomatik yapar — ama PGlite'ta mevcut olmadığından SQL ile yapacağız.
+
+---
+
+## ▶ Canlı Örnek — Ham Çizgilerden Topoloji
+
+<RunnableBlock
+  sql={`-- Ham yol verisini simüle et (uçları bağlı olmayan LineString'ler)
+CREATE TABLE IF NOT EXISTS ham_yollar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(LINESTRING, 4326)
+);
+
+INSERT INTO ham_yollar (ad, geom) VALUES
+  ('Cadde A', ST_GeomFromText('LINESTRING(28.970 41.030, 28.980 41.040)', 4326)),
+  ('Cadde B', ST_GeomFromText('LINESTRING(28.980 41.040, 28.990 41.035)', 4326)),
+  ('Cadde C', ST_GeomFromText('LINESTRING(28.990 41.035, 28.985 41.025)', 4326)),
+  ('Cadde D', ST_GeomFromText('LINESTRING(28.985 41.025, 28.970 41.030)', 4326)),
+  ('Çapraz',  ST_GeomFromText('LINESTRING(28.970 41.030, 28.990 41.035)', 4326))
+ON CONFLICT DO NOTHING;
+
+-- Tüm uç noktaları çıkar
+SELECT
+  id,
+  ad,
+  ST_AsText(ST_StartPoint(geom)) AS baslangic,
+  ST_AsText(ST_EndPoint(geom))   AS bitis
+FROM ham_yollar;`}
+  label="Ham yol uç noktaları"
+/>
+
+---
+
+## ▶ Düğüm ID'si Ata
+
+<RunnableBlock
+  sql={`-- Aynı koordinat = aynı düğüm ID
+WITH tum_noktalar AS (
+  SELECT ST_StartPoint(geom) AS pt FROM ham_yollar
+  UNION
+  SELECT ST_EndPoint(geom)   AS pt FROM ham_yollar
+),
+dugumler AS (
+  SELECT
+    ROW_NUMBER() OVER (ORDER BY ST_X(pt), ST_Y(pt)) AS dugum_id,
+    pt AS geom
+  FROM (SELECT DISTINCT pt FROM tum_noktalar) d
+)
+SELECT dugum_id, ST_AsText(geom) AS koordinat FROM dugumler ORDER BY dugum_id;`}
+  label="Benzersiz düğümlere ID ata"
+/>
+
+---
+
+## ▶ Kenar Tablosunu Tamamla
+
+<RunnableBlock
+  sql={`-- source/target ID'li kenar tablosu oluştur
+WITH tum_noktalar AS (
+  SELECT ST_StartPoint(geom) AS pt FROM ham_yollar
+  UNION
+  SELECT ST_EndPoint(geom)   AS pt FROM ham_yollar
+),
+dugumler AS (
+  SELECT
+    ROW_NUMBER() OVER (ORDER BY ST_X(pt), ST_Y(pt)) AS dugum_id,
+    pt AS geom
+  FROM (SELECT DISTINCT pt FROM tum_noktalar) d
+)
+SELECT
+  y.id,
+  y.ad,
+  ds.dugum_id AS source,
+  dt.dugum_id AS target,
+  ROUND(ST_Length(y.geom::geography)::numeric) AS uzunluk_m
+FROM ham_yollar y
+JOIN dugumler ds ON ST_Equals(ds.geom, ST_StartPoint(y.geom))
+JOIN dugumler dt ON ST_Equals(dt.geom, ST_EndPoint(y.geom))
+ORDER BY y.id;`}
+  label="Tamamlanmış kenar tablosu"
+/>
+
+---
+
+## 🧪 Dene — Bağlantı Kontrolü
+
+<RunnableBlock
+  sql={`-- Hangi düğümler hangi kenarlarla bağlı? (bağlantılılık analizi)
+WITH tum_noktalar AS (
+  SELECT ST_StartPoint(geom) AS pt FROM ham_yollar
+  UNION SELECT ST_EndPoint(geom) FROM ham_yollar
+),
+dugumler AS (
+  SELECT ROW_NUMBER() OVER (ORDER BY ST_X(pt), ST_Y(pt)) AS dugum_id, pt AS geom
+  FROM (SELECT DISTINCT pt FROM tum_noktalar) d
+)
+SELECT
+  d.dugum_id,
+  COUNT(*) AS baglanti_sayisi,
+  array_agg(y.ad ORDER BY y.ad) AS bagli_yollar
+FROM dugumler d
+JOIN ham_yollar y ON
+  ST_Equals(d.geom, ST_StartPoint(y.geom)) OR
+  ST_Equals(d.geom, ST_EndPoint(y.geom))
+GROUP BY d.dugum_id
+ORDER BY d.dugum_id;`}
+  label="Düğüm bağlantı sayıları"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Yakın ama eşit olmayan noktalar:** GPS verisi küçük koordinat farkları içerebilir. `ST_Equals` yerine `ST_DWithin(pt1, pt2, 0.00001)` kullan veya önce snap uygula.
+2. **T-junction (üçlü kavşak):** Bir çizginin ortasından başka çizgi başlıyorsa `ST_StartPoint`/`ST_EndPoint` yetersiz. Ham veriyi `ST_Node` ile önce parçala.
+3. **pgr_createTopology kolaylığı:** Gerçek projede `pgr_createTopology('tablo', 0.00001)` tüm bu adımları otomatik yapar. Kavramsal anlamak için el yapımı gösterdik.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **Dijkstra algoritması** — SQL recursive CTE ile en kısa yol.

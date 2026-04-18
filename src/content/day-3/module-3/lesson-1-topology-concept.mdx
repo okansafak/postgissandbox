@@ -1,0 +1,127 @@
+## 🎯 Ne öğreneceksin?
+
+- PostGIS Topology ile basit geometri arasındaki farkı açıklayabileceksin
+- Paylaşımlı kenar (shared edge) kavramının neden önemli olduğunu anlayabileceksin
+- Topoloji kullanım senaryolarını örnekleyebileceksin
+
+---
+
+## 📖 Kavram: Neden Topoloji?
+
+**Basit geometri (spaghetti model):**
+```
+İl A poligonu: kendi kenarlarını tanımlar
+İl B poligonu: kendi kenarlarını tanımlar
+```
+→ Ortak sınır iki kez saklanır. İl A sınırı güncellense, İl B güncellenmez → boşluk/örtüşme hatası.
+
+**Topoloji:**
+- Ortak sınır **bir kez** saklanır (shared edge)
+- Her poligon kenar listesine referans verir
+- Güncelleme: tek kenarda → tüm komşu poligonlar otomatik güncellenir
+
+---
+
+## 📖 Kullanım Senaryoları
+
+| Senaryo | Sorun | Çözüm |
+|---|---|---|
+| Kadastro parselleri | Komşu parseller çakışıyor | Paylaşımlı kenar |
+| İdari sınırlar | İl güncellenir, ilçe boşluk kalır | Topoloji güncelleme |
+| Yol ağı | Çakışan segmentler | Ortak düğüm |
+| Bina tabanları | 0.001 mm örtüşme | Topoloji temizleme |
+
+---
+
+## ▶ Canlı Örnek — Çakışma Problemi (Basit Geometri)
+
+<RunnableBlock
+  sql={`-- Komşu iki parsel — ortak kenar iki kez tanımlanmış
+CREATE TABLE IF NOT EXISTS parseller_basit (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POLYGON, 4326)
+);
+
+INSERT INTO parseller_basit (ad, geom) VALUES
+  ('Parsel A', ST_GeomFromText('POLYGON((28.970 41.030, 28.980 41.030, 28.980 41.040, 28.970 41.040, 28.970 41.030))', 4326)),
+  ('Parsel B', ST_GeomFromText('POLYGON((28.980 41.030, 28.990 41.030, 28.990 41.040, 28.980 41.040, 28.980 41.030))', 4326));
+
+-- Ortak sınır — paylaşılıyor mu?
+SELECT
+  a.ad AS parsel1,
+  b.ad AS parsel2,
+  ST_AsText(ST_Intersection(a.geom, b.geom)) AS ortak
+FROM parseller_basit a, parseller_basit b
+WHERE a.id < b.id AND ST_Touches(a.geom, b.geom);`}
+  label="Komşu parsel ortak sınır"
+/>
+
+---
+
+## ▶ Topoloji Soruları
+
+<RunnableBlock
+  sql={`-- Topoloji soruları basit geometriyle da yanıtlanabilir
+-- ama güncelleme güvensiz
+SELECT
+  a.ad AS parsel,
+  COUNT(*) AS komsu_sayisi,
+  array_agg(b.ad ORDER BY b.ad) AS komsular
+FROM parseller_basit a
+JOIN parseller_basit b ON ST_Touches(a.geom, b.geom)
+WHERE a.id != b.id
+GROUP BY a.id, a.ad;`}
+  label="Komşuluk ilişkisi"
+/>
+
+---
+
+## ▶ postgis_topology Extension
+
+<RunnableBlock
+  sql={`-- postgis_topology PGlite'ta mevcut mu?
+SELECT name, default_version
+FROM pg_available_extensions
+WHERE name LIKE '%topolog%';`}
+  label="Topology extension kontrolü"
+/>
+
+> PGlite'ta `postgis_topology` mevcut olabilir (PGlite PostGIS 3.6.2 içerir). Extension yüklüyse sonraki dersde kullanacağız.
+
+---
+
+## 🧪 Dene — Örtüşme Tespiti
+
+<RunnableBlock
+  sql={`-- İki poligon arası örtüşme var mı?
+SELECT
+  a.ad,
+  b.ad,
+  ST_Area(ST_Intersection(a.geom, b.geom)::geography) AS ortusum_m2
+FROM parseller_basit a
+JOIN parseller_basit b ON a.id < b.id
+WHERE ST_Overlaps(a.geom, b.geom);
+
+-- Touches ama Overlaps değil = mükemmel komşuluk
+SELECT
+  a.ad, b.ad, 'Mükemmel komşu' AS durum
+FROM parseller_basit a
+JOIN parseller_basit b ON a.id < b.id
+WHERE ST_Touches(a.geom, b.geom) AND NOT ST_Overlaps(a.geom, b.geom);`}
+  label="Örtüşme ve komşuluk tespiti"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Spaghetti model büyük projede sorun:** Az sayıda parsel için basit geometri yeterli. 100K+ parsel → topoloji veya en azından constraint (ST_IsValid + check) zorunlu.
+2. **postgis_topology hafif ağırlıklı değil:** Kurulum, topoloji bakımı ve sorgu yazımı karmaşık. Basit komşuluk için `ST_Touches` yeterli.
+3. **PGlite topoloji desteği:** PostGIS 3.6.2 `postgis_topology` içerir ama PGlite WASM bundle'ında dahil olmayabilir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: `CreateTopology` ve `AddTopoGeometryColumn` ile topoloji kurulumu.

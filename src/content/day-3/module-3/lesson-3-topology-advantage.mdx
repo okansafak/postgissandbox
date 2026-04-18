@@ -1,0 +1,117 @@
+## 🎯 Ne öğreneceksin?
+
+- Topolojik güncellemenin tüm komşuları nasıl otomatik etkilediğini gösterebileceksin
+- Topoloji tabanlı komşuluk sorgularını yazabileceksin
+- Basit geometri vs topoloji için doğru karar verebileceksin
+
+---
+
+## 📖 Kavram: Otomatik Güncelleme
+
+```
+Basit geometri:
+  Parsel A sınırı değişti → Parsel B güncellenmedi → Boşluk oluştu
+
+Topoloji:
+  Kenar güncellendi → Parsel A ve Parsel B aynı kenara referans verir → Otomatik düzeltme
+```
+
+Bu, kadastro ve idari sınır sistemlerinde kritik. TKGM (Tapu Kadastro Genel Müdürlüğü) topolojik veri modeli kullanır.
+
+---
+
+## ▶ Canlı Örnek — Topoloji Komşuluk Sorgusu
+
+<RunnableBlock
+  sql={`-- Topoloji üzerinden komşu parsel tespiti
+-- (kadastro_topo kuruluysa)
+SELECT
+  a.ad AS parsel,
+  b.ad AS komsu
+FROM kadastro a
+JOIN kadastro b ON a.id != b.id
+WHERE ST_Touches(a.tgeom::geometry, b.tgeom::geometry)
+ORDER BY a.ad, b.ad;`}
+  label="Topoloji komşuluk sorgusu"
+/>
+
+---
+
+## ▶ Paylaşılan Kenar Doğrula
+
+<RunnableBlock
+  sql={`-- Paylaşılan kenarları doğrula
+-- left_face ve right_face farklıysa paylaşımlı kenar
+SELECT
+  e.edge_id,
+  e.left_face AS sol_yuz,
+  e.right_face AS sag_yuz,
+  ST_AsText(e.geom) AS kenar_wkt
+FROM kadastro_topo.edge_data e
+WHERE e.left_face != 0 AND e.right_face != 0;`}
+  label="Paylaşılan kenarlar"
+/>
+
+---
+
+## ▶ Basit Geometri ile Karşılaştır
+
+<RunnableBlock
+  sql={`-- Basit geometride aynı sınır iki farklı WKT ile ifade edilmiş
+SELECT
+  a.ad AS parsel1,
+  b.ad AS parsel2,
+  ROUND(ST_Length(
+    ST_Intersection(a.geom, b.geom)::geography
+  )::numeric) AS ortak_sinir_m
+FROM parseller_basit a, parseller_basit b
+WHERE a.id < b.id AND ST_Touches(a.geom, b.geom);`}
+  label="Basit geometride ortak sınır uzunluğu"
+/>
+
+---
+
+## 🧪 Dene — Geometri Doğrulama
+
+<RunnableBlock
+  sql={`-- Topoloji doğrulama: geçersiz geometri var mı?
+SELECT
+  ad,
+  ST_IsValid(geom) AS gecerli,
+  ST_IsValidReason(geom) AS neden
+FROM parseller_basit
+WHERE NOT ST_IsValid(geom);
+
+-- Temiz rapor
+SELECT 'Tüm geometriler geçerli' AS durum
+WHERE NOT EXISTS (
+  SELECT 1 FROM parseller_basit WHERE NOT ST_IsValid(geom)
+);`}
+  label="Geometri doğrulama raporu"
+/>
+
+---
+
+## 📖 Karar: Ne Zaman Topoloji?
+
+| Durum | Topoloji gerekli mi? |
+|---|---|
+| < 1000 parsel, statik veri | ❌ ST_Touches yeterli |
+| 100K+ parsel, sık güncelleme | ✅ Topoloji zorunlu |
+| Yol ağı analizi | ✅ veya pgRouting şeması |
+| Web harita görüntüleme | ❌ Basit geometry daha hızlı |
+| Kadastro / resmi sınır | ✅ Standart gereği |
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Topoloji bakımı:** `RemoveFromTopology`, `MoveIsoNode` gibi fonksiyonları öğrenmek gerekir. Basit UPDATE çalışmaz.
+2. **Sorgu karmaşıklığı:** `tgeom::geometry` cast her sorguda ek join maliyeti ekler.
+3. **PostGIS Topology API kararlılığı:** Major versiyon değişimlerinde API değişebilir — sürüm sabitliliğini kontrol et.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 3.3 tamamlandı! Sırada **Modül 3.4 — Güvenlik**: rol, yetki, RLS ve mekansal erişim kontrolü.

@@ -1,0 +1,132 @@
+## 🏆 Görev 3: Erişilemez Bölgeler
+
+**Hedef:** Hangi ilçelerin merkezi en yakın toplanma alanına 2 km'den uzakta? Bu ilçeleri haritada kırmızıyla göster.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- `ST_DWithin` + `NOT EXISTS` ile erişim boşluğu tespit edebileceksin
+- İlçe centroid'i ile toplanma alanı mesafesini hesaplayabileceksin
+- Kritik bölgeleri haritada vurgulayabileceksin
+
+---
+
+## ▶ Her İlçeye En Yakın Toplanma Alanı
+
+<RunnableBlock
+  sql={`-- İlçe merkezi → en yakın toplanma alanı mesafesi
+SELECT
+  i.ilce,
+  t.ad AS yakin_toplanma,
+  ROUND(ST_Distance(
+    ST_Centroid(i.geom)::geography,
+    t.geom::geography
+  )::numeric / 1000, 2) AS uzaklik_km,
+  t.kapasite
+FROM istanbul_ilceler i
+CROSS JOIN LATERAL (
+  SELECT ad, geom, kapasite
+  FROM toplanma_alanlari
+  ORDER BY ST_Distance(ST_Centroid(i.geom)::geography, geom::geography)
+  LIMIT 1
+) t
+ORDER BY uzaklik_km DESC;`}
+  label="İlçe → en yakın toplanma alanı"
+/>
+
+---
+
+## ▶ 2 km Eşiğini Aşan İlçeler
+
+<RunnableBlock
+  sql={`-- 2 km içinde toplanma alanı OLMAYAN ilçeler
+SELECT
+  i.ilce,
+  i.nufus,
+  ST_Centroid(i.geom) AS merkez_geom,
+  MIN(ST_Distance(
+    ST_Centroid(i.geom)::geography,
+    t.geom::geography
+  ) / 1000)::numeric AS en_yakin_km
+FROM istanbul_ilceler i
+CROSS JOIN toplanma_alanlari t
+GROUP BY i.id, i.ilce, i.nufus, i.geom
+HAVING MIN(ST_Distance(
+  ST_Centroid(i.geom)::geography,
+  t.geom::geography
+)) > 2000
+ORDER BY en_yakin_km DESC;`}
+  label="2 km+ uzaktaki ilçeler"
+/>
+
+---
+
+## ▶ NOT EXISTS ile Verimli Sorgu
+
+<RunnableBlock
+  sql={`-- ST_DWithin + NOT EXISTS — indeks dostu
+SELECT
+  i.ilce,
+  i.nufus,
+  i.geom AS ilce_geom
+FROM istanbul_ilceler i
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM toplanma_alanlari t
+  WHERE ST_DWithin(
+    ST_Centroid(i.geom)::geography,
+    t.geom::geography,
+    2000  -- 2 km
+  )
+)
+ORDER BY i.nufus DESC;`}
+  label="NOT EXISTS ile erişim boşluğu"
+/>
+
+---
+
+## ▶ Görselleştirme: Riskli İlçeler
+
+<RunnableBlock
+  sql={`-- Tüm ilçeler + erişim durumu (harita için)
+SELECT
+  i.ilce,
+  i.nufus,
+  i.geom,
+  CASE
+    WHEN EXISTS (
+      SELECT 1 FROM toplanma_alanlari t
+      WHERE ST_DWithin(ST_Centroid(i.geom)::geography, t.geom::geography, 2000)
+    ) THEN 'erisimli'
+    ELSE 'riskli'
+  END AS durum
+FROM istanbul_ilceler i
+ORDER BY i.ilce;`}
+  label="İlçe erişim durum haritası"
+/>
+
+---
+
+## 🧪 Dene — Kapasite Ağırlıklı Analiz
+
+<RunnableBlock
+  sql={`-- Toplam kapasiteye göre ilçe sıralaması
+SELECT
+  i.ilce,
+  i.nufus,
+  COALESCE(SUM(t.kapasite), 0) AS yakin_kapasite,
+  ROUND(COALESCE(SUM(t.kapasite), 0)::numeric / i.nufus * 100, 2) AS kapasite_oran_pct
+FROM istanbul_ilceler i
+LEFT JOIN toplanma_alanlari t
+  ON ST_DWithin(ST_Centroid(i.geom)::geography, t.geom::geography, 3000)
+GROUP BY i.id, i.ilce, i.nufus
+ORDER BY kapasite_oran_pct ASC;`}
+  label="Nüfus başına toplanma kapasitesi"
+/>
+
+---
+
+## 🔗 Sıradaki Görev
+
+Son görev: **Hotspot Analizi** — acil çağrı yoğunluklarını DBSCAN ile tespit et.

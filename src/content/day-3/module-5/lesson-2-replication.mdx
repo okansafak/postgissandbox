@@ -1,0 +1,131 @@
+## 🎯 Ne öğreneceksin?
+
+- Streaming ve Logical Replication farkını açıklayabileceksin
+- PostGIS için hangi replikasyon tipinin uygun olduğunu söyleyebileceksin
+- Replikasyon kurulum adımlarını özetleyebileceksin
+
+---
+
+## 📖 Kavram: Replikasyon Tipleri
+
+| Özellik | Streaming | Logical |
+|---|---|---|
+| Kapsam | Tüm cluster (byte-by-byte) | Tablo seçimi mümkün |
+| PostgreSQL versiyon farkı | Aynı major versiyon | Farklı versiyon OK |
+| PostGIS desteği | Tam | Kısıtlı (`geometry` için logical decode eklentisi gerekebilir) |
+| Read replica | Evet | Evet |
+| Çift yönlü | Hayır | Evet (bi-directional) |
+| Kullanım | HA, failover | Seçici sync, upgrade, cross-cluster |
+
+---
+
+## 📖 PostGIS ve Replikasyon
+
+**Streaming Replication** PostGIS ile sorunsuz çalışır — fiziksel kopyalama yapar.
+
+**Logical Replication** dikkat gerektiren durumlar:
+- `geometry` tipi binary format — `pgoutput` plugin ile desteklenir (PG 15+)
+- Extension yayınlamada `wal_level = logical` gerekir
+- Subscriber tarafında extension kurulu olmalı
+
+---
+
+## ▶ Canlı Örnek — Replikasyon Durumu Sorgula
+
+<RunnableBlock
+  sql={`-- Streaming replication durumu (replica sunucuda çalışır)
+SELECT
+  application_name,
+  state,
+  sent_lsn,
+  write_lsn,
+  flush_lsn,
+  replay_lsn,
+  sync_state
+FROM pg_stat_replication;
+-- Boş dönerse replikasyon yapılandırılmamış (tek sunucu)`}
+  label="Replication slot durumu"
+/>
+
+---
+
+## ▶ WAL Konfigürasyon Kontrolü
+
+<RunnableBlock
+  sql={`-- Replikasyon için gerekli ayarlar
+SELECT name, setting, unit, context
+FROM pg_settings
+WHERE name IN (
+  'wal_level',
+  'max_wal_senders',
+  'max_replication_slots',
+  'hot_standby',
+  'archive_mode'
+)
+ORDER BY name;`}
+  label="WAL ve replikasyon ayarları"
+/>
+
+---
+
+## ▶ Logical Replication Publication
+
+<RunnableBlock
+  sql={`-- Logical replication: yayın oluştur
+-- (wal_level = logical gerektirir, PGlite'ta çalışmayabilir)
+
+-- Mekansal tablolar için publication
+-- CREATE PUBLICATION cbs_pub
+--   FOR TABLE noktalar_perf, kaza_noktalari;
+
+-- Mevcut publikasyonlar
+SELECT pubname, puballtables, pubinsert, pubupdate, pubdelete
+FROM pg_publication;`}
+  label="Logical replication publication"
+/>
+
+---
+
+## 📖 Replikasyon Mimarisi
+
+```
+Üretim (Primary):
+  PostgreSQL + PostGIS
+  wal_level = replica (streaming) veya logical
+       |
+       | WAL stream
+       ↓
+Yedek (Standby):
+  PostgreSQL + PostGIS (aynı versiyon)
+  hot_standby = on → Read queries OK
+
+Read Replica kullanım:
+  Uygulama → Primary (yazma)
+  Raporlama → Standby (okuma)
+```
+
+---
+
+## 🧪 Dene — Replication Lag Simülasyonu
+
+<RunnableBlock
+  sql={`-- Replikasyon lag: pg_wal_lsn_diff ile
+SELECT
+  pg_current_wal_lsn() AS mevcut_lsn,
+  pg_walfile_name(pg_current_wal_lsn()) AS wal_dosyasi;`}
+  label="Mevcut WAL konumu"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Standby read-only:** Streaming standby yazma kabul etmez. Bağlantı pool'unu primary/standby olarak ikiye ayır.
+2. **PostGIS extension standby'da:** Standby fiziksel kopya — extension otomatik mevcut. Logical replication'da manuel kurulum gerekir.
+3. **Replikasyon lag izleme:** `pg_stat_replication.replay_lag` kolonunu izle. Uzun lag → standby yavaş → failover gecikmesi.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **PITR** — yanlışlıkla silinen veriyi zaman makinesiyle geri getir.

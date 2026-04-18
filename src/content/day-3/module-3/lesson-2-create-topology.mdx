@@ -1,0 +1,115 @@
+## 🎯 Ne öğreneceksin?
+
+- `CreateTopology` ile topoloji şeması oluşturabileceksin
+- `ST_CreateTopoGeo` veya `toTopoGeom` ile geometrileri topolojiye dönüştürebileceksin
+- Topoloji tablolarını (`edge_data`, `node`, `face`) sorgulayabileceksin
+
+---
+
+## 📖 Kavram: Topoloji Veri Yapısı
+
+`CreateTopology('isim', srid, precision)` şu tabloları oluşturur:
+
+| Tablo | İçerik |
+|---|---|
+| `isim.node` | Düğümler (noktalar) |
+| `isim.edge_data` | Kenarlar (çizgiler + sol/sağ yüz referansı) |
+| `isim.face` | Yüzeyler (poligonlar) |
+| `isim.relation` | Feature → topoloji element bağlantısı |
+
+---
+
+## ▶ Canlı Örnek — Topoloji Oluştur
+
+<RunnableBlock
+  sql={`-- postgis_topology extension yükle
+CREATE EXTENSION IF NOT EXISTS postgis_topology;
+
+-- Yeni topoloji: 'kadastro_topo', SRID 4326, precision 0.00001 derece
+SELECT CreateTopology('kadastro_topo', 4326, 0.00001);`}
+  label="Topoloji şeması oluştur"
+/>
+
+---
+
+## ▶ TopoGeometry Sütunu Ekle
+
+<RunnableBlock
+  sql={`-- Parsel tablosuna topoloji sütunu ekle
+CREATE TABLE IF NOT EXISTS kadastro (
+  id    SERIAL PRIMARY KEY,
+  ad    TEXT,
+  tgeom TOPOGEOMETRY
+);
+
+-- Topoloji sütununu kaydet
+SELECT AddTopoGeometryColumn(
+  'kadastro_topo',  -- topoloji adı
+  'public',         -- şema
+  'kadastro',       -- tablo
+  'tgeom',          -- sütun
+  'POLYGON'         -- tip
+);`}
+  label="TopoGeometry sütunu ekle"
+/>
+
+---
+
+## ▶ Geometri Topolojiye Dönüştür
+
+<RunnableBlock
+  sql={`-- Parselleri topolojiye ekle
+INSERT INTO kadastro (ad, tgeom)
+SELECT ad, toTopoGeom(geom, 'kadastro_topo', 1, 0.00001)
+FROM parseller_basit;
+
+-- Topoloji düğümlerini gör
+SELECT node_id, ST_AsText(geom) AS konum
+FROM kadastro_topo.node;`}
+  label="Geometriyi topolojiye dönüştür"
+/>
+
+---
+
+## ▶ Topoloji Kenarlarını İncele
+
+<RunnableBlock
+  sql={`-- Kenar tablosu: shared edges burada
+SELECT
+  edge_id,
+  start_node,
+  end_node,
+  left_face,
+  right_face,
+  ST_AsText(geom) AS kenar_wkt
+FROM kadastro_topo.edge_data;`}
+  label="Kenar verisi"
+/>
+
+---
+
+## 🧪 Dene — Topoloji Üzerinden Geometri Al
+
+<RunnableBlock
+  sql={`-- TopoGeometry'den standart geometry'ye geri dön
+SELECT
+  ad,
+  ST_AsText(tgeom::geometry) AS wkt,
+  ST_Area(tgeom::geometry::geography) AS alan_m2
+FROM kadastro;`}
+  label="TopoGeometry → Geometry dönüşümü"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`CreateTopology` idempotent değil:** Aynı isimle tekrar çağrılırsa hata. `DropTopology('kadastro_topo')` ile önce sil.
+2. **Precision çok büyük:** `precision = 1.0` (1 derece) çok geniş snap — yakın kenarlar birleşir. Genellikle `0.00001` (≈1m) güvenli.
+3. **PGlite'ta topology desteği:** Extension yüklü olsa bile bazı fonksiyonlar WASM'da çalışmayabilir. Hata alırsan kavramsal anlatım izini takip et.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Son ders: **Topolojik güncellemenin avantajı** — komşu parsel otomatik değişimi.

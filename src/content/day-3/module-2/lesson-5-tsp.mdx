@@ -1,0 +1,166 @@
+## 🎯 Ne öğreneceksin?
+
+- Gezgin Satıcı Problemi'ni (TSP) açıklayabileceksin
+- Greedy nearest-neighbor heuristiğini SQL ile uygulayabileceksin
+- Teslimat güzergahı için pratik çözüm üretebileceksin
+
+---
+
+## 📖 Kavram: TSP
+
+"N nokta ziyaret edilecek, başlangıca geri dön — toplam mesafeyi minimize et."
+
+TSP NP-hard: Exact çözüm 20+ nokta için yıllarca sürebilir. Gerçek uygulamada **heuristik** kullanılır:
+
+| Yöntem | Kalite | Hız |
+|---|---|---|
+| **Greedy nearest-neighbor** | %20-25 optimal üstü | Çok hızlı |
+| **2-opt swap** | Çok iyi | Orta |
+| **pgr_TSP** (concorde) | Optimal | Yavaş |
+
+PGlite'ta pgr_TSP yok — greedy yaklaşımı SQL ile göstereceğiz.
+
+---
+
+## ▶ Canlı Örnek — 5 Durak Teslimat
+
+<RunnableBlock
+  sql={`-- 5 teslimat noktası
+CREATE TABLE IF NOT EXISTS teslimat_noktalari (
+  id   INT PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO teslimat_noktalari (id, ad, geom) VALUES
+  (1, 'Depo (Taksim)',    ST_SetSRID(ST_MakePoint(28.979, 41.037), 4326)),
+  (2, 'Beşiktaş',        ST_SetSRID(ST_MakePoint(29.005, 41.043), 4326)),
+  (3, 'Levent',          ST_SetSRID(ST_MakePoint(29.010, 41.079), 4326)),
+  (4, 'Şişli',           ST_SetSRID(ST_MakePoint(28.982, 41.055), 4326)),
+  (5, 'Kağıthane',       ST_SetSRID(ST_MakePoint(28.980, 41.090), 4326))
+ON CONFLICT DO NOTHING;
+
+-- Tüm noktalar arası mesafe matrisi
+SELECT
+  a.ad AS nereden,
+  b.ad AS nereye,
+  ROUND(ST_Distance(a.geom::geography, b.geom::geography)::numeric / 1000, 2) AS km
+FROM teslimat_noktalari a
+CROSS JOIN teslimat_noktalari b
+WHERE a.id < b.id
+ORDER BY km;`}
+  label="Mesafe matrisi"
+/>
+
+---
+
+## ▶ Greedy Nearest-Neighbor
+
+<RunnableBlock
+  sql={`-- Greedy: Depo'dan başla, her adımda en yakın ziyaret edilmemiş noktaya git
+WITH RECURSIVE guzergah AS (
+  -- Başlangıç: Depo (id=1)
+  SELECT
+    1 AS mevcut_id,
+    ARRAY[1] AS ziyaret_edildi,
+    0.0 AS toplam_km
+  UNION ALL
+  SELECT
+    sonraki.id,
+    g.ziyaret_edildi || ARRAY[sonraki.id],
+    g.toplam_km + sonraki.mesafe_km
+  FROM guzergah g
+  CROSS JOIN LATERAL (
+    SELECT
+      t.id,
+      ROUND(ST_Distance(
+        (SELECT geom FROM teslimat_noktalari WHERE id = g.mevcut_id)::geography,
+        t.geom::geography
+      )::numeric / 1000, 2) AS mesafe_km
+    FROM teslimat_noktalari t
+    WHERE NOT t.id = ANY(g.ziyaret_edildi)
+    ORDER BY ST_Distance(
+      (SELECT geom FROM teslimat_noktalari WHERE id = g.mevcut_id)::geography,
+      t.geom::geography
+    )
+    LIMIT 1
+  ) sonraki
+  WHERE array_length(g.ziyaret_edildi, 1) < 5
+)
+SELECT
+  ziyaret_edildi AS sira,
+  toplam_km AS guzergah_km,
+  -- Depoya dönüş ekle
+  toplam_km + ROUND(ST_Distance(
+    (SELECT geom FROM teslimat_noktalari WHERE id = mevcut_id)::geography,
+    (SELECT geom FROM teslimat_noktalari WHERE id = 1)::geography
+  )::numeric / 1000, 2) AS toplam_donuslu_km
+FROM guzergah
+WHERE array_length(ziyaret_edildi, 1) = 5
+ORDER BY toplam_km;`}
+  label="Greedy nearest-neighbor güzergah"
+/>
+
+---
+
+## ▶ Güzergah Geometrisini Çiz
+
+<RunnableBlock
+  sql={`-- Güzergahı tek LineString olarak çiz
+WITH sira AS (
+  SELECT ARRAY[1, 2, 4, 3, 5, 1] AS dugum_sira  -- greedy sonucunu manuel gir
+)
+SELECT
+  ST_MakeLine(
+    ARRAY(
+      SELECT t.geom
+      FROM unnest(sira.dugum_sira) WITH ORDINALITY AS u(id, ord)
+      JOIN teslimat_noktalari t ON t.id = u.id
+      ORDER BY u.ord
+    )
+  ) AS rota_geom
+FROM sira;`}
+  label="Güzergah geometrisi"
+/>
+
+---
+
+## 🧪 Dene — En Kötü Güzergah ile Karşılaştır
+
+<RunnableBlock
+  sql={`-- Tüm permütasyonların toplam mesafesi (5! = 120 kombinasyon)
+SELECT
+  ARRAY[a,b,c,d,e] AS sira,
+  ROUND((
+    SELECT SUM(ST_Distance(t1.geom::geography, t2.geom::geography) / 1000)
+    FROM (VALUES
+      (a,b),(b,c),(c,d),(d,e),(e,a)
+    ) AS pairs(x,y)
+    JOIN teslimat_noktalari t1 ON t1.id = pairs.x
+    JOIN teslimat_noktalari t2 ON t2.id = pairs.y
+  )::numeric, 2) AS toplam_km
+FROM
+  (SELECT 1 AS a) t1,
+  (SELECT unnest(ARRAY[2,3,4,5]) AS b) t2,
+  (SELECT unnest(ARRAY[2,3,4,5]) AS c) t3,
+  (SELECT unnest(ARRAY[2,3,4,5]) AS d) t4,
+  (SELECT unnest(ARRAY[2,3,4,5]) AS e) t5
+WHERE b<>c AND b<>d AND b<>e AND c<>d AND c<>e AND d<>e
+ORDER BY toplam_km
+LIMIT 5;`}
+  label="Tüm permütasyonların en kısa 5'i"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Greedy optimal değil:** Greedy %20-30 daha uzun güzergah üretebilir. Küçük setlerde tam çözüm, büyüklerde 2-opt veya OR-Tools kullan.
+2. **Gerçek yol vs kuş uçuşu:** Bu örnekte kuş uçuşu mesafe kullandık. Gerçek projede Dijkstra/OSRM ile yol mesafesi al.
+3. **pgr_TSP:** pgRouting mevcut olduğunda `pgr_tsp(matrix, start_id)` çağrısı yeterli — Concorde solver kullanır.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 3.2 tamamlandı! Sırada **Modül 3.3 — Topology**: paylaşımlı kenar kavramı ve kadastro verisi.

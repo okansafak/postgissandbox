@@ -1,0 +1,132 @@
+## 🎯 Ne öğreneceksin?
+
+- Dijkstra algoritmasının mantığını açıklayabileceksin
+- SQL recursive CTE ile en kısa yolu hesaplayabileceksin
+- `yol_agi` tablosu üzerinde A → B güzergahı bulabileceksin
+
+---
+
+## 📖 Kavram: Dijkstra Algoritması
+
+1. Başlangıç düğümüne mesafe = 0, diğerlerine ∞
+2. En düşük maliyetli düğümü seç
+3. Komşularına güncellenen mesafeyi yaz (geçiş daha ucuzsa)
+4. Hedef düğüme ulaşana dek tekrar et
+
+**SQL ile:** Recursive CTE (WITH RECURSIVE) Dijkstra'yı yaklaşık olarak simüle edebilir — küçük ağlarda yeterli.
+
+---
+
+## ▶ Canlı Örnek — Taksim'den Maslak'a
+
+<RunnableBlock
+  sql={`-- Yol ağı tablosunun mevcut olduğunu varsayıyoruz (lesson-1'den)
+-- En kısa yol: Düğüm 1 (Taksim) → Düğüm 5 (Maslak)
+WITH RECURSIVE dijkstra AS (
+  -- Başlangıç: Taksim (düğüm 1)
+  SELECT
+    1 AS dugum,
+    0.0 AS toplam_maliyet,
+    ARRAY[1] AS yol,
+    FALSE AS ziyaret_edildi
+  UNION ALL
+  SELECT
+    CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END,
+    d.toplam_maliyet + y.uzunluk_m,
+    d.yol || ARRAY[CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END],
+    FALSE
+  FROM dijkstra d
+  JOIN yol_agi y ON (y.source = d.dugum OR (y.target = d.dugum AND NOT y.tek_yon))
+  WHERE NOT (CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END = ANY(d.yol))
+    AND array_length(d.yol, 1) < 6
+)
+SELECT
+  yol,
+  ROUND(toplam_maliyet::numeric / 1000, 2) AS toplam_km
+FROM dijkstra
+WHERE dugum = 5  -- Maslak
+ORDER BY toplam_maliyet
+LIMIT 3;`}
+  label="Dijkstra: Taksim → Maslak"
+/>
+
+---
+
+## ▶ Yol Geometrisini Çiz
+
+<RunnableBlock
+  sql={`-- En kısa yolu haritada göster
+WITH RECURSIVE dijkstra AS (
+  SELECT 1 AS dugum, 0.0 AS maliyet, ARRAY[1] AS yol
+  UNION ALL
+  SELECT
+    CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END,
+    d.maliyet + y.uzunluk_m,
+    d.yol || ARRAY[CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END]
+  FROM dijkstra d
+  JOIN yol_agi y ON (y.source = d.dugum OR (y.target = d.dugum AND NOT y.tek_yon))
+  WHERE NOT (CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END = ANY(d.yol))
+    AND array_length(d.yol, 1) < 6
+),
+en_kisa AS (
+  SELECT yol FROM dijkstra WHERE dugum = 5 ORDER BY maliyet LIMIT 1
+),
+yol_segmentler AS (
+  SELECT
+    n1, n2,
+    y.geom
+  FROM (
+    SELECT
+      yol[i] AS n1,
+      yol[i+1] AS n2
+    FROM en_kisa, generate_series(1, array_length(yol, 1)-1) i
+  ) pairs
+  JOIN yol_agi y ON
+    (y.source = n1 AND y.target = n2) OR
+    (y.source = n2 AND y.target = n1)
+)
+SELECT ST_Collect(geom) AS rota_geom FROM yol_segmentler;`}
+  label="En kısa yol geometrisi"
+/>
+
+---
+
+## 🧪 Dene — Farklı Hedef
+
+<RunnableBlock
+  sql={`-- Beşiktaş'tan Maslak'a (düğüm 2 → 5)
+WITH RECURSIVE dijkstra AS (
+  SELECT 2 AS dugum, 0.0 AS maliyet, ARRAY[2] AS yol
+  UNION ALL
+  SELECT
+    CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END,
+    d.maliyet + y.uzunluk_m,
+    d.yol || ARRAY[CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END]
+  FROM dijkstra d
+  JOIN yol_agi y ON (y.source = d.dugum OR (y.target = d.dugum AND NOT y.tek_yon))
+  WHERE NOT (CASE WHEN y.source = d.dugum THEN y.target ELSE y.source END = ANY(d.yol))
+    AND array_length(d.yol, 1) < 6
+)
+SELECT
+  yol,
+  ROUND(maliyet::numeric / 1000, 2) AS km
+FROM dijkstra
+WHERE dugum = 5
+ORDER BY maliyet
+LIMIT 3;`}
+  label="Beşiktaş → Maslak güzergahları"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Recursive CTE Dijkstra = simülasyon:** Büyük ağlarda (10K+ kenar) bu yaklaşım yavaş ve tam doğru değil. Gerçek projede pgRouting veya uygulama katmanı (OSRM, Valhalla) kullan.
+2. **Döngü kontrolü:** `NOT ... = ANY(d.yol)` döngü önler ama `array_length < 6` limiti koymazsan sonsuz döngü olabilir.
+3. **Tek yönlü yol:** `tek_yon = TRUE` olan kenarda geri yön geçişi engellendi. Yön kontrolünü tam uygulamak için `reverse_cost = -1` şemasına bak.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **Servis alanı (izokon)** — bir noktadan N dakika/km içinde ulaşılabilir bölge.

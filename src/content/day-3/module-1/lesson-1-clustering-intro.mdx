@@ -1,0 +1,116 @@
+## 🎯 Ne öğreneceksin?
+
+- Mekansal kümeleme kavramını açıklayabileceksin
+- KMeans, DBSCAN ve H3 yöntemlerini karşılaştırabileceksin
+- Hangi durumda hangi yöntemi seçeceğine karar verebileceksin
+
+---
+
+## 📖 Kavram: Mekansal Kümeleme Nedir?
+
+Kümeleme: Birbirine yakın nesneleri otomatik olarak gruplama — önceden etiket olmadan.
+
+**Kullanım alanları:**
+- Şube lokasyonu optimizasyonu
+- Trafik kaza kara noktaları
+- Nüfus yoğunluk haritası
+- Teslimat rota gruplandırma
+
+---
+
+## 📖 Üç Ana Yaklaşım
+
+| Yöntem | Küme sayısı | Gürültü toleransı | En iyi kullanım |
+|---|---|---|---|
+| **KMeans** (`ST_ClusterKMeans`) | Önceden belirlenir | Yok | Şube/bölge optimizasyonu |
+| **DBSCAN** (`ST_ClusterDBSCAN`) | Otomatik bulunur | Var | Kaza noktaları, anomali |
+| **H3 Hex Grid** | Grid boyutuna göre | — | Yoğunluk haritası, görsel |
+
+---
+
+## ▶ Canlı Örnek — Test Verisi
+
+<RunnableBlock
+  sql={`-- Kümeleme için test verisi: İstanbul çevresinde 500 nokta
+CREATE TABLE IF NOT EXISTS kaza_noktalari (
+  id    SERIAL PRIMARY KEY,
+  zaman DATE,
+  agir  BOOLEAN,
+  geom  GEOMETRY(POINT, 4326)
+);
+
+-- 3 yoğunluk bölgesi + dağınık gürültü
+INSERT INTO kaza_noktalari (zaman, agir, geom)
+SELECT
+  '2024-01-01'::date + (random() * 365)::int,
+  random() > 0.8,
+  CASE (i % 4)
+    WHEN 0 THEN  -- Boğaziçi köprüsü çevresi
+      ST_SetSRID(ST_MakePoint(29.03 + random()*0.05, 41.04 + random()*0.03), 4326)
+    WHEN 1 THEN  -- TEM Bağcılar
+      ST_SetSRID(ST_MakePoint(28.82 + random()*0.05, 41.05 + random()*0.03), 4326)
+    WHEN 2 THEN  -- E-5 Maltepe
+      ST_SetSRID(ST_MakePoint(29.12 + random()*0.05, 40.92 + random()*0.03), 4326)
+    ELSE         -- Rastgele gürültü
+      ST_SetSRID(ST_MakePoint(28.6 + random()*0.8, 40.85 + random()*0.4), 4326)
+  END
+FROM generate_series(1, 500) i
+ON CONFLICT DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_kaza_geom ON kaza_noktalari USING gist(geom);
+ANALYZE kaza_noktalari;
+
+SELECT COUNT(*) AS toplam_kayit FROM kaza_noktalari;`}
+  label="Kümeleme test verisi"
+/>
+
+---
+
+## ▶ Yöntem Karşılaştırma Tablosu
+
+<RunnableBlock
+  sql={`-- KMeans: 5 küme, her noktaya küme numarası ata
+SELECT
+  ST_ClusterKMeans(geom, 5) OVER () AS kmeans_id,
+  COUNT(*) OVER (PARTITION BY ST_ClusterKMeans(geom, 5) OVER ()) AS kume_boyutu,
+  id
+FROM kaza_noktalari
+ORDER BY kmeans_id
+LIMIT 10;`}
+  label="KMeans küme dağılımı (ilk 10)"
+/>
+
+---
+
+## 🧪 Dene — Küme Merkezleri
+
+<RunnableBlock
+  sql={`-- Her KMeans kümesinin merkezi
+SELECT
+  kume_id,
+  COUNT(*) AS nokta_sayisi,
+  ST_AsText(ST_Centroid(ST_Collect(geom))) AS merkez
+FROM (
+  SELECT
+    ST_ClusterKMeans(geom, 5) OVER () AS kume_id,
+    geom
+  FROM kaza_noktalari
+) sub
+GROUP BY kume_id
+ORDER BY nokta_sayisi DESC;`}
+  label="KMeans küme merkezleri"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **KMeans küre sayısını önceden bilmek gerekir:** Kaç küme olduğunu bilmiyorsan DBSCAN daha iyi seçim.
+2. **KMeans geometri ağırlığı izler:** Tüm noktalar eşit ağırlıklı — outlier etkisi azaltılamaz.
+3. **DBSCAN parametreler kritik:** `eps` (mesafe) ve `min_points` yanlış ayarlanınca tüm noktalar tek küme veya gürültü olabilir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste KMeans detaylı: **ST_ClusterKMeans** ile şube optimizasyonu.

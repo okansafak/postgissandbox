@@ -1,0 +1,112 @@
+## 🏆 Görev 2: İlçe Bazlı Sağlık Yoğunluğu
+
+**Hedef:** Her ilçedeki sağlık kuruluşu sayısını ve nüfus başına sağlık kuruluşu oranını hesapla.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- Mekansal JOIN ile ilçe-kuruluş ilişkisi kurabileceksin
+- Nüfus başına normalize edilmiş sağlık göstergesi üretebileceksin
+- Sonuçları haritada görselleştirebileceksin
+
+---
+
+## ▶ İlçe Bazlı Sağlık Sayımı
+
+<RunnableBlock
+  sql={`SELECT
+  i.ilce,
+  i.nufus,
+  COUNT(s.id) AS toplam_kuruluş,
+  COUNT(s.id) FILTER (WHERE s.tur = 'hastane') AS hastane,
+  COUNT(s.id) FILTER (WHERE s.tur = 'saglik_ocagi') AS saglik_ocagi,
+  ROUND(
+    COUNT(s.id)::numeric / i.nufus * 100000, 2
+  ) AS yuz_bin_kisi_basi
+FROM istanbul_ilceler i
+LEFT JOIN saglik_kuruluslari s
+  ON ST_Within(s.geom, i.geom)
+GROUP BY i.id, i.ilce, i.nufus
+ORDER BY yuz_bin_kisi_basi DESC;`}
+  label="İlçe sağlık yoğunluğu"
+/>
+
+---
+
+## ▶ Harita için İlçe + Yoğunluk
+
+<RunnableBlock
+  sql={`-- İlçe poligonları + sağlık skoru — haritada renklendir
+SELECT
+  i.ilce,
+  i.geom,
+  COUNT(s.id) AS kuruluş_sayisi,
+  CASE
+    WHEN COUNT(s.id) = 0 THEN 'kapsamsiz'
+    WHEN COUNT(s.id) = 1 THEN 'dusuk'
+    WHEN COUNT(s.id) <= 3 THEN 'orta'
+    ELSE 'yuksek'
+  END AS kapsam_seviye
+FROM istanbul_ilceler i
+LEFT JOIN saglik_kuruluslari s ON ST_Within(s.geom, i.geom)
+GROUP BY i.id, i.ilce, i.geom
+ORDER BY kuruluş_sayisi;`}
+  label="İlçe kapsam haritası"
+/>
+
+---
+
+## ▶ En Az Kapsanan İlçeler
+
+<RunnableBlock
+  sql={`-- En düşük sağlık kapsamı
+SELECT
+  i.ilce,
+  i.nufus,
+  COALESCE(COUNT(s.id), 0) AS kuruluş,
+  CASE WHEN COUNT(s.id) = 0 THEN '⚠ Hiç kuruluş yok!' ELSE 'OK' END AS uyari
+FROM istanbul_ilceler i
+LEFT JOIN saglik_kuruluslari s ON ST_Within(s.geom, i.geom)
+GROUP BY i.id, i.ilce, i.nufus
+HAVING COUNT(s.id) < 2
+ORDER BY i.nufus DESC;`}
+  label="Düşük kapsamlı ilçeler"
+/>
+
+---
+
+## ▶ Sağlık Kuruluşu Centroid Haritası
+
+<RunnableBlock
+  sql={`-- Her sağlık kuruluşunun konumu — haritada nokta olarak
+SELECT
+  ad,
+  tur,
+  ilce,
+  geom
+FROM saglik_kuruluslari
+ORDER BY tur, ad;`}
+  label="Sağlık kuruluşları harita"
+/>
+
+---
+
+## 🧪 Dene — En Yoğun İlçedeki Hastaneler
+
+<RunnableBlock
+  sql={`-- En kalabalık ilçedeki tüm sağlık kuruluşları
+WITH en_kalabalik AS (
+  SELECT ilce, geom FROM istanbul_ilceler ORDER BY nufus DESC LIMIT 1
+)
+SELECT s.ad, s.tur, s.geom
+FROM saglik_kuruluslari s
+JOIN en_kalabalik e ON ST_Within(s.geom, e.geom);`}
+  label="En kalabalık ilçenin sağlık kurumları"
+/>
+
+---
+
+## 🔗 Sıradaki Görev
+
+Görev 3: **Erişilemez bölgeler** — hangi ilçelerde en yakın toplanma alanı 2 km'den uzakta?

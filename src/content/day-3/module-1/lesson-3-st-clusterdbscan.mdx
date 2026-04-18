@@ -1,0 +1,149 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_ClusterDBSCAN` parametrelerini doğru ayarlayabileceksin
+- Gürültü noktaları (`cid = NULL`) KMeans'tan nasıl ayırt edersin
+- Kara nokta analizi (hotspot) yapabileceksin
+
+---
+
+## 📖 Kavram: DBSCAN
+
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise):
+- **eps:** Komşuluk yarıçapı — kaç metre içindeki noktalar komşu?
+- **min_points:** Bir küme için minimum nokta sayısı
+- Yeterli yoğunlukta olanlar küme oluşturur, geri kalanlar **gürültü** (NULL cid)
+
+```sql
+ST_ClusterDBSCAN(geom, eps := 500, minpoints := 5) OVER ()
+-- eps: geometry biriminde → 4326 koordinatlarında derece!
+-- Metre için: önce ST_Transform(geom, 3857) yap
+```
+
+---
+
+## 📖 Geometri → Metre Dönüşümü
+
+`ST_ClusterDBSCAN` geometry biriminde çalışır. EPSG:4326'da 1 birim ≈ 111 km. Doğru metre kullanmak için:
+
+```sql
+-- ✅ Metre cinsinden eps: önce 3857'ye dönüştür
+ST_ClusterDBSCAN(ST_Transform(geom, 3857), eps := 500, minpoints := 5) OVER ()
+```
+
+---
+
+## ▶ Canlı Örnek — Kara Noktalar
+
+<RunnableBlock
+  sql={`-- 500m içinde en az 5 kaza: kara nokta kümesi
+SELECT
+  cid,
+  COUNT(*) AS kaza_sayisi,
+  ST_AsText(ST_Centroid(ST_Collect(geom))) AS merkez_wkt,
+  ST_Centroid(ST_Collect(geom)) AS geom
+FROM (
+  SELECT
+    ST_ClusterDBSCAN(
+      ST_Transform(geom, 3857),
+      eps := 500,
+      minpoints := 5
+    ) OVER () AS cid,
+    geom
+  FROM kaza_noktalari
+) sub
+WHERE cid IS NOT NULL  -- gürültüyü dışla
+GROUP BY cid
+ORDER BY kaza_sayisi DESC;`}
+  label="DBSCAN kara noktalar"
+/>
+
+---
+
+## ▶ Gürültü vs Küme Oranı
+
+<RunnableBlock
+  sql={`SELECT
+  CASE WHEN cid IS NULL THEN 'gürültü' ELSE 'küme-' || cid::text END AS durum,
+  COUNT(*) AS nokta_sayisi
+FROM (
+  SELECT
+    ST_ClusterDBSCAN(
+      ST_Transform(geom, 3857),
+      eps := 500,
+      minpoints := 5
+    ) OVER () AS cid
+  FROM kaza_noktalari
+) sub
+GROUP BY CASE WHEN cid IS NULL THEN 'gürültü' ELSE 'küme-' || cid::text END
+ORDER BY nokta_sayisi DESC;`}
+  label="Küme vs gürültü dağılımı"
+/>
+
+---
+
+## ▶ Parametre Hassasiyeti
+
+<RunnableBlock
+  sql={`-- eps ve minpoints değiştirince küme sayısı nasıl değişiyor?
+SELECT
+  eps_m,
+  minpts,
+  COUNT(DISTINCT cid) FILTER (WHERE cid IS NOT NULL) AS kume_sayisi,
+  COUNT(*) FILTER (WHERE cid IS NULL) AS gurultu_sayisi
+FROM (
+  SELECT 200 AS eps_m, 3 AS minpts,
+    ST_ClusterDBSCAN(ST_Transform(geom,3857), 200, 3) OVER () AS cid
+  FROM kaza_noktalari
+  UNION ALL
+  SELECT 500, 5,
+    ST_ClusterDBSCAN(ST_Transform(geom,3857), 500, 5) OVER () AS cid
+  FROM kaza_noktalari
+  UNION ALL
+  SELECT 1000, 10,
+    ST_ClusterDBSCAN(ST_Transform(geom,3857), 1000, 10) OVER () AS cid
+  FROM kaza_noktalari
+) t
+GROUP BY eps_m, minpts
+ORDER BY eps_m;`}
+  label="Parametre karşılaştırması"
+/>
+
+---
+
+## 🧪 Dene — Ağır Kaza Hotspot
+
+<RunnableBlock
+  sql={`-- Sadece ağır kazalar için hotspot — daha sıkı parametre
+SELECT
+  cid,
+  COUNT(*) AS agir_kaza,
+  ST_Centroid(ST_Collect(geom)) AS geom
+FROM (
+  SELECT
+    ST_ClusterDBSCAN(
+      ST_Transform(geom, 3857), 1000, 3
+    ) OVER () AS cid,
+    geom
+  FROM kaza_noktalari
+  WHERE agir = TRUE
+) sub
+WHERE cid IS NOT NULL
+GROUP BY cid
+ORDER BY agir_kaza DESC
+LIMIT 5;`}
+  label="Ağır kaza hotspot top-5"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **4326'da eps derece cinsinden:** `eps := 0.005` ≈ 500 m ekvatorda — ama Türkiye enleminde farklı. **Her zaman 3857 veya UTM'e dönüştür.**
+2. **cid NULL = gürültü:** KMeans'ta hiçbir nokta NULL değildir. DBSCAN'da gürültüler `cid IS NULL` döner — filtrelemeyi unutma.
+3. **minpoints=1:** Her nokta kendi kümesi olur — işe yaramaz. Minimum 3-5 değer kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste grid tabanlı yoğunluk: **H3 Hexagonal Grid** ile yoğunluk haritası (JavaScript emülasyonu).

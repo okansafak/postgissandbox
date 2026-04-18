@@ -1,0 +1,120 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_ClusterKMeans` sözdizimini yazabileceksin
+- Window function ile küme atamalarını yapabileceksin
+- Küme merkezlerini hesaplayıp haritada gösterebileceksin
+
+---
+
+## 📖 Kavram: K-Means Kümeleme
+
+K-Means: k adet küme merkezi seç, her noktayı en yakın merkeze ata, merkezleri güncelle — yakınsayana dek tekrar et.
+
+**SQL sözdizimi:**
+```sql
+ST_ClusterKMeans(geom, k) OVER ()
+```
+
+`OVER ()` zorunlu — window function olarak çalışır. Tüm tabloya uygular.
+
+**Bölge tanımlama kullanım senaryosu:**
+- k = şube sayısı
+- Her nokta en yakın şubeye atanır
+- Küme merkezi = yeni şube konumu adayı
+
+---
+
+## ▶ Canlı Örnek — 5 Hizmet Bölgesi
+
+<RunnableBlock
+  sql={`-- 5 bölgeye böl: her kaza hangi bölgeye düşüyor?
+SELECT
+  kume_id,
+  COUNT(*)                                          AS kaza_sayisi,
+  ROUND(AVG(CASE WHEN agir THEN 1 ELSE 0 END)::numeric * 100, 1) AS agir_oran_pct,
+  ST_AsText(ST_Centroid(ST_Collect(geom)))          AS bolge_merkezi
+FROM (
+  SELECT
+    ST_ClusterKMeans(geom, 5) OVER () AS kume_id,
+    agir,
+    geom
+  FROM kaza_noktalari
+) sub
+GROUP BY kume_id
+ORDER BY kaza_sayisi DESC;`}
+  label="5 hizmet bölgesi"
+/>
+
+---
+
+## ▶ Küme Merkezlerini Haritada Göster
+
+<RunnableBlock
+  sql={`-- Küme merkezi geometrileri — haritada görünür
+SELECT
+  kume_id,
+  COUNT(*) AS nokta_sayisi,
+  ST_Centroid(ST_Collect(geom)) AS geom
+FROM (
+  SELECT ST_ClusterKMeans(geom, 5) OVER () AS kume_id, geom
+  FROM kaza_noktalari
+) sub
+GROUP BY kume_id;`}
+  label="Küme merkezi noktaları"
+/>
+
+---
+
+## ▶ Küme Sayısı Etkisi
+
+<RunnableBlock
+  sql={`-- k=3 vs k=7: hangi bölünme daha anlamlı?
+SELECT
+  k3_kume,
+  COUNT(*) AS nokta_sayisi,
+  ROUND(ST_Area(ST_ConvexHull(ST_Collect(geom))::geography)::numeric / 1000000, 2) AS alan_km2
+FROM (
+  SELECT
+    ST_ClusterKMeans(geom, 3) OVER () AS k3_kume,
+    geom
+  FROM kaza_noktalari
+) sub
+GROUP BY k3_kume
+ORDER BY nokta_sayisi DESC;`}
+  label="k=3 küme boyutları"
+/>
+
+---
+
+## 🧪 Dene — Alt Küme Üzerine KMeans
+
+<RunnableBlock
+  sql={`-- Sadece ağır kazalar: 3 bölge
+SELECT
+  kume_id,
+  COUNT(*) AS agir_kaza,
+  ST_AsText(ST_Centroid(ST_Collect(geom))) AS merkez
+FROM (
+  SELECT
+    ST_ClusterKMeans(geom, 3) OVER () AS kume_id,
+    geom
+  FROM kaza_noktalari
+  WHERE agir = TRUE
+) sub
+GROUP BY kume_id;`}
+  label="Ağır kazalara özel KMeans"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **k > nokta sayısı:** `k` değeri tablodaki satır sayısından büyük olamaz — hata verir.
+2. **Deterministic değil:** Her çalıştırmada başlangıç merkezi rastgele seçilir, sonuç değişebilir. Tekrarlanabilirlik için `pg_catalog.setseed(0.5)` ile seed set et.
+3. **Geography ile çalışmaz doğrudan:** `ST_ClusterKMeans` geometry sütunu bekler. Cast gerekirse: önceden `ST_Transform(geom, 3857)` yap, sonra geri dönüştür.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste gürültü tolere eden kümeleme: **ST_ClusterDBSCAN** ile kara nokta tespiti.

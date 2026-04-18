@@ -1,0 +1,128 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Within` ile mekansal RLS politikası yazabileceksin
+- Kullanıcı yetki alanı poligonu bazlı erişim kısıtlaması yapabileceksin
+- Mekansal politikanın performans etkisini değerlendirebileceksin
+
+---
+
+## 📖 Kavram: Mekansal Erişim Kontrolü
+
+"İstanbul sorumlusu sadece İstanbul içindeki parselleri görsün."
+
+```sql
+CREATE POLICY mekansal_sinir ON parseller
+  FOR SELECT
+  USING (
+    ST_Within(
+      geom,
+      (SELECT bolge FROM kullanici_bolgeleri WHERE kullanici = current_user)
+    )
+  );
+```
+
+---
+
+## ▶ Canlı Örnek — Yetki Alanı Tablosu
+
+<RunnableBlock
+  sql={`-- Kullanıcı yetki alanları
+CREATE TABLE IF NOT EXISTS kullanici_bolge (
+  kullanici TEXT PRIMARY KEY,
+  il_adi    TEXT,
+  bolge     GEOMETRY(POLYGON, 4326)
+);
+
+INSERT INTO kullanici_bolge (kullanici, il_adi, bolge) VALUES
+  ('istanbul_usr', 'İstanbul',
+   ST_MakeEnvelope(28.5, 40.8, 29.5, 41.3, 4326)),
+  ('ankara_usr', 'Ankara',
+   ST_MakeEnvelope(32.4, 39.6, 33.2, 40.2, 4326));
+
+-- Korunan nokta tablosu
+CREATE TABLE IF NOT EXISTS yetkili_noktalar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO yetkili_noktalar (ad, geom) VALUES
+  ('İstanbul Noktası 1', ST_SetSRID(ST_MakePoint(28.979, 41.037), 4326)),
+  ('İstanbul Noktası 2', ST_SetSRID(ST_MakePoint(29.050, 41.020), 4326)),
+  ('Ankara Noktası 1',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)),
+  ('Orta Anadolu',       ST_SetSRID(ST_MakePoint(34.000, 39.500), 4326));
+
+SELECT COUNT(*) AS toplam FROM yetkili_noktalar;`}
+  label="Yetki alanı ve nokta tablosu"
+/>
+
+---
+
+## ▶ Mekansal RLS Politikası
+
+<RunnableBlock
+  sql={`ALTER TABLE yetkili_noktalar ENABLE ROW LEVEL SECURITY;
+
+-- Mekansal politika: kullanıcının yetki alanı içindeki noktalar
+CREATE POLICY mekansal_erisim ON yetkili_noktalar
+  FOR SELECT
+  USING (
+    ST_Within(
+      geom,
+      COALESCE(
+        (SELECT bolge FROM kullanici_bolge WHERE kullanici = current_user),
+        ST_MakeEnvelope(-180, -90, 180, 90, 4326)  -- superuser için tüm dünya
+      )
+    )
+  );
+
+-- Superuser her şeyi görür (politika bypass)
+SELECT ad, ST_AsText(geom) AS konum FROM yetkili_noktalar;`}
+  label="Mekansal RLS politikası"
+/>
+
+---
+
+## ▶ Session Parametresi ile Simüle Et
+
+<RunnableBlock
+  sql={`-- Politika aktif ama superuser — manuel filtre ile test
+-- Gerçek sistemde: SET ROLE istanbul_usr; ile test edilir
+SELECT
+  n.ad,
+  CASE WHEN ST_Within(n.geom, b.bolge) THEN 'Erişilebilir' ELSE 'Kısıtlı'
+  END AS erisim
+FROM yetkili_noktalar n
+CROSS JOIN kullanici_bolge b
+WHERE b.kullanici = 'istanbul_usr';`}
+  label="İstanbul kullanıcısı simülasyonu"
+/>
+
+---
+
+## 🧪 Dene — Ankara Kullanıcısı
+
+<RunnableBlock
+  sql={`-- Ankara kullanıcısının görebileceği noktalar
+SELECT
+  n.ad,
+  ROUND(ST_Distance(n.geom::geography, ST_Centroid(b.bolge)::geography)::numeric / 1000, 1) AS merkeze_km
+FROM yetkili_noktalar n
+JOIN kullanici_bolge b ON b.kullanici = 'ankara_usr'
+WHERE ST_Within(n.geom, b.bolge);`}
+  label="Ankara kullanıcısı görünür noktalar"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Mekansal politika GIST indeksi kullanmaz doğrudan:** `ST_Within(geom, subquery)` her satırda subquery çalıştırır. Performans için: yetki alanını oturumda önbelleğe al veya materialized view kullan.
+2. **`current_user` vs `session_user`:** Rol değiştirildiğinde `current_user` değişir, `session_user` değişmez. Politikada `current_user` güvenli.
+3. **NULL geometri:** Kullanıcının yetki alanı yoksa `COALESCE` ile fallback ver — aksi halde politika her satırı reddeder.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Son ders: **Read-only kullanıcı şablonu** — GeoServer ve QGIS için üretim yapılandırması.

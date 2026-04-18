@@ -1,0 +1,138 @@
+## 🏆 Kapanış Projesi — İstanbul Acil Durum Analizi
+
+**Senaryo:** İstanbul'da acil durum müdahale kapasitesini analiz edeceksin.
+
+Veri setleri:
+- 39 ilçe poligonu
+- ~200 sağlık kuruluşu (hastane + sağlık ocağı)
+- ~100 itfaiye + AFAD toplanma alanı
+
+---
+
+## 🎯 Görev 1: Veri Doğrulama
+
+- Tüm geometrilerin geçerli olduğunu kontrol et
+- Bozuk olanları `ST_MakeValid` ile onar
+- Koordinat sistemini doğrula (SRID = 4326)
+
+---
+
+## ▶ Veri Seti Kur
+
+<RunnableBlock
+  sql={`-- İstanbul ilçe sınırları (basitleştirilmiş bbox'lar)
+CREATE TABLE IF NOT EXISTS istanbul_ilceler (
+  id      SERIAL PRIMARY KEY,
+  ilce    TEXT UNIQUE,
+  nufus   INT,
+  geom    GEOMETRY(POLYGON, 4326)
+);
+
+INSERT INTO istanbul_ilceler (ilce, nufus, geom) VALUES
+  ('Kadıköy',    500000, ST_MakeEnvelope(29.00, 40.96, 29.12, 41.02, 4326)),
+  ('Üsküdar',    540000, ST_MakeEnvelope(28.98, 41.00, 29.10, 41.10, 4326)),
+  ('Beşiktaş',   180000, ST_MakeEnvelope(28.96, 41.03, 29.06, 41.08, 4326)),
+  ('Şişli',      270000, ST_MakeEnvelope(28.96, 41.05, 29.02, 41.12, 4326)),
+  ('Fatih',      420000, ST_MakeEnvelope(28.90, 40.98, 28.99, 41.04, 4326)),
+  ('Beyoğlu',    230000, ST_MakeEnvelope(28.96, 41.02, 29.00, 41.07, 4326)),
+  ('Bağcılar',   750000, ST_MakeEnvelope(28.78, 41.01, 28.88, 41.07, 4326)),
+  ('Pendik',     700000, ST_MakeEnvelope(29.15, 40.86, 29.35, 40.96, 4326)),
+  ('Maltepe',    490000, ST_MakeEnvelope(29.10, 40.91, 29.20, 40.97, 4326)),
+  ('Ataşehir',   430000, ST_MakeEnvelope(29.08, 40.97, 29.18, 41.04, 4326))
+ON CONFLICT (ilce) DO NOTHING;
+
+-- Sağlık kuruluşları
+CREATE TABLE IF NOT EXISTS saglik_kuruluslari (
+  id      SERIAL PRIMARY KEY,
+  ad      TEXT,
+  tur     TEXT,  -- 'hastane' veya 'saglik_ocagi'
+  ilce    TEXT,
+  geom    GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO saglik_kuruluslari (ad, tur, ilce, geom) VALUES
+  ('Kadıköy Eğitim Araştırma Hastanesi', 'hastane', 'Kadıköy', ST_SetSRID(ST_MakePoint(29.030, 40.990), 4326)),
+  ('Üsküdar Devlet Hastanesi',           'hastane', 'Üsküdar', ST_SetSRID(ST_MakePoint(29.010, 41.020), 4326)),
+  ('Şişli Etfal Hastanesi',              'hastane', 'Şişli',   ST_SetSRID(ST_MakePoint(28.990, 41.060), 4326)),
+  ('Fatih Sağlık Merkezi',               'saglik_ocagi', 'Fatih', ST_SetSRID(ST_MakePoint(28.940, 41.010), 4326)),
+  ('Beşiktaş Sağlık Ocağı',             'saglik_ocagi', 'Beşiktaş', ST_SetSRID(ST_MakePoint(29.000, 41.050), 4326)),
+  ('Pendik Eğitim Hastanesi',            'hastane', 'Pendik', ST_SetSRID(ST_MakePoint(29.230, 40.880), 4326)),
+  ('Maltepe Devlet Hastanesi',           'hastane', 'Maltepe', ST_SetSRID(ST_MakePoint(29.140, 40.930), 4326)),
+  ('Bağcılar Eğitim Hastanesi',          'hastane', 'Bağcılar', ST_SetSRID(ST_MakePoint(28.840, 41.040), 4326))
+ON CONFLICT DO NOTHING;
+
+-- Toplanma alanları
+CREATE TABLE IF NOT EXISTS toplanma_alanlari (
+  id      SERIAL PRIMARY KEY,
+  ad      TEXT,
+  tur     TEXT,  -- 'itfaiye' veya 'afad'
+  kapasite INT,
+  geom    GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO toplanma_alanlari (ad, tur, kapasite, geom) VALUES
+  ('Kadıköy Meydan',    'afad', 5000, ST_SetSRID(ST_MakePoint(29.018, 40.990), 4326)),
+  ('Üsküdar Meydanı',   'afad', 3000, ST_SetSRID(ST_MakePoint(29.015, 41.022), 4326)),
+  ('Maçka Parkı',       'afad', 8000, ST_SetSRID(ST_MakePoint(28.997, 41.045), 4326)),
+  ('Fatih Meydan',      'afad', 4000, ST_SetSRID(ST_MakePoint(28.950, 41.015), 4326)),
+  ('Bağcılar Stadı',    'afad', 6000, ST_SetSRID(ST_MakePoint(28.850, 41.038), 4326)),
+  ('Pendik Sahil',      'afad', 7000, ST_SetSRID(ST_MakePoint(29.250, 40.872), 4326))
+ON CONFLICT DO NOTHING;
+
+SELECT 'Veri yüklendi' AS durum,
+  (SELECT COUNT(*) FROM istanbul_ilceler) AS ilce,
+  (SELECT COUNT(*) FROM saglik_kuruluslari) AS saglik,
+  (SELECT COUNT(*) FROM toplanma_alanlari) AS toplanma;`}
+  label="Proje veri seti kurulumu"
+/>
+
+---
+
+## ▶ Geometri Doğrulama
+
+<RunnableBlock
+  sql={`-- Tüm tablolarda geçersiz geometri tara
+SELECT 'istanbul_ilceler' AS tablo, id, ilce AS kimlik, ST_IsValidReason(geom) AS sorun
+FROM istanbul_ilceler WHERE NOT ST_IsValid(geom)
+UNION ALL
+SELECT 'saglik_kuruluslari', id, ad, ST_IsValidReason(geom)
+FROM saglik_kuruluslari WHERE NOT ST_IsValid(geom)
+UNION ALL
+SELECT 'toplanma_alanlari', id, ad, ST_IsValidReason(geom)
+FROM toplanma_alanlari WHERE NOT ST_IsValid(geom);
+
+-- Temiz rapor
+SELECT 'Tüm geometriler geçerli!' AS sonuc
+WHERE NOT EXISTS (
+  SELECT 1 FROM istanbul_ilceler WHERE NOT ST_IsValid(geom)
+) AND NOT EXISTS (
+  SELECT 1 FROM saglik_kuruluslari WHERE NOT ST_IsValid(geom)
+);`}
+  label="Geometri doğrulama raporu"
+/>
+
+---
+
+## ▶ SRID Kontrolü
+
+<RunnableBlock
+  sql={`-- Tüm tabloların SRID'leri
+SELECT 'istanbul_ilceler' AS tablo, ST_SRID(geom) AS srid, COUNT(*) FROM istanbul_ilceler GROUP BY 2
+UNION ALL
+SELECT 'saglik_kuruluslari', ST_SRID(geom), COUNT(*) FROM saglik_kuruluslari GROUP BY 2
+UNION ALL
+SELECT 'toplanma_alanlari', ST_SRID(geom), COUNT(*) FROM toplanma_alanlari GROUP BY 2;`}
+  label="SRID doğrulama"
+/>
+
+---
+
+## ⚠ Proje Notu
+
+Bu proje PGlite'ta çalışır — veriler `generate_series` değil, gerçekçi koordinatlarla oluşturuldu. Sonraki derslerde bu veri setini analiz edeceğiz.
+
+---
+
+## 🔗 Sıradaki Görev
+
+Görev 2: **İlçe bazlı sağlık yoğunluğu** — her ilçedeki hastane sayısı ve nüfus başına oran.

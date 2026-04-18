@@ -1,0 +1,132 @@
+## 🎯 Ne öğreneceksin?
+
+- PITR (Point-in-Time Recovery) kavramını açıklayabileceksin
+- WAL arşivleme + base backup kombinasyonunu özetleyebileceksin
+- Geri dönme senaryosunu adım adım anlatabileceksin
+
+---
+
+## 📖 Kavram: PITR
+
+"Saat 14:30'da yanlışlıkla `DELETE FROM kadastro` çalıştırdım. 14:29'a dönebilir miyim?"
+
+**Evet — eğer WAL arşivleme aktifse.**
+
+PITR = Base Backup + WAL Segment Oynatma:
+1. Son base backup'ı geri yükle
+2. Hatalı işlemden önceki zamana kadar WAL segment'lerini oynat
+3. `recovery_target_time` ile tam zaman belirle
+
+---
+
+## 📖 PITR Kurulum Gereksinimleri
+
+```ini
+# postgresql.conf
+wal_level = replica
+archive_mode = on
+archive_command = 'cp %p /wal-arsiv/%f'
+```
+
+```bash
+# Gece base backup
+pg_basebackup -D /yedekler/$(date +%Y%m%d) -Ft -z -P
+
+# Kurtarma: recovery.conf (PG 12+ postgresql.conf'ta)
+restore_command = 'cp /wal-arsiv/%f %p'
+recovery_target_time = '2024-01-15 14:29:00'
+recovery_target_action = promote
+```
+
+---
+
+## ▶ Canlı Örnek — WAL Ayarları Kontrol
+
+<RunnableBlock
+  sql={`-- PITR için gerekli WAL ayarları
+SELECT
+  name,
+  setting,
+  context
+FROM pg_settings
+WHERE name IN (
+  'wal_level',
+  'archive_mode',
+  'archive_command',
+  'restore_command',
+  'recovery_target_time'
+)
+ORDER BY name;`}
+  label="PITR WAL ayarları"
+/>
+
+---
+
+## ▶ Transaction ID ile Geri Dönme
+
+<RunnableBlock
+  sql={`-- Yanlış silme senaryosu simülasyonu
+CREATE TABLE IF NOT EXISTS kritik_veri (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO kritik_veri (ad, geom) VALUES
+  ('Kritik Nokta 1', ST_SetSRID(ST_MakePoint(28.979, 41.037), 4326)),
+  ('Kritik Nokta 2', ST_SetSRID(ST_MakePoint(29.005, 41.043), 4326));
+
+-- Transaction ID kaydını al (PITR'da kullanılır)
+SELECT txid_current() AS mevcut_xid;`}
+  label="Transaction ID simülasyonu"
+/>
+
+---
+
+## ▶ pg_lsn ile Zaman Damgası
+
+<RunnableBlock
+  sql={`-- WAL LSN ve zaman damgası ilişkisi
+SELECT
+  pg_current_wal_lsn() AS lsn,
+  now() AS zaman,
+  pg_walfile_name(pg_current_wal_lsn()) AS wal_segment;
+
+-- PITR recovery target:
+-- recovery_target_lsn = '0/1234ABCD'
+-- recovery_target_time = '2024-01-15 14:29:00+03'
+-- recovery_target_xid = '12345678'`}
+  label="WAL LSN ve zaman damgası"
+/>
+
+---
+
+## 🧪 Dene — Checkpoint Zorla
+
+<RunnableBlock
+  sql={`-- Checkpoint: WAL buffer'ı diske yaz
+-- PITR güvenilirliği için düzenli checkpoint önemli
+CHECKPOINT;
+
+SELECT
+  checkpoint_lsn,
+  prior_lsn,
+  redo_lsn,
+  write_time
+FROM pg_control_checkpoint();`}
+  label="Checkpoint durumu"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **WAL arşivi doluysa:** Arşiv dolduğunda `archive_command` başarısız olur → PostgreSQL durabiliyor. Disk alanını izle.
+2. **PITR + PostGIS:** Geri yükleme sonrası `SELECT postgis_full_version()` ile extension sağlığını kontrol et.
+3. **`recovery_target_inclusive`:** Varsayılan `true` — hedef zamanı dahil. Hedef zamandaki kötü işlemi de oynatır. `false` yap veya bir saniye erken hedefle.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste: **PgBouncer** — bağlantı havuzu ile yüksek eş zamanlılık yönetimi.

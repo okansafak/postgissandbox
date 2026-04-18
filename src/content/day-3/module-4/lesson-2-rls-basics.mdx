@@ -1,0 +1,120 @@
+## 🎯 Ne öğreneceksin?
+
+- Row Level Security (RLS) kavramını açıklayabileceksin
+- `CREATE POLICY` ile satır filtresi yazabileceksin
+- `current_user` ve `current_setting` ile dinamik politika oluşturabileceksin
+
+---
+
+## 📖 Kavram: Row Level Security
+
+Normal yetki: Tüm tablo okunabilir veya hiçbiri.
+**RLS:** Her kullanıcı sadece kendi satırlarını görür.
+
+```sql
+-- 1. RLS etkinleştir
+ALTER TABLE t ENABLE ROW LEVEL SECURITY;
+
+-- 2. Politika yaz
+CREATE POLICY p ON t FOR SELECT
+  USING (sahip = current_user);
+```
+
+Politika olmayan tabloda RLS aktifse → hiçbir satır dönmez (deny-by-default).
+
+---
+
+## ▶ Canlı Örnek — Kullanıcı Bazlı Politika
+
+<RunnableBlock
+  sql={`-- Kullanıcı sahipliği olan tablo
+CREATE TABLE IF NOT EXISTS kullanici_verileri (
+  id       SERIAL PRIMARY KEY,
+  kullanici TEXT,
+  deger    TEXT,
+  geom     GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO kullanici_verileri (kullanici, deger, geom) VALUES
+  ('ahmet', 'Veri A', ST_SetSRID(ST_MakePoint(28.979, 41.037), 4326)),
+  ('mehmet', 'Veri B', ST_SetSRID(ST_MakePoint(29.005, 41.043), 4326)),
+  ('ahmet', 'Veri C', ST_SetSRID(ST_MakePoint(28.982, 41.055), 4326));
+
+-- RLS etkinleştir
+ALTER TABLE kullanici_verileri ENABLE ROW LEVEL SECURITY;
+
+-- Politika: kullanıcı sadece kendi satırlarını görür
+CREATE POLICY kullanici_politika ON kullanici_verileri
+  FOR ALL
+  USING (kullanici = current_user);
+
+-- Superuser politika dışında — tümünü görür
+SELECT * FROM kullanici_verileri;`}
+  label="RLS politika kurulumu"
+/>
+
+---
+
+## ▶ current_setting ile Dinamik Politika
+
+<RunnableBlock
+  sql={`-- Session parametresiyle dinamik filtre
+CREATE TABLE IF NOT EXISTS bolge_verileri (
+  id     SERIAL PRIMARY KEY,
+  il_kod TEXT,
+  ad     TEXT,
+  geom   GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO bolge_verileri (il_kod, ad, geom) VALUES
+  ('34', 'İstanbul Noktası', ST_SetSRID(ST_MakePoint(28.979, 41.037), 4326)),
+  ('06', 'Ankara Noktası',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)),
+  ('35', 'İzmir Noktası',    ST_SetSRID(ST_MakePoint(27.142, 38.423), 4326));
+
+ALTER TABLE bolge_verileri ENABLE ROW LEVEL SECURITY;
+
+-- Politika: session'da ayarlanan il koduna göre filtrele
+CREATE POLICY il_politika ON bolge_verileri
+  FOR SELECT
+  USING (
+    il_kod = current_setting('app.il_kodu', TRUE)
+    OR current_setting('app.il_kodu', TRUE) IS NULL
+  );
+
+-- Test: İstanbul için filtrele
+SET app.il_kodu = '34';
+SELECT * FROM bolge_verileri;`}
+  label="Session değişkeni ile RLS"
+/>
+
+---
+
+## 🧪 Dene — Farklı İl Kodu
+
+<RunnableBlock
+  sql={`-- Ankara için filtrele
+SET app.il_kodu = '06';
+SELECT il_kod, ad FROM bolge_verileri;`}
+  label="Ankara il filtresi"
+/>
+
+<RunnableBlock
+  sql={`-- Tüm illeri gör (null → filtre yok)
+SET app.il_kodu = '';
+SELECT il_kod, ad FROM bolge_verileri;`}
+  label="Filtre kaldır"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Superuser RLS'yi atlar:** `BYPASSRLS` yetkisine sahip kullanıcılar politikayı görmez. Test için normal kullanıcıya geç.
+2. **`current_setting` ikinci parametre:** `current_setting('app.x', TRUE)` — TRUE = ayar yoksa NULL döner, hata vermez. FALSE ise hata verir.
+3. **Performance:** RLS politikası her sorguya WHERE eklenir. Politika sütununda indeks olmazsa yavaşlar. `il_kod` üzerine B-tree index ekle.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste mekansal RLS: **ST_Within ile il bazlı erişim kontrolü**.

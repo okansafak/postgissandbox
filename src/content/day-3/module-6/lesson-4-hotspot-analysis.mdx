@@ -1,0 +1,175 @@
+## 🏆 Görev 4: Hotspot Analizi
+
+**Hedef:** Son 1 yıldaki acil çağrıları DBSCAN ile kümele, yoğun 5 noktayı haritada göster.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- Gerçek bir analitik pipeline'ı baştan sona uygulayabileceksin
+- Kümeleme + ilçe analizi + görselleştirmeyi birleştirebileceksin
+- Tüm kursun kazanımlarını tek senaryoda kullanabileceksin
+
+---
+
+## ▶ Acil Çağrı Verisi Oluştur
+
+<RunnableBlock
+  sql={`-- Acil çağrı simülasyonu: İstanbul'da 300 çağrı
+CREATE TABLE IF NOT EXISTS acil_cagrilar (
+  id      SERIAL PRIMARY KEY,
+  tarih   DATE,
+  tur     TEXT,  -- 'yangın', 'kaza', 'sağlık'
+  geom    GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO acil_cagrilar (tarih, tur, geom)
+SELECT
+  '2024-01-01'::date + (random() * 364)::int,
+  CASE (i % 3)
+    WHEN 0 THEN 'yangın'
+    WHEN 1 THEN 'kaza'
+    ELSE 'sağlık'
+  END,
+  CASE (i % 5)
+    WHEN 0 THEN  -- Kadıköy yoğunluğu
+      ST_SetSRID(ST_MakePoint(29.02 + random()*0.04, 40.98 + random()*0.03), 4326)
+    WHEN 1 THEN  -- Üsküdar
+      ST_SetSRID(ST_MakePoint(29.00 + random()*0.05, 41.01 + random()*0.04), 4326)
+    WHEN 2 THEN  -- Fatih
+      ST_SetSRID(ST_MakePoint(28.92 + random()*0.04, 41.00 + random()*0.03), 4326)
+    WHEN 3 THEN  -- Bağcılar
+      ST_SetSRID(ST_MakePoint(28.82 + random()*0.05, 41.03 + random()*0.03), 4326)
+    ELSE         -- Rastgele
+      ST_SetSRID(ST_MakePoint(28.7 + random()*0.7, 40.9 + random()*0.3), 4326)
+  END
+FROM generate_series(1, 300) i
+ON CONFLICT DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_acil_geom ON acil_cagrilar USING gist(geom);
+ANALYZE acil_cagrilar;
+
+SELECT tur, COUNT(*) AS cagri_sayisi
+FROM acil_cagrilar GROUP BY tur ORDER BY cagri_sayisi DESC;`}
+  label="Acil çağrı verisi oluştur"
+/>
+
+---
+
+## ▶ DBSCAN Hotspot Tespiti
+
+<RunnableBlock
+  sql={`-- DBSCAN: 500m içinde en az 8 çağrı = hotspot kümesi
+SELECT
+  cid AS kume_id,
+  COUNT(*) AS cagri_sayisi,
+  COUNT(*) FILTER (WHERE tur = 'yangın') AS yangin,
+  COUNT(*) FILTER (WHERE tur = 'kaza') AS kaza,
+  COUNT(*) FILTER (WHERE tur = 'sağlık') AS saglik,
+  ST_Centroid(ST_Collect(geom)) AS merkez_geom
+FROM (
+  SELECT
+    ST_ClusterDBSCAN(
+      ST_Transform(geom, 3857), 500, 8
+    ) OVER () AS cid,
+    tur,
+    geom
+  FROM acil_cagrilar
+) sub
+WHERE cid IS NOT NULL
+GROUP BY cid
+ORDER BY cagri_sayisi DESC
+LIMIT 5;`}
+  label="Top-5 hotspot kümesi"
+/>
+
+---
+
+## ▶ Hotspot + İlçe Birleştir
+
+<RunnableBlock
+  sql={`-- Her hotspot hangi ilçede?
+WITH hotspots AS (
+  SELECT
+    cid,
+    COUNT(*) AS cagri,
+    ST_Centroid(ST_Collect(geom)) AS merkez
+  FROM (
+    SELECT
+      ST_ClusterDBSCAN(ST_Transform(geom,3857), 500, 8) OVER () AS cid,
+      geom
+    FROM acil_cagrilar
+  ) sub
+  WHERE cid IS NOT NULL
+  GROUP BY cid
+)
+SELECT
+  h.cid,
+  h.cagri,
+  i.ilce,
+  h.merkez AS hotspot_geom,
+  ROUND(ST_Distance(h.merkez::geography,
+    (SELECT geom::geography FROM saglik_kuruluslari
+     ORDER BY ST_Distance(h.merkez::geography, geom::geography) LIMIT 1)
+  )::numeric / 1000, 2) AS en_yakin_saglik_km
+FROM hotspots h
+LEFT JOIN istanbul_ilceler i ON ST_Within(h.merkez, i.geom)
+ORDER BY h.cagri DESC
+LIMIT 5;`}
+  label="Hotspot ilçe ve sağlık analizi"
+/>
+
+---
+
+## ▶ Final: Tüm Analizi Birleştir
+
+<RunnableBlock
+  sql={`-- Kapsamlı özet rapor: ilçe bazlı sağlık, toplanma ve hotspot
+SELECT
+  i.ilce,
+  i.nufus,
+  COUNT(DISTINCT s.id) AS saglik_kurulus,
+  COUNT(DISTINCT t.id) AS toplanma_alani_2km,
+  COALESCE(SUM(DISTINCT t.kapasite), 0) AS toplanma_kapasitesi,
+  COUNT(DISTINCT c.id) AS acil_cagri_sayisi,
+  CASE
+    WHEN COUNT(DISTINCT t.id) = 0 THEN '🔴 Kritik'
+    WHEN COUNT(DISTINCT s.id) = 0 THEN '🟠 Riskli'
+    WHEN COUNT(DISTINCT s.id) < 2 THEN '🟡 Dikkat'
+    ELSE '🟢 Yeterli'
+  END AS risk_seviyesi
+FROM istanbul_ilceler i
+LEFT JOIN saglik_kuruluslari s ON ST_Within(s.geom, i.geom)
+LEFT JOIN toplanma_alanlari t
+  ON ST_DWithin(ST_Centroid(i.geom)::geography, t.geom::geography, 3000)
+LEFT JOIN acil_cagrilar c ON ST_Within(c.geom, i.geom)
+GROUP BY i.id, i.ilce, i.nufus
+ORDER BY
+  CASE WHEN COUNT(DISTINCT t.id) = 0 THEN 0
+       WHEN COUNT(DISTINCT s.id) = 0 THEN 1
+       WHEN COUNT(DISTINCT s.id) < 2 THEN 2
+       ELSE 3 END,
+  i.nufus DESC;`}
+  label="İlçe bazlı kapsamlı acil durum raporu"
+/>
+
+---
+
+## 🎓 Tebrikler!
+
+15 saatlik PostGIS Akademi'yi tamamladın. Öğrendiklerin:
+
+**Gün 1:** Geometry tipleri, SRID, mekansal ilişkiler, ölçüm fonksiyonları
+
+**Gün 2:** Veri yükleme, indeks ve performans, EXPLAIN ANALYZE, partitioning
+
+**Gün 3:** Kümeleme, ağ analizi, topology, güvenlik, production operasyonu
+
+---
+
+## 🔗 İleri Kaynaklar
+
+- [PostGIS Belgelendirmesi](https://postgis.net/documentation/)
+- [pgRouting Belgelendirmesi](https://pgrouting.org/)
+- [Awesome PostGIS](https://github.com/dbeat/awesome-postgis)
+- `EXPLAIN ANALYZE` görselleştirici: explain.depesz.com

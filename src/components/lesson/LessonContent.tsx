@@ -139,6 +139,44 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-3': 'lesson-3-list-partitioning',
     'lesson-4': 'lesson-4-partition-pruning',
   },
+  'day-3/module-1': {
+    'lesson-1': 'lesson-1-clustering-intro',
+    'lesson-2': 'lesson-2-st-clusterkmeans',
+    'lesson-3': 'lesson-3-st-clusterdbscan',
+    'lesson-4': 'lesson-4-hex-grid-density',
+    'lesson-5': 'lesson-5-clustering-decision',
+  },
+  'day-3/module-2': {
+    'lesson-1': 'lesson-1-network-basics',
+    'lesson-2': 'lesson-2-network-topology',
+    'lesson-3': 'lesson-3-dijkstra',
+    'lesson-4': 'lesson-4-service-area',
+    'lesson-5': 'lesson-5-tsp',
+  },
+  'day-3/module-3': {
+    'lesson-1': 'lesson-1-topology-concept',
+    'lesson-2': 'lesson-2-create-topology',
+    'lesson-3': 'lesson-3-topology-advantage',
+  },
+  'day-3/module-4': {
+    'lesson-1': 'lesson-1-role-grant',
+    'lesson-2': 'lesson-2-rls-basics',
+    'lesson-3': 'lesson-3-spatial-rls',
+    'lesson-4': 'lesson-4-readonly-user',
+  },
+  'day-3/module-5': {
+    'lesson-1': 'lesson-1-pg-dump-restore',
+    'lesson-2': 'lesson-2-replication',
+    'lesson-3': 'lesson-3-pitr',
+    'lesson-4': 'lesson-4-pgbouncer',
+    'lesson-5': 'lesson-5-monitoring',
+  },
+  'day-3/module-6': {
+    'lesson-1': 'lesson-1-data-validation',
+    'lesson-2': 'lesson-2-health-density',
+    'lesson-3': 'lesson-3-unreachable-areas',
+    'lesson-4': 'lesson-4-hotspot-analysis',
+  },
 };
 
 function buildGlobKey(day: string, mod: string, lesson: string): string {

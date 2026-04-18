@@ -1,0 +1,134 @@
+## 🎯 Ne öğreneceksin?
+
+- `pg_stat_activity` ile aktif sorguları izleyebileceksin
+- Buffer cache hit oranını hesaplayabileceksin
+- `pg_stat_user_tables` ile dead tuple ve seq scan uyarılarını okuyabileceksin
+
+---
+
+## 📖 Kavram: PostgreSQL Sağlık Göstergeleri
+
+| Gösterge | Hedef | Sorun işareti |
+|---|---|---|
+| Cache hit oranı | > %99 | < %95 → shared_buffers artır |
+| Dead tuple oranı | < %5 | > %20 → autovacuum sıklığı artır |
+| Seq scan oranı | < %10 (büyük tablolar) | > %50 → index eksik |
+| Uzun süreli sorgular | < 1 dakika | > 5 dk → yavaş sorgu |
+| Bağlantı kullanımı | < %80 | > %90 → PgBouncer |
+
+---
+
+## ▶ Canlı Örnek — Aktif Sorgu İzleme
+
+<RunnableBlock
+  sql={`-- Çalışan sorgular + süre
+SELECT
+  pid,
+  usename AS kullanici,
+  application_name AS uygulama,
+  state,
+  EXTRACT(EPOCH FROM (now() - query_start))::int AS sure_sn,
+  LEFT(query, 80) AS sorgu
+FROM pg_stat_activity
+WHERE state != 'idle'
+  AND pid != pg_backend_pid()
+ORDER BY sure_sn DESC NULLS LAST;`}
+  label="Aktif sorgular"
+/>
+
+---
+
+## ▶ Cache Hit Oranı
+
+<RunnableBlock
+  sql={`-- Buffer cache hit oranı — veritabanı bazında
+SELECT
+  datname AS veritabani,
+  blks_hit AS onbellek_hit,
+  blks_read AS disk_okuma,
+  ROUND(
+    blks_hit::numeric / NULLIF(blks_hit + blks_read, 0) * 100, 2
+  ) AS hit_oran_pct
+FROM pg_stat_database
+WHERE datname = current_database();`}
+  label="Cache hit oranı"
+/>
+
+---
+
+## ▶ Tablo Sağlık Raporu
+
+<RunnableBlock
+  sql={`-- Kapsamlı tablo sağlık raporu
+SELECT
+  relname AS tablo,
+  n_live_tup AS canli,
+  n_dead_tup AS olu,
+  ROUND(
+    n_dead_tup::numeric / NULLIF(n_live_tup + n_dead_tup, 0) * 100, 1
+  ) AS olu_oran_pct,
+  seq_scan,
+  idx_scan,
+  ROUND(
+    idx_scan::numeric / NULLIF(seq_scan + idx_scan, 0) * 100, 1
+  ) AS idx_oran_pct,
+  last_autovacuum,
+  last_autoanalyze
+FROM pg_stat_user_tables
+WHERE n_live_tup > 100
+ORDER BY olu_oran_pct DESC NULLS LAST
+LIMIT 10;`}
+  label="Tablo sağlık raporu"
+/>
+
+---
+
+## ▶ Yavaş Sorgu Tespiti
+
+<RunnableBlock
+  sql={`-- pg_stat_statements (extension gerektirir — olmayabilir)
+-- Yoksa pg_stat_activity ile uzun süreli sorguları izle
+SELECT
+  pid,
+  usename,
+  EXTRACT(EPOCH FROM (now() - query_start))::int AS sure_sn,
+  wait_event_type,
+  wait_event,
+  LEFT(query, 100) AS sorgu
+FROM pg_stat_activity
+WHERE state = 'active'
+  AND query_start < now() - interval '5 seconds'
+  AND pid != pg_backend_pid()
+ORDER BY sure_sn DESC;`}
+  label="Uzun süreli sorgu tespiti"
+/>
+
+---
+
+## 🧪 Dene — İzleme Dashboardu
+
+<RunnableBlock
+  sql={`-- Tek sorguda veritabanı özeti
+SELECT
+  (SELECT COUNT(*) FROM pg_stat_activity WHERE state = 'active') AS aktif_baglanti,
+  (SELECT ROUND(blks_hit::numeric/NULLIF(blks_hit+blks_read,0)*100,1)
+   FROM pg_stat_database WHERE datname = current_database()) AS cache_hit_pct,
+  (SELECT SUM(n_dead_tup) FROM pg_stat_user_tables) AS toplam_olu_satir,
+  (SELECT COUNT(*) FROM pg_stat_user_tables WHERE n_dead_tup > n_live_tup * 0.1) AS vakum_gereken,
+  pg_size_pretty(pg_database_size(current_database())) AS db_boyutu;`}
+  label="Veritabanı özet dashboardu"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`pg_stat_statements` şart:** Yavaş sorgu analizi için en güçlü araç. `CREATE EXTENSION pg_stat_statements` + `shared_preload_libraries = 'pg_stat_statements'` gerekir.
+2. **İzleme istatistikleri sıfırlanabilir:** `pg_stat_reset()` ile tüm istatistikler temizlenir. Sunucu yeniden başlatmada da sıfırlanır.
+3. **`pg_stat_activity` yeterli değil:** Tamamlanan sorgular gösterilmez. Loglar + `pg_stat_statements` kombinasyonu kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 3.5 tamamlandı! Sırada **Modül 3.6 — Kapanış Projesi**: İstanbul Acil Durum Analizi ile tüm öğrendiklerini bir araya getir.
