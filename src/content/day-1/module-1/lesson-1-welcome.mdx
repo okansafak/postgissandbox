@@ -1,0 +1,59 @@
+## 🎯 Ne öğreneceksin?
+
+- Bu platformun nasıl çalıştığını kavrayacaksın
+- Sol paneli (ders), sağ üstü (SQL editörü) ve sağ alttaki (harita/tablo) göreceksin
+- İlk SQL sorgunu çalıştıracak ve sonucu göreceksin
+
+---
+
+## 📖 Platform Nasıl Çalışır?
+
+PostGIS Akademi'ye hoş geldin! Bu platform **tamamen tarayıcında** çalışır — sunucu yok, kurulum yok.
+
+Ekranın üç bölümü var:
+
+| Bölüm | Ne işe yarar? |
+|---|---|
+| **Sol** (şu an okuduğun yer) | Ders içeriği — kavramlar, örnekler, egzersizler |
+| **Sağ üst** | SQL editörü — sorgularını buraya yaz ve çalıştır |
+| **Sağ alt** | Sonuçlar — Harita, Tablo veya EXPLAIN sekmesi |
+
+Aklındaki tek soru şu olmalı: **"Bu SQL ne yapar?"** — yaz, çalıştır, gör.
+
+---
+
+## 🗄 Veritabanı Nerede?
+
+Tarayıcının içinde! **PGlite** sayesinde tam bir PostgreSQL + PostGIS veritabanı doğrudan sekmende çalışıyor. Veriler **IndexedDB**'de saklanır, tarayıcıyı kapatsın açsın veriler kaybolmaz.
+
+> Bu yüzden hiçbir şey kurmadan PostGIS öğrenebilirsin.
+
+---
+
+## ▶ Canlı Örnek — İlk Sorgu
+
+Aşağıdaki butona bas. SQL editörüne yüklenecek, çalıştırınca "Tablo" sekmesinde sonucu göreceksin:
+
+<RunnableBlock sql="SELECT 'Merhaba PostGIS!' AS mesaj, version() AS pg_surum;" label="İlk sorguyu çalıştır" />
+
+---
+
+## 🧪 Dene
+
+Editörde `mesaj` yerine kendi adını yaz:
+
+<RunnableBlock sql="SELECT 'Merhaba, [ADINIZ]!' AS mesaj;" label="Deneme" />
+
+---
+
+## ⚠ Tuzaklar
+
+- Sorgunu yazdıktan sonra **Ctrl+Enter** ya da **Çalıştır** butonuna basmalısın — editör otomatik çalıştırmaz.
+- SQL büyük/küçük harf duyarsızdır (`SELECT` = `select`), ama büyük harfle yazmak yaygın gelenektir.
+- Noktalı virgül (`;`) isteğe bağlıdır ama iyi alışkanlıktır.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Bir sonraki derste **PGlite nedir ve PostgreSQL ile PostGIS arasındaki fark ne?** sorusunu yanıtlayacağız.

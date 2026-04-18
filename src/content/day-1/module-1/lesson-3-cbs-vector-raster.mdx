@@ -1,0 +1,95 @@
+## 🎯 Ne öğreneceksin?
+
+- CBS'in (Coğrafi Bilgi Sistemi) temel amacını açıklayabileceksin
+- **Vektör** ve **raster** veri tiplerini ayırt edebileceksin
+- PostGIS'in bu tablodaki yerini tanımlayabileceksin
+
+---
+
+## 📖 Kavram: CBS Nedir?
+
+**CBS (Coğrafi Bilgi Sistemi / GIS — Geographic Information System)**, gerçek dünya konumlarına bağlı verileri depolayan, analiz eden ve görselleştiren bir sistemdir.
+
+Örnekler:
+- "İstanbul'daki tüm hastaneler nerede?" → nokta verisi
+- "E-5 karayolunun güzergahı" → çizgi verisi
+- "Türkiye'nin il sınırları" → poligon verisi
+- "Ankara'nın uydu görüntüsü" → raster verisi
+
+---
+
+## 📖 Kavram: Vektör vs Raster
+
+### Vektör Veri
+
+Koordinatlarla tanımlı geometriler. Üç temel tip:
+
+| Tip | Türkçe | Örnek |
+|---|---|---|
+| `POINT` | Nokta | Hastane, ATM, POI |
+| `LINESTRING` | Çizgi / Polizincir | Yol, nehir, rota |
+| `POLYGON` | Poligon | İl sınırı, bina, parsel |
+
+Çoklu versiyonları da var: `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`.
+
+**PostGIS vektör verilerle çalışır.** `ST_*` fonksiyonlarının tamamı vektör geometrisi üzerinde işlem yapar.
+
+### Raster Veri
+
+Piksellerden oluşan ızgara. Her hücrenin bir değeri var.
+
+| Özellik | Vektör | Raster |
+|---|---|---|
+| Format | Koordinat listeleri | Piksel matrisi |
+| Örnek | İl sınırı, yol | Uydu görüntüsü, DEM |
+| PostGIS desteği | ✅ Tam destek | `postgis_raster` extension |
+| Bu kursta | ✅ Kullanıyoruz | ℹ️ Kavramsal anlatım |
+
+> Bu kursun tamamı **vektör** verilerle ilgilidir. Raster konusu Gün 3'te kısaca ele alınır.
+
+---
+
+## ▶ Canlı Örnek — Geometri Tipi Sorgulama
+
+PostGIS'e farklı geometri tipleri üretelim ve tiplerini sorgulayalım:
+
+<RunnableBlock
+  sql={`SELECT
+  'POINT'       AS tip, ST_GeometryType(ST_MakePoint(28.9, 41.0))  AS sonuc
+UNION ALL
+SELECT
+  'LINESTRING'  AS tip, ST_GeometryType(ST_MakeLine(
+                          ST_MakePoint(28.9, 41.0),
+                          ST_MakePoint(32.8, 39.9)))               AS sonuc
+UNION ALL
+SELECT
+  'POLYGON'     AS tip, ST_GeometryType(ST_Buffer(
+                          ST_MakePoint(28.9, 41.0)::geography, 1000)::geometry) AS sonuc;`}
+  label="Geometri tiplerini gör"
+/>
+
+---
+
+## 🧪 Dene
+
+`ST_MakePoint` ile Ankara'nın koordinatını oluştur (`32.854, 39.930`) ve geometri tipini sorgula:
+
+<RunnableBlock
+  sql={`SELECT
+  ST_GeometryType(ST_MakePoint(32.854, 39.930)) AS tip,
+  ST_AsText(ST_MakePoint(32.854, 39.930))       AS wkt_gosterim;`}
+  label="Ankara noktası"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+- **"Harita" ≠ "Raster":** Görsel haritalar genelde raster gibi görünür ama altındaki veri vektör olabilir. OpenStreetMap veritabanı tamamen vektör veridir.
+- **PostGIS raster işleyebilir ama farklı:** `postgis_raster` ayrı bir extension. Bu kurs kapsamında değil.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Bir sonraki derste **ilk gerçek harita sorgunuzu** çalıştıracaksınız: `ST_MakePoint` ile İstanbul'u haritada göreceksiniz.

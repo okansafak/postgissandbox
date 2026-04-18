@@ -1,0 +1,73 @@
+## 🎯 Ne öğreneceksin?
+
+- PGlite'ın ne olduğunu ve neden tarayıcıda çalıştığını açıklayabileceksin
+- PostgreSQL, PostGIS ve PGlite arasındaki farkı özetleyebileceksin
+- `version()` ve `postgis_full_version()` sorgularını yorumlayabileceksin
+
+---
+
+## 📖 Kavram: Üçlü Ayrım
+
+### PostgreSQL
+Dünyanın en gelişmiş açık kaynaklı **ilişkisel veritabanı**. Metin, sayı, JSON, UUID gibi standart veri tiplerini saklar. Coğrafi veri konusunda yeteneksizdir.
+
+### PostGIS
+PostgreSQL'e kurulu bir **eklenti (extension)**. 300+ `ST_*` fonksiyonu, `geometry` ve `geography` tipleri, mekansal indeksler (GIST) ekler. Yani PostGIS, PostgreSQL olmadan çalışmaz — ama PostgreSQL, PostGIS olmadan çalışır.
+
+```
+PostgreSQL  ──(extension)──►  PostGIS
+   temel DB                  mekansal güç
+```
+
+### PGlite
+ElectricSQL tarafından geliştirilen bir proje. PostgreSQL'i **WebAssembly (WASM)**'a derleyerek tarayıcıda çalıştırıyor. Bu platformda kullandığın veritabanı PGlite + PostGIS'tir.
+
+> **Önemli:** PGlite deneyseldir. Üretim ortamı için değil; öğrenme, prototipleme ve bu kurs için mükemmeldir.
+
+---
+
+## ▶ Canlı Örnek — Sürümleri Sorgula
+
+<RunnableBlock sql="SELECT version() AS postgresql_surumu;" label="PostgreSQL sürümünü gör" />
+
+<RunnableBlock sql="SELECT postgis_full_version() AS postgis_surumu;" label="PostGIS sürümünü gör" />
+
+Çıktıda şunları göreceksin:
+- `POSTGIS="3.6.2"` — PostGIS sürümü
+- `PGSQL="170"` — PostgreSQL 17 üzerinde çalışıyor
+- `GEOS`, `PROJ` — PostGIS'in kullandığı geometri kütüphaneleri
+
+---
+
+## 🧪 Dene
+
+`postgis_full_version()` çıktısındaki `GEOS` sürümünü not al. Aynı sorguyu bir hafta sonra çalıştırsan ne değişir? (Cevap: PGlite sürümünü güncellemediğin sürece hiçbir şey — veriler IndexedDB'de kalır.)
+
+---
+
+## 🎯 Egzersiz
+
+Hem PostgreSQL hem PostGIS bilgisini tek bir sorguda yan yana göster:
+
+<RunnableBlock
+  sql={`SELECT
+  current_database() AS veritabani,
+  version()           AS pg_surumu,
+  postgis_lib_version() AS postgis_lib;`}
+  label="Tek sorguda tüm sürümler"
+/>
+
+> `postgis_lib_version()` sadece kısa sürüm numarasını döndürür (örn. `3.6.2`).
+
+---
+
+## ⚠ Tuzaklar
+
+- **PostGIS ≠ PostgreSQL:** "PostGIS sorgusu" diye bir şey yoktur. PostGIS sadece PostgreSQL'e fonksiyon ve tip ekler. Tüm sorgular geçerli SQL'dir.
+- **Extension aktif edilmeli:** `CREATE EXTENSION postgis;` bir kez çalıştırılmalıdır. Bu platformda otomatik yapılmıştır, endişelenme.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Bir sonraki derste **CBS (Coğrafi Bilgi Sistemi) nedir?** ve **vektör vs raster verinin** farkını öğreneceğiz.
