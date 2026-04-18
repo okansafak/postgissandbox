@@ -87,6 +87,22 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-5': 'lesson-5-turkey-epsg',
     'lesson-6': 'lesson-6-projection-decision',
   },
+  'module-4': {
+    'lesson-1': 'lesson-1-contains-within',
+    'lesson-2': 'lesson-2-intersects-disjoint',
+    'lesson-3': 'lesson-3-touches-crosses-overlaps',
+    'lesson-4': 'lesson-4-dwithin',
+    'lesson-5': 'lesson-5-spatial-join',
+  },
+  'module-5': {
+    'lesson-1': 'lesson-1-distance',
+    'lesson-2': 'lesson-2-area-length',
+    'lesson-3': 'lesson-3-centroid',
+    'lesson-4': 'lesson-4-buffer',
+    'lesson-5': 'lesson-5-set-operations',
+    'lesson-6': 'lesson-6-envelope-hull',
+    'lesson-7': 'lesson-7-knn',
+  },
 };
 
 function buildGlobKey(day: string, mod: string, lesson: string): string {

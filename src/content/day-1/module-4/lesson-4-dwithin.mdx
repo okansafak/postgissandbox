@@ -1,0 +1,117 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_DWithin` ile "N metre içindeki" geometrileri filtreleyebileceksin
+- `ST_DWithin` ile `ST_Distance` arasındaki performans farkını açıklayabileceksin
+- Yakınlık sorgularını GIST indeksiyle hızlandırabileceksin
+
+---
+
+## 📖 Kavram: Mesafeye Dayalı Filtre
+
+`ST_DWithin(A, B, distance)` — A ve B arasındaki mesafe `distance`'tan küçük veya eşit mi?
+
+```sql
+-- geography ile: distance = metre
+ST_DWithin(geom_a::geography, geom_b::geography, 1000)  -- 1 km içinde
+
+-- geometry ile: distance = SRID birimi (4326 → derece, UTM → metre)
+ST_DWithin(geom_a, geom_b, 0.009)  -- ~1 km ama derece cinsinden (kaçın!)
+```
+
+### Neden ST_DWithin > ST_Distance < ?
+
+```sql
+-- ⚠ YAVAŞ: Her satır için mesafe hesaplar, indeksten yararlanamaz
+WHERE ST_Distance(a.geom::geography, b.geom::geography) < 1000
+
+-- ✅ HIZLI: GIST indeksiyle bounding box eleme yapar, sonra kesin test
+WHERE ST_DWithin(a.geom::geography, b.geom::geography, 1000)
+```
+
+---
+
+## ▶ Canlı Örnek — İstanbul Merkezine 50 km İçindeki Şehirler
+
+<RunnableBlock
+  sql={`WITH merkez AS (
+  SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+),
+sehirler AS (
+  SELECT 'Bursa'    AS ad, ST_SetSRID(ST_MakePoint(29.061, 40.182), 4326) AS geom
+  UNION ALL SELECT 'İzmit',   ST_SetSRID(ST_MakePoint(29.918, 40.766), 4326)
+  UNION ALL SELECT 'Tekirdağ',ST_SetSRID(ST_MakePoint(27.508, 40.978), 4326)
+  UNION ALL SELECT 'Adapazarı',ST_SetSRID(ST_MakePoint(30.399, 40.769), 4326)
+  UNION ALL SELECT 'Edirne',  ST_SetSRID(ST_MakePoint(26.555, 41.677), 4326)
+)
+SELECT
+  s.ad,
+  ROUND(ST_Distance(m.geom::geography, s.geom::geography)::numeric / 1000, 0) AS km,
+  ST_DWithin(m.geom::geography, s.geom::geography, 100000) AS yuz_km_icinde
+FROM merkez m, sehirler s
+ORDER BY km;`}
+  label="İstanbul'a 100 km içindeki şehirler"
+  autoFit
+/>
+
+---
+
+## ▶ Pratik: Yakın Nokta Bulma
+
+<RunnableBlock
+  sql={`-- Birbirine 500 km'den yakın şehir çiftleri
+WITH sehirler AS (
+  SELECT 'İstanbul'  AS ad, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL SELECT 'Ankara',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  UNION ALL SELECT 'Antalya',  ST_SetSRID(ST_MakePoint(30.717, 36.896), 4326)
+  UNION ALL SELECT 'Trabzon',  ST_SetSRID(ST_MakePoint(39.726, 41.002), 4326)
+)
+SELECT
+  a.ad AS sehir_1, b.ad AS sehir_2,
+  ROUND(ST_Distance(a.geom::geography, b.geom::geography)::numeric / 1000, 0) AS km
+FROM sehirler a, sehirler b
+WHERE a.ad < b.ad
+  AND ST_DWithin(a.geom::geography, b.geom::geography, 500000)
+ORDER BY km;`}
+  label="500 km içindeki şehir çiftleri"
+/>
+
+---
+
+## 🎯 Egzersiz
+
+Ankara'ya en yakın 3 şehri bul:
+
+<RunnableBlock
+  sql={`WITH ankara AS (
+  SELECT ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326) AS geom
+),
+sehirler AS (
+  SELECT 'İstanbul' AS ad, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  UNION ALL SELECT 'Konya',    ST_SetSRID(ST_MakePoint(32.483, 37.872), 4326)
+  UNION ALL SELECT 'Kayseri',  ST_SetSRID(ST_MakePoint(35.485, 38.720), 4326)
+  UNION ALL SELECT 'Samsun',   ST_SetSRID(ST_MakePoint(36.330, 41.293), 4326)
+  UNION ALL SELECT 'Eskişehir',ST_SetSRID(ST_MakePoint(30.521, 39.776), 4326)
+)
+SELECT s.ad,
+  ROUND(ST_Distance(a.geom::geography, s.geom::geography)::numeric / 1000, 0) AS km
+FROM ankara a, sehirler s
+ORDER BY ST_Distance(a.geom::geography, s.geom::geography)
+LIMIT 3;`}
+  label="Ankara'ya en yakın 3 şehir"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_DWithin geometry'de derece kullanır:** `ST_DWithin(geom4326, geom4326, 1000)` → 1000 **derece** — anlamsız. `::geography` cast veya UTM ile kullan.
+2. **ST_DWithin eşit mesafeyi dahil eder:** `< distance` değil `<= distance`. Tam sınırda olan nokta dahil.
+3. **İndeks yoksa yavaş:** `CREATE INDEX USING gist(geom)` olmadan büyük tablolarda `ST_DWithin` yine de sequential scan yapar.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki ders en güçlü araçlardan biri: **mekansal JOIN** — iki tabloyu geometrik ilişkiyle birleştir.

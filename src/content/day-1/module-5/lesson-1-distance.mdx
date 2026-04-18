@@ -1,0 +1,104 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Distance` ile iki nokta arasındaki mesafeyi doğru hesaplayabileceksin
+- Birim sorununu (derece vs metre) çözebileceksin
+- `geography` ve `ST_Transform` yollarını karşılaştırabileceksin
+
+---
+
+## 📖 Kavram: ST_Distance
+
+`ST_Distance(A, B)` iki geometri arasındaki **minimum mesafeyi** döndürür.
+
+Döndürdüğü birim SRID'e bağlıdır:
+- `geometry` EPSG:4326 → **derece** (anlamsız uzun mesafelerde)
+- `geometry` EPSG:32635 (UTM) → **metre**
+- `geography` → **metre** (elipsoid, doğru)
+
+```sql
+-- 3 doğru yol:
+-- 1) geography cast
+ST_Distance(a::geography, b::geography)
+
+-- 2) ST_Transform → UTM
+ST_Distance(ST_Transform(a, 32636), ST_Transform(b, 32636))
+
+-- 3) ST_DistanceSphere (hızlı ama daha az hassas)
+ST_DistanceSphere(a, b)
+```
+
+---
+
+## ▶ Canlı Örnek — Şehirlerarası Mesafe Tablosu
+
+<RunnableBlock
+  sql={`WITH sehirler AS (
+  SELECT 'İstanbul' AS ad, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL SELECT 'Ankara',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  UNION ALL SELECT 'Antalya',  ST_SetSRID(ST_MakePoint(30.717, 36.896), 4326)
+  UNION ALL SELECT 'Trabzon',  ST_SetSRID(ST_MakePoint(39.726, 41.002), 4326)
+)
+SELECT
+  a.ad AS kaynak,
+  b.ad AS hedef,
+  ROUND(ST_Distance(a.geom::geography, b.geom::geography)::numeric / 1000, 0) AS km
+FROM sehirler a, sehirler b
+WHERE a.ad < b.ad
+ORDER BY km;`}
+  label="Şehirlerarası mesafe matrisi"
+/>
+
+---
+
+## ▶ Nokta–Çizgi Mesafesi
+
+`ST_Distance` sadece nokta-nokta değil, her geometri çifti için çalışır:
+
+<RunnableBlock
+  sql={`WITH nokta AS (
+  SELECT ST_SetSRID(ST_MakePoint(29.5, 41.0), 4326) AS geom
+),
+yol AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('LINESTRING(28.979 41.015, 32.854 39.930)'),
+    4326) AS geom
+)
+SELECT
+  ROUND(ST_Distance(n.geom::geography, y.geom::geography)::numeric / 1000, 1) AS yola_mesafe_km
+FROM nokta n, yol y;`}
+  label="Noktadan yola dik mesafe"
+/>
+
+---
+
+## 🧪 Dene
+
+`ST_DistanceSphere` ile `geography` karşılaştır — fark ne kadar?
+
+<RunnableBlock
+  sql={`WITH a AS (SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS g),
+     b AS (SELECT ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326) AS g)
+SELECT
+  ROUND(ST_Distance(a.g::geography, b.g::geography)::numeric)    AS geography_m,
+  ROUND(ST_DistanceSphere(a.g, b.g)::numeric)                     AS sphere_m,
+  ROUND(ST_Distance(
+    ST_Transform(a.g, 32636),
+    ST_Transform(b.g, 32636))::numeric)                           AS utm36n_m
+FROM a, b;`}
+  label="3 yöntem karşılaştırması"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **4326 geometry → derece:** `ST_Distance(geom4326, geom4326)` derece döndürür. `/ 111000` ile metreye çevirebilirsin ama bu kaba bir yaklaşım — `::geography` kullan.
+2. **ST_DistanceSphere küre varsayar:** Dünya küre değil elipsoid, bu yüzden ~%0.3 hata var. Mühendislik için `geography` kullan.
+3. **Büyük tablolarda ST_Distance WHERE koşulu:** `WHERE ST_Distance(...) < 1000` → sequential scan. `WHERE ST_DWithin(...)` → GIST indeks. Önce filtrele, sonra hesapla.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste alan ve uzunluk ölçümleri: `ST_Area`, `ST_Perimeter`, `ST_Length`.

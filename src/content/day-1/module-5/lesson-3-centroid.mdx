@@ -1,0 +1,101 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Centroid` ile ağırlık merkezini hesaplayabileceksin
+- `ST_PointOnSurface` ile **her zaman** poligon içinde bir nokta bulabileceksin
+- İki fonksiyonun farkını gerçek bir örnekle görebileceksin
+
+---
+
+## 📖 Kavram
+
+### ST_Centroid
+Geometrinin **ağırlık merkezi** (geometrik ortalama). Bazen poligonun **dışına** düşebilir.
+
+**Örnek:** At nalı şeklindeki bir poligon, çentik boyunca centroid dışarıya çıkar.
+
+### ST_PointOnSurface
+Geometrinin **yüzeyi üzerinde garantili** bir nokta. Her zaman poligon içindedir.
+
+**Ne zaman hangisi?**
+
+| Durum | Kullan |
+|---|---|
+| Haritada etiket / pin | `ST_PointOnSurface` (güvenli) |
+| İstatistiksel merkez | `ST_Centroid` (doğru ağırlık merkezi) |
+| Konveks poligon | İkisi de aynı sonucu verir |
+
+---
+
+## ▶ Canlı Örnek — At Nalı Poligonu
+
+<RunnableBlock
+  sql={`WITH at_nali AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('POLYGON((0 0, 3 0, 3 1, 1 1, 1 2, 3 2, 3 3, 0 3, 0 0))'),
+    4326) AS geom
+)
+SELECT
+  ST_AsText(ST_Centroid(geom))       AS centroid_wkt,
+  ST_AsText(ST_PointOnSurface(geom)) AS point_on_surface_wkt,
+  -- Centroid poligon içinde mi?
+  ST_Contains(geom, ST_Centroid(geom))       AS centroid_icinde,
+  ST_Contains(geom, ST_PointOnSurface(geom)) AS pos_icinde
+FROM at_nali;`}
+  label="At nalı — centroid dışarıda mı?"
+/>
+
+---
+
+## ▶ Haritada Göster
+
+<RunnableBlock
+  sql={`WITH alan AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('POLYGON((28.9 41.0, 29.1 41.0, 29.1 41.05, 29.05 41.05, 29.05 41.1, 29.1 41.1, 29.1 41.2, 28.9 41.2, 28.9 41.0))'),
+    4326) AS geom
+)
+SELECT geom, 'Poligon' AS label FROM alan
+UNION ALL
+SELECT ST_Centroid(geom), 'Centroid' FROM alan
+UNION ALL
+SELECT ST_PointOnSurface(geom), 'PointOnSurface' FROM alan;`}
+  label="Centroid vs PointOnSurface haritada"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene
+
+Çoklu şehirler için centroid hesapla — bir MULTIPOINT'in centroid'i nerede?
+
+<RunnableBlock
+  sql={`WITH sehirler AS (
+  SELECT ST_Collect(ARRAY[
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326),  -- İstanbul
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326),  -- Ankara
+    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326),  -- İzmir
+    ST_SetSRID(ST_MakePoint(30.717, 36.896), 4326)   -- Antalya
+  ]) AS geom
+)
+SELECT
+  ST_AsText(ST_Centroid(geom)) AS merkez,
+  ST_Centroid(geom) AS geom
+FROM sehirler;`}
+  label="4 şehrin geometrik merkezi"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Centroid dışarı düşebilir:** C harfi, yıldız veya halka şeklindeki poligonlarda centroid poligon dışına çıkar. Etiket konumu için `ST_PointOnSurface` tercih et.
+2. **LineString centroid:** Bir çizginin centroid'i orta noktasıdır, `ST_LineInterpolatePoint(line, 0.5)` ile aynı sonucu verir.
+3. **Boş geometri:** `ST_Centroid(ST_GeomFromText('POINT EMPTY'))` → `POINT EMPTY`. NULL değil, boş geometri döner.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste en sık kullanılan analitik araçlardan biri: **`ST_Buffer` — tampon bölge oluşturma**.

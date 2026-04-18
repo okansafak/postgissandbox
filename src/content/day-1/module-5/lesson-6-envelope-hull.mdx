@@ -1,0 +1,104 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Envelope` ile sınırlayıcı dikdörtgen oluşturabileceksin
+- `ST_ConvexHull` ile dış bükey kabuk hesaplayabileceksin
+- `ST_ConcaveHull` ile daha gerçekçi kapsam alanı bulabileceksin
+
+---
+
+## 📖 Kavram: Kapsam Geometrileri
+
+Bir nokta kümesini veya karmaşık geometriyi kapsayan daha basit geometriler:
+
+| Fonksiyon | Çıktı | Kullanım |
+|---|---|---|
+| `ST_Envelope(g)` | Dikdörtgen POLYGON | Hızlı bounding box, indeks sorguları |
+| `ST_ConvexHull(g)` | Dış bükey (convex) POLYGON | Cluster kapsamı, görsel kapsam |
+| `ST_ConcaveHull(g, target)` | İç bükey (concave) POLYGON | Gerçekçi alan tahmini |
+
+### target parametresi (ConcaveHull)
+0.0 → maksimum concave (noktaların tam etrafı)  
+1.0 → convex hull ile aynı  
+0.9 → tavsiye edilen başlangıç değeri
+
+---
+
+## ▶ Canlı Örnek — Üç Kapsam
+
+<RunnableBlock
+  sql={`WITH noktalar AS (
+  SELECT ST_Collect(ARRAY[
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326),
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326),
+    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326),
+    ST_SetSRID(ST_MakePoint(30.717, 36.896), 4326),
+    ST_SetSRID(ST_MakePoint(36.330, 41.293), 4326),
+    ST_SetSRID(ST_MakePoint(39.726, 41.002), 4326)
+  ]) AS geom
+)
+SELECT 'Noktalar'    AS label, geom FROM noktalar
+UNION ALL SELECT 'Envelope',    ST_Envelope(geom)            FROM noktalar
+UNION ALL SELECT 'ConvexHull',  ST_ConvexHull(geom)          FROM noktalar
+UNION ALL SELECT 'ConcaveHull', ST_ConcaveHull(geom, 0.9)    FROM noktalar;`}
+  label="Envelope, ConvexHull, ConcaveHull"
+  autoFit
+/>
+
+---
+
+## ▶ Alan Karşılaştırması
+
+<RunnableBlock
+  sql={`WITH noktalar AS (
+  SELECT ST_Collect(ARRAY[
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326),
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326),
+    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326),
+    ST_SetSRID(ST_MakePoint(30.717, 36.896), 4326),
+    ST_SetSRID(ST_MakePoint(39.726, 41.002), 4326)
+  ]) AS geom
+)
+SELECT
+  ROUND(ST_Area(ST_Envelope(geom)::geography)::numeric / 1e6, 0)       AS envelope_km2,
+  ROUND(ST_Area(ST_ConvexHull(geom)::geography)::numeric / 1e6, 0)     AS convex_km2,
+  ROUND(ST_Area(ST_ConcaveHull(geom,0.9)::geography)::numeric / 1e6, 0) AS concave_km2
+FROM noktalar;`}
+  label="Alan karşılaştırması"
+/>
+
+---
+
+## 🧪 Dene
+
+Kendi noktalarını ekle ve ConcaveHull target değerini değiştirerek farkı gör:
+
+<RunnableBlock
+  sql={`WITH cluster AS (
+  SELECT ST_Collect(ARRAY[
+    ST_SetSRID(ST_MakePoint(29.0, 41.0), 4326),
+    ST_SetSRID(ST_MakePoint(29.3, 40.8), 4326),
+    ST_SetSRID(ST_MakePoint(29.1, 40.6), 4326),
+    ST_SetSRID(ST_MakePoint(28.8, 40.7), 4326),
+    ST_SetSRID(ST_MakePoint(28.7, 41.1), 4326),
+    ST_SetSRID(ST_MakePoint(29.2, 41.2), 4326)
+  ]) AS geom
+)
+SELECT ST_ConcaveHull(geom, 0.7) AS geom  -- 0.7 dene, sonra 0.95 ile karşılaştır
+FROM cluster;`}
+  label="ConcaveHull target değeri"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Envelope dikdörtgen:** Döndürdüğü poligon her zaman axis-aligned (dönmemiş) dikdörtgendir. Döndürülmüş minimum bounding box için `ST_OrientedEnvelope` kullan.
+2. **ST_ConcaveHull az noktada hata verebilir:** 3'ten az nokta için `ST_ConvexHull` kullan.
+3. **target=0.0 çok yavaş:** `ConcaveHull(geom, 0.0)` çok fazla vertex üretir. Pratikte 0.8-0.95 arası değer kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modülün son dersi: **`<->` KNN operatörü — en yakın N komşuyu verimli bul**.

@@ -1,0 +1,116 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Area`, `ST_Perimeter`, `ST_Length` fonksiyonlarını doğru birimde kullanabileceksin
+- Poligon alanını m² ve km² cinsinden hesaplayabileceksin
+- Bir lineer geometrinin uzunluğunu metreyle ölçebileceksin
+
+---
+
+## 📖 Kavram
+
+| Fonksiyon | Girdi | Çıktı |
+|---|---|---|
+| `ST_Area(geom)` | Polygon/MultiPolygon | Alan (SRID birimiyle) |
+| `ST_Perimeter(geom)` | Polygon/MultiPolygon | Çevre (SRID birimiyle) |
+| `ST_Length(geom)` | LineString/MultiLineString | Uzunluk (SRID birimiyle) |
+
+**Birim kuralı** aynı: `geometry` 4326 → derece², `::geography` → m² / m.
+
+```sql
+-- Doğru:
+ST_Area(geom::geography)       -- m²
+ST_Length(geom::geography)     -- m
+ST_Perimeter(geom::geography)  -- m
+```
+
+---
+
+## ▶ Canlı Örnek — İstanbul Bölgesi Alanı
+
+<RunnableBlock
+  sql={`WITH istanbul AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('POLYGON((27.9 40.8,29.9 40.8,29.9 41.6,27.9 41.6,27.9 40.8))'),
+    4326) AS geom
+)
+SELECT
+  ROUND(ST_Area(geom::geography)::numeric)           AS alan_m2,
+  ROUND(ST_Area(geom::geography)::numeric / 1e6, 0)  AS alan_km2,
+  ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 0) AS cevre_km
+FROM istanbul;`}
+  label="Bölge alanı ve çevresi"
+/>
+
+---
+
+## ▶ Çizgi Uzunluğu
+
+<RunnableBlock
+  sql={`WITH rota AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('LINESTRING(28.979 41.015, 30.717 36.896, 27.143 38.423)'),
+    4326) AS geom
+)
+SELECT
+  ROUND(ST_Length(geom::geography)::numeric / 1000, 0) AS toplam_km,
+  ST_NPoints(geom) AS segment_nokta_sayisi
+FROM rota;`}
+  label="Rota uzunluğu (km)"
+  autoFit
+/>
+
+---
+
+## ▶ Şehir Karşılaştırması
+
+<RunnableBlock
+  sql={`WITH ilce_alanlari AS (
+  SELECT 'Kadıköy (~45 km²)' AS ilce,
+    ST_SetSRID(ST_GeomFromText('POLYGON((29.0 40.95,29.1 40.95,29.1 41.05,29.0 41.05,29.0 40.95))'), 4326) AS geom
+  UNION ALL
+  SELECT 'Beşiktaş (~20 km²)',
+    ST_SetSRID(ST_GeomFromText('POLYGON((28.95 41.03,29.0 41.03,29.0 41.10,28.95 41.10,28.95 41.03))'), 4326)
+)
+SELECT
+  ilce,
+  ROUND(ST_Area(geom::geography)::numeric / 1e6, 1) AS alan_km2,
+  ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 1) AS cevre_km
+FROM ilce_alanlari
+ORDER BY alan_km2 DESC;`}
+  label="İlçe alan karşılaştırması"
+/>
+
+---
+
+## 🎯 Egzersiz
+
+Bir dikdörtgen poligon oluştur (İstanbul-Ankara-İzmir çevresini kapsayan). Alanını km² ve çevresini km cinsinden hesapla:
+
+<RunnableBlock
+  sql={`WITH kutu AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('POLYGON((27 37, 34 37, 34 42, 27 42, 27 37))'),
+    4326) AS geom
+)
+SELECT
+  ROUND(ST_Area(geom::geography)::numeric / 1e6, 0)       AS alan_km2,
+  ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 0) AS cevre_km,
+  geom
+FROM kutu;`}
+  label="Büyük bölge alanı"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Area(geometry 4326):** Derece² döndürür, ~`0.009` gibi küçük bir sayı. Metrekare değil! `::geography` ekle.
+2. **MultiPolygon toplam alan:** `ST_Area(multipolygon)` tüm parçaların toplam alanını verir. Parça parça için `ST_GeometryN` ile döngüye gir.
+3. **ST_Length sadece lineer geometri:** `ST_Length(polygon)` → hata verir. Poligon çevresi için `ST_Perimeter` kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste etiket konumu belirlemek için: `ST_Centroid` vs `ST_PointOnSurface`.

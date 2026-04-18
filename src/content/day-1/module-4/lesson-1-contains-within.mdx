@@ -1,0 +1,102 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Contains` ve `ST_Within` ile "içinde mi?" sorularını yanıtlayabileceksin
+- İki fonksiyonun birbirinin tersi olduğunu anlayabileceksin
+- Nokta-poligon, poligon-poligon ilişkilerini test edebileceksin
+
+---
+
+## 📖 Kavram: İçerik İlişkileri
+
+Mekansal ilişki fonksiyonları iki geometri arasındaki **topolojik ilişkiyi** test eder ve `true`/`false` döndürür.
+
+### ST_Contains(A, B)
+"A, B'yi **tamamen içeriyor** mu?"
+→ B'nin tüm noktaları A içinde ve B'nin en az bir noktası A'nın iç bölgesinde.
+
+### ST_Within(A, B)
+"A, B'nin **içinde** mi?"
+→ `ST_Contains(B, A)` ile eşdeğer.
+
+```
+ST_Contains(poligon, nokta) = ST_Within(nokta, poligon)
+```
+
+> **Sınır kuralı:** Sınır üzerindeki nokta için `ST_Contains` → `false`, `ST_Covers` → `true`. Dikkat!
+
+---
+
+## ▶ Canlı Örnek — Nokta Poligon İçinde mi?
+
+<RunnableBlock
+  sql={`WITH alan AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('POLYGON((28.8 40.9, 29.2 40.9, 29.2 41.2, 28.8 41.2, 28.8 40.9))'),
+    4326) AS geom
+),
+noktalar AS (
+  SELECT 'İstanbul merkez' AS ad, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL
+  SELECT 'Ankara',               ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL
+  SELECT 'Sınır üstü',           ST_SetSRID(ST_MakePoint(28.8, 41.0),   4326)
+)
+SELECT
+  n.ad,
+  ST_Contains(a.geom, n.geom) AS iceride_mi,
+  ST_Within(n.geom, a.geom)   AS within_mi,
+  ST_Covers(a.geom, n.geom)   AS covers_mi
+FROM alan a, noktalar n;`}
+  label="Nokta içerik testi"
+/>
+
+---
+
+## ▶ Haritada Gör — Alan + Noktalar
+
+<RunnableBlock
+  sql={`SELECT ST_SetSRID(
+  ST_GeomFromText('POLYGON((28.8 40.9, 29.2 40.9, 29.2 41.2, 28.8 41.2, 28.8 40.9))'),
+  4326) AS geom, 'Alan' AS label
+UNION ALL
+SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326), 'İçeride'
+UNION ALL
+SELECT ST_SetSRID(ST_MakePoint(29.4, 41.0), 4326), 'Dışarıda';`}
+  label="Alan ve noktaları haritada gör"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — Poligon içinde poligon
+
+<RunnableBlock
+  sql={`WITH buyuk AS (
+  SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))'), 4326) AS geom
+),
+kucuk AS (
+  SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2, 8 2, 8 8, 2 8, 2 2))'), 4326) AS geom
+),
+tasman AS (
+  SELECT ST_SetSRID(ST_GeomFromText('POLYGON((8 8, 12 8, 12 12, 8 12, 8 8))'), 4326) AS geom
+)
+SELECT
+  'küçük içinde mi?' AS test, ST_Within(kucuk.geom, buyuk.geom) AS sonuc FROM buyuk, kucuk
+UNION ALL
+SELECT 'taşan içinde mi?',    ST_Within(tasman.geom, buyuk.geom) FROM buyuk, tasman;`}
+  label="Poligon-poligon içerik testi"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **Sınır üzerindeki nokta:** `ST_Contains(poly, boundary_point)` → `false`. Sınırı dahil etmek istiyorsan `ST_Covers` kullan.
+2. **ST_Within boş geometri:** `ST_Within(ST_GeomFromText('POINT EMPTY'), poly)` → `false`. Boş geometrileri filtrele.
+3. **SRID eşleşmesi zorunlu:** İki geometri farklı SRID'te ise sonuç hatalı veya hata alırsın. `ST_SRID(a) = ST_SRID(b)` kontrolü yap.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste **kesişim** ilişkileri: `ST_Intersects` ve `ST_Disjoint`.

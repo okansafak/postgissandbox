@@ -1,0 +1,97 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Touches`, `ST_Crosses`, `ST_Overlaps` arasındaki ince farkları açıklayabileceksin
+- Hangi topolojik durumda hangi fonksiyonun `true` döndürdüğünü belirleyebileceksin
+- DE-9IM matrisini kavramsal düzeyde anlayabileceksin
+
+---
+
+## 📖 Kavram: Üç İnce Ayrım
+
+### ST_Touches(A, B) — "Sadece Kenardan Dokunuyor"
+- Sınırları ortak nokta paylaşıyor
+- **İç kısımları örtüşmüyor**
+- Örnek: Yan yana iki il poligonu
+
+### ST_Crosses(A, B) — "Kesişerek Geçiyor"
+- Geometrilerin iç kısımları kesişiyor
+- Ama birini tamamen içermiyor
+- Tipik: Yolun nehri kesmesi (LineString × LineString veya LineString × Polygon)
+
+### ST_Overlaps(A, B) — "Kısmen Örtüşüyor"
+- Aynı boyuttaki geometriler kısmen örtüşüyor
+- Birini tamamen içermiyor
+- Tipik: İki poligonun kısmen üst üste gelmesi
+
+---
+
+## ▶ Canlı Örnek — Üç Durum
+
+<RunnableBlock
+  sql={`WITH poly_a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
+     poly_b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((4 0,8 0,8 4,4 4,4 0))'), 4326) AS g),  -- sadece kenar
+     poly_c AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS g),  -- örtüşüyor
+     line_d AS (SELECT ST_SetSRID(ST_GeomFromText('LINESTRING(-1 2, 5 2)'),           4326) AS g)   -- geçiyor
+SELECT 'A touches B (sadece kenar)' AS test, ST_Touches(poly_a.g, poly_b.g) AS sonuc FROM poly_a, poly_b
+UNION ALL
+SELECT 'A overlaps C (kısmen örtüş)',  ST_Overlaps(poly_a.g, poly_c.g) FROM poly_a, poly_c
+UNION ALL
+SELECT 'line crosses A (içinden geç)', ST_Crosses(line_d.g, poly_a.g)  FROM poly_a, line_d
+UNION ALL
+SELECT 'A intersects C (genel test)',  ST_Intersects(poly_a.g, poly_c.g) FROM poly_a, poly_c;`}
+  label="Touches, Overlaps, Crosses karşılaştırması"
+/>
+
+---
+
+## ▶ Komşu İller — ST_Touches
+
+<RunnableBlock
+  sql={`WITH iller AS (
+  SELECT 'İstanbul' AS il,
+    ST_SetSRID(ST_GeomFromText('POLYGON((27.9 40.8,29.9 40.8,29.9 41.6,27.9 41.6,27.9 40.8))'), 4326) AS geom
+  UNION ALL
+  SELECT 'Tekirdağ',
+    ST_SetSRID(ST_GeomFromText('POLYGON((26.5 40.8,27.9 40.8,27.9 41.5,26.5 41.5,26.5 40.8))'), 4326)
+  UNION ALL
+  SELECT 'Kocaeli',
+    ST_SetSRID(ST_GeomFromText('POLYGON((29.9 40.5,30.9 40.5,30.9 41.2,29.9 41.2,29.9 40.5))'), 4326)
+)
+SELECT a.il AS il_a, b.il AS il_b,
+  ST_Touches(a.geom, b.geom) AS komsu_mu
+FROM iller a, iller b
+WHERE a.il < b.il;`}
+  label="Komşu il testi"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene
+
+<RunnableBlock
+  sql={`-- DE-9IM matrisini görmek için ST_Relate kullan
+WITH a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
+     b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS g)
+SELECT
+  ST_Relate(a.g, b.g)    AS de9im_matrisi,
+  ST_Overlaps(a.g, b.g)  AS overlaps,
+  ST_Touches(a.g, b.g)   AS touches,
+  ST_Contains(a.g, b.g)  AS contains
+FROM a, b;`}
+  label="DE-9IM matrisi"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Overlaps aynı boyut gerektirir:** `ST_Overlaps(polygon, linestring)` → her zaman `false`. Farklı boyutlar için `ST_Crosses` kullan.
+2. **ST_Touches iç örtüşmede false:** İki poligonun hem ortak kenarı hem iç örtüşmesi varsa `ST_Touches` → `false`, `ST_Overlaps` → `true`.
+3. **Pratik kullanım:** Üretimde bu üçü az kullanılır. Çoğu sorgu `ST_Intersects` veya `ST_Contains` ile çözülür.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki ders en pratik mekansal filtre: **`ST_DWithin` — N metre içindeki geometriler**.

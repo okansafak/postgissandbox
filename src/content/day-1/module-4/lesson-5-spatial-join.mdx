@@ -1,0 +1,117 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Intersects` / `ST_Contains` ile mekansal JOIN yazabileceksin
+- "Hangi nokta hangi poligon içinde?" sorusunu SQL ile yanıtlayabileceksin
+- Mekansal JOIN performansını GIST indeksiyle iyileştirebileceksin
+
+---
+
+## 📖 Kavram: Mekansal JOIN
+
+Klasik JOIN iki tabloyu bir ID eşleştirmesiyle birleştirir. **Mekansal JOIN** ise iki tabloyu **geometrik ilişkiyle** birleştirir.
+
+```sql
+-- Klasik JOIN: ID eşleştirme
+SELECT * FROM noktalar n JOIN bolgeler b ON n.bolge_id = b.id
+
+-- Mekansal JOIN: içerik ilişkisi
+SELECT * FROM noktalar n JOIN bolgeler b ON ST_Contains(b.geom, n.geom)
+```
+
+Gerçek dünya örneği:
+- "Hangi restoran hangi ilçede?" → `ST_Contains(ilce.geom, restoran.geom)`
+- "Hangi yol hangi şehirden geçiyor?" → `ST_Intersects(sehir.geom, yol.geom)`
+
+---
+
+## ▶ Canlı Örnek — Noktaları Bölgelere Ata
+
+<RunnableBlock
+  sql={`WITH bolgeler AS (
+  SELECT 'Batı'   AS ad, ST_SetSRID(ST_GeomFromText('POLYGON((25 36, 31 36, 31 42, 25 42, 25 36))'), 4326) AS geom
+  UNION ALL
+  SELECT 'Orta',         ST_SetSRID(ST_GeomFromText('POLYGON((31 36, 37 36, 37 42, 31 42, 31 36))'), 4326)
+  UNION ALL
+  SELECT 'Doğu',         ST_SetSRID(ST_GeomFromText('POLYGON((37 36, 45 36, 45 42, 37 42, 37 36))'), 4326)
+),
+sehirler AS (
+  SELECT 'İstanbul'  AS sehir, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+  UNION ALL SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)
+  UNION ALL SELECT 'Ankara',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL SELECT 'Konya',    ST_SetSRID(ST_MakePoint(32.483, 37.872), 4326)
+  UNION ALL SELECT 'Erzurum',  ST_SetSRID(ST_MakePoint(41.269, 39.904), 4326)
+  UNION ALL SELECT 'Van',      ST_SetSRID(ST_MakePoint(43.380, 38.494), 4326)
+)
+SELECT s.sehir, b.ad AS bolge
+FROM sehirler s
+JOIN bolgeler b ON ST_Contains(b.geom, s.geom)
+ORDER BY b.ad, s.sehir;`}
+  label="Şehirleri bölgelere ata"
+  autoFit
+/>
+
+---
+
+## ▶ Aggregate ile Birleştir — Bölgedeki Şehir Sayısı
+
+<RunnableBlock
+  sql={`WITH bolgeler AS (
+  SELECT 'Batı' AS ad, ST_SetSRID(ST_GeomFromText('POLYGON((25 36,31 36,31 42,25 42,25 36))'), 4326) AS geom
+  UNION ALL SELECT 'Orta', ST_SetSRID(ST_GeomFromText('POLYGON((31 36,37 36,37 42,31 42,31 36))'), 4326)
+  UNION ALL SELECT 'Doğu', ST_SetSRID(ST_GeomFromText('POLYGON((37 36,45 36,45 42,37 42,37 36))'), 4326)
+),
+sehirler AS (
+  SELECT 'İstanbul' AS s, ST_SetSRID(ST_MakePoint(28.979,41.015),4326) AS geom
+  UNION ALL SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143,38.423),4326)
+  UNION ALL SELECT 'Ankara',   ST_SetSRID(ST_MakePoint(32.854,39.930),4326)
+  UNION ALL SELECT 'Konya',    ST_SetSRID(ST_MakePoint(32.483,37.872),4326)
+  UNION ALL SELECT 'Erzurum',  ST_SetSRID(ST_MakePoint(41.269,39.904),4326)
+  UNION ALL SELECT 'Van',      ST_SetSRID(ST_MakePoint(43.380,38.494),4326)
+  UNION ALL SELECT 'Bursa',    ST_SetSRID(ST_MakePoint(29.061,40.182),4326)
+)
+SELECT b.ad AS bolge,
+  COUNT(*)                     AS sehir_sayisi,
+  STRING_AGG(c.s, ', ' ORDER BY c.s) AS sehirler,
+  b.geom
+FROM bolgeler b
+JOIN sehirler c ON ST_Contains(b.geom, c.geom)
+GROUP BY b.ad, b.geom
+ORDER BY b.ad;`}
+  label="Bölge başına şehir sayısı"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — LEFT JOIN ile Boş Bölgeleri Bul
+
+<RunnableBlock
+  sql={`WITH bolgeler AS (
+  SELECT 1 AS id, 'Kuzey' AS ad, ST_SetSRID(ST_GeomFromText('POLYGON((25 41,45 41,45 45,25 45,25 41))'), 4326) AS geom
+  UNION ALL SELECT 2, 'Güney', ST_SetSRID(ST_GeomFromText('POLYGON((25 36,45 36,45 38,25 38,25 36))'), 4326)
+  UNION ALL SELECT 3, 'Orta',  ST_SetSRID(ST_GeomFromText('POLYGON((25 38,45 38,45 41,25 41,25 38))'), 4326)
+),
+sehirler AS (
+  SELECT 'Ankara'  AS s, ST_SetSRID(ST_MakePoint(32.854,39.930),4326) AS geom
+  UNION ALL SELECT 'Konya', ST_SetSRID(ST_MakePoint(32.483,37.872),4326)
+)
+SELECT b.ad, COUNT(c.s) AS sehir_sayisi
+FROM bolgeler b
+LEFT JOIN sehirler c ON ST_Contains(b.geom, c.geom)
+GROUP BY b.ad ORDER BY b.ad;`}
+  label="LEFT JOIN — şehir olmayan bölgeler"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **CROSS JOIN riski:** `FROM a, b WHERE ST_Contains(...)` implicit cross join yapar — N×M satır üretir, sonra filtreler. Büyük tablolarda `JOIN ... ON` kullan.
+2. **NULL sonuçlar:** `ST_Contains` sınır noktası için `false` döner — sınırdaki noktalar JOIN'e katılmaz. `ST_Covers` daha kapsayıcı.
+3. **GIST indeksi olmadan:** Büyük tablolarda `CREATE INDEX ON tablo USING gist(geom)` yoksa sorgular çok yavaş olur.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Modül 1.4 tamamlandı! Sırada **Modül 1.5 — Ölçüm ve Temel Analitik**: mesafe, alan, tampon, union, KNN.

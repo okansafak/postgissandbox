@@ -1,0 +1,132 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Buffer` ile etki alanı / tampon bölge oluşturabileceksin
+- Metre cinsinden tampon için doğru yöntemi seçebileceksin
+- Tampon sonucunu mekansal analizde filtre olarak kullanabileceksin
+
+---
+
+## 📖 Kavram: Tampon Bölge
+
+`ST_Buffer(geom, distance)` bir geometrinin çevresinde `distance` kadar genişletilmiş bir **POLYGON** döndürür.
+
+```sql
+-- ⚠ YANLIŞ: 0.01 derece (~1.1 km) — tutarsız
+ST_Buffer(geom_4326, 0.01)
+
+-- ✅ DOĞRU: geography → metre, geri 4326'ya dönüştür
+ST_Transform(
+  ST_Buffer(ST_Transform(geom, 32636), 1000),
+  4326
+)
+
+-- ✅ DOĞRU: geography cast (en kolay)
+ST_Buffer(geom::geography, 1000)::geometry
+```
+
+---
+
+## ▶ Canlı Örnek — İstanbul'a 50 km Tampon
+
+<RunnableBlock
+  sql={`SELECT
+  ST_Buffer(
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+    50000  -- 50 km = 50000 metre
+  )::geometry AS geom,
+  '50 km tampon' AS label;`}
+  label="İstanbul 50 km tampon"
+  autoFit
+/>
+
+---
+
+## ▶ Yol Tamponu
+
+<RunnableBlock
+  sql={`SELECT
+  ST_Buffer(
+    ST_SetSRID(
+      ST_GeomFromText('LINESTRING(28.979 41.015, 30.717 36.896)'),
+      4326
+    )::geography,
+    20000  -- 20 km koridor
+  )::geometry AS geom,
+  '20 km yol koridoru' AS label;`}
+  label="Yol güzergahı tamponu"
+  autoFit
+/>
+
+---
+
+## ▶ Tampon + Filtre
+
+<RunnableBlock
+  sql={`WITH istanbul_tamponu AS (
+  SELECT ST_Buffer(
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+    100000)::geometry AS geom
+),
+sehirler AS (
+  SELECT 'Bursa'     AS ad, ST_SetSRID(ST_MakePoint(29.061, 40.182), 4326) AS geom
+  UNION ALL SELECT 'Tekirdağ', ST_SetSRID(ST_MakePoint(27.508, 40.978), 4326)
+  UNION ALL SELECT 'Ankara',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
+  UNION ALL SELECT 'İzmit',    ST_SetSRID(ST_MakePoint(29.918, 40.766), 4326)
+)
+SELECT s.ad,
+  ROUND(ST_Distance(
+    ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
+    s.geom::geography)::numeric/1000, 0) AS km,
+  ST_Contains(t.geom, s.geom) AS tampon_icinde,
+  s.geom
+FROM istanbul_tamponu t, sehirler s
+ORDER BY km;`}
+  label="100 km tampon içindeki şehirler"
+  autoFit
+/>
+
+---
+
+## 🎯 Egzersiz
+
+Ankara'dan 200 km tampon çiz, sonra bu alan içindeki şehirleri filtrele:
+
+<RunnableBlock
+  sql={`WITH tampon AS (
+  SELECT ST_Buffer(
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography,
+    200000)::geometry AS geom
+),
+sehirler AS (
+  SELECT 'İstanbul' AS ad, ST_SetSRID(ST_MakePoint(28.979,41.015),4326) AS geom
+  UNION ALL SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143,38.423),4326)
+  UNION ALL SELECT 'Konya',    ST_SetSRID(ST_MakePoint(32.483,37.872),4326)
+  UNION ALL SELECT 'Kayseri',  ST_SetSRID(ST_MakePoint(35.485,38.720),4326)
+  UNION ALL SELECT 'Samsun',   ST_SetSRID(ST_MakePoint(36.330,41.293),4326)
+  UNION ALL SELECT 'Eskişehir',ST_SetSRID(ST_MakePoint(30.521,39.776),4326)
+)
+SELECT s.ad,
+  ROUND(ST_Distance(
+    ST_SetSRID(ST_MakePoint(32.854,39.930),4326)::geography,
+    s.geom::geography)::numeric/1000,0) AS km,
+  s.geom
+FROM tampon t, sehirler s
+WHERE ST_Contains(t.geom, s.geom)
+ORDER BY km;`}
+  label="Ankara 200 km tampon analizi"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Buffer 4326'da derece kullanır:** `ST_Buffer(geom_4326, 1000)` → 1000 **derece** (~111,000 km!) tampon. `::geography` veya UTM kullan.
+2. **geography cast geri geometry'ye:** `ST_Buffer(geom::geography, 1000)` → `geography` döner. Geometri işlemleriyle kullanmak için `::geometry` ile geri çevir.
+3. **Çözünürlük:** `ST_Buffer`'ın 3. parametresi `num_seg_quarter_circle` — varsayılan 8. Daha düzgün daire için `ST_Buffer(geom, dist, 32)` kullan.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste geometrileri birleştiren ve kesen set işlemleri: `ST_Union`, `ST_Intersection`, `ST_Difference`.

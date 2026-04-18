@@ -1,0 +1,90 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_Union`, `ST_Intersection`, `ST_Difference` ile geometri set işlemleri yapabileceksin
+- Birleşim, kesişim ve fark kavramlarını geometriye uygulayabileceksin
+- `ST_SymDifference` ile simetrik farkı hesaplayabileceksin
+
+---
+
+## 📖 Kavram: Geometri Set İşlemleri
+
+| Fonksiyon | İşlem | Açıklama |
+|---|---|---|
+| `ST_Union(A, B)` | A ∪ B | A ve B'nin tamamı (birleşim) |
+| `ST_Intersection(A, B)` | A ∩ B | A ve B'nin ortak alanı |
+| `ST_Difference(A, B)` | A − B | A'nın B ile örtüşmeyen kısmı |
+| `ST_SymDifference(A, B)` | A △ B | Her ikisinin de sadece kendine ait kısımları |
+
+---
+
+## ▶ Canlı Örnek — Dört İşlem
+
+<RunnableBlock
+  sql={`WITH a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
+     b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS g)
+SELECT 'A' AS label, a.g AS geom FROM a
+UNION ALL SELECT 'B', b.g FROM b
+UNION ALL SELECT 'A∪B (union)',        ST_Union(a.g, b.g) FROM a,b
+UNION ALL SELECT 'A∩B (intersection)', ST_Intersection(a.g, b.g) FROM a,b
+UNION ALL SELECT 'A−B (difference)',   ST_Difference(a.g, b.g) FROM a,b
+UNION ALL SELECT 'A△B (symdiff)',      ST_SymDifference(a.g, b.g) FROM a,b;`}
+  label="Dört set işlemi"
+  autoFit
+/>
+
+---
+
+## ▶ Aggregate Union — Birden Fazla Poligonu Birleştir
+
+`ST_Union` aggregate olarak da kullanılabilir — bir tablodaki tüm geometrileri tek poligona birleştirir:
+
+<RunnableBlock
+  sql={`WITH parceller AS (
+  SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,2 0,2 2,0 2,0 0))'), 4326) AS geom
+  UNION ALL SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 0,4 0,4 2,2 2,2 0))'), 4326)
+  UNION ALL SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 2,2 2,2 4,0 4,0 2))'), 4326)
+  UNION ALL SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,4 2,4 4,2 4,2 2))'), 4326)
+)
+SELECT
+  COUNT(*)                   AS parca_sayisi,
+  ST_Union(geom)             AS birlesik_geom,
+  ROUND(ST_Area(ST_Union(geom)::geography)::numeric, 0) AS birlesik_alan_m2
+FROM parceller;`}
+  label="4 parsel → birleşik poligon"
+  autoFit
+/>
+
+---
+
+## 🧪 Dene — Şehir Tamponlarının Kesişimi
+
+<RunnableBlock
+  sql={`WITH istanbul_tampon AS (
+  SELECT ST_Buffer(
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography, 150000)::geometry AS geom
+),
+ankara_tampon AS (
+  SELECT ST_Buffer(
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography, 150000)::geometry AS geom
+)
+SELECT
+  ST_IsEmpty(ST_Intersection(i.geom, a.geom)) AS kesisim_bos_mu,
+  ST_Intersection(i.geom, a.geom) AS geom
+FROM istanbul_tampon i, ankara_tampon a;`}
+  label="150 km tamponların kesişimi"
+  autoFit
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Intersection boş döndürebilir:** Geometriler kesişmiyorsa `ST_Intersection` → boş geometry. `ST_IsEmpty` ile kontrol et.
+2. **ST_Union topoloji onarmaz:** Geçersiz geometrileri birleştirirken hata alabilirsin. Önce `ST_MakeValid` uygula.
+3. **ST_Difference sırasına dikkat:** `ST_Difference(A, B)` ≠ `ST_Difference(B, A)`. A'dan B'yi çıkarır.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste kapsam geometrileri: `ST_Envelope`, `ST_ConvexHull`, `ST_ConcaveHull`.
