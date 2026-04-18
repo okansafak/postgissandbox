@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* Plan §8.1 tema tokenları */
+@theme {
+  --color-primary: #1b3a5c;
+  --color-primary-light: #2a4f7a;
+  --color-accent: #aed6f1;
+  --color-surface: #0d1b2e;
+  --color-surface-2: #111f33;
+  --color-border: #1e3451;
+  --color-text: #c8d8ec;
+  --color-text-muted: #6b8aaa;
+
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+}
+
+html {
+  background-color: #0d1b2e;
+  color: #c8d8ec;
+  font-family: var(--font-family-sans);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* OpenLayers harita için gerekli */
+.ol-map {
+  width: 100%;
+  height: 100%;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d1b2e; }
+::-webkit-scrollbar-thumb { background: #1e3451; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #2a4f7a; }
