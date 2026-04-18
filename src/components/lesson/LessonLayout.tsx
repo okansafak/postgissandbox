@@ -1,4 +1,6 @@
+import { useRef, useState } from 'react';
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import type { ImperativePanelHandle } from 'react-resizable-panels';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SqlEditor from '@/components/editor/SqlEditor';
 import SpatialMap from '@/components/map/SpatialMap';
@@ -14,10 +16,28 @@ interface LessonLayoutProps {
 }
 
 export default function LessonLayout({ day, module, lesson }: LessonLayoutProps) {
+  const sidebarRef = useRef<ImperativePanelHandle>(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  function toggleSidebar() {
+    if (collapsed) {
+      sidebarRef.current?.expand();
+    } else {
+      sidebarRef.current?.collapse();
+    }
+  }
+
   return (
     <div className="h-full flex flex-col">
       {/* Üst çubuk */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-surface shrink-0">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-surface shrink-0">
+        <button
+          onClick={toggleSidebar}
+          title={collapsed ? 'Menüyü aç' : 'Menüyü kapat'}
+          className="p-1 rounded text-text-muted hover:text-text hover:bg-surface-2 transition-colors shrink-0"
+        >
+          {collapsed ? '☰' : '✕'}
+        </button>
         <span className="text-xs text-text-muted font-mono uppercase tracking-widest">
           PostGIS Akademi
         </span>
@@ -31,7 +51,17 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
       {/* Ana 3'lü panel: sidebar | içerik | editör+harita */}
       <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
         {/* Sidebar: müfredat navigasyonu */}
-        <Panel defaultSize={18} minSize={12} maxSize={28} className="border-r border-border overflow-hidden">
+        <Panel
+          ref={sidebarRef}
+          defaultSize={18}
+          minSize={14}
+          maxSize={30}
+          collapsible
+          collapsedSize={0}
+          onCollapse={() => setCollapsed(true)}
+          onExpand={() => setCollapsed(false)}
+          className="border-r border-border overflow-hidden"
+        >
           <CurriculumSidebar />
         </Panel>
 
@@ -51,7 +81,6 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
         {/* Sağ panel: editör üstte, harita/tablo altta */}
         <Panel defaultSize={48} minSize={35}>
           <PanelGroup orientation="vertical">
-            {/* Sağ üst: SQL editörü */}
             <Panel
               defaultSize={40}
               minSize={20}
@@ -62,7 +91,6 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
 
             <PanelResizeHandle className="h-1 bg-border hover:bg-primary-light transition-colors cursor-row-resize" />
 
-            {/* Sağ alt: Sekmeli panel */}
             <Panel defaultSize={60} minSize={20} className="overflow-hidden">
               <Tabs defaultValue="map" className="h-full flex flex-col">
                 <TabsList className="flex gap-0 border-b border-border bg-surface shrink-0">
