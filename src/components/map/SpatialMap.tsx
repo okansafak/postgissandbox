@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
-import OSM from 'ol/source/OSM';
+import XYZ from 'ol/source/XYZ';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
@@ -14,11 +14,11 @@ import 'ol/ol.css';
 const DEFAULT_FEATURE_STYLE = new Style({
   image: new Circle({
     radius: 7,
-    fill: new Fill({ color: '#AED6F1' }),
-    stroke: new Stroke({ color: '#1B3A5C', width: 2 }),
+    fill: new Fill({ color: '#ff3333' }),
+    stroke: new Stroke({ color: '#fff', width: 1.5 }),
   }),
-  fill: new Fill({ color: 'rgba(174, 214, 241, 0.3)' }),
-  stroke: new Stroke({ color: '#AED6F1', width: 2 }),
+  fill: new Fill({ color: 'rgba(255, 51, 51, 0.25)' }),
+  stroke: new Stroke({ color: '#ff3333', width: 2 }),
 });
 
 export default function SpatialMap() {
@@ -34,7 +34,12 @@ export default function SpatialMap() {
     mapInstance.current = new Map({
       target: mapRef.current,
       layers: [
-        new TileLayer({ source: new OSM() }),
+        new TileLayer({
+          source: new XYZ({
+            url: 'https://{a-d}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+            attributions: '© <a href="https://carto.com/">CARTO</a>',
+          }),
+        }),
         new VectorLayer({
           source: vectorSource.current,
           style: DEFAULT_FEATURE_STYLE,
