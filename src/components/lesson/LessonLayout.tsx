@@ -68,13 +68,23 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
                     </TabsTrigger>
                   ))}
                 </TabsList>
-                <TabsContent value="map" className="flex-1 overflow-hidden">
+                <TabsContent
+                  value="map"
+                  className="flex-1 overflow-hidden data-[state=inactive]:hidden"
+                  style={{ display: 'flex', flexDirection: 'column' }}
+                >
                   <SpatialMap />
                 </TabsContent>
-                <TabsContent value="table" className="flex-1 overflow-auto p-2">
+                <TabsContent
+                  value="table"
+                  className="flex-1 overflow-auto p-2 data-[state=inactive]:hidden"
+                >
                   <ResultTable />
                 </TabsContent>
-                <TabsContent value="explain" className="flex-1 overflow-auto p-2">
+                <TabsContent
+                  value="explain"
+                  className="flex-1 overflow-auto p-2 data-[state=inactive]:hidden"
+                >
                   <ExplainPlan />
                 </TabsContent>
               </Tabs>

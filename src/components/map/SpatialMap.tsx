@@ -46,7 +46,11 @@ export default function SpatialMap() {
       }),
     });
 
+    const ro = new ResizeObserver(() => mapInstance.current?.updateSize());
+    ro.observe(mapRef.current);
+
     return () => {
+      ro.disconnect();
       mapInstance.current?.setTarget(undefined);
       mapInstance.current = null;
     };

@@ -1,5 +1,4 @@
 import { Suspense, useEffect, useState, type ComponentType } from 'react';
-import { MDXProvider } from '@mdx-js/react';
 import RunnableBlock from './RunnableBlock';
 import { getLessonByRoute } from '@/curriculum/structure';
 import { Link } from 'react-router-dom';
@@ -124,15 +123,13 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
         </div>
       )}
 
-      {/* İçerik */}
+      {/* İçerik — components prop olarak doğrudan geçilir; MDXProvider gerekmez */}
       {loadError ? (
         <div className="p-4 rounded bg-red-950 text-red-300 text-sm font-mono">{loadError}</div>
       ) : MdxComponent ? (
-        <MDXProvider components={mdxComponents as never}>
-          <Suspense fallback={<div className="text-text-muted text-sm">Yükleniyor…</div>}>
-            <MdxComponent />
-          </Suspense>
-        </MDXProvider>
+        <Suspense fallback={<div className="text-text-muted text-sm">Yükleniyor…</div>}>
+          <MdxComponent components={mdxComponents as never} />
+        </Suspense>
       ) : (
         <div className="text-text-muted text-sm">Yükleniyor…</div>
       )}
