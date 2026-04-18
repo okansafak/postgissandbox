@@ -1,0 +1,123 @@
+## 🎯 Ne öğreneceksin?
+
+- SRID ve EPSG kodunun ne olduğunu açıklayabileceksin
+- `spatial_ref_sys` tablosunu sorgulayabileceksin
+- En sık kullanılan EPSG kodlarını ezberleyebileceksin
+
+---
+
+## 📖 Kavram: SRID Nedir?
+
+**SRID (Spatial Reference ID)** — PostGIS'in her koordinat sistemine atadığı bir tamsayı. Geometry'nin hangi koordinat sisteminde yazıldığını söyler.
+
+**EPSG (European Petroleum Survey Group)** — koordinat sistemi kodlarını standartlaştıran kuruluş. EPSG kodları global olarak kabul görmüş referans numaralarıdır.
+
+PostGIS'te SRID = EPSG kodu (çoğunlukla).
+
+### En Önemli EPSG Kodları
+
+| EPSG | İsim | Birim | Kullanım |
+|---|---|---|---|
+| **4326** | WGS84 | Derece (lon/lat) | GPS, GeoJSON, küresel depolama |
+| **3857** | Web Mercator | Metre (yaklaşık) | Google Maps, OSM, web tile'lar |
+| **32635** | UTM Zone 35N | Metre (hassas) | Türkiye batısı (İstanbul, İzmir) |
+| **32636** | UTM Zone 36N | Metre (hassas) | Türkiye ortası (Ankara, Konya) |
+| **32637** | UTM Zone 37N | Metre (hassas) | Türkiye doğusu (Erzurum, Van) |
+
+---
+
+## 📖 Kavram: spatial_ref_sys Tablosu
+
+PostGIS kurulduğunda `spatial_ref_sys` tablosu otomatik oluşur — 8500+ koordinat sistemi tanımı içerir:
+
+```sql
+SELECT srid, auth_name, auth_srid, srtext
+FROM spatial_ref_sys
+WHERE srid = 4326;
+```
+
+---
+
+## ▶ Canlı Örnek — EPSG:4326 Tanımını İncele
+
+<RunnableBlock
+  sql={`SELECT
+  srid,
+  auth_name,
+  auth_srid,
+  LEFT(srtext, 120) AS srtext_kisalt,
+  LEFT(proj4text, 80) AS proj4text_kisalt
+FROM spatial_ref_sys
+WHERE srid = 4326;`}
+  label="WGS84 (4326) tanımı"
+/>
+
+---
+
+## ▶ Türkiye'de Kullanılan EPSG'leri Listele
+
+<RunnableBlock
+  sql={`SELECT srid, auth_name, LEFT(srtext, 80) AS tanim
+FROM spatial_ref_sys
+WHERE srid IN (4326, 3857, 32635, 32636, 32637, 5254, 5255, 5256, 5257, 5258, 5259)
+ORDER BY srid;`}
+  label="Türkiye EPSG listesi"
+/>
+
+---
+
+## ▶ Kaç Koordinat Sistemi Var?
+
+<RunnableBlock
+  sql={`SELECT
+  COUNT(*)                                        AS toplam_srid,
+  COUNT(*) FILTER (WHERE auth_name = 'EPSG')     AS epsg_sayisi,
+  COUNT(*) FILTER (WHERE proj4text LIKE '%+proj=utm%') AS utm_sayisi
+FROM spatial_ref_sys;`}
+  label="spatial_ref_sys istatistikleri"
+/>
+
+---
+
+## 🧪 Dene
+
+Web Mercator (3857) tanımını incele — hangi projeksiyon tipi kullandığını bul:
+
+<RunnableBlock
+  sql={`SELECT
+  srid,
+  LEFT(srtext, 150) AS tanim,
+  proj4text
+FROM spatial_ref_sys
+WHERE srid = 3857;`}
+  label="Web Mercator (3857) tanımı"
+/>
+
+`+proj=merc` ifadesini görmelisin — bu Mercator projeksiyonunu gösterir.
+
+---
+
+## 🎯 Egzersiz
+
+`spatial_ref_sys` tablosunda `'PROJCS'` ile başlayan (projektif koordinat sistemi) kaç kayıt var?
+
+<RunnableBlock
+  sql={`SELECT COUNT(*) AS projektif_srid_sayisi
+FROM spatial_ref_sys
+WHERE srtext LIKE 'PROJCS%';`}
+  label="Projektif koordinat sistemi sayısı"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **SRID ≠ EPSG her zaman:** Bazı eski sistemlerde SRID başka numaralar kullanabilir. `auth_name = 'EPSG'` kontrolü yap.
+2. **4326 derece cinsinden:** `ST_Distance(geom4326, geom4326)` derece döndürür. Metre için `::geography` cast veya `ST_Transform` kullan.
+3. **3857 metre "yaklaşık":** Web Mercator (3857) kutuplara gidildikçe ciddi şekil bozulması yaşar. Yüksek hassasiyetli ölçüm için kullanma.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki ders bu kursun en kritik konusu: **`geometry` vs `geography`** tipi — ve neden fark önemli.

@@ -1,0 +1,119 @@
+## 🎯 Ne öğreneceksin?
+
+- `geometry` ve `geography` tiplerinin farkını açıklayabileceksin
+- İstanbul-Ankara mesafesini 3 farklı yöntemle hesaplayabileceksin
+- Hangi tipte ne zaman kullanılacağına karar verebileceksin
+
+---
+
+## 📖 Kavram: İki Farklı Dünya Modeli
+
+PostGIS iki farklı tip sunar:
+
+### `geometry` — Düz Dünya
+
+Koordinatları **2D düzlem** üzerinde sayı olarak işler. Hesaplamalar hızlı ama uzak noktalar arasında **yanlış** sonuç verir.
+
+### `geography` — Yuvarlak Dünya
+
+Koordinatları **küre yüzeyi** üzerinde işler. Hesaplamalar daha yavaş ama mesafe/alan sonuçları doğru (metre/m²).
+
+---
+
+## 📖 Pratik Kural
+
+| Durum | Kullan |
+|---|---|
+| Küçük bölge (şehir içi, birkaç km) | `geometry` + uygun UTM SRID |
+| Ülke geneli veya uluslararası | `geography` (4326) |
+| Web haritası için hızlı render | `geometry` (3857) |
+| Kesin alan/mesafe ölçümü | `geometry` UTM veya `geography` |
+| GeoJSON depolama/API | `geography` (4326) |
+
+---
+
+## ▶ Canlı Örnek — İstanbul-Ankara: 3 Yöntem
+
+<RunnableBlock
+  sql={`SELECT
+  -- Yöntem 1: SRID'siz geometry — YANLIŞ (derece)
+  ROUND(ST_Distance(
+    ST_MakePoint(28.979, 41.015),
+    ST_MakePoint(32.854, 39.930)
+  )::numeric, 4) AS yanlis_derece,
+
+  -- Yöntem 2: geography cast — DOĞRU (metre, elipsoid)
+  ROUND(ST_Distance(
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography
+  )::numeric / 1000, 1) AS dogru_geography_km,
+
+  -- Yöntem 3: UTM 36N projection — DOĞRU (metre, planar)
+  ROUND(ST_Distance(
+    ST_Transform(ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326), 32636),
+    ST_Transform(ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326), 32636)
+  )::numeric / 1000, 1) AS utm36n_km;`}
+  label="İstanbul-Ankara mesafesi — 3 yöntem"
+/>
+
+> Doğru cevap ~352 km. Yöntem 1 anlamsız, Yöntem 2 ve 3 birbirine çok yakın olmalı.
+
+---
+
+## ▶ Alan Farkı: geometry vs geography
+
+<RunnableBlock
+  sql={`WITH kare AS (
+  SELECT ST_SetSRID(
+    ST_GeomFromText('POLYGON((28.9 41.0, 29.0 41.0, 29.0 41.1, 28.9 41.1, 28.9 41.0))'),
+    4326
+  ) AS geom
+)
+SELECT
+  -- geometry ST_Area: derece² (anlamsız)
+  ROUND(ST_Area(geom)::numeric, 6)                AS alan_derece_kare,
+
+  -- geography cast: m²
+  ROUND(ST_Area(geom::geography)::numeric)        AS alan_m2,
+
+  -- km²
+  ROUND(ST_Area(geom::geography)::numeric / 1e6, 2) AS alan_km2,
+
+  -- UTM 35N ile karşılaştır
+  ROUND(ST_Area(ST_Transform(geom, 32635))::numeric / 1e6, 2) AS utm_km2
+FROM kare;`}
+  label="Aynı poligon: 3 farklı alan"
+/>
+
+---
+
+## 🧪 Dene — Türkiye'nin Alanı
+
+Türkiye yaklaşık koordinatlarla bir poligon çiz ve alanını hesapla (gerçek: ~783,562 km²):
+
+<RunnableBlock
+  sql={`SELECT ROUND(
+  ST_Area(
+    ST_SetSRID(
+      ST_GeomFromText('POLYGON((26 36, 45 36, 45 42, 26 42, 26 36))'),
+      4326
+    )::geography
+  ) / 1e6, 0
+) AS yaklasik_alan_km2;
+-- Not: gerçek sınır değil, kaba dikdörtgen`}
+  label="Türkiye kaba alan tahmini"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **`::geography` cast her zaman 4326 varsayar:** `geometry`'yi `geography`'ye cast etmeden önce SRID=4326 olduğundan emin ol. Farklı SRID'de cast yapılırsa PostGIS hata verir.
+2. **`geography` işlemleri yavaştır:** `ST_Distance` için `geography` elipsoid hesabı yapar — büyük tablolarda `ST_Transform` + UTM geometry daha hızlı olabilir.
+3. **`ST_Buffer` geography ile farklı:** `ST_Buffer(geom::geography, 1000)` 1000 metre tampon yapar. `ST_Buffer(geom, 0.01)` ise 0.01 derece tampon yapar — tamamen farklı sonuç.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste `ST_SetSRID` ile `ST_Transform` arasındaki kritik farkı öğreneceğiz — bu iki fonksiyon sıkça karıştırılır.

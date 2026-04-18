@@ -79,6 +79,14 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-5': 'lesson-5-geometry-metadata',
     'lesson-6': 'lesson-6-valid-geometry',
   },
+  'module-3': {
+    'lesson-1': 'lesson-1-why-projections',
+    'lesson-2': 'lesson-2-srid-epsg',
+    'lesson-3': 'lesson-3-geometry-vs-geography',
+    'lesson-4': 'lesson-4-setsrid-vs-transform',
+    'lesson-5': 'lesson-5-turkey-epsg',
+    'lesson-6': 'lesson-6-projection-decision',
+  },
 };
 
 function buildGlobKey(day: string, mod: string, lesson: string): string {

@@ -1,0 +1,96 @@
+## 🎯 Ne öğreneceksin?
+
+- Dünya'nın neden düz bir haritaya tam olarak aktarılamadığını açıklayabileceksin
+- Projeksiyon hatalarının SQL sorgularını nasıl etkilediğini görebileceksin
+- SRID kavramının neden var olduğunu anlayabileceksin
+
+---
+
+## 📖 Kavram: Portakal Kabuğu Problemi
+
+Dünya bir küre. Harita düz bir kağıt. Kürenin yüzeyini düzleştirmek için bir şeyleri **germek**, **kesmek** veya **sıkıştırmak** gerekir — bu da her zaman bir bozulma demektir.
+
+Bunu anlamak için bir portakal düşün: kabuğunu soyup düzleştirmeye çalıştığında ya kıyılar yırtılır ya ortası gerilir. Harita projeksiyonları da tam olarak bunu yapar.
+
+### Sonuç: Her Harita Bir Yalan Söyler
+
+| Projeksiyon | Koruduğu | Bozduğu | Nerede Kullanılır |
+|---|---|---|---|
+| Mercator (EPSG:3857) | Şekil (yerel) | Alan | Web haritaları (Google, OSM) |
+| WGS84 (EPSG:4326) | Koordinat sistemi | Mesafe/alan hesabı | GPS, depolama |
+| UTM (EPSG:32635) | Alan + mesafe | Geniş bölge kapsamı | Mühendislik, Türkiye |
+| Albers Equal Area | Alan | Şekil | İstatistik haritaları |
+
+---
+
+## 📖 Kavram: Neden SQL'i Etkiler?
+
+```sql
+-- ⚠ YANLIŞ — derece cinsinden mesafe, anlamsız!
+SELECT ST_Distance(
+  ST_MakePoint(28.979, 41.015),
+  ST_MakePoint(32.854, 39.930)
+);
+-- Sonuç: 4.82 (DERECE! ~537 km ama bunu söylemez)
+
+-- ✅ DOĞRU — metre cinsinden mesafe
+SELECT ST_Distance(
+  ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+  ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography
+);
+-- Sonuç: ~351000 (metre)
+```
+
+Koordinat sistemi belirtmeden yapılan hesaplamalar **anlamsız sayılar** döndürür.
+
+---
+
+## ▶ Canlı Örnek — Aynı Mesafe, İki Farklı Sonuç
+
+<RunnableBlock
+  sql={`SELECT
+  -- SRID'siz: derece cinsinden (anlamsız)
+  ST_Distance(
+    ST_MakePoint(28.979, 41.015),
+    ST_MakePoint(32.854, 39.930)
+  ) AS mesafe_derece,
+
+  -- geography cast: metre cinsinden (doğru)
+  ROUND(ST_Distance(
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
+    ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography
+  )::numeric / 1000, 1) AS mesafe_km;`}
+  label="İstanbul-Ankara: derece vs km"
+/>
+
+---
+
+## 🧪 Dene
+
+Türkiye'nin en batısı (26.0°E) ile en doğusu (44.8°E) arasındaki açısal mesafeyi hesapla. Sonra km cinsinden gerçek mesafeyi bul:
+
+<RunnableBlock
+  sql={`SELECT
+  -- Açısal fark
+  44.8 - 26.0 AS acısal_fark_derece,
+  -- Gerçek mesafe (40°N enleminde)
+  ROUND(ST_Distance(
+    ST_SetSRID(ST_MakePoint(26.0, 40.0), 4326)::geography,
+    ST_SetSRID(ST_MakePoint(44.8, 40.0), 4326)::geography
+  )::numeric / 1000, 0) AS gercek_km;`}
+  label="Türkiye eni"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **SRID=-1 sessiz hata:** `ST_MakePoint` tek başına SRID=-1 döndürür. PostGIS hata vermez ama hesaplamalar yanlış olur.
+2. **Derece cinsinden "mesafe" anlamsız:** 1 derece enlem ~111 km, ama 1 derece boylam farklı enleme göre değişir (kutuplarda sıfıra iner).
+3. **Görüntü doğru ≠ hesap doğru:** Haritada güzel görünen bir geometri, yanlış SRID ile hatalı alan/mesafe hesabı verir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste bu problemi çözen sistemi öğreneceğiz: **SRID, EPSG ve `spatial_ref_sys` tablosu**.

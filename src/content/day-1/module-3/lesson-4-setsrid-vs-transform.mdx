@@ -1,0 +1,137 @@
+## 🎯 Ne öğreneceksin?
+
+- `ST_SetSRID` ile `ST_Transform` arasındaki farkı kesin olarak açıklayabileceksin
+- Yanlış kullanımın nasıl sessiz hatalara yol açtığını görebileceksin
+- Doğru dönüşüm zincirini yazabileceksin
+
+---
+
+## 📖 Kavram: İki Farklı İşlem
+
+Bu iki fonksiyon sıkça karıştırılır — ama tamamen farklı şeyler yapar:
+
+### ST_SetSRID — Etiket Yapıştır
+
+Koordinatları **değiştirmez**. Sadece geometriye "bu koordinatlar X sisteminde" etiketi yapıştırır.
+
+```sql
+-- Koordinatlar aynı kalır, sadece SRID değişir
+ST_SetSRID(geom, 4326)
+```
+
+**Ne zaman kullan:** Koordinatlar zaten doğru sistemde yazılmış ama SRID etiketi eksik.
+
+### ST_Transform — Gerçek Dönüşüm
+
+Koordinatları **matematiksel olarak dönüştürür**. 4326'dan 32636'ya gidildiğinde lon/lat → X/Y (metre) olur.
+
+```sql
+-- Koordinatlar değişir: 28.9 derece → 500000 metre civarı
+ST_Transform(ST_SetSRID(geom, 4326), 32636)
+```
+
+**Ne zaman kullan:** Farklı koordinat sistemine geçmek istiyorsun.
+
+---
+
+## 📖 Kural: Önce SetSRID, Sonra Transform
+
+```
+Ham koordinatlar → ST_SetSRID(geom, kaynak_srid) → ST_Transform(..., hedef_srid)
+```
+
+Transform için geometrinin kaynak SRID'ini **bilmesi** gerekir. SetSRID olmadan Transform hata verir.
+
+---
+
+## ▶ Canlı Örnek — SetSRID vs Transform
+
+<RunnableBlock
+  sql={`WITH istanbul AS (
+  SELECT ST_MakePoint(28.979, 41.015) AS raw_geom
+)
+SELECT
+  -- Sadece SetSRID: koordinatlar değişmez
+  ST_AsText(ST_SetSRID(raw_geom, 4326))              AS setsrid_sonuc,
+
+  -- Transform: derece → metre (UTM 36N)
+  ST_AsText(ST_Transform(ST_SetSRID(raw_geom, 4326), 32636)) AS transform_sonuc,
+
+  -- Transform: derece → Web Mercator
+  ST_AsText(ST_Transform(ST_SetSRID(raw_geom, 4326), 3857))  AS webmercator_sonuc
+FROM istanbul;`}
+  label="SetSRID vs Transform farkı"
+/>
+
+---
+
+## ▶ Yanlış Kullanım — Sessiz Hata
+
+<RunnableBlock
+  sql={`-- ⚠ YANLIŞ: SetSRID ile "dönüşüm yapmaya" çalışmak
+-- Koordinatlar değişmez, sadece etiket değişir
+SELECT
+  ST_AsText(ST_SetSRID(ST_MakePoint(28.979, 41.015), 32636)) AS yanlis_32636,
+  -- Bu koordinatlar 32636 sisteminde anlamsız!
+  ST_SRID(ST_SetSRID(ST_MakePoint(28.979, 41.015), 32636))   AS srid_etiketi;
+
+-- ✅ DOĞRU: Önce 4326 etiketle, sonra 32636'ya dönüştür
+-- SELECT ST_Transform(ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326), 32636);`}
+  label="Yanlış SetSRID kullanımı"
+/>
+
+---
+
+## ▶ Pratik: 4326 → 32636 → Geri 4326
+
+<RunnableBlock
+  sql={`WITH istanbul_4326 AS (
+  SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
+),
+istanbul_utm AS (
+  SELECT ST_Transform(geom, 32636) AS geom FROM istanbul_4326
+)
+SELECT
+  ST_AsText(istanbul_4326.geom)       AS baslangic_4326,
+  ST_AsText(istanbul_utm.geom)        AS utm_36n,
+  -- Geri dönüşüm
+  ST_AsText(ST_Transform(istanbul_utm.geom, 4326)) AS geri_4326
+FROM istanbul_4326, istanbul_utm;`}
+  label="4326 → UTM → 4326 gidiş-dönüş"
+/>
+
+> Gidiş-dönüş sonucunda orijinal koordinatlara çok yakın bir değer görmelisin (kayan nokta hassasiyeti farkı normal).
+
+---
+
+## 🧪 Dene
+
+İstanbul'u UTM 35N (32635) sistemine dönüştür ve X, Y koordinatlarını ayrı sütunlarda göster:
+
+<RunnableBlock
+  sql={`WITH utm AS (
+  SELECT ST_Transform(
+    ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326),
+    32635
+  ) AS geom
+)
+SELECT
+  ROUND(ST_X(geom)::numeric, 0) AS utm_x_metre,
+  ROUND(ST_Y(geom)::numeric, 0) AS utm_y_metre
+FROM utm;`}
+  label="İstanbul UTM 35N koordinatları"
+/>
+
+---
+
+## ⚠ Tuzaklar
+
+1. **ST_Transform SRID bilinmiyorsa hata:** `ST_Transform` çağrılmadan önce geometrinin SRID'i -1 ise `ERROR: invalid srid`. `ST_SetSRID` ile etiketle.
+2. **SetSRID dönüşüm yapmaz:** `ST_SetSRID(geom, 32636)` geometriyi UTM'e dönüştürmez — koordinatları düzeltmez. Bu çok yaygın bir hatadır.
+3. **Birden fazla Transform zinciri:** `ST_Transform(ST_Transform(geom, 32636), 4326)` geçerlidir — her adımda SRID güncellenir.
+
+---
+
+## 🔗 Bağlantılı Konular
+
+Sonraki derste Türkiye'de hangi EPSG kodlarının kullanıldığını ve hangi bölge için hangisinin seçileceğini öğreneceğiz.
