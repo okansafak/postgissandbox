@@ -91,7 +91,7 @@ ON CONFLICT DO NOTHING;
 SELECT
   COUNT(DISTINCT source) + COUNT(DISTINCT target) AS benzersiz_dugum,
   COUNT(*) AS kenar_sayisi,
-  ROUND(SUM(uzunluk_m)/1000, 1) AS toplam_km
+  ROUND(SUM(uzunluk_m)::numeric/1000, 1) AS toplam_km
 FROM yol_agi;`}
   label="Düğüm noktaları ve ağ özeti"
 />

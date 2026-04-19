@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
+import type { EditorView } from '@codemirror/view';
 import { useEditorStore } from '@/store/editorStore';
 import { executeQuery } from '@/pglite/client';
 import { useMapStore } from '@/store/mapStore';
@@ -10,11 +11,22 @@ import { resultToGeoJSON, detectGeometryColumns } from '@/pglite/geojson-adapter
 export default function SqlEditor() {
   const { sql: currentSql, setSql, setResult, setError, setRunning, isRunning } = useEditorStore();
   const addLayer = useMapStore((s) => s.addLayer);
+  const editorViewRef = useRef<EditorView | null>(null);
 
-  const sqlValue = currentSql;
+  /** Seçili metin varsa onu, yoksa tüm editörü döndürür */
+  const getQueryToRun = useCallback((): string => {
+    const view = editorViewRef.current;
+    if (view) {
+      const sel = view.state.selection.main;
+      if (!sel.empty) {
+        return view.state.sliceDoc(sel.from, sel.to).trim();
+      }
+    }
+    return currentSql.trim();
+  }, [currentSql]);
 
   const handleRun = useCallback(async () => {
-    const query = sqlValue.trim();
+    const query = getQueryToRun();
     if (!query || isRunning) return;
 
     setRunning(true);
@@ -37,13 +49,16 @@ export default function SqlEditor() {
     } finally {
       setRunning(false);
     }
-  }, [sqlValue, isRunning, setRunning, setError, setResult, addLayer]);
+  }, [getQueryToRun, isRunning, setRunning, setError, setResult, addLayer]);
 
   return (
     <div className="h-full flex flex-col bg-surface">
       {/* Araç çubuğu */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
         <span className="text-xs text-text-muted font-mono">SQL Editörü</span>
+        <span className="text-xs text-text-muted hidden sm:inline opacity-50">
+          Seçili metin varsa yalnızca o çalışır · Ctrl+Enter
+        </span>
         <div className="flex-1" />
         <button
           onClick={handleRun}
@@ -64,10 +79,11 @@ export default function SqlEditor() {
       {/* CodeMirror editörü */}
       <div className="flex-1 overflow-hidden">
         <CodeMirror
-          value={sqlValue}
+          value={currentSql}
           height="100%"
           theme={oneDark}
           extensions={[sql()]}
+          onCreateEditor={(view) => { editorViewRef.current = view; }}
           onChange={(val) => setSql(val)}
           onKeyDown={(e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
