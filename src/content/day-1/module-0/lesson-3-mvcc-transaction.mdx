@@ -1,0 +1,129 @@
+## MVCC ve Transaction Yapısı
+
+**Hedef:** PostgreSQL'in okuma-yazma çakışmasını MVCC ile nasıl çözdüğünü anla ve transaction komutlarını kullan.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- MVCC'nin (Multi-Version Concurrency Control) ölü satır sorununu nasıl çözdüğünü açıklayabileceksin
+- `BEGIN / COMMIT / ROLLBACK` ile transaction yazabileceksin
+- `xmin` ve `xmax` sistem sütunlarını sorgulayabileceksin
+
+---
+
+## MVCC Nedir?
+
+Geleneksel veritabanlarında okuma-yazma çakışmasını önlemek için satırlar kilitlenir — okuyucular yazarları, yazarlar okuyucuları bekler.
+
+PostgreSQL farklı bir yol izler: her `UPDATE` veya `DELETE` eski satırı silmez, **yeni bir sürüm ekler**. Eski sürüm "ölü satır" olarak kalır ve VACUUM tarafından temizlenir.
+
+```
+Satır v1 (xmin=100, xmax=200)  ← Transaction 200 bu satırı güncelledi
+Satır v2 (xmin=200, xmax=NULL) ← Aktif sürüm
+```
+
+Bu sayede:
+- Okuyucular hiçbir zaman yazarı beklemez
+- Her transaction kendi tutarlı "snapshot"ını görür
+
+---
+
+## ▶ xmin / xmax sistem sütunları
+
+<RunnableBlock
+  sql={`-- Test tablosu oluştur
+CREATE TABLE IF NOT EXISTS mvcc_test (
+  id   SERIAL PRIMARY KEY,
+  veri TEXT
+);
+
+INSERT INTO mvcc_test (veri) VALUES ('ilk satır'), ('ikinci satır');
+
+-- xmin: satırı ekleyen transaction ID
+-- xmax: satırı silen/güncelleyen transaction ID (0 = aktif)
+SELECT id, veri, xmin, xmax
+FROM mvcc_test;`}
+  label="xmin/xmax görüntüle"
+/>
+
+---
+
+## ▶ BEGIN / COMMIT ile transaction
+
+<RunnableBlock
+  sql={`-- Transaction içinde iki INSERT atomik olarak gerçekleşir
+BEGIN;
+  INSERT INTO mvcc_test (veri) VALUES ('transaction satır 1');
+  INSERT INTO mvcc_test (veri) VALUES ('transaction satır 2');
+COMMIT;
+
+SELECT id, veri FROM mvcc_test ORDER BY id;`}
+  label="Başarılı transaction"
+/>
+
+---
+
+## ▶ ROLLBACK ile geri al
+
+<RunnableBlock
+  sql={`-- Hatalı işlemi geri al
+BEGIN;
+  INSERT INTO mvcc_test (veri) VALUES ('silinecek satır');
+  -- bir şeyler yanlış gitti
+ROLLBACK;
+
+-- Bu satır tabloda görünmez
+SELECT count(*) AS satir_sayisi FROM mvcc_test;`}
+  label="ROLLBACK ile geri alma"
+/>
+
+---
+
+## ▶ SAVEPOINT ile kısmi geri alma
+
+<RunnableBlock
+  sql={`BEGIN;
+  INSERT INTO mvcc_test (veri) VALUES ('iyi satır');
+  SAVEPOINT sp1;
+  INSERT INTO mvcc_test (veri) VALUES ('kötü satır');
+  ROLLBACK TO SAVEPOINT sp1;
+  -- 'kötü satır' geri alındı, 'iyi satır' kaldı
+COMMIT;
+
+SELECT veri FROM mvcc_test ORDER BY id DESC LIMIT 3;`}
+  label="SAVEPOINT kullanımı"
+/>
+
+---
+
+## ▶ Dead tuple sayısı
+
+<RunnableBlock
+  sql={`-- UPDATE eski satırı ölü bırakır
+UPDATE mvcc_test SET veri = 'güncellendi' WHERE id = 1;
+
+-- pg_stat_user_tables ile dead tuple sayısını gör
+SELECT relname, n_live_tup, n_dead_tup
+FROM pg_stat_user_tables
+WHERE relname = 'mvcc_test';`}
+  label="Dead tuple gözlemi"
+/>
+
+---
+
+## 📌 Özet
+
+| Komut | Ne yapar |
+|---|---|
+| `BEGIN` | Transaction başlatır |
+| `COMMIT` | Değişiklikleri kalıcı yazar |
+| `ROLLBACK` | Tüm değişiklikleri geri alır |
+| `SAVEPOINT` | Transaction içinde kontrol noktası |
+| `ROLLBACK TO` | Savepoint'e kadar geri alır |
+
+---
+
+## 🔗 Sıradaki Ders
+
+Ders 4: **Isolation Levels ve Lock** — eşzamanlı transaction'lar arasındaki görünürlük kurallarını öğren.

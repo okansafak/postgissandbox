@@ -41,6 +41,7 @@ export interface ModuleMeta {
 }
 
 export const MODULE_META: ModuleMeta[] = [
+  { day: 1, module: 0, title: 'PostgreSQL Temelleri ve Mimari', durationMinutes: 45 },
   { day: 1, module: 1, title: 'Kuruluma ve Platforma Giriş', durationMinutes: 30 },
   { day: 1, module: 2, title: 'Geometri Temelleri', durationMinutes: 60 },
   { day: 1, module: 3, title: 'SRID ve Projeksiyonlar', durationMinutes: 75 },
@@ -59,8 +60,46 @@ export const MODULE_META: ModuleMeta[] = [
   { day: 3, module: 6, title: 'Kapanış Projesi: İstanbul Acil Durum Analizi', durationMinutes: 60 },
 ];
 
-/** Modül 1.1 — Kuruluma ve Platforma Giriş */
+/** Modül 1.0 — PostgreSQL Temelleri ve Mimari */
 export const CURRICULUM: Lesson[] = [
+  {
+    id: 'day-1-module-0-lesson-1', day: 1, module: 0, order: 1,
+    title: 'Cluster, Database, Schema yapısı',
+    slug: 'lesson-1', level: 'L1', estimatedMinutes: 12,
+    prerequisites: [],
+    objectives: ['Cluster–Database–Schema hiyerarşisini açıklayabilir', 'search_path ile schema seçimini yönetebilir', '\\l, \\dn, \\dt psql meta-komutlarını kullanabilir'],
+    mdxPath: '/src/content/day-1/module-0/lesson-1-cluster-database-schema.mdx',
+    exercises: [], tags: ['postgresql', 'cluster', 'database', 'schema'],
+  },
+  {
+    id: 'day-1-module-0-lesson-2', day: 1, module: 0, order: 2,
+    title: 'Tablespace kavramı',
+    slug: 'lesson-2', level: 'L1', estimatedMinutes: 10,
+    prerequisites: ['day-1-module-0-lesson-1'],
+    objectives: ['Tablespace\'in ne olduğunu ve neden kullanıldığını açıklayabilir', 'pg_tablespace catalog tablosunu sorgulayabilir', 'Varsayılan tablespace ile özel tablespace farkını söyleyebilir'],
+    mdxPath: '/src/content/day-1/module-0/lesson-2-tablespace.mdx',
+    exercises: [], tags: ['tablespace', 'depolama', 'disk'],
+  },
+  {
+    id: 'day-1-module-0-lesson-3', day: 1, module: 0, order: 3,
+    title: 'MVCC ve Transaction yapısı',
+    slug: 'lesson-3', level: 'L1', estimatedMinutes: 12,
+    prerequisites: ['day-1-module-0-lesson-2'],
+    objectives: ['MVCC\'nin ölü satır sorununu nasıl çözdüğünü açıklayabilir', 'BEGIN/COMMIT/ROLLBACK ile transaction yazabilir', 'xmin/xmax sistem sütunlarını sorgulayabilir'],
+    mdxPath: '/src/content/day-1/module-0/lesson-3-mvcc-transaction.mdx',
+    exercises: [], tags: ['mvcc', 'transaction', 'xmin', 'xmax'],
+  },
+  {
+    id: 'day-1-module-0-lesson-4', day: 1, module: 0, order: 4,
+    title: 'Isolation Levels ve Lock mekanizması',
+    slug: 'lesson-4', level: 'L1', estimatedMinutes: 11,
+    prerequisites: ['day-1-module-0-lesson-3'],
+    objectives: ['READ COMMITTED / REPEATABLE READ / SERIALIZABLE farkını açıklayabilir', 'pg_locks ile aktif kilitleri görebilir', 'Deadlock senaryosunu tanımlayabilir'],
+    mdxPath: '/src/content/day-1/module-0/lesson-4-isolation-locks.mdx',
+    exercises: [], tags: ['isolation', 'lock', 'deadlock', 'serializable'],
+  },
+
+  /** Modül 1.1 — Kuruluma ve Platforma Giriş */
   {
     id: 'day-1-module-1-lesson-1',
     day: 1,
@@ -159,6 +198,15 @@ export const CURRICULUM: Lesson[] = [
       },
     ],
     tags: ['st_makepoint', 'harita', 'koordinat', 'ilk-sorgu'],
+  },
+  {
+    id: 'day-1-module-1-lesson-5', day: 1, module: 1, order: 5,
+    title: 'postgis.net belgelendirmesi nasıl kullanılır?',
+    slug: 'lesson-5', level: 'L1', estimatedMinutes: 8,
+    prerequisites: ['day-1-module-1-lesson-4'],
+    objectives: ['postgis.net\'te ST_* fonksiyonlarını hızla bulabilir', 'Fonksiyon imzası ve tip sınıflarını okuyabilir', 'Geometry vs Geography kabul eden overload\'ları ayırt edebilir'],
+    mdxPath: '/src/content/day-1/module-1/lesson-5-postgis-reference.mdx',
+    exercises: [], tags: ['postgis.net', 'dokümantasyon', 'referans'],
   },
 
   // ─── Modül 1.2 — Geometri Temelleri ───────────────────────────────────────
@@ -574,6 +622,15 @@ export const CURRICULUM: Lesson[] = [
     mdxPath: '/src/content/day-2/module-1/lesson-4-bulk-transform.mdx',
     exercises: [], tags: ['st_transform', 'bulk-update', 'srid-dönüşüm'],
   },
+  {
+    id: 'day-2-module-1-lesson-5', day: 2, module: 1, order: 5,
+    title: 'ogr2ogr / shp2pgsql — kavramsal genel bakış',
+    slug: 'lesson-5', level: 'L2', estimatedMinutes: 10,
+    prerequisites: ['day-2-module-1-lesson-4'],
+    objectives: ['ogr2ogr\'ın desteklediği formatları sıralayabilir', 'shp2pgsql ile shapefile yükleme pipeline\'ını açıklayabilir', 'PGlite\'ta neden çalışmadığını ve alternatiflerini söyleyebilir'],
+    mdxPath: '/src/content/day-2/module-1/lesson-5-ogr2ogr.mdx',
+    exercises: [], tags: ['ogr2ogr', 'shp2pgsql', 'gdal', 'veri-yükleme'],
+  },
 
   // ─── Modül 2.2 — Geometri İşlemleri (Advanced) ───────────────────────────
   {
@@ -780,8 +837,15 @@ export const CURRICULUM: Lesson[] = [
     mdxPath: '/src/content/day-2/module-5/lesson-4-partition-pruning.mdx',
     exercises: [], tags: ['partition-pruning', 'static-pruning', 'runtime-pruning'],
   },
-];
-
+  {
+    id: 'day-2-module-5-lesson-5', day: 2, module: 5, order: 5,
+    title: 'Tablespace performans stratejisi',
+    slug: 'lesson-5', level: 'L2', estimatedMinutes: 10,
+    prerequisites: ['day-2-module-5-lesson-4'],
+    objectives: ['SSD/HDD tablespace ayrımının performansa etkisini açıklayabilir', 'Index\'i ayrı tablespace\'e taşıyabilir', 'pg_tablespace kataloğunu sorgulayabilir'],
+    mdxPath: '/src/content/day-2/module-5/lesson-5-tablespace-performance.mdx',
+    exercises: [], tags: ['tablespace', 'ssd', 'performans', 'indeks'],
+  },
 
   // ─── Modül 3.1 — Kümeleme ve Yoğunluk Analizi ────────────────────────────
   {

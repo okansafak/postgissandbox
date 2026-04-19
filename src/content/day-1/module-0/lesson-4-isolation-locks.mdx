@@ -1,0 +1,164 @@
+## Isolation Levels ve Lock Mekanizması
+
+**Hedef:** Eşzamanlı transaction'ların birbirini nasıl etkilediğini ve PostgreSQL'in bunu nasıl kontrol ettiğini kavra.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- READ COMMITTED, REPEATABLE READ ve SERIALIZABLE farkını açıklayabileceksin
+- `pg_locks` ile aktif kilitleri görebileceksin
+- Deadlock senaryosunu tanımlayabileceksin
+
+---
+
+## Isolation Levels
+
+SQL standardı dört isolation level tanımlar. Her biri farklı anomalilere izin verir:
+
+| Level | Dirty Read | Non-Repeatable Read | Phantom Read |
+|---|---|---|---|
+| READ UNCOMMITTED | Mümkün* | Mümkün | Mümkün |
+| **READ COMMITTED** | İmkânsız | Mümkün | Mümkün |
+| REPEATABLE READ | İmkânsız | İmkânsız | Mümkün* |
+| SERIALIZABLE | İmkânsız | İmkânsız | İmkânsız |
+
+*PostgreSQL READ UNCOMMITTED'ı READ COMMITTED gibi davrandırır. REPEATABLE READ phantom read'i de engeller.
+
+PostgreSQL'in **varsayılanı: READ COMMITTED**
+
+---
+
+## ▶ Mevcut isolation level
+
+<RunnableBlock
+  sql={`-- Mevcut transaction isolation level
+SHOW transaction_isolation;`}
+  label="Transaction isolation level"
+/>
+
+---
+
+## ▶ REPEATABLE READ örneği
+
+<RunnableBlock
+  sql={`-- Test verisi
+CREATE TABLE IF NOT EXISTS hesap (
+  id      SERIAL PRIMARY KEY,
+  bakiye  NUMERIC
+);
+INSERT INTO hesap (bakiye) VALUES (1000), (2000)
+ON CONFLICT DO NOTHING;
+
+-- REPEATABLE READ: transaction başındaki snapshot sabit kalır
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+  SELECT id, bakiye FROM hesap ORDER BY id;
+  -- Başka bir connection aynı anda UPDATE yapsa bile
+  -- bu transaction aynı değerleri görmeye devam eder
+COMMIT;
+
+SELECT id, bakiye FROM hesap ORDER BY id;`}
+  label="REPEATABLE READ snapshot"
+/>
+
+---
+
+## ▶ SERIALIZABLE örneği
+
+<RunnableBlock
+  sql={`-- SERIALIZABLE: en güçlü izolasyon
+-- İki transaction eş zamanlı aynı veriyi okuyup yazarsa
+-- biri "serialization failure" hatası alır
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+  UPDATE hesap SET bakiye = bakiye - 100 WHERE id = 1;
+  UPDATE hesap SET bakiye = bakiye + 100 WHERE id = 2;
+COMMIT;
+
+SELECT id, bakiye FROM hesap ORDER BY id;`}
+  label="SERIALIZABLE transfer"
+/>
+
+---
+
+## ▶ Lock türleri
+
+<RunnableBlock
+  sql={`-- pg_locks: aktif kilitler
+-- (tek bağlantıda lock sayısı azdır, multi-user ortamda anlamlıdır)
+SELECT
+  locktype,
+  relation::regclass AS tablo,
+  mode,
+  granted
+FROM pg_locks
+WHERE relation IS NOT NULL
+ORDER BY granted DESC, mode;`}
+  label="Aktif kilitler"
+/>
+
+---
+
+## ▶ Row-level lock: SELECT FOR UPDATE
+
+<RunnableBlock
+  sql={`-- SELECT FOR UPDATE: satır üzerine exclusive lock koyar
+-- Aynı satırı başka bir transaction güncelleyemez
+BEGIN;
+  SELECT id, bakiye
+  FROM hesap
+  WHERE id = 1
+  FOR UPDATE;
+  -- Burada hesaplama yapılır
+  UPDATE hesap SET bakiye = bakiye - 50 WHERE id = 1;
+COMMIT;
+
+SELECT id, bakiye FROM hesap ORDER BY id;`}
+  label="SELECT FOR UPDATE"
+/>
+
+---
+
+## Deadlock
+
+Deadlock: A transaction'ı B'yi bekler, B transaction'ı A'yı bekler.
+
+```
+T1: LOCK hesap(id=1)  →  bekliyor hesap(id=2)
+T2: LOCK hesap(id=2)  →  bekliyor hesap(id=1)
+         ↑__________________________|
+```
+
+PostgreSQL deadlock'u otomatik algılar ve bir transaction'ı `ERROR: deadlock detected` ile sonlandırır.
+
+**Önlem:** Her zaman aynı sırayla satır kilitle (küçük id'den büyüğe gibi).
+
+---
+
+## ▶ Advisory lock (uygulama seviyesi)
+
+<RunnableBlock
+  sql={`-- pg_try_advisory_lock: uygulama tanımlı kilit
+-- Dönüş true = kilit alındı, false = başkası tutmuş
+SELECT pg_try_advisory_lock(12345) AS kilit_alindi;
+
+-- İşi yap...
+
+-- Kilidi serbest bırak
+SELECT pg_advisory_unlock(12345) AS serbest_birakildi;`}
+  label="Advisory lock"
+/>
+
+---
+
+## 📌 Özet
+
+- Varsayılan isolation **READ COMMITTED** — her statement yeni snapshot alır
+- **REPEATABLE READ** finansal raporlar için idealdir
+- **SERIALIZABLE** en güvenli ama en yavaş
+- Deadlock'tan kaçınmak için kilitleri her zaman aynı sırayla al
+
+---
+
+## 🔗 Sıradaki Modül
+
+Modül 1.1: **Kuruluma ve Platforma Giriş** — PGlite ve PostGIS kurulumunu keşfet.

@@ -1,0 +1,128 @@
+## postgis.net Belgelendirmesi Nasıl Kullanılır?
+
+**Hedef:** PostGIS fonksiyonlarını resmi belgede hızla bul ve fonksiyon imzasını oku.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- postgis.net'te ST_* fonksiyonlarını hızla bulabileceksin
+- Fonksiyon imzasını (signature) ve tip sınıflarını okuyabileceksin
+- Geometry ve Geography kabul eden overload'ları ayırt edebileceksin
+
+---
+
+## postgis.net Yapısı
+
+`https://postgis.net/docs/` adresindeki belge üç ana bölüme ayrılır:
+
+| Bölüm | İçerik |
+|---|---|
+| **Reference** | Her fonksiyonun imzası, açıklaması ve örneği |
+| **Manual** | Kavramsal açıklamalar (SRID, indeks, vb.) |
+| **Tutorials** | Adım adım rehberler |
+
+Arama için: `https://postgis.net/docs/ST_Buffer.html` — fonksiyon adını URL'ye ekle.
+
+---
+
+## Fonksiyon İmzasını Okumak
+
+Örnek: `ST_DWithin`
+
+```
+geometry ST_DWithin(geometry g1, geometry g2, double precision distance_cartesian);
+boolean  ST_DWithin(geography gg1, geography gg2, double precision distance_meters, boolean use_spheroid = true);
+```
+
+**Okuması:**
+- `boolean` = dönüş tipi
+- `geometry` / `geography` = kabul ettiği girdi tipi
+- `use_spheroid = true` = varsayılan değerli parametre (opsiyonel)
+
+---
+
+## Tip Sınıfları
+
+PostGIS fonksiyonları üç giriş tipini kabul eder:
+
+| Tip | Ne zaman kullanılır |
+|---|---|
+| `geometry` | Projeksiyon koordinatları (metre, feet…) |
+| `geography` | WGS84 lon/lat — küresel hesaplama |
+| `text` (WKT) | Bazı constructor fonksiyonlar |
+
+---
+
+## ▶ Hangi fonksiyonlar geography kabul eder?
+
+<RunnableBlock
+  sql={`-- PostGIS'te geography tipini kabul eden fonksiyonlar
+SELECT DISTINCT proname
+FROM pg_proc p
+JOIN pg_type t ON t.oid = ANY(p.proargtypes)
+WHERE t.typname = 'geography'
+  AND p.proname LIKE 'st_%'
+ORDER BY proname;`}
+  label="Geography kabul eden ST_ fonksiyonları"
+/>
+
+---
+
+## ▶ Bir fonksiyonun tüm overload'ları
+
+<RunnableBlock
+  sql={`-- ST_Buffer'ın tüm imzaları
+SELECT
+  proname,
+  pg_get_function_arguments(oid) AS parametreler,
+  pg_get_function_result(oid) AS donus_tipi
+FROM pg_proc
+WHERE proname = 'st_buffer'
+ORDER BY oid;`}
+  label="ST_Buffer overload'ları"
+/>
+
+---
+
+## ▶ Fonksiyon kategorileri
+
+<RunnableBlock
+  sql={`-- PostGIS fonksiyonlarını öneke göre say
+SELECT
+  CASE
+    WHEN proname LIKE 'st_collect%'  THEN 'ST_Collect grubu'
+    WHEN proname LIKE 'st_cluster%'  THEN 'ST_Cluster grubu'
+    WHEN proname LIKE 'st_distance%' THEN 'ST_Distance grubu'
+    WHEN proname LIKE 'st_within%'   THEN 'ST_Within grubu'
+    WHEN proname LIKE 'st_as%'       THEN 'ST_As* (çıktı)'
+    WHEN proname LIKE 'st_make%'     THEN 'ST_Make* (oluşturucu)'
+    ELSE proname
+  END AS kategori,
+  count(*) AS overload_sayisi
+FROM pg_proc
+WHERE proname LIKE 'st_%'
+GROUP BY 1
+ORDER BY overload_sayisi DESC
+LIMIT 15;`}
+  label="Fonksiyon kategorileri"
+/>
+
+---
+
+## 📌 Hızlı Referans
+
+| İhtiyaç | Fonksiyon |
+|---|---|
+| Mesafe (metre) | `ST_Distance(::geography, ::geography)` |
+| Mesafe (degree) | `ST_Distance(geometry, geometry)` |
+| Kesişim? | `ST_Intersects` |
+| X km içinde? | `ST_DWithin` |
+| Alan | `ST_Area(::geography)` → m² |
+| Tampon | `ST_Buffer` |
+
+---
+
+## 🔗 Sıradaki Modül
+
+Modül 1.2: **Geometri Temelleri** — POINT, LINESTRING, POLYGON tiplerini öğren.

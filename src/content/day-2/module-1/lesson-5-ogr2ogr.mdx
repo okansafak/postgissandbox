@@ -1,0 +1,150 @@
+## ogr2ogr / shp2pgsql — Kavramsal Genel Bakış
+
+**Hedef:** Komut satırı CBS araçlarının hangi sorunları çözdüğünü ve PGlite alternatifleri neler olduğunu öğren.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- `ogr2ogr`'ın desteklediği formatları sıralayabileceksin
+- `shp2pgsql` ile shapefile yükleme pipeline'ını açıklayabileceksin
+- PGlite'ta neden çalışmadığını ve alternatiflerini söyleyebileceksin
+
+---
+
+## ogr2ogr Nedir?
+
+`ogr2ogr`, GDAL kütüphanesinin bir parçasıdır ve **150+ coğrafi veri formatı** arasında dönüşüm yapar.
+
+```bash
+# Shapefile → PostgreSQL
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=localhost dbname=gisdb user=postgres" \
+  turkiye_iller.shp \
+  -nln public.iller \
+  -t_srs EPSG:4326
+
+# GeoJSON → PostgreSQL
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=localhost dbname=gisdb" \
+  Istanbul_mahalleler.geojson \
+  -nln mahalleler
+
+# PostGIS → GeoPackage (dışa aktarım)
+ogr2ogr -f "GPKG" cikti.gpkg \
+  PG:"host=localhost dbname=gisdb" \
+  -sql "SELECT * FROM iller WHERE nufus > 1000000"
+```
+
+**Desteklenen formatlar (seçme):** Shapefile, GeoJSON, GeoPackage, KML, GML, CSV+WKT, DXF, FileGDB, OSM, WFS
+
+---
+
+## shp2pgsql Nedir?
+
+`shp2pgsql`, PostGIS ile birlikte gelen bir araçtır. Shapefile'ı SQL INSERT ifadelerine dönüştürür.
+
+```bash
+# SQL dosyası oluştur
+shp2pgsql -s 4326 -W UTF-8 il_sinirlari.shp public.iller > iller.sql
+
+# Doğrudan yükle
+shp2pgsql -s 4326 il_sinirlari.shp public.iller | psql -d gisdb
+
+# Seçenekler
+# -s: SRID
+# -W: encoding (UTF-8, LATIN1…)
+# -a: append (tabloya ekle, yeni oluşturma)
+# -d: drop & recreate
+# -p: yalnızca CREATE TABLE (veri yok)
+```
+
+---
+
+## raster2pgsql
+
+Raster veriler için `shp2pgsql`'in kardeşidir:
+
+```bash
+raster2pgsql -s 4326 -I -C dem.tif public.dem | psql -d gisdb
+```
+
+---
+
+## PGlite'ta Neden Çalışmaz?
+
+Bu araçlar **işletim sistemi süreçleridir** — tarayıcı sandbox'ı dışarıdır. PGlite bir WASM PostgreSQL olduğu için:
+
+1. Dış süreç çağrısı yapılamaz
+2. Dosya sistemi erişimi yoktur
+3. `psql` bağlantısı kurulamaz
+
+---
+
+## ▶ PGlite Alternatifleri
+
+<RunnableBlock
+  sql={`-- Alternatif 1: GeoJSON'u SQL ile yükle (Bu kursta yaptığımız)
+-- GeoJSON koordinatları ST_GeomFromGeoJSON ile parse edilir
+CREATE TABLE IF NOT EXISTS ornek_noktalar (
+  id   SERIAL PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO ornek_noktalar (ad, geom)
+SELECT
+  'Nokta ' || i,
+  ST_SetSRID(ST_MakePoint(
+    28.5 + random() * 1.0,
+    40.8 + random() * 0.5
+  ), 4326)
+FROM generate_series(1, 5) i;
+
+SELECT id, ad, ST_AsText(geom) AS konum
+FROM ornek_noktalar;`}
+  label="GeoJSON/SQL ile veri yükleme"
+/>
+
+<RunnableBlock
+  sql={`-- Alternatif 2: CSV koordinatları → Geometriye çevir
+-- ogr2ogr'ın yaptığını SQL ile simüle et
+CREATE TABLE IF NOT EXISTS csv_simulasyon (
+  id      SERIAL,
+  sehir   TEXT,
+  lon     FLOAT,
+  lat     FLOAT
+);
+
+INSERT INTO csv_simulasyon (sehir, lon, lat) VALUES
+  ('İstanbul', 28.979, 41.015),
+  ('Ankara',   32.854, 39.920),
+  ('İzmir',    27.142, 38.424);
+
+-- Koordinat sütunlarından geometri üret
+SELECT
+  sehir,
+  ST_SetSRID(ST_MakePoint(lon, lat), 4326) AS geom,
+  ST_AsText(ST_SetSRID(ST_MakePoint(lon, lat), 4326)) AS wkt
+FROM csv_simulasyon;`}
+  label="CSV koordinat → geometri dönüşümü"
+/>
+
+---
+
+## 📌 Karşılaştırma
+
+| Araç | Platform | Kaynak format | Hedef |
+|---|---|---|---|
+| `ogr2ogr` | Komut satırı | 150+ format | 150+ format |
+| `shp2pgsql` | Komut satırı | Shapefile | PostgreSQL |
+| `raster2pgsql` | Komut satırı | GeoTIFF, vb. | PostgreSQL |
+| SQL + ST_* | Her ortam | CSV, JSON, WKT | PostgreSQL |
+
+Gerçek projelerde `ogr2ogr` ile yükle, PGlite'ta SQL ile simüle et.
+
+---
+
+## 🔗 Sıradaki Modül
+
+Modül 2.2: **Geometri İşlemleri (Advanced)** — ST_Simplify, ST_Subdivide ve lineer referanslama.

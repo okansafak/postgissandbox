@@ -1,4 +1,5 @@
-import { Suspense, useEffect, useState, type ComponentType } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import type { ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import RunnableBlock from './RunnableBlock';
 import { getLessonByRoute, getNextLesson, getPrevLesson } from '@/curriculum/structure';
@@ -65,11 +66,18 @@ const mdxGlob = import.meta.glob<{ default: ComponentType }>('../../content/**/*
 
 /** MDX dosya adı haritası: "day-N/module-N" → lesson slug → filename */
 const LESSON_FILENAME: Record<string, Record<string, string>> = {
+  'day-1/module-0': {
+    'lesson-1': 'lesson-1-cluster-database-schema',
+    'lesson-2': 'lesson-2-tablespace',
+    'lesson-3': 'lesson-3-mvcc-transaction',
+    'lesson-4': 'lesson-4-isolation-locks',
+  },
   'day-1/module-1': {
     'lesson-1': 'lesson-1-welcome',
     'lesson-2': 'lesson-2-pglite-postgresql-postgis',
     'lesson-3': 'lesson-3-cbs-vector-raster',
     'lesson-4': 'lesson-4-first-map',
+    'lesson-5': 'lesson-5-postgis-reference',
   },
   'day-1/module-2': {
     'lesson-1': 'lesson-1-geometry-types',
@@ -108,6 +116,7 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-2': 'lesson-2-geojson-load',
     'lesson-3': 'lesson-3-staging-pattern',
     'lesson-4': 'lesson-4-bulk-transform',
+    'lesson-5': 'lesson-5-ogr2ogr',
   },
   'day-2/module-2': {
     'lesson-1': 'lesson-1-simplify',
@@ -138,6 +147,7 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-2': 'lesson-2-range-partitioning',
     'lesson-3': 'lesson-3-list-partitioning',
     'lesson-4': 'lesson-4-partition-pruning',
+    'lesson-5': 'lesson-5-tablespace-performance',
   },
   'day-3/module-1': {
     'lesson-1': 'lesson-1-clustering-intro',
@@ -191,7 +201,8 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
   const markComplete = useProgressStore((s) => s.markComplete);
   const isComplete = useProgressStore((s) => s.isComplete);
 
-  const [MdxComponent, setMdxComponent] = useState<ComponentType | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [MdxComponent, setMdxComponent] = useState<ComponentType<Record<string, any>> | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {

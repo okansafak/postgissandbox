@@ -1,0 +1,116 @@
+## Cluster, Database, Schema Yapısı
+
+**Hedef:** PostgreSQL'in üç katmanlı nesne hiyerarşisini (Cluster → Database → Schema) kavra ve arama yolunu yönet.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- Cluster, Database ve Schema kavramlarını birbirinden ayırt edebileceksin
+- `search_path` ile varsayılan schema'yı değiştirebileceksin
+- `\l`, `\dn`, `\dt` psql komutlarının SQL karşılıklarını yazabileceksin
+
+---
+
+## ▶ Hiyerarşiyi keşfet
+
+<RunnableBlock
+  sql={`-- Mevcut database ve kullanıcıyı göster
+SELECT current_database(), current_user, version();`}
+  label="Mevcut bağlantı bilgisi"
+/>
+
+---
+
+## ▶ Schema'ları listele
+
+<RunnableBlock
+  sql={`-- \dn komutunun SQL karşılığı
+SELECT schema_name, schema_owner
+FROM information_schema.schemata
+ORDER BY schema_name;`}
+  label="Schema listesi"
+/>
+
+---
+
+## ▶ search_path ile çalış
+
+<RunnableBlock
+  sql={`-- search_path nedir?
+SHOW search_path;`}
+  label="Mevcut search_path"
+/>
+
+<RunnableBlock
+  sql={`-- Yeni schema oluştur ve search_path'e ekle
+CREATE SCHEMA IF NOT EXISTS egitim;
+SET search_path TO egitim, public;
+
+-- Artık "egitim." prefix'i olmadan tablo oluşturulur
+CREATE TABLE IF NOT EXISTS test_tablo (id SERIAL, ad TEXT);
+INSERT INTO test_tablo (ad) VALUES ('önce egitim schema''ya gider');
+
+SELECT schemaname, tablename
+FROM pg_tables
+WHERE tablename = 'test_tablo';`}
+  label="Schema oluştur ve search_path ayarla"
+/>
+
+---
+
+## ▶ Tablo, view ve sequence envanteri
+
+<RunnableBlock
+  sql={`-- \dt komutunun SQL karşılığı: public şemasındaki tüm tablolar
+SELECT tablename, tableowner
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY tablename;`}
+  label="Public schema tabloları"
+/>
+
+<RunnableBlock
+  sql={`-- Tüm nesneler: tablo, view, sequence — şema bilgisiyle
+SELECT table_schema, table_name, table_type
+FROM information_schema.tables
+WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+ORDER BY table_schema, table_name;`}
+  label="Tüm kullanıcı nesneleri"
+/>
+
+---
+
+## 🧪 Dene
+
+<RunnableBlock
+  sql={`-- search_path'i sıfırla, temizle
+SET search_path TO public;
+DROP TABLE IF EXISTS egitim.test_tablo;
+DROP SCHEMA IF EXISTS egitim;
+
+-- public schema'daki postgis nesnelerini say
+SELECT count(*) AS postgis_nesne_sayisi
+FROM pg_proc p
+JOIN pg_namespace n ON p.pronamespace = n.oid
+WHERE n.nspname = 'public' AND p.proname LIKE 'st_%';`}
+  label="PostGIS fonksiyon sayısı"
+/>
+
+---
+
+## 📌 Özet
+
+| Katman | Ne içerir | Psql komutu |
+|---|---|---|
+| **Cluster** | Tüm database'ler | `\l` |
+| **Database** | Schema'lar | `\c dbname` |
+| **Schema** | Tablolar, view'lar, fonksiyonlar | `\dn`, `\dt` |
+
+`search_path` önemlidir: aynı isimli iki tablo farklı schema'da olabilir ve hangisinin seçileceğini path belirler.
+
+---
+
+## 🔗 Sıradaki Ders
+
+Ders 2: **Tablespace** — verilerin diskte nerede saklandığını öğren.

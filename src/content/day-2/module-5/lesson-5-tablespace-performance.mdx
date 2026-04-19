@@ -1,0 +1,150 @@
+## Tablespace Performans Stratejisi
+
+**Hedef:** SSD/HDD tablespace ayrımının performansa etkisini anla ve indeksleri ayrı tablespace'e taşı.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- SSD/HDD tablespace ayrımının performansa etkisini açıklayabileceksin
+- Bir indeksi ayrı tablespace'e taşıyabileceksin
+- `pg_tablespace` ve `pg_class` ile yerleşim bilgisini sorgulayabileceksin
+
+---
+
+## Tablespace Performans Stratejisi
+
+Varsayılan olarak tüm tablolar ve indeksler aynı diskte saklanır. Ayrı tablespace tanımlamak şunlara olanak sağlar:
+
+```
+/mnt/ssd/pg_indexes/   ← Hızlı SSD: GiST indeksleri buraya
+/mnt/hdd/pg_data/      ← Büyük HDD: ham veri tabloları buraya
+/dev/shm/pg_temp/      ← RAM diski: geçici sıralama için
+```
+
+**PostGIS özelinde:** Büyük bir ilçe poligonu tablosunun GiST indeksi SSD'de, geometri verisinin kendisi HDD'de olursa mekansal sorgular belirgin şekilde hızlanır.
+
+---
+
+## ▶ Mevcut tablespace'leri incele
+
+<RunnableBlock
+  sql={`-- Tüm tablespace'ler ve boyutları
+SELECT
+  spcname AS tablespace_adi,
+  pg_catalog.pg_get_userbyid(spcowner) AS sahip,
+  pg_size_pretty(
+    pg_catalog.pg_tablespace_size(oid)
+  ) AS boyut
+FROM pg_catalog.pg_tablespace
+ORDER BY spcname;`}
+  label="Tablespace boyutları"
+/>
+
+---
+
+## ▶ Tablespace oluşturma (kavramsal)
+
+```sql
+-- Gerçek ortamda (PGlite'ta çalışmaz — OS dizini gerekir):
+
+-- SSD üzerinde yüksek performanslı tablespace
+CREATE TABLESPACE ssd_ts
+  OWNER postgres
+  LOCATION '/mnt/ssd/postgres';
+
+-- HDD üzerinde büyük veri tablespace
+CREATE TABLESPACE hdd_ts
+  OWNER postgres
+  LOCATION '/mnt/hdd/postgres';
+```
+
+---
+
+## ▶ Belirli tablespace'de tablo/indeks oluştur
+
+```sql
+-- Tablo HDD'de, indeks SSD'de
+CREATE TABLE buyuk_gps_kayitlari (
+  id    BIGSERIAL PRIMARY KEY,
+  geom  GEOMETRY(POINT, 4326),
+  zaman TIMESTAMPTZ
+) TABLESPACE hdd_ts;
+
+-- İndeks SSD'de
+CREATE INDEX idx_gps_geom
+  ON buyuk_gps_kayitlari USING GIST(geom)
+  TABLESPACE ssd_ts;
+```
+
+---
+
+## ▶ Mevcut nesnenin tablespace'ini değiştir
+
+```sql
+-- Tabloyu taşı
+ALTER TABLE buyuk_gps_kayitlari SET TABLESPACE ssd_ts;
+
+-- İndeksi taşı (yeniden oluşturulur)
+ALTER INDEX idx_gps_geom SET TABLESPACE hdd_ts;
+```
+
+---
+
+## ▶ Hangi tablo hangi tablespace'de? (PGlite'ta çalışır)
+
+<RunnableBlock
+  sql={`-- Tablo ve indeks tablespace dağılımı
+SELECT
+  c.relname AS nesne_adi,
+  CASE c.relkind
+    WHEN 'r' THEN 'tablo'
+    WHEN 'i' THEN 'indeks'
+    WHEN 'p' THEN 'partition'
+  END AS tur,
+  COALESCE(t.spcname, 'pg_default') AS tablespace,
+  pg_size_pretty(pg_relation_size(c.oid)) AS boyut
+FROM pg_class c
+LEFT JOIN pg_tablespace t ON c.reltablespace = t.oid
+JOIN pg_namespace n ON c.relnamespace = n.oid
+WHERE n.nspname = 'public'
+  AND c.relkind IN ('r', 'i', 'p')
+ORDER BY pg_relation_size(c.oid) DESC
+LIMIT 20;`}
+  label="Tablo/indeks tablespace dağılımı"
+/>
+
+---
+
+## ▶ Bölümlü tablo partition'larını farklı tablespace'lere dağıt
+
+```sql
+-- Sıcak veri (son ay) SSD'de, soğuk veri HDD'de
+CREATE TABLE gps_2025_01
+  PARTITION OF gps_partitioned
+  FOR VALUES FROM ('2025-01-01') TO ('2025-02-01')
+  TABLESPACE ssd_ts;
+
+CREATE TABLE gps_2024_01
+  PARTITION OF gps_partitioned
+  FOR VALUES FROM ('2024-01-01') TO ('2024-02-01')
+  TABLESPACE hdd_ts;
+```
+
+---
+
+## 📌 Tablespace Seçim Rehberi
+
+| Nesne | Önerilen |
+|---|---|
+| GiST / GIN indeksler | SSD (yoğun random I/O) |
+| Büyük geometri tabloları | HDD (sıralı okuma) |
+| Geçici sıralama (`temp_tablespaces`) | RAM diski |
+| Sistem katalogları | pg_global (değiştirme) |
+| OLTP tabloları | SSD |
+
+---
+
+## 🔗 Sıradaki Modül
+
+Modül 3.1: **Kümeleme ve Yoğunluk Analizi** — ST_ClusterKMeans ve ST_ClusterDBSCAN.
