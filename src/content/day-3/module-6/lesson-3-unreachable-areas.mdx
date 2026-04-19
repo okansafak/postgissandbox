@@ -12,6 +12,45 @@
 
 ---
 
+## ⚙ Ön Hazırlık — Veri setini kur
+
+> Bu dersi ilk defa açıyorsan veya önceki görevleri çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS istanbul_ilceler (
+  id SERIAL PRIMARY KEY, ilce TEXT UNIQUE, nufus INT, geom GEOMETRY(POLYGON,4326));
+INSERT INTO istanbul_ilceler (ilce,nufus,geom) VALUES
+  ('Kadıköy',500000,ST_MakeEnvelope(29.00,40.96,29.12,41.02,4326)),
+  ('Üsküdar',540000,ST_MakeEnvelope(28.98,41.00,29.10,41.10,4326)),
+  ('Beşiktaş',180000,ST_MakeEnvelope(28.96,41.03,29.06,41.08,4326)),
+  ('Şişli',270000,ST_MakeEnvelope(28.96,41.05,29.02,41.12,4326)),
+  ('Fatih',420000,ST_MakeEnvelope(28.90,40.98,28.99,41.04,4326)),
+  ('Beyoğlu',230000,ST_MakeEnvelope(28.96,41.02,29.00,41.07,4326)),
+  ('Bağcılar',750000,ST_MakeEnvelope(28.78,41.01,28.88,41.07,4326)),
+  ('Pendik',700000,ST_MakeEnvelope(29.15,40.86,29.35,40.96,4326)),
+  ('Maltepe',490000,ST_MakeEnvelope(29.10,40.91,29.20,40.97,4326)),
+  ('Ataşehir',430000,ST_MakeEnvelope(29.08,40.97,29.18,41.04,4326))
+ON CONFLICT (ilce) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS toplanma_alanlari (
+  id SERIAL PRIMARY KEY, ad TEXT, tur TEXT, kapasite INT, geom GEOMETRY(POINT,4326));
+INSERT INTO toplanma_alanlari (ad,tur,kapasite,geom) VALUES
+  ('Kadıköy Meydan','afad',5000,ST_SetSRID(ST_MakePoint(29.018,40.990),4326)),
+  ('Üsküdar Meydanı','afad',3000,ST_SetSRID(ST_MakePoint(29.015,41.022),4326)),
+  ('Maçka Parkı','afad',8000,ST_SetSRID(ST_MakePoint(28.997,41.045),4326)),
+  ('Fatih Meydan','afad',4000,ST_SetSRID(ST_MakePoint(28.950,41.015),4326)),
+  ('Bağcılar Stadı','afad',6000,ST_SetSRID(ST_MakePoint(28.850,41.038),4326)),
+  ('Pendik Sahil','afad',7000,ST_SetSRID(ST_MakePoint(29.250,40.872),4326))
+ON CONFLICT DO NOTHING;
+
+SELECT 'Hazır' AS durum,
+  (SELECT COUNT(*) FROM istanbul_ilceler) AS ilce,
+  (SELECT COUNT(*) FROM toplanma_alanlari) AS toplanma;`}
+  label="Veri setini hazırla (önceki görevleri atladıysan)"
+/>
+
+---
+
 ## ▶ Her İlçeye En Yakın Toplanma Alanı
 
 <RunnableBlock

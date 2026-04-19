@@ -12,6 +12,47 @@
 
 ---
 
+## ⚙ Ön Hazırlık — Veri setini kur
+
+> Bu dersi ilk defa açıyorsan veya Görev 1'i çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS istanbul_ilceler (
+  id SERIAL PRIMARY KEY, ilce TEXT UNIQUE, nufus INT, geom GEOMETRY(POLYGON,4326));
+INSERT INTO istanbul_ilceler (ilce,nufus,geom) VALUES
+  ('Kadıköy',500000,ST_MakeEnvelope(29.00,40.96,29.12,41.02,4326)),
+  ('Üsküdar',540000,ST_MakeEnvelope(28.98,41.00,29.10,41.10,4326)),
+  ('Beşiktaş',180000,ST_MakeEnvelope(28.96,41.03,29.06,41.08,4326)),
+  ('Şişli',270000,ST_MakeEnvelope(28.96,41.05,29.02,41.12,4326)),
+  ('Fatih',420000,ST_MakeEnvelope(28.90,40.98,28.99,41.04,4326)),
+  ('Beyoğlu',230000,ST_MakeEnvelope(28.96,41.02,29.00,41.07,4326)),
+  ('Bağcılar',750000,ST_MakeEnvelope(28.78,41.01,28.88,41.07,4326)),
+  ('Pendik',700000,ST_MakeEnvelope(29.15,40.86,29.35,40.96,4326)),
+  ('Maltepe',490000,ST_MakeEnvelope(29.10,40.91,29.20,40.97,4326)),
+  ('Ataşehir',430000,ST_MakeEnvelope(29.08,40.97,29.18,41.04,4326))
+ON CONFLICT (ilce) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS saglik_kuruluslari (
+  id SERIAL PRIMARY KEY, ad TEXT, tur TEXT, ilce TEXT, geom GEOMETRY(POINT,4326));
+INSERT INTO saglik_kuruluslari (ad,tur,ilce,geom) VALUES
+  ('Kadıköy Eğitim Araştırma','hastane','Kadıköy',ST_SetSRID(ST_MakePoint(29.030,40.990),4326)),
+  ('Üsküdar Devlet','hastane','Üsküdar',ST_SetSRID(ST_MakePoint(29.010,41.020),4326)),
+  ('Şişli Etfal','hastane','Şişli',ST_SetSRID(ST_MakePoint(28.990,41.060),4326)),
+  ('Fatih Sağlık Merkezi','saglik_ocagi','Fatih',ST_SetSRID(ST_MakePoint(28.940,41.010),4326)),
+  ('Beşiktaş Sağlık Ocağı','saglik_ocagi','Beşiktaş',ST_SetSRID(ST_MakePoint(29.000,41.050),4326)),
+  ('Pendik Eğitim','hastane','Pendik',ST_SetSRID(ST_MakePoint(29.230,40.880),4326)),
+  ('Maltepe Devlet','hastane','Maltepe',ST_SetSRID(ST_MakePoint(29.140,40.930),4326)),
+  ('Bağcılar Eğitim','hastane','Bağcılar',ST_SetSRID(ST_MakePoint(28.840,41.040),4326))
+ON CONFLICT DO NOTHING;
+
+SELECT 'Hazır' AS durum,
+  (SELECT COUNT(*) FROM istanbul_ilceler) AS ilce,
+  (SELECT COUNT(*) FROM saglik_kuruluslari) AS saglik;`}
+  label="Veri setini hazırla (Görev 1'i atladıysan)"
+/>
+
+---
+
 ## ▶ İlçe Bazlı Sağlık Sayımı
 
 <RunnableBlock
