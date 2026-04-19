@@ -7,13 +7,11 @@ import { executeQuery } from '@/pglite/client';
 import { useMapStore } from '@/store/mapStore';
 import { resultToGeoJSON, detectGeometryColumns } from '@/pglite/geojson-adapter';
 
-const STARTER_SQL = 'SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom;';
-
 export default function SqlEditor() {
   const { sql: currentSql, setSql, setResult, setError, setRunning, isRunning } = useEditorStore();
   const addLayer = useMapStore((s) => s.addLayer);
 
-  const sqlValue = currentSql || STARTER_SQL;
+  const sqlValue = currentSql;
 
   const handleRun = useCallback(async () => {
     const query = sqlValue.trim();
@@ -55,10 +53,11 @@ export default function SqlEditor() {
           {isRunning ? '⏳ Çalışıyor…' : '▶ Çalıştır'}
         </button>
         <button
-          onClick={() => setSql(STARTER_SQL)}
+          onClick={() => setSql('')}
           className="px-2 py-1.5 rounded border border-border text-xs text-text-muted hover:text-text transition-colors"
+          title="Editörü temizle"
         >
-          Sıfırla
+          Temizle
         </button>
       </div>
 

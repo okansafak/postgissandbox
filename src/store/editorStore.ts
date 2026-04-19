@@ -23,8 +23,10 @@ interface EditorState {
   reset: () => void;
 }
 
+export const STARTER_SQL = 'SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom;';
+
 export const useEditorStore = create<EditorState>((set) => ({
-  sql: '',
+  sql: STARTER_SQL,
   result: null,
   error: null,
   isRunning: false,

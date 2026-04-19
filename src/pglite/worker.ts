@@ -46,16 +46,23 @@ self.addEventListener('message', async (event: MessageEvent<Req>) => {
       return;
     }
 
-    // kind === 'query'
+    // kind === 'query' — exec() ile çalıştır: çoklu statement + trailing comment desteği
     const t0 = performance.now();
-    const result = await db.query(req.sql);
+    const results = await db.exec(req.sql);
     const durationMs = Math.round(performance.now() - t0);
+
+    // Son SELECT/WITH sonucunu al (en son fields'i olan result)
+    type PGResult = { rows: unknown[]; fields: { name: string; dataTypeID: number }[] };
+    const last: PGResult =
+      (results as PGResult[]).filter((r) => r.fields.length > 0).at(-1) ??
+      (results as PGResult[]).at(-1) ??
+      { rows: [], fields: [] };
 
     self.postMessage({
       id: req.id,
       ok: true,
-      rows: (result.rows as Record<string, unknown>[]).map(serializeRow),
-      fields: (result.fields as { name: string; dataTypeID: number }[]),
+      rows: (last.rows as Record<string, unknown>[]).map(serializeRow),
+      fields: last.fields,
       durationMs,
     });
   } catch (e: unknown) {
