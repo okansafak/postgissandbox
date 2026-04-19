@@ -3,13 +3,21 @@
 **Senaryo:** İstanbul'da acil durum müdahale kapasitesini analiz edeceksin.
 
 Veri setleri:
-- 39 ilçe poligonu
-- ~200 sağlık kuruluşu (hastane + sağlık ocağı)
-- ~100 itfaiye + AFAD toplanma alanı
+- 10 ilçe poligonu (basitleştirilmiş bbox)
+- 8 sağlık kuruluşu (hastane + sağlık ocağı)
+- 6 AFAD toplanma alanı
 
 ---
 
-## 🎯 Görev 1: Veri Doğrulama
+## 🎯 Ne öğreneceksin?
+
+- Çok tablolu bir proje veri setini kurup doğrulayabileceksin
+- `ST_IsValid` + `ST_IsValidReason` ile geometri sorunlarını tespit edebileceksin
+- Tüm tabloların SRID tutarlılığını kontrol edebileceksin
+
+---
+
+## 📋 Görev 1: Veri Doğrulama
 
 - Tüm geometrilerin geçerli olduğunu kontrol et
 - Bozuk olanları `ST_MakeValid` ile onar

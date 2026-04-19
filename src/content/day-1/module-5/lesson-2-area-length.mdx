@@ -35,7 +35,7 @@ ST_Perimeter(geom::geography)  -- m
 )
 SELECT
   ROUND(ST_Area(geom::geography)::numeric)           AS alan_m2,
-  ROUND(ST_Area(geom::geography)::numeric / 1e6, 0)  AS alan_km2,
+  ROUND(ST_Area(geom::geography)::numeric / 1000000, 0)  AS alan_km2,
   ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 0) AS cevre_km
 FROM istanbul;`}
   label="Bölge alanı ve çevresi"
@@ -73,7 +73,7 @@ FROM rota;`}
 )
 SELECT
   ilce,
-  ROUND(ST_Area(geom::geography)::numeric / 1e6, 1) AS alan_km2,
+  ROUND(ST_Area(geom::geography)::numeric / 1000000, 1) AS alan_km2,
   ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 1) AS cevre_km
 FROM ilce_alanlari
 ORDER BY alan_km2 DESC;`}
@@ -82,7 +82,7 @@ ORDER BY alan_km2 DESC;`}
 
 ---
 
-## 🎯 Egzersiz
+## 🧪 Egzersiz
 
 Bir dikdörtgen poligon oluştur (İstanbul-Ankara-İzmir çevresini kapsayan). Alanını km² ve çevresini km cinsinden hesapla:
 
@@ -93,7 +93,7 @@ Bir dikdörtgen poligon oluştur (İstanbul-Ankara-İzmir çevresini kapsayan). 
     4326) AS geom
 )
 SELECT
-  ROUND(ST_Area(geom::geography)::numeric / 1e6, 0)       AS alan_km2,
+  ROUND(ST_Area(geom::geography)::numeric / 1000000, 0)       AS alan_km2,
   ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 0) AS cevre_km,
   geom
 FROM kutu;`}
@@ -111,6 +111,6 @@ FROM kutu;`}
 
 ---
 
-## 🔗 Bağlantılı Konular
+## 🔗 Sıradaki Ders
 
 Sonraki derste etiket konumu belirlemek için: `ST_Centroid` vs `ST_PointOnSurface`.

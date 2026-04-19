@@ -86,7 +86,7 @@ WITH bbox AS (
 ),
 grid AS (
   SELECT g.geom,
-    ROUND(ST_Area(g.geom::geography)::numeric / 1e6, 2) AS alan_km2
+    ROUND(ST_Area(g.geom::geography)::numeric / 1000000, 2) AS alan_km2
   FROM bbox, ST_SquareGrid(0.05, bbox.geom) g
 )
 SELECT
@@ -130,6 +130,6 @@ HAVING COUNT(k.id) > 3;`}
 
 ---
 
-## 🔗 Bağlantılı Konular
+## 🔗 Sıradaki Ders
 
 Son ders: **KMeans vs DBSCAN vs Grid** — karar tablosu ve hangi yöntemi seçersin?

@@ -89,7 +89,7 @@ FROM test_parceller;`}
 
 ---
 
-## 🎯 Egzersiz
+## 🧪 Egzersiz
 
 Verilen 5 noktayı `ST_MakePolygon` ile kapalı poligona çevir ve alan hesapla:
 
@@ -117,7 +117,7 @@ Verilen 5 noktayı `ST_MakePolygon` ile kapalı poligona çevir ve alan hesapla:
           ST_MakePoint(28.9, 41.0)
         ])
       )::geography
-    ) / 1e6, 2
+    ) / 1000000, 2
   ) AS alan_km2;`}
   label="Poligon alanı hesapla"
 />
@@ -132,6 +132,6 @@ Verilen 5 noktayı `ST_MakePolygon` ile kapalı poligona çevir ve alan hesapla:
 
 ---
 
-## 🔗 Bağlantılı Konular
+## 🔗 Sıradaki Ders
 
 Modül 1.2 tamamlandı! Sırada **Modül 1.3 — SRID ve Projeksiyonlar** var: koordinat sistemleri, EPSG kodları ve `ST_Transform`.

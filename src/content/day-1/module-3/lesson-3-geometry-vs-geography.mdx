@@ -77,10 +77,10 @@ SELECT
   ROUND(ST_Area(geom::geography)::numeric)        AS alan_m2,
 
   -- km²
-  ROUND(ST_Area(geom::geography)::numeric / 1e6, 2) AS alan_km2,
+  ROUND(ST_Area(geom::geography)::numeric / 1000000, 2) AS alan_km2,
 
   -- UTM 35N ile karşılaştır
-  ROUND(ST_Area(ST_Transform(geom, 32635))::numeric / 1e6, 2) AS utm_km2
+  ROUND(ST_Area(ST_Transform(geom, 32635))::numeric / 1000000, 2) AS utm_km2
 FROM kare;`}
   label="Aynı poligon: 3 farklı alan"
 />
@@ -98,7 +98,7 @@ Türkiye yaklaşık koordinatlarla bir poligon çiz ve alanını hesapla (gerçe
       ST_GeomFromText('POLYGON((26 36, 45 36, 45 42, 26 42, 26 36))'),
       4326
     )::geography
-  ) / 1e6, 0
+  ) / 1000000, 0
 ) AS yaklasik_alan_km2;
 -- Not: gerçek sınır değil, kaba dikdörtgen`}
   label="Türkiye kaba alan tahmini"
@@ -114,6 +114,6 @@ Türkiye yaklaşık koordinatlarla bir poligon çiz ve alanını hesapla (gerçe
 
 ---
 
-## 🔗 Bağlantılı Konular
+## 🔗 Sıradaki Ders
 
 Sonraki derste `ST_SetSRID` ile `ST_Transform` arasındaki kritik farkı öğreneceğiz — bu iki fonksiyon sıkça karıştırılır.

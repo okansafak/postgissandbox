@@ -90,7 +90,7 @@ SELECT id, ad, tur, ST_AsText(geom) AS wkt FROM geojson_noktalar;`}
   )) AS polygon_wkt,
   ROUND(ST_Area(ST_GeomFromGeoJSON(
     '{"type":"Polygon","coordinates":[[[28.9,41.0],[29.1,41.0],[29.1,41.1],[28.9,41.1],[28.9,41.0]]]}')
-  ::geography)::numeric / 1e6, 1) AS alan_km2;`}
+  ::geography)::numeric / 1000000, 1) AS alan_km2;`}
   label="GeoJSON Polygon yükle"
 />
 
@@ -104,6 +104,6 @@ SELECT id, ad, tur, ST_AsText(geom) AS wkt FROM geojson_noktalar;`}
 
 ---
 
-## 🔗 Bağlantılı Konular
+## 🔗 Sıradaki Ders
 
 Sonraki derste temiz veri yüklemede altın standart: **staging tablosu deseni**.

@@ -59,9 +59,9 @@ UNION ALL SELECT 'ConcaveHull', ST_ConcaveHull(geom, 0.9)    FROM noktalar;`}
   ]) AS geom
 )
 SELECT
-  ROUND(ST_Area(ST_Envelope(geom)::geography)::numeric / 1e6, 0)       AS envelope_km2,
-  ROUND(ST_Area(ST_ConvexHull(geom)::geography)::numeric / 1e6, 0)     AS convex_km2,
-  ROUND(ST_Area(ST_ConcaveHull(geom,0.9)::geography)::numeric / 1e6, 0) AS concave_km2
+  ROUND(ST_Area(ST_Envelope(geom)::geography)::numeric / 1000000, 0)       AS envelope_km2,
+  ROUND(ST_Area(ST_ConvexHull(geom)::geography)::numeric / 1000000, 0)     AS convex_km2,
+  ROUND(ST_Area(ST_ConcaveHull(geom,0.9)::geography)::numeric / 1000000, 0) AS concave_km2
 FROM noktalar;`}
   label="Alan karşılaştırması"
 />
@@ -99,6 +99,6 @@ FROM cluster;`}
 
 ---
 
-## 🔗 Bağlantılı Konular
+## 🔗 Sıradaki Ders
 
 Modülün son dersi: **`<->` KNN operatörü — en yakın N komşuyu verimli bul**.
