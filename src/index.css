@@ -1,23 +1,22 @@
 @import "tailwindcss";
 
-/* Plan §8.1 tema tokenları */
 @theme {
-  --color-primary: #1b3a5c;
-  --color-primary-light: #2a4f7a;
-  --color-accent: #aed6f1;
-  --color-surface: #0d1b2e;
-  --color-surface-2: #111f33;
-  --color-border: #1e3451;
-  --color-text: #c8d8ec;
-  --color-text-muted: #6b8aaa;
+  --color-primary: #2d6a4f;
+  --color-primary-light: #40916c;
+  --color-accent: #52b788;
+  --color-surface: #0e1a12;
+  --color-surface-2: #182a1e;
+  --color-border: #243d2c;
+  --color-text: #eaf4ec;
+  --color-text-muted: #7aab83;
 
   --font-family-sans: 'Inter', system-ui, sans-serif;
   --font-family-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
 }
 
 html {
-  background-color: #0d1b2e;
-  color: #c8d8ec;
+  background-color: #0e1a12;
+  color: #eaf4ec;
   font-family: var(--font-family-sans);
   height: 100%;
 }
@@ -41,6 +40,6 @@ body {
 }
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0d1b2e; }
-::-webkit-scrollbar-thumb { background: #1e3451; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #2a4f7a; }
+::-webkit-scrollbar-track { background: #0e1a12; }
+::-webkit-scrollbar-thumb { background: #243d2c; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #40916c; }

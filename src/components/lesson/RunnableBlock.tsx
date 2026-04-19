@@ -1,4 +1,5 @@
 import { useEditorStore } from '@/store/editorStore';
+import { Play } from '@/components/ui/Icons';
 
 interface RunnableBlockProps {
   sql: string;
@@ -23,7 +24,7 @@ export default function RunnableBlock({ sql, label = 'Editöre Yükle ve Çalı�
           onClick={() => setSql(sql.trim())}
           className="text-xs px-3 py-1.5 rounded bg-primary hover:bg-primary-light text-white transition-colors"
         >
-          ▶ {label}
+          <span className="flex items-center gap-1.5"><Play size={10} /> {label}</span>
         </button>
       </div>
     </div>

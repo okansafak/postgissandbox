@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import RunnableBlock from './RunnableBlock';
 import { getLessonByRoute, getNextLesson, getPrevLesson } from '@/curriculum/structure';
 import { useProgressStore } from '@/store/progressStore';
+import { ArrowLeft } from '@/components/ui/Icons';
 
 interface LessonContentProps {
   day: string;
@@ -234,7 +235,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
       {meta && (
         <div className="mb-6">
           <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
-            <span>Gün {meta.day}</span>
+            <span>Bölüm {meta.day}</span>
             <span>·</span>
             <span>Modül {meta.module}</span>
             <span>·</span>
@@ -263,9 +264,9 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
           {prev ? (
             <Link
               to={`/lesson/day-${prev.day}/module-${prev.module}/${prev.slug}`}
-              className="text-sm text-text-muted hover:text-text"
+              className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text"
             >
-              ← {prev.title}
+              <ArrowLeft size={13} /> {prev.title}
             </Link>
           ) : (
             <span />

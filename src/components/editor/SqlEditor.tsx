@@ -4,6 +4,7 @@ import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import type { EditorView } from '@codemirror/view';
 import { useEditorStore } from '@/store/editorStore';
+import { Play, Spinner, XCircle } from '@/components/ui/Icons';
 import { executeQuery } from '@/pglite/client';
 import { useMapStore } from '@/store/mapStore';
 import { resultToGeoJSON, detectGeometryColumns } from '@/pglite/geojson-adapter';
@@ -65,7 +66,10 @@ export default function SqlEditor() {
           disabled={isRunning}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary hover:bg-primary-light disabled:opacity-50 text-white text-sm transition-colors"
         >
-          {isRunning ? '⏳ Çalışıyor…' : '▶ Çalıştır'}
+          {isRunning
+            ? <span className="flex items-center gap-1.5"><Spinner size={13} /> Çalışıyor…</span>
+            : <span className="flex items-center gap-1.5"><Play size={11} /> Çalıştır</span>
+          }
         </button>
         <button
           onClick={() => setSql('')}
@@ -111,7 +115,7 @@ function ErrorBar() {
   if (!error) return null;
   return (
     <div className="px-3 py-2 bg-red-950 border-t border-red-800 text-red-300 text-xs font-mono shrink-0 max-h-24 overflow-y-auto">
-      ❌ {error}
+      <span className="flex items-start gap-1.5"><XCircle size={14} className="shrink-0 mt-0.5" /> {error}</span>
     </div>
   );
 }

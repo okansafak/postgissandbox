@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Group as PanelGroup, Panel, Separator as PanelResizeHandle } from 'react-resizable-panels';
+import { Menu, MapPin, Table, Lightning } from '@/components/ui/Icons';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import SqlEditor from '@/components/editor/SqlEditor';
 import SpatialMap from '@/components/map/SpatialMap';
@@ -26,14 +27,14 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
           title={sidebarOpen ? 'Menüyü kapat' : 'Menüyü aç'}
           className="p-1.5 rounded text-text-muted hover:text-text hover:bg-surface-2 transition-colors shrink-0 text-base leading-none"
         >
-          ☰
+          <Menu size={16} />
         </button>
         <span className="text-xs text-text-muted font-mono uppercase tracking-widest">
           PostGIS Akademi
         </span>
         <span className="text-border">|</span>
         <span className="text-sm text-text">
-          Gün {day.replace('day-', '')} / Modül {module.replace('module-', '')} / Ders{' '}
+          Bölüm {day.replace('day-', '')} / Modül {module.replace('module-', '')} / Ders{' '}
           {lesson.replace('lesson-', '')}
         </span>
       </div>
@@ -85,7 +86,12 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
                         value={tab}
                         className="px-4 py-2 text-sm text-text-muted data-[state=active]:text-accent data-[state=active]:border-b-2 data-[state=active]:border-accent hover:text-text transition-colors"
                       >
-                        {tab === 'map' ? '🗺 Harita' : tab === 'table' ? '📋 Tablo' : '🔍 EXPLAIN'}
+                        {tab === 'map'
+                          ? <span className="flex items-center gap-1.5"><MapPin size={13} /> Harita</span>
+                          : tab === 'table'
+                          ? <span className="flex items-center gap-1.5"><Table size={13} /> Tablo</span>
+                          : <span className="flex items-center gap-1.5"><Lightning size={13} /> EXPLAIN</span>
+                        }
                       </TabsTrigger>
                     ))}
                   </TabsList>

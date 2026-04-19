@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getCurriculumTree } from '@/curriculum/structure';
 import { useProgressStore } from '@/store/progressStore';
+import { ArrowLeft, ChevronRight, Check, Dot, Search } from '@/components/ui/Icons';
 
-const DAY_LABELS: Record<number, string> = {
-  1: 'Gün 1 — Spatial SQL Fundamentals',
-  2: 'Gün 2 — Sorgular, İndeks ve Performans',
-  3: 'Gün 3 — Production, Ağ Analizi ve Proje',
+const SECTION_LABELS: Record<number, string> = {
+  1: 'Bölüm 1 — Spatial SQL Fundamentals',
+  2: 'Bölüm 2 — Sorgular, İndeks ve Performans',
+  3: 'Bölüm 3 — Production, Ağ Analizi ve Proje',
 };
 
 export default function CurriculumSidebar() {
@@ -17,7 +18,6 @@ export default function CurriculumSidebar() {
   const isComplete = useProgressStore((s) => s.isComplete);
 
   const tree = getCurriculumTree();
-  // group by day
   const days = [1, 2, 3] as const;
 
   const [openDays, setOpenDays] = useState<Set<number>>(
@@ -26,6 +26,7 @@ export default function CurriculumSidebar() {
   const [openModules, setOpenModules] = useState<Set<string>>(
     () => new Set([`${activeDay}-${activeModule}`]),
   );
+  const [query, setQuery] = useState('');
 
   function toggleDay(day: number) {
     setOpenDays((prev) => {
@@ -43,42 +44,79 @@ export default function CurriculumSidebar() {
     });
   }
 
+  const q = query.trim().toLowerCase();
+  const filteredTree = q
+    ? tree
+        .map((node) => ({
+          ...node,
+          lessons: node.lessons.filter(
+            (l) =>
+              l.title.toLowerCase().includes(q) ||
+              (l.tags ?? []).some((t: string) => t.toLowerCase().includes(q)),
+          ),
+        }))
+        .filter((node) => node.lessons.length > 0)
+    : tree;
+
   return (
     <nav className="h-full overflow-y-auto bg-surface text-sm select-none">
-      <div className="px-3 py-3 border-b border-border">
-        <Link to="/" className="text-xs font-mono uppercase tracking-widest text-text-muted hover:text-accent transition-colors">
-          ← Ana Sayfa
+      <div className="px-3 py-3 border-b border-border flex flex-col gap-2">
+        <Link
+          to="/"
+          className="flex items-center gap-1.5 text-xs font-medium text-text-muted hover:text-accent transition-colors"
+        >
+          <ArrowLeft size={13} />
+          Ana Sayfa
         </Link>
+        <div className="relative">
+          <Search size={13} className="absolute left-2 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+          <input
+            type="search"
+            placeholder="Ders ara…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-7 pr-2 py-1.5 text-xs rounded border border-border bg-surface-2
+                       text-text placeholder:text-text-muted focus:outline-none focus:border-accent"
+          />
+        </div>
       </div>
 
       {days.map((day) => {
-        const dayNodes = tree.filter((n) => n.day === day);
-        const isOpen = openDays.has(day);
+        const dayNodes = filteredTree.filter((n) => n.day === day);
+        if (dayNodes.length === 0 && q) return null;
+
+        const isOpen = q ? true : openDays.has(day);
 
         return (
           <div key={day}>
             <button
-              onClick={() => toggleDay(day)}
+              onClick={() => !q && toggleDay(day)}
               className="w-full flex items-center gap-1.5 px-3 py-2 text-left text-xs font-semibold text-text-muted uppercase tracking-wider hover:text-text transition-colors border-b border-border"
             >
-              <span className={`transition-transform ${isOpen ? 'rotate-90' : ''}`}>▶</span>
-              {DAY_LABELS[day]}
+              <ChevronRight
+                size={11}
+                className={`shrink-0 transition-transform ${isOpen ? 'rotate-90' : ''}`}
+              />
+              {SECTION_LABELS[day]}
             </button>
 
             {isOpen && dayNodes.map((node) => {
               const modKey = `day-${node.day}-module-${node.module}`;
-              const isModOpen = openModules.has(modKey);
+              const isModOpen = q ? true : openModules.has(modKey);
               const isActiveModule = activeDay === `day-${node.day}` && activeModule === `module-${node.module}`;
 
               return (
                 <div key={modKey}>
                   <button
-                    onClick={() => toggleModule(modKey)}
+                    onClick={() => !q && toggleModule(modKey)}
                     className={`w-full flex items-center gap-1.5 px-4 py-1.5 text-left text-xs hover:text-text transition-colors ${
                       isActiveModule ? 'text-accent' : 'text-text-muted'
                     }`}
                   >
-                    <span className={`transition-transform shrink-0 ${isModOpen ? 'rotate-90' : ''}`}>▶</span>
+                    <ChevronRight
+                      size={10}
+                      className={`shrink-0 transition-transform ${isModOpen ? 'rotate-90' : ''}`}
+                    />
                     <span>
                       {node.day}.{node.module} — {node.moduleTitle}
                     </span>
@@ -99,18 +137,18 @@ export default function CurriculumSidebar() {
                               to={`/lesson/day-${lesson.day}/module-${lesson.module}/${lesson.slug}`}
                               className={`flex items-center gap-2 px-6 py-1.5 transition-colors ${
                                 isActive
-                                  ? 'bg-primary/30 text-accent font-medium'
+                                  ? 'bg-primary/20 text-accent font-medium'
                                   : 'text-text-muted hover:text-text hover:bg-surface-2'
                               }`}
                             >
-                              <span className="shrink-0 w-4 text-center">
-                                {done ? '✓' : <span className="inline-block w-2 h-2 rounded-full bg-border" />}
+                              <span className="shrink-0 w-4 flex items-center justify-center">
+                                {done
+                                  ? <Check size={12} className="text-accent" />
+                                  : <Dot size={6} className="text-border" />
+                                }
                               </span>
-                              <span className="truncate">
+                              <span className="truncate" title={lesson.title}>
                                 {lesson.order}. {lesson.title}
-                              </span>
-                              <span className="ml-auto shrink-0 text-[10px] text-text-muted">
-                                {lesson.estimatedMinutes}dk
                               </span>
                             </Link>
                           </li>
