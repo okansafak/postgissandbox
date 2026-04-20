@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Analytics } from '@vercel/analytics/react';
 import Dashboard from '@/pages/Dashboard';
 import Lesson from '@/pages/Lesson';
 import Playground from '@/pages/Playground';
@@ -17,7 +16,6 @@ export default function App() {
         <Route path="/playground" element={<Playground />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-      <Analytics />
     </BrowserRouter>
   );
 }
