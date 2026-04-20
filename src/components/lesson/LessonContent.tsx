@@ -200,7 +200,7 @@ function buildGlobKey(day: string, mod: string, lesson: string): string {
 export default function LessonContent({ day, module, lesson }: LessonContentProps) {
   const meta = getLessonByRoute(day.replace('day-', ''), module.replace('module-', ''), lesson);
   const markComplete = useProgressStore((s) => s.markComplete);
-  const isComplete = useProgressStore((s) => s.isComplete);
+  const completedLessons = useProgressStore((s) => s.completedLessons);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [MdxComponent, setMdxComponent] = useState<ComponentType<Record<string, any>> | null>(null);
@@ -224,7 +224,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
   }, [day, module, lesson]);
 
   const lessonId = meta?.id ?? `${day}-${module}-${lesson}`;
-  const completed = isComplete(lessonId);
+  const completed = completedLessons.includes(lessonId);
 
   const next = meta ? getNextLesson(meta) : null;
   const prev = meta ? getPrevLesson(meta) : null;

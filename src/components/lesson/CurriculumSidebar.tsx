@@ -15,7 +15,7 @@ export default function CurriculumSidebar() {
   const activeDay = params.day ?? '';
   const activeModule = params.module ?? '';
   const activeLesson = params.lesson ?? '';
-  const isComplete = useProgressStore((s) => s.isComplete);
+  const completedLessons = useProgressStore((s) => s.completedLessons);
 
   const tree = getCurriculumTree();
   const days = [1, 2, 3] as const;
@@ -129,7 +129,7 @@ export default function CurriculumSidebar() {
                           activeDay === `day-${lesson.day}` &&
                           activeModule === `module-${lesson.module}` &&
                           activeLesson === lesson.slug;
-                        const done = isComplete(lesson.id);
+                        const done = completedLessons.includes(lesson.id);
 
                         return (
                           <li key={lesson.id}>
