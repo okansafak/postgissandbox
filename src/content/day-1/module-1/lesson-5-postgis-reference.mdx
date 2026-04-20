@@ -1,18 +1,31 @@
 ## postgis.net Belgelendirmesi Nasıl Kullanılır?
 
-**Hedef:** PostGIS fonksiyonlarını resmi belgede hızla bul ve fonksiyon imzasını oku.
+**Hedef:** Bir fonksiyonu (ör. `ST_Buffer`, `ST_DWithin`) resmi belgede en hızlı şekilde bulup doğru sürümünü seçebilmek.
 
 ---
 
 ## 🎯 Ne öğreneceksin?
 
-- postgis.net'te ST_* fonksiyonlarını hızla bulabileceksin
-- Fonksiyon imzasını (signature) ve tip sınıflarını okuyabileceksin
-- Geometry ve Geography kabul eden overload'ları ayırt edebileceksin
+- postgis.net içinde kaybolmadan doğru sayfaya ulaşabileceksin
+- Bir fonksiyon sayfasındaki en kritik 5 alanı okuyabileceksin
+- `geometry` ve `geography` sürümlerini karıştırmadan seçebileceksin
+- Belgede gördüğün SQL örneğini kendi sorguna güvenle uyarlayabileceksin
 
 ---
 
-## postgis.net Yapısı
+## Neden Bu Kadar Önemli?
+
+PostGIS'te aynı isimli fonksiyonun birden fazla sürümü olur.
+
+Örnek: `ST_Distance`
+- `geometry` ile kullanırsan birim çoğu zaman derece veya projeksiyon birimidir
+- `geography` ile kullanırsan birim metredir
+
+Sonuç: Fonksiyon adını bilmek yetmez, **hangi tip ile çağırdığını** bilmek gerekir.
+
+---
+
+## postgis.net Yapısı (Kısa Harita)
 
 `https://postgis.net/docs/` adresindeki belge üç ana bölüme ayrılır:
 
@@ -22,11 +35,29 @@
 | **Manual** | Kavramsal açıklamalar (SRID, indeks, vb.) |
 | **Tutorials** | Adım adım rehberler |
 
-Arama için: `https://postgis.net/docs/ST_Buffer.html` — fonksiyon adını URL'ye ekle.
+En pratik yol: fonksiyon adını URL'e yaz.
+
+- `https://postgis.net/docs/ST_Buffer.html`
+- `https://postgis.net/docs/ST_DWithin.html`
+- `https://postgis.net/docs/ST_Transform.html`
 
 ---
 
-## Fonksiyon İmzasını Okumak
+## Bir Fonksiyon Sayfası Nasıl Okunur?
+
+Bir sayfaya girdiğinde aşağıdaki sırayla oku:
+
+1. **Synopsis / Signature**
+2. **Description**
+3. **Availability** (hangi PostGIS sürümünde var?)
+4. **Examples**
+5. **See Also**
+
+Bu 5 adımı uygularsan yanlış fonksiyon seçme olasılığın çok düşer.
+
+---
+
+## Signature Okuma Örneği
 
 Örnek: `ST_DWithin`
 
@@ -36,13 +67,44 @@ boolean  ST_DWithin(geography gg1, geography gg2, double precision distance_mete
 ```
 
 **Okuması:**
-- `boolean` = dönüş tipi
-- `geometry` / `geography` = kabul ettiği girdi tipi
-- `use_spheroid = true` = varsayılan değerli parametre (opsiyonel)
+
+- En soldaki `boolean`: fonksiyonun dönüş tipi (`true/false`)
+- `geometry g1, geometry g2`: aynı tip iki geometri bekliyor
+- `distance_cartesian`: geometry kullanımında projeksiyon birimi
+- `geography ... distance_meters`: geography kullanımında metre
+- `use_spheroid = true`: varsayılan parametre; istersen geçmezsin
+
+Bu yüzden imzadaki tek bir kelime (`geometry` vs `geography`) sonucu tamamen değiştirir.
 
 ---
 
-## Tip Sınıfları
+## En Sık Hata: Geometry mi Geography mi?
+
+| Soru | Kullanım |
+|---|---|
+| "Kaç metre?" | `geography` (veya metre projeksiyonlu geometry) |
+| "Sadece topolojik ilişki (kesişim, içinde mi)?" | `geometry` |
+| "Web harita görüntüleme" | çoğu zaman `geometry` + uygun SRID |
+
+Kural: lon/lat (`4326`) ile doğrudan mesafe/alan hesaplıyorsan ekstra dikkat et.
+
+---
+
+## Belgeden SQL'e Geçiş Akışı
+
+Bir fonksiyonu ilk kez kullanırken şu mini checklist'i uygula:
+
+1. Fonksiyon sayfasını aç
+2. Signature'da tipleri kontrol et (`geometry/geography`)
+3. Örnek sorguyu kopyala
+4. Kendi tablon/sütun adına uyarla
+5. Sonucu küçük bir veriyle test et
+
+Bu akış özellikle `ST_Buffer`, `ST_DWithin`, `ST_Distance`, `ST_Area` için çok işe yarar.
+
+---
+
+## Tip Sınıfları (Hızlı Bakış)
 
 PostGIS fonksiyonları üç giriş tipini kabul eder:
 
@@ -54,7 +116,7 @@ PostGIS fonksiyonları üç giriş tipini kabul eder:
 
 ---
 
-## ▶ Hangi fonksiyonlar geography kabul eder?
+## ▶ Dene: Geography Kabul Eden Fonksiyonlar
 
 <RunnableBlock
   sql={`-- PostGIS'te geography tipini kabul eden fonksiyonlar
@@ -69,7 +131,7 @@ ORDER BY proname;`}
 
 ---
 
-## ▶ Bir fonksiyonun tüm overload'ları
+## ▶ Dene: Bir Fonksiyonun Tüm Overload'ları
 
 <RunnableBlock
   sql={`-- ST_Buffer'ın tüm imzaları
@@ -85,7 +147,7 @@ ORDER BY oid;`}
 
 ---
 
-## ▶ Fonksiyon kategorileri
+## ▶ Dene: Fonksiyon Kategorileri
 
 <RunnableBlock
   sql={`-- PostGIS fonksiyonlarını öneke göre say
@@ -120,6 +182,19 @@ LIMIT 15;`}
 | X km içinde? | `ST_DWithin` |
 | Alan | `ST_Area(::geography)` → m² |
 | Tampon | `ST_Buffer` |
+
+---
+
+## Kapanış
+
+Belge kullanmanın en kısa özeti:
+
+1. Fonksiyon adını bul
+2. Signature'ı oku
+3. Tipi doğru seç (`geometry` / `geography`)
+4. Örneği kendi verine uyarla
+
+Bu alışkanlıkla PostGIS'te öğrenme hızın dramatik şekilde artar.
 
 ---
 
