@@ -44,7 +44,7 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
         {/* Sidebar: CSS ile genişlik kontrolü */}
         <aside
           style={{ width: sidebarOpen ? '220px' : '0px', minWidth: sidebarOpen ? '220px' : '0px' }}
-          className="shrink-0 overflow-hidden border-r border-border transition-all duration-200"
+          className="shrink-0 overflow-hidden border-r border-border bg-surface transition-all duration-200"
         >
           <div className="w-[220px] h-full">
             <CurriculumSidebar />
@@ -52,17 +52,18 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
         </aside>
 
         {/* Sağ: 2'li yeniden boyutlandırılabilir panel */}
-        <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
+        <PanelGroup orientation="horizontal" className="flex-1 overflow-hidden bg-surface">
           {/* Orta: MDX içerik */}
           <Panel
             defaultSize={40}
             minSize={25}
             className="overflow-y-auto bg-surface-2 border-r border-border"
+            style={{ boxShadow: 'inset -1px 0 0 var(--color-border-strong)' }}
           >
             <LessonContent day={day} module={module} lesson={lesson} />
           </Panel>
 
-          <PanelResizeHandle className="w-1 bg-border hover:bg-primary-light transition-colors cursor-col-resize" />
+          <PanelResizeHandle className="panel-divider-v hover:opacity-90 transition-opacity cursor-col-resize" />
 
           {/* Sağ: editör + harita/tablo */}
           <Panel defaultSize={60} minSize={40}>
@@ -71,11 +72,12 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
                 defaultSize={40}
                 minSize={20}
                 className="overflow-hidden border-b border-border"
+                style={{ boxShadow: 'inset 0 -1px 0 var(--color-border-strong)' }}
               >
                 <SqlEditor />
               </Panel>
 
-              <PanelResizeHandle className="h-1 bg-border hover:bg-primary-light transition-colors cursor-row-resize" />
+              <PanelResizeHandle className="panel-divider-h hover:opacity-90 transition-opacity cursor-row-resize" />
 
               <Panel defaultSize={60} minSize={20} className="overflow-hidden">
                 <Tabs defaultValue="map" className="h-full flex flex-col">
@@ -97,20 +99,19 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
                   </TabsList>
                   <TabsContent
                     value="map"
-                    className="flex-1 overflow-hidden data-[state=inactive]:hidden"
-                    style={{ display: 'flex', flexDirection: 'column' }}
+                    className="flex-1 overflow-hidden flex flex-col data-[state=inactive]:hidden"
                   >
                     <SpatialMap />
                   </TabsContent>
                   <TabsContent
                     value="table"
-                    className="flex-1 overflow-auto p-2 data-[state=inactive]:hidden"
+                    className="flex-1 overflow-auto p-2 mt-0 data-[state=inactive]:hidden"
                   >
                     <ResultTable />
                   </TabsContent>
                   <TabsContent
                     value="explain"
-                    className="flex-1 overflow-auto p-2 data-[state=inactive]:hidden"
+                    className="flex-1 overflow-auto p-2 mt-0 data-[state=inactive]:hidden"
                   >
                     <ExplainPlan />
                   </TabsContent>

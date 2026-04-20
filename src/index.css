@@ -7,8 +7,9 @@
   --color-primary-light: #40916c;
   --color-accent: #52b788;
   --color-surface: #0e1a12;
-  --color-surface-2: #182a1e;
-  --color-border: #243d2c;
+  --color-surface-2: #1b2f22;
+  --color-border: #355944;
+  --color-border-strong: #4f7b5f;
   --color-text: #eaf4ec;
   --color-text-muted: #7aab83;
 
@@ -45,3 +46,14 @@ body {
 ::-webkit-scrollbar-track { background: #0e1a12; }
 ::-webkit-scrollbar-thumb { background: #243d2c; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #40916c; }
+
+/* Layout panelleri arasindaki ayirimi daha net yapar. */
+.panel-divider-v {
+  width: 2px;
+  background: linear-gradient(to bottom, #33563f, #4f7b5f 50%, #33563f);
+}
+
+.panel-divider-h {
+  height: 2px;
+  background: linear-gradient(to right, #33563f, #4f7b5f 50%, #33563f);
+}

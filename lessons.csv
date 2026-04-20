@@ -1,0 +1,87 @@
+Bölüm,Modül,Sıra,Ders ID,Başlık,Slug,Seviye,Dakika
+Bölüm 1,1.0,1,day-1-module-0-lesson-1,"Cluster, Database, Schema yapısı",lesson-1,L1,12
+Bölüm 1,1.0,2,day-1-module-0-lesson-2,"Tablespace kavramı",lesson-2,L1,10
+Bölüm 1,1.0,3,day-1-module-0-lesson-3,"MVCC ve Transaction yapısı",lesson-3,L1,12
+Bölüm 1,1.0,4,day-1-module-0-lesson-4,"Isolation Levels ve Lock mekanizması",lesson-4,L1,11
+Bölüm 1,1.1,1,day-1-module-1-lesson-1,"Hoş geldin: Bu platform nasıl çalışır?",lesson-1,L1,5
+Bölüm 1,1.1,2,day-1-module-1-lesson-2,"PGlite nedir? PostgreSQL ≠ PostGIS",lesson-2,L1,10
+Bölüm 1,1.1,3,day-1-module-1-lesson-3,"Bir CBS ne işe yarar? Vektör vs Raster",lesson-3,L1,10
+Bölüm 1,1.1,4,day-1-module-1-lesson-4,"İlk haritayı çiz",lesson-4,L1,5
+Bölüm 1,1.1,5,day-1-module-1-lesson-5,"postgis.net belgelendirmesi nasıl kullanılır?",lesson-5,L1,8
+Bölüm 1,1.2,1,day-1-module-2-lesson-1,"Geometry tipleri: POINT, LINESTRING, POLYGON",lesson-1,L1,10
+Bölüm 1,1.2,2,day-1-module-2-lesson-2,"MULTI* ve GEOMETRYCOLLECTION",lesson-2,L1,10
+Bölüm 1,1.2,3,day-1-module-2-lesson-3,"WKT, EWKT ve GeoJSON formatları",lesson-3,L1,10
+Bölüm 1,1.2,4,day-1-module-2-lesson-4,"Geometri oluşturucuları: MakePoint, MakeLine, MakePolygon",lesson-4,L1,10
+Bölüm 1,1.2,5,day-1-module-2-lesson-5,"Geometry metadata: AsText, GeometryType, NPoints",lesson-5,L1,10
+Bölüm 1,1.2,6,day-1-module-2-lesson-6,"Geçerli/geçersiz geometri: ST_IsValid, ST_MakeValid",lesson-6,L1,10
+Bölüm 1,1.3,1,day-1-module-3-lesson-1,"Dünya yuvarlak, harita düz — bu neden önemli?",lesson-1,L1,10
+Bölüm 1,1.3,2,day-1-module-3-lesson-2,"SRID, EPSG ve spatial_ref_sys tablosu",lesson-2,L1,15
+Bölüm 1,1.3,3,day-1-module-3-lesson-3,"Geometry vs Geography — kritik fark",lesson-3,L1,15
+Bölüm 1,1.3,4,day-1-module-3-lesson-4,"ST_SetSRID ≠ ST_Transform",lesson-4,L1,15
+Bölüm 1,1.3,6,day-1-module-3-lesson-6,"Hangi durumda hangi projeksiyonu seçmeli?",lesson-6,L1,10
+Bölüm 1,1.4,1,day-1-module-4-lesson-1,"ST_Contains ve ST_Within — ""içinde mi?""",lesson-1,L1,10
+Bölüm 1,1.4,2,day-1-module-4-lesson-2,"ST_Intersects ve ST_Disjoint",lesson-2,L1,10
+Bölüm 1,1.4,3,day-1-module-4-lesson-3,"ST_Touches, ST_Crosses, ST_Overlaps",lesson-3,L1,10
+Bölüm 1,1.4,4,day-1-module-4-lesson-4,"ST_DWithin — ""N metre içinde""",lesson-4,L1,15
+Bölüm 1,1.4,5,day-1-module-4-lesson-5,"JOIN ile mekansal birleştirme",lesson-5,L1,15
+Bölüm 1,1.5,1,day-1-module-5-lesson-1,"ST_Distance — mesafe hesabı (dikkat: SRID!)",lesson-1,L1,10
+Bölüm 1,1.5,2,day-1-module-5-lesson-2,"ST_Area, ST_Perimeter, ST_Length",lesson-2,L1,10
+Bölüm 1,1.5,3,day-1-module-5-lesson-3,"ST_Centroid vs ST_PointOnSurface",lesson-3,L1,10
+Bölüm 1,1.5,4,day-1-module-5-lesson-4,"ST_Buffer — tampon bölge",lesson-4,L1,10
+Bölüm 1,1.5,5,day-1-module-5-lesson-5,"ST_Union, ST_Intersection, ST_Difference",lesson-5,L1,10
+Bölüm 1,1.5,6,day-1-module-5-lesson-6,"ST_Envelope, ST_ConvexHull, ST_ConcaveHull",lesson-6,L1,10
+Bölüm 1,1.5,7,day-1-module-5-lesson-7,"En yakın N komşu: <-> KNN operatörü",lesson-7,L1,15
+Bölüm 2,2.1,1,day-2-module-1-lesson-1,"CSV ve TSV yükleme: COPY vs INSERT",lesson-1,L2,10
+Bölüm 2,2.1,2,day-2-module-1-lesson-2,"GeoJSON yükleme ve ST_GeomFromGeoJSON",lesson-2,L2,10
+Bölüm 2,2.1,3,day-2-module-1-lesson-3,"Staging tablosu ile güvenli yükleme",lesson-3,L2,10
+Bölüm 2,2.1,4,day-2-module-1-lesson-4,"Toplu dönüşüm: ST_Transform + UPDATE",lesson-4,L2,10
+Bölüm 2,2.1,5,day-2-module-1-lesson-5,"ogr2ogr / shp2pgsql — kavramsal genel bakış",lesson-5,L2,10
+Bölüm 2,2.2,1,day-2-module-2-lesson-1,"ST_Simplify ve ST_SimplifyPreserveTopology",lesson-1,L2,12
+Bölüm 2,2.2,2,day-2-module-2-lesson-2,"ST_Subdivide — büyük poligonu parçala",lesson-2,L2,10
+Bölüm 2,2.2,3,day-2-module-2-lesson-3,"Doğrusal referans: ST_LineLocatePoint ve ST_LineInterpolatePoint",lesson-3,L2,12
+Bölüm 2,2.2,4,day-2-module-2-lesson-4,"ST_ClosestPoint ve ST_ShortestLine",lesson-4,L2,10
+Bölüm 2,2.2,5,day-2-module-2-lesson-5,"ST_Azimuth — yön hesabı",lesson-5,L2,10
+Bölüm 2,2.3,1,day-2-module-3-lesson-1,"Neden mekansal indeks gerekli?",lesson-1,L2,10
+Bölüm 2,2.3,2,day-2-module-3-lesson-2,"CREATE INDEX USING GIST — temel",lesson-2,L2,10
+Bölüm 2,2.3,3,day-2-module-3-lesson-3,"SP-GIST — nokta yoğun veri için",lesson-3,L2,10
+Bölüm 2,2.3,4,day-2-module-3-lesson-4,"Bounding Box operatörü: &&",lesson-4,L2,10
+Bölüm 2,2.3,5,day-2-module-3-lesson-5,"Partial ve Functional index",lesson-5,L2,10
+Bölüm 2,2.3,6,day-2-module-3-lesson-6,"pg_stat_user_indexes ile kullanım izleme",lesson-6,L2,10
+Bölüm 2,2.3,7,day-2-module-3-lesson-7,"ANALYZE — istatistikleri güncelle",lesson-7,L2,10
+Bölüm 2,2.4,1,day-2-module-4-lesson-1,"EXPLAIN ANALYZE temelleri",lesson-1,L2,15
+Bölüm 2,2.4,2,day-2-module-4-lesson-2,"Seq Scan, Index Scan, Bitmap Heap Scan",lesson-2,L2,12
+Bölüm 2,2.4,3,day-2-module-4-lesson-3,"Cost ve rows tahmini nasıl okunur?",lesson-3,L2,12
+Bölüm 2,2.4,4,day-2-module-4-lesson-4,"ST_Distance antipattern ve ST_DWithin",lesson-4,L2,12
+Bölüm 2,2.4,5,day-2-module-4-lesson-5,"WHERE içinde fonksiyon kullanımı (sargable)",lesson-5,L2,10
+Bölüm 2,2.4,6,day-2-module-4-lesson-6,"EXPLAIN FORMAT JSON — araçlarla entegrasyon",lesson-6,L2,14
+Bölüm 2,2.5,1,day-2-module-5-lesson-1,"VACUUM ve tablo bloat",lesson-1,L2,10
+Bölüm 2,2.5,2,day-2-module-5-lesson-2,"Range Partitioning — zaman bazlı bölümleme",lesson-2,L2,12
+Bölüm 2,2.5,3,day-2-module-5-lesson-3,"List Partitioning — kategori bazlı bölümleme",lesson-3,L2,10
+Bölüm 2,2.5,4,day-2-module-5-lesson-4,"Partition Pruning — hangi partition atlanır?",lesson-4,L2,13
+Bölüm 2,2.5,5,day-2-module-5-lesson-5,"Tablespace performans stratejisi",lesson-5,L2,10
+Bölüm 3,3.1,1,day-3-module-1-lesson-1,"Mekansal kümeleme: KMeans, DBSCAN, Grid",lesson-1,L3,10
+Bölüm 3,3.1,2,day-3-module-1-lesson-2,"ST_ClusterKMeans — şube optimizasyonu",lesson-2,L3,15
+Bölüm 3,3.1,3,day-3-module-1-lesson-3,"ST_ClusterDBSCAN — kara nokta tespiti",lesson-3,L3,15
+Bölüm 3,3.1,4,day-3-module-1-lesson-4,"Hexagonal grid ile yoğunluk haritası",lesson-4,L3,12
+Bölüm 3,3.1,5,day-3-module-1-lesson-5,"Kümeleme yöntemi karar matrisi",lesson-5,L3,8
+Bölüm 3,3.2,1,day-3-module-2-lesson-1,"Ağ analizi temelleri: düğüm-kenar modeli",lesson-1,L3,10
+Bölüm 3,3.2,2,day-3-module-2-lesson-2,"Ham geometriden ağ topolojisi oluştur",lesson-2,L3,12
+Bölüm 3,3.2,3,day-3-module-2-lesson-3,"Dijkstra: SQL recursive CTE ile en kısa yol",lesson-3,L3,15
+Bölüm 3,3.2,4,day-3-module-2-lesson-4,"Servis alanı: ağ mesafesiyle izokon",lesson-4,L3,12
+Bölüm 3,3.2,5,day-3-module-2-lesson-5,"TSP: çoklu durak güzergah optimizasyonu",lesson-5,L3,11
+Bölüm 3,3.3,1,day-3-module-3-lesson-1,"PostGIS Topology: paylaşımlı kenar kavramı",lesson-1,L3,10
+Bölüm 3,3.3,2,day-3-module-3-lesson-2,"CreateTopology ve TopoGeometry",lesson-2,L3,10
+Bölüm 3,3.3,3,day-3-module-3-lesson-3,"Topolojik güncellemenin avantajı",lesson-3,L3,10
+Bölüm 3,3.4,1,day-3-module-4-lesson-1,"Rol ve yetki modeli: GRANT, REVOKE",lesson-1,L3,10
+Bölüm 3,3.4,2,day-3-module-4-lesson-2,"Row Level Security (RLS) temelleri",lesson-2,L3,12
+Bölüm 3,3.4,3,day-3-module-4-lesson-3,"Mekansal RLS: ST_Within ile bölge bazlı erişim",lesson-3,L3,12
+Bölüm 3,3.4,4,day-3-module-4-lesson-4,"Read-only kullanıcı: GeoServer/QGIS şablonu",lesson-4,L3,11
+Bölüm 3,3.5,1,day-3-module-5-lesson-1,"pg_dump ve pg_restore ile yedekleme",lesson-1,L3,10
+Bölüm 3,3.5,2,day-3-module-5-lesson-2,"Streaming vs Logical Replication",lesson-2,L3,10
+Bölüm 3,3.5,3,day-3-module-5-lesson-3,"PITR: zaman makinesinde geri dön",lesson-3,L3,10
+Bölüm 3,3.5,4,day-3-module-5-lesson-4,"PgBouncer: bağlantı havuzu",lesson-4,L3,10
+Bölüm 3,3.5,5,day-3-module-5-lesson-5,"İzleme: pg_stat_activity, cache hit, dead tuple",lesson-5,L3,5
+Bölüm 3,3.6,1,day-3-module-6-lesson-1,"Proje Görev 1: Veri doğrulama ve kurulum",lesson-1,L3,15
+Bölüm 3,3.6,2,day-3-module-6-lesson-2,"Proje Görev 2: İlçe bazlı sağlık yoğunluğu",lesson-2,L3,15
+Bölüm 3,3.6,3,day-3-module-6-lesson-3,"Proje Görev 3: Erişilemez bölgeler",lesson-3,L3,15
+Bölüm 3,3.6,4,day-3-module-6-lesson-4,"Proje Görev 4: Hotspot analizi ve final rapor",lesson-4,L3,15
