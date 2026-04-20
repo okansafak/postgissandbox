@@ -33,10 +33,10 @@ Yüksek çözünürlüklü il/ülke sınırları binlerce noktadan oluşur. Web'
 )
 SELECT
   ST_NPoints(geom)                         AS nokta_orijinal,
-  ST_NPoints(ST_Simplify(geom, 0.05))      AS nokta_simplify_005,
+  ST_NPoints(ST_Simplify(geom, 0.005))      AS nokta_simplify_0005,
   ST_NPoints(ST_Simplify(geom, 0.1))       AS nokta_simplify_01,
-  ST_NPoints(ST_SimplifyPreserveTopology(geom,0.05)) AS nokta_spt_005,
-  ST_Simplify(geom, 0.05) AS geom
+  ST_NPoints(ST_SimplifyPreserveTopology(geom,0.01)) AS nokta_spt_001,
+  ST_Simplify(geom, 0.01) AS geom
 FROM karmasik;`}
   label="Sadeleştirme karşılaştırması"
   autoFit
