@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getCurriculumTree } from '@/curriculum/structure';
+import { getCurriculumTree, getLessonByRoute, getLessonRoute, getModuleDisplayNumber } from '@/curriculum/structure';
 import { useProgressStore } from '@/store/progressStore';
 import { ArrowLeft, ChevronRight, Check, Dot, Search } from '@/components/ui/Icons';
 
@@ -15,23 +15,28 @@ export default function CurriculumSidebar() {
   const activeDay = params.day ?? '';
   const activeModule = params.module ?? '';
   const activeLesson = params.lesson ?? '';
+  const activeMeta = getLessonByRoute(activeDay, activeModule, activeLesson);
   const completedLessons = useProgressStore((s) => s.completedLessons);
 
   const tree = getCurriculumTree();
   const days = [1, 2, 3] as const;
 
   const [openDays, setOpenDays] = useState<Set<number>>(
-    () => new Set([Number(activeDay.replace('day-', '')) || 1]),
+    () => new Set([(activeMeta?.day ?? Number(activeDay.replace('day-', ''))) || 1]),
   );
   const [openModules, setOpenModules] = useState<Set<string>>(
-    () => new Set([`${activeDay}-${activeModule}`]),
+    () => new Set([
+      activeMeta
+        ? `day-${activeMeta.day}-module-${activeMeta.module}`
+        : `${activeDay}-${activeModule}`,
+    ]),
   );
   const [query, setQuery] = useState('');
 
   function toggleDay(day: number) {
     setOpenDays((prev) => {
       const next = new Set(prev);
-      next.has(day) ? next.delete(day) : next.add(day);
+      if (next.has(day)) { next.delete(day); } else { next.add(day); }
       return next;
     });
   }
@@ -39,7 +44,7 @@ export default function CurriculumSidebar() {
   function toggleModule(key: string) {
     setOpenModules((prev) => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) { next.delete(key); } else { next.add(key); }
       return next;
     });
   }
@@ -103,7 +108,7 @@ export default function CurriculumSidebar() {
             {isOpen && dayNodes.map((node) => {
               const modKey = `day-${node.day}-module-${node.module}`;
               const isModOpen = q ? true : openModules.has(modKey);
-              const isActiveModule = activeDay === `day-${node.day}` && activeModule === `module-${node.module}`;
+              const isActiveModule = activeMeta?.day === node.day && activeMeta?.module === node.module;
 
               return (
                 <div key={modKey}>
@@ -118,23 +123,20 @@ export default function CurriculumSidebar() {
                       className={`shrink-0 transition-transform ${isModOpen ? 'rotate-90' : ''}`}
                     />
                     <span>
-                      {node.day}.{node.module} — {node.moduleTitle}
+                      {node.day}.{getModuleDisplayNumber(node.day, node.module)} — {node.moduleTitle}
                     </span>
                   </button>
 
                   {isModOpen && (
                     <ul>
                       {node.lessons.map((lesson) => {
-                        const isActive =
-                          activeDay === `day-${lesson.day}` &&
-                          activeModule === `module-${lesson.module}` &&
-                          activeLesson === lesson.slug;
+                        const isActive = activeMeta?.id === lesson.id;
                         const done = completedLessons.includes(lesson.id);
 
                         return (
                           <li key={lesson.id}>
                             <Link
-                              to={`/lesson/day-${lesson.day}/module-${lesson.module}/${lesson.slug}`}
+                              to={getLessonRoute(lesson.day, lesson.module, lesson.slug)}
                               className={`flex items-center gap-2 px-6 py-1.5 transition-colors ${
                                 isActive
                                   ? 'bg-primary/20 text-accent font-medium'

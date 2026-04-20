@@ -10,8 +10,9 @@ import { useMapStore } from '@/store/mapStore';
 import { resultToGeoJSON, detectGeometryColumns } from '@/pglite/geojson-adapter';
 
 export default function SqlEditor() {
-  const { sql: currentSql, setSql, setResult, setError, setRunning, isRunning } = useEditorStore();
+  const { sql: currentSql, setSql, setResult, setError, setRunning, isRunning, reset } = useEditorStore();
   const addLayer = useMapStore((s) => s.addLayer);
+  const clearLayers = useMapStore((s) => s.clearLayers);
   const editorViewRef = useRef<EditorView | null>(null);
 
   /** Seçili metin varsa onu, yoksa tüm editörü döndürür */
@@ -52,6 +53,11 @@ export default function SqlEditor() {
     }
   }, [getQueryToRun, isRunning, setRunning, setError, setResult, addLayer]);
 
+  const handleClear = useCallback(() => {
+    reset();
+    clearLayers();
+  }, [reset, clearLayers]);
+
   return (
     <div className="h-full flex flex-col bg-surface">
       {/* Araç çubuğu */}
@@ -72,9 +78,9 @@ export default function SqlEditor() {
           }
         </button>
         <button
-          onClick={() => setSql('')}
+          onClick={handleClear}
           className="px-2 py-1.5 rounded border border-border text-xs text-text-muted hover:text-text transition-colors"
-          title="Editörü temizle"
+          title="Editörü ve haritayı temizle"
         >
           Temizle
         </button>

@@ -8,6 +8,7 @@ import ResultTable from '@/components/results/ResultTable';
 import ExplainPlan from '@/components/results/ExplainPlan';
 import LessonContent from '@/components/lesson/LessonContent';
 import CurriculumSidebar from '@/components/lesson/CurriculumSidebar';
+import { getActualModuleNumber, getModuleDisplayNumber } from '@/curriculum/structure';
 
 interface LessonLayoutProps {
   day: string;
@@ -17,6 +18,11 @@ interface LessonLayoutProps {
 
 export default function LessonLayout({ day, module, lesson }: LessonLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const dayNumber = Number(day.replace('day-', ''));
+  const routeModuleNumber = Number(module.replace('module-', ''));
+  const moduleDisplay = Number.isNaN(dayNumber) || Number.isNaN(routeModuleNumber)
+    ? module.replace('module-', '')
+    : String(getModuleDisplayNumber(dayNumber, getActualModuleNumber(dayNumber, routeModuleNumber)));
 
   return (
     <div className="h-full flex flex-col">
@@ -34,7 +40,7 @@ export default function LessonLayout({ day, module, lesson }: LessonLayoutProps)
         </span>
         <span className="text-border">|</span>
         <span className="text-sm text-text">
-          Bölüm {day.replace('day-', '')} / Modül {module.replace('module-', '')} / Ders{' '}
+          Bölüm {day.replace('day-', '')} / Modül {moduleDisplay} / Ders{' '}
           {lesson.replace('lesson-', '')}
         </span>
       </div>

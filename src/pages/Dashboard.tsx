@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { getCurriculumTree } from '@/curriculum/structure';
+import { getCurriculumTree, getLessonById, getLessonRoute } from '@/curriculum/structure';
 import { useProgressStore } from '@/store/progressStore';
 
 const SECTION_TITLES: Record<number, string> = {
@@ -11,6 +11,15 @@ const SECTION_TITLES: Record<number, string> = {
 export default function Dashboard() {
   const tree = getCurriculumTree();
   const completedLessons = useProgressStore((s) => s.completedLessons);
+  const beginnerStart = getLessonById('day-1-module-1-lesson-1');
+  const postgresFundamentalsStart = getLessonById('day-1-module-0-lesson-1');
+
+  const beginnerStartLink = beginnerStart
+    ? getLessonRoute(beginnerStart.day, beginnerStart.module, beginnerStart.slug)
+    : '/lesson/day-1/module-1/lesson-1';
+  const fundamentalsStartLink = postgresFundamentalsStart
+    ? getLessonRoute(postgresFundamentalsStart.day, postgresFundamentalsStart.module, postgresFundamentalsStart.slug)
+    : '/lesson/day-1/module-2/lesson-1';
 
   const totalLessons = tree.reduce((acc, n) => acc + n.lessons.length, 0);
   const totalCompleted = completedLessons.length;
@@ -50,6 +59,29 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <div className="px-8 py-6 border-b border-border">
+        <h2 className="text-base font-semibold text-text mb-3">Nereden başlamak istersin?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            to={beginnerStartLink}
+            className="p-4 rounded-xl border border-primary/40 bg-primary/10 hover:border-primary transition-colors"
+          >
+            <div className="text-xs uppercase tracking-wider text-accent font-semibold mb-1">Yeni başlayanlar için önerilen</div>
+            <div className="text-sm font-semibold text-text">Bölüm 1.1 · Hoş geldin: Bu platform nasıl çalışır?</div>
+            <div className="text-xs text-text-muted mt-1">Hiç bilmeyenler için en güvenli başlangıç rotası</div>
+          </Link>
+
+          <Link
+            to={fundamentalsStartLink}
+            className="p-4 rounded-xl border border-border bg-surface-2 hover:border-accent transition-colors"
+          >
+            <div className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">Alternatif başlangıç</div>
+            <div className="text-sm font-semibold text-text">Bölüm 1.2 · PostgreSQL Temelleri ve Mimari</div>
+            <div className="text-xs text-text-muted mt-1">Altyapı/mimari konularıyla başlamak isteyenler için</div>
+          </Link>
+        </div>
+      </div>
+
       {/* Section cards */}
       <div className="px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         {days.map((day) => {
@@ -63,7 +95,7 @@ export default function Dashboard() {
           const firstIncomplete = dayLessons.find((l) => !completedLessons.includes(l.id));
           const ctaLesson = firstIncomplete ?? dayLessons[0];
           const ctaLink = ctaLesson
-            ? `/lesson/day-${ctaLesson.day}/module-${ctaLesson.module}/${ctaLesson.slug}`
+            ? getLessonRoute(ctaLesson.day, ctaLesson.module, ctaLesson.slug)
             : `/lesson/day-${day}/module-1/lesson-1`;
           const isStarted = dayCompleted > 0;
 

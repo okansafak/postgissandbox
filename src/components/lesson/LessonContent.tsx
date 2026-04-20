@@ -2,7 +2,7 @@ import { Suspense, useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import RunnableBlock from './RunnableBlock';
-import { getLessonByRoute, getNextLesson, getPrevLesson } from '@/curriculum/structure';
+import { getLessonByRoute, getLessonRoute, getModuleDisplayNumber, getNextLesson, getPrevLesson } from '@/curriculum/structure';
 import { useProgressStore } from '@/store/progressStore';
 import { ArrowLeft } from '@/components/ui/Icons';
 
@@ -210,7 +210,9 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
     setMdxComponent(null);
     setLoadError(null);
 
-    const key = buildGlobKey(day, module, lesson);
+    const mdxDay = meta ? `day-${meta.day}` : day;
+    const mdxModule = meta ? `module-${meta.module}` : module;
+    const key = buildGlobKey(mdxDay, mdxModule, lesson);
     const loader = mdxGlob[key];
 
     if (!loader) {
@@ -221,7 +223,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
     loader()
       .then((mod) => setMdxComponent(() => mod.default))
       .catch((e: unknown) => setLoadError(String(e)));
-  }, [day, module, lesson]);
+  }, [day, module, lesson, meta]);
 
   const lessonId = meta?.id ?? `${day}-${module}-${lesson}`;
   const completed = completedLessons.includes(lessonId);
@@ -237,7 +239,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
           <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
             <span>Bölüm {meta.day}</span>
             <span>·</span>
-            <span>Modül {meta.module}</span>
+            <span>Modül {getModuleDisplayNumber(meta.day, meta.module)}</span>
             <span>·</span>
             <span>{meta.estimatedMinutes} dk</span>
             <span>·</span>
@@ -263,7 +265,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
         <div className="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4">
           {prev ? (
             <Link
-              to={`/lesson/day-${prev.day}/module-${prev.module}/${prev.slug}`}
+              to={getLessonRoute(prev.day, prev.module, prev.slug)}
               className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text"
             >
               <ArrowLeft size={13} /> {prev.title}
@@ -282,7 +284,7 @@ export default function LessonContent({ day, module, lesson }: LessonContentProp
 
           {next ? (
             <Link
-              to={`/lesson/day-${next.day}/module-${next.module}/${next.slug}`}
+              to={getLessonRoute(next.day, next.module, next.slug)}
               className="text-sm text-accent hover:underline"
             >
               {next.title} →

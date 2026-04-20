@@ -60,7 +60,39 @@ export const MODULE_META: ModuleMeta[] = [
   { day: 3, module: 6, title: 'Kapanış Projesi: İstanbul Acil Durum Analizi', durationMinutes: 60 },
 ];
 
-/** Modül 1.0 — PostgreSQL Temelleri ve Mimari */
+const DAY_MODULE_SEQUENCE: Record<number, number[]> = {
+  1: [1, 0, 2, 3, 4, 5],
+  2: [1, 2, 3, 4, 5],
+  3: [1, 2, 3, 4, 5, 6],
+};
+
+function getModuleSequence(day: number): number[] {
+  return DAY_MODULE_SEQUENCE[day] ?? [];
+}
+
+function getModuleRank(day: number, module: number): number {
+  const sequence = getModuleSequence(day);
+  const idx = sequence.indexOf(module);
+  return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+}
+
+export function getModuleDisplayNumber(day: number, module: number): number {
+  const rank = getModuleRank(day, module);
+  return rank === Number.MAX_SAFE_INTEGER ? module : rank + 1;
+}
+
+export function getActualModuleNumber(day: number, moduleDisplay: number): number {
+  if (moduleDisplay <= 0) return moduleDisplay;
+  const sequence = getModuleSequence(day);
+  return sequence[moduleDisplay - 1] ?? moduleDisplay;
+}
+
+export function getLessonRoute(day: number, module: number, lessonSlug: string): string {
+  const displayModule = getModuleDisplayNumber(day, module);
+  return `/lesson/day-${day}/module-${displayModule}/${lessonSlug}`;
+}
+
+/** Modül 1.2 — PostgreSQL Temelleri ve Mimari */
 export const CURRICULUM: Lesson[] = [
   {
     id: 'day-1-module-0-lesson-1', day: 1, module: 0, order: 1,
@@ -1101,8 +1133,12 @@ export function getLessonById(id: string): Lesson | undefined {
 
 /** Gün + modül + slug'a göre bul */
 export function getLessonByRoute(day: string, module: string, lessonSlug: string): Lesson | undefined {
+  const dayNumber = Number(day.replace('day-', ''));
+  const routeModule = Number(module.replace('module-', ''));
+  const actualModule = getActualModuleNumber(dayNumber, routeModule);
+
   return CURRICULUM.find(
-    (l) => l.day === Number(day) && l.module === Number(module.replace('module-', '')) && l.slug === lessonSlug,
+    (l) => l.day === dayNumber && l.module === actualModule && l.slug === lessonSlug,
   );
 }
 
@@ -1116,9 +1152,17 @@ export function getNextLesson(current: Lesson): Lesson | null {
   const sameModule = getLessonsByModule(current.day, current.module);
   const idx = sameModule.findIndex((l) => l.id === current.id);
   if (idx < sameModule.length - 1) return sameModule[idx + 1] ?? null;
-  // Sonraki modülün ilk dersi
-  const nextModuleLessons = getLessonsByModule(current.day, current.module + 1);
-  return nextModuleLessons[0] ?? null;
+
+  const moduleSequence = getModuleSequence(current.day);
+  const currentModuleIdx = moduleSequence.indexOf(current.module);
+  if (currentModuleIdx === -1) return null;
+
+  for (let i = currentModuleIdx + 1; i < moduleSequence.length; i += 1) {
+    const nextModuleLessons = getLessonsByModule(current.day, moduleSequence[i] ?? -1);
+    if (nextModuleLessons.length > 0) return nextModuleLessons[0] ?? null;
+  }
+
+  return null;
 }
 
 /** Önceki ders */
@@ -1126,9 +1170,17 @@ export function getPrevLesson(current: Lesson): Lesson | null {
   const sameModule = getLessonsByModule(current.day, current.module);
   const idx = sameModule.findIndex((l) => l.id === current.id);
   if (idx > 0) return sameModule[idx - 1] ?? null;
-  // Önceki modülün son dersi
-  const prevModuleLessons = getLessonsByModule(current.day, current.module - 1);
-  return prevModuleLessons[prevModuleLessons.length - 1] ?? null;
+
+  const moduleSequence = getModuleSequence(current.day);
+  const currentModuleIdx = moduleSequence.indexOf(current.module);
+  if (currentModuleIdx === -1) return null;
+
+  for (let i = currentModuleIdx - 1; i >= 0; i -= 1) {
+    const prevModuleLessons = getLessonsByModule(current.day, moduleSequence[i] ?? -1);
+    if (prevModuleLessons.length > 0) return prevModuleLessons[prevModuleLessons.length - 1] ?? null;
+  }
+
+  return null;
 }
 
 /** Curriculum ağacı: gün → modül → dersler */
@@ -1141,11 +1193,18 @@ export interface CurriculumNode {
 }
 
 export function getCurriculumTree(): CurriculumNode[] {
-  return MODULE_META.map((meta) => ({
-    day: meta.day,
-    module: meta.module,
-    moduleTitle: meta.title,
-    durationMinutes: meta.durationMinutes,
-    lessons: getLessonsByModule(meta.day, meta.module),
-  })).filter((node) => node.lessons.length > 0);
+  return MODULE_META
+    .slice()
+    .sort((a, b) => {
+      if (a.day !== b.day) return a.day - b.day;
+      return getModuleRank(a.day, a.module) - getModuleRank(b.day, b.module);
+    })
+    .map((meta) => ({
+      day: meta.day,
+      module: meta.module,
+      moduleTitle: meta.title,
+      durationMinutes: meta.durationMinutes,
+      lessons: getLessonsByModule(meta.day, meta.module),
+    }))
+    .filter((node) => node.lessons.length > 0);
 }

@@ -90,8 +90,8 @@ async function runWrappedQuery(
   originalSql: string,
   geomCols: DetectedGeomCol[],
 ): Promise<{ rows: Record<string, unknown>[] }> {
-  // Trailing semicolon temizle
-  const cleanSql = originalSql.replace(/;\s*$/, '');
+  // CTE içine gömerken sondaki yorum/semicolon artıklarını temizle
+  const cleanSql = sanitizeSqlForCte(originalSql);
 
   // Her geometry sütunu için ST_AsGeoJSON(ST_Transform(col, 4326)) ifadesi oluştur
   const geomExpressions = geomCols
@@ -116,6 +116,25 @@ async function runWrappedQuery(
     // Wrapper query başarısız olursa orijinal sonucu dön
     return { rows: [] };
   }
+}
+
+function sanitizeSqlForCte(sql: string): string {
+  let clean = sql.trim();
+
+  // Sondaki yorum + semicolon kombinasyonlarını stabil hale gelene kadar buda
+  // Örn: "SELECT ...; -- yorum" veya "SELECT ...; /* not */"
+  while (true) {
+    const prev = clean;
+    clean = clean
+      .replace(/--[^\n\r]*$/g, '')
+      .replace(/\/\*[\s\S]*?\*\/\s*$/g, '')
+      .replace(/;\s*$/g, '')
+      .trimEnd();
+
+    if (clean === prev) break;
+  }
+
+  return clean;
 }
 
 function buildFeatureCollection(
