@@ -1,13 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
 import path from 'path';
 
 export default defineConfig({
   plugins: [
-    tailwindcss(),
     // MDX enforce:'pre' ile react'tan önce çalışmalı
     { enforce: 'pre', ...mdx({ remarkPlugins: [remarkGfm] }) },
     react(),
