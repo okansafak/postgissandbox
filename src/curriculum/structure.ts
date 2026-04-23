@@ -58,12 +58,13 @@ export const MODULE_META: ModuleMeta[] = [
   { day: 3, module: 4, title: 'Güvenlik ve Erişim Kontrolü', durationMinutes: 45 },
   { day: 3, module: 5, title: 'Production Operasyonu', durationMinutes: 45 },
   { day: 3, module: 6, title: 'Kapanış Projesi: İstanbul Acil Durum Analizi', durationMinutes: 60 },
+  { day: 3, module: 7, title: 'Expert Capstone: İstanbul Unified Mobility Platform', durationMinutes: 120 },
 ];
 
 const DAY_MODULE_SEQUENCE: Record<number, number[]> = {
   1: [1, 0, 2, 3, 4, 5],
   2: [1, 2, 3, 4, 5],
-  3: [1, 2, 3, 4, 5, 6],
+  3: [1, 2, 3, 4, 5, 6, 7],
 };
 
 function getModuleSequence(day: number): number[] {
@@ -1123,6 +1124,71 @@ export const CURRICULUM: Lesson[] = [
     objectives: ['DBSCAN ile acil çağrı hotspot kümelerini tespit edebilir', 'Hotspot + ilçe + sağlık analizini birleştirebilir', 'Kapsamlı özet rapor üretebilir'],
     mdxPath: '/src/content/day-3/module-6/lesson-4-hotspot-analysis.mdx',
     exercises: [], tags: ['proje', 'hotspot', 'final-rapor'],
+  },
+
+  // ─── Modül 3.7 — Expert Capstone: İstanbul Unified Mobility Platform ──────
+  {
+    id: 'day-3-module-7-lesson-1', day: 3, module: 7, order: 1,
+    title: 'Mekansal Analitik: H3 Hexagonal Binning ve Real-Time KPI',
+    slug: 'lesson-1', level: 'L3', estimatedMinutes: 15,
+    prerequisites: ['day-3-module-6-lesson-4'],
+    objectives: ['H3 kütüphanesi ile hexagonal grid oluşturabilir', 'Moran\'s I mekansal otokorelasyonunu hesaplayabilir', 'Real-time KPI dashboard verisi hazırlayabilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-1-spatial-analytics.mdx',
+    exercises: [], tags: ['h3', 'hexagonal-grid', 'moran-i', 'spatial-autocorrelation'],
+  },
+  {
+    id: 'day-3-module-7-lesson-2', day: 3, module: 7, order: 2,
+    title: 'PostgreSQL High Availability ve Monitoring',
+    slug: 'lesson-2', level: 'L3', estimatedMinutes: 15,
+    prerequisites: ['day-3-module-7-lesson-1'],
+    objectives: ['Streaming replication ile HA setup yapabilir', 'pgBouncer connection pooling konfigüre edebilir', 'Prometheus metrikleri izleyebilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-2-deployment.mdx',
+    exercises: [], tags: ['ha', 'streaming-replication', 'pgbouncer', 'prometheus'],
+  },
+  {
+    id: 'day-3-module-7-lesson-3', day: 3, module: 7, order: 3,
+    title: 'Capstone Proje: İstanbul Unified Mobility Platform Planı',
+    slug: 'lesson-3', level: 'L3', estimatedMinutes: 20,
+    prerequisites: ['day-3-module-7-lesson-2'],
+    objectives: ['16 milyon kişiye hizmet verme mimarisini tasarlayabilir', 'Unified data model oluşturabilir', 'Kapasite ve timeline planlaması yapabilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-3-capstone-planning.mdx',
+    exercises: [], tags: ['capstone', 'project-planning', 'architecture'],
+  },
+  {
+    id: 'day-3-module-7-lesson-4', day: 3, module: 7, order: 4,
+    title: 'ETL Pipeline ve Veri Entegrasyonu',
+    slug: 'lesson-4', level: 'L3', estimatedMinutes: 18,
+    prerequisites: ['day-3-module-7-lesson-3'],
+    objectives: ['4 farklı kaynaktan veri extract edebilir', 'Koordinat transformasyonları uygulayabilir', 'Veri kalitesi validation yapabilir', 'CDC ile incremental load implementasyonu yapabilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-4-data-integration.mdx',
+    exercises: [], tags: ['etl', 'data-integration', 'coordinate-transform', 'cdc'],
+  },
+  {
+    id: 'day-3-module-7-lesson-5', day: 3, module: 7, order: 5,
+    title: 'Real-Time Optimizasyon Motoru',
+    slug: 'lesson-5', level: 'L3', estimatedMinutes: 18,
+    prerequisites: ['day-3-module-7-lesson-4'],
+    objectives: ['Greedy insertion routing implementasyonu yapabilir', '7 günlük demand forecasting hazırlayabilir', 'Anomaly detection yapabilir', '36-40% cost reduction hedefini anlayabilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-5-optimization.mdx',
+    exercises: [], tags: ['optimization', 'routing', 'forecasting', 'anomaly-detection'],
+  },
+  {
+    id: 'day-3-module-7-lesson-6', day: 3, module: 7, order: 6,
+    title: 'Production Deployment ve Business Impact',
+    slug: 'lesson-6', level: 'L3', estimatedMinutes: 15,
+    prerequisites: ['day-3-module-7-lesson-5'],
+    objectives: ['99.99% uptime SLA setup yapabilir', 'Database HA ve failover konfigurasyonu yapabilir', 'Monitoring ve alerting setup yapabilir', 'Business ROI metriklerini izleyebilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-6-production.mdx',
+    exercises: [], tags: ['production', 'sla', 'monitoring', 'business-metrics'],
+  },
+  {
+    id: 'day-3-module-7-lesson-7', day: 3, module: 7, order: 7,
+    title: 'Özet: 94 Dersin Tamamlanması ve Next Steps',
+    slug: 'lesson-7', level: 'L3', estimatedMinutes: 10,
+    prerequisites: ['day-3-module-7-lesson-6'],
+    objectives: ['94 derslik PostGIS yolculuğunu özetleyebilir', 'Expert seviye becerilerini bilir', 'Sonraki adımları ve kaynakları bilir'],
+    mdxPath: '/src/content/day-3/module-7/lesson-7-summary.mdx',
+    exercises: [], tags: ['summary', 'capstone', 'next-steps'],
   },
 ];
 

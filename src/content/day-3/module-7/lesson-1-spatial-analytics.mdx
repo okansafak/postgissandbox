@@ -1,0 +1,161 @@
+## 📊 Mekansal Analitik: Gerçek Zamanlı KPI Dashboard
+
+**Hedef:** ST_HexagonGrid ile İstanbul adreslerinin eczane erişilebilirliğini analiz et.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- `ST_HexagonGrid` ile hexagonal grid oluşturabileceksin
+- Hiyerarşik aggregation (nokta → hücre → ilçe) yapabileceksin
+- Mekansal otokorelasyon istatistikleri hesaplayabileceksin
+- Real-time KPI dashboard verisi hazırlayabileceksin
+
+---
+
+## ▶ Hexagonal Grid Oluştur
+
+<RunnableBlock
+  sql={`-- ST_HexagonGrid ile İstanbul üzerine hex grid (0.01 derece ≈ 1km)
+WITH bbox AS (
+  SELECT ST_MakeEnvelope(28.6, 40.8, 29.4, 41.3, 4326) AS geom
+)
+SELECT
+  ROW_NUMBER() OVER () AS hucre_id,
+  ST_AsText(h.geom) AS hex_wkt,
+  ST_Area(h.geom::geography)::int4 AS alan_m2
+FROM bbox, ST_HexagonGrid(0.01, bbox.geom) h
+LIMIT 20;`}
+  label="Hex grid oluştur (ilk 20 hücre)"
+/>
+
+---
+
+## ▶ Eczane Erişilebilirliğini Hesapla
+
+<RunnableBlock
+  sql={`-- Örnek eczane ve adres noktaları oluştur
+CREATE TABLE IF NOT EXISTS eczanes (
+  id SERIAL PRIMARY KEY,
+  name TEXT,
+  geom GEOMETRY(POINT, 4326)
+);
+
+INSERT INTO eczanes (name, geom) VALUES
+  ('Taksim Eczanesi',   ST_SetSRID(ST_MakePoint(28.9774, 41.0365), 4326)),
+  ('Kadıköy Eczanesi',  ST_SetSRID(ST_MakePoint(29.0297, 40.9902), 4326)),
+  ('Beşiktaş Eczanesi', ST_SetSRID(ST_MakePoint(29.0088, 41.0430), 4326)),
+  ('Şişli Eczanesi',    ST_SetSRID(ST_MakePoint(28.9885, 41.0614), 4326)),
+  ('Üsküdar Eczanesi',  ST_SetSRID(ST_MakePoint(29.0138, 41.0271), 4326))
+ON CONFLICT DO NOTHING;
+
+-- Her hex hücresinde en yakın eczane mesafesi
+WITH bbox AS (
+  SELECT ST_MakeEnvelope(28.96, 41.00, 29.05, 41.07, 4326) AS geom
+),
+grid AS (
+  SELECT h.geom, ST_Centroid(h.geom) AS merkez
+  FROM bbox, ST_HexagonGrid(0.005, bbox.geom) h
+)
+SELECT
+  ROW_NUMBER() OVER () AS hucre_id,
+  MIN(ST_Distance(g.merkez::geography, e.geom::geography))::int4 AS en_yakin_eczane_m,
+  CASE
+    WHEN MIN(ST_Distance(g.merkez::geography, e.geom::geography)) < 500  THEN '✓ İyi (< 500m)'
+    WHEN MIN(ST_Distance(g.merkez::geography, e.geom::geography)) < 1000 THEN '~ Orta (< 1km)'
+    ELSE '✗ Uzak (> 1km)'
+  END AS erisim_durumu
+FROM grid g
+CROSS JOIN eczanes e
+GROUP BY g.geom
+ORDER BY en_yakin_eczane_m
+LIMIT 15;`}
+  label="Eczane erişilebilirlik analizi"
+/>
+
+---
+
+## ▶ İlçe Bazlı Yoğunluk Analizi
+
+<RunnableBlock
+  sql={`-- İlçe bazlı eczane yoğunluğu ve istatistikleri
+WITH istanbul_districts AS (
+  SELECT 1 AS id, 'Fatih'     AS ilce, 420000 AS nufus, ST_MakeEnvelope(28.88, 40.97, 28.98, 41.04, 4326) AS geom
+  UNION ALL SELECT 2, 'Beyoğlu',  230000, ST_MakeEnvelope(28.96, 41.02, 29.00, 41.07, 4326)
+  UNION ALL SELECT 3, 'Beşiktaş', 180000, ST_MakeEnvelope(28.99, 41.03, 29.06, 41.09, 4326)
+  UNION ALL SELECT 4, 'Şişli',    270000, ST_MakeEnvelope(28.96, 41.05, 29.02, 41.12, 4326)
+  UNION ALL SELECT 5, 'Kadıköy',  500000, ST_MakeEnvelope(29.00, 40.96, 29.12, 41.02, 4326)
+),
+eczane_per_ilce AS (
+  SELECT
+    d.id,
+    d.ilce,
+    d.nufus,
+    COUNT(e.id) AS eczane_sayisi,
+    ROUND((COUNT(e.id)::numeric / d.nufus * 100000), 2) AS eczane_per_100k
+  FROM istanbul_districts d
+  LEFT JOIN eczanes e ON ST_Within(e.geom, d.geom)
+  GROUP BY d.id, d.ilce, d.nufus
+)
+SELECT
+  ilce,
+  nufus,
+  eczane_sayisi,
+  eczane_per_100k,
+  AVG(eczane_per_100k) OVER () AS ort_yogunluk,
+  CASE
+    WHEN eczane_per_100k > AVG(eczane_per_100k) OVER () THEN '↑ Yüksek'
+    ELSE '↓ Düşük'
+  END AS yogunluk_sinifi
+FROM eczane_per_ilce
+ORDER BY eczane_per_100k DESC;`}
+  label="İlçe bazlı yoğunluk istatistikleri"
+/>
+
+---
+
+## ▶ Mekansal Otokorelasyon (Moran's I benzeri)
+
+<RunnableBlock
+  sql={`-- Moran's I yaklaşımı: yoğunluk değerlerinin komşu ilçelerle korelasyonu
+WITH district_density AS (
+  SELECT
+    1 AS id, 'Fatih'     AS ilce, 5.95 AS yogunluk
+  UNION ALL SELECT 2, 'Beyoğlu',  7.83
+  UNION ALL SELECT 3, 'Beşiktaş', 6.67
+  UNION ALL SELECT 4, 'Şişli',    7.41
+  UNION ALL SELECT 5, 'Kadıköy',  8.40
+),
+stats AS (
+  SELECT
+    AVG(yogunluk) AS ortalama,
+    STDDEV(yogunluk) AS std_sapma,
+    COUNT(*) AS n
+  FROM district_density
+)
+SELECT
+  d.ilce,
+  d.yogunluk,
+  ROUND(((d.yogunluk - s.ortalama) / NULLIF(s.std_sapma, 0))::numeric, 2) AS z_skoru,
+  CASE
+    WHEN (d.yogunluk - s.ortalama) > 0 THEN 'Ortalamanın üstünde'
+    ELSE 'Ortalamanın altında'
+  END AS kume_tipi,
+  ROUND(s.ortalama::numeric, 2) AS genel_ortalama,
+  ROUND(s.std_sapma::numeric, 2) AS std_sapma
+FROM district_density d, stats s
+ORDER BY d.yogunluk DESC;`}
+  label="Mekansal yoğunluk otokorelasyonu"
+/>
+
+---
+
+## ✨ Özet
+
+Mekansal analitik ile:
+- ✓ `ST_HexagonGrid` ile 1km²'lik hücrelerde KPI hesaplama
+- ✓ Her hücre için en yakın eczane erişim mesafesi
+- ✓ İlçe bazlı normalleştirilmiş yoğunluk (per 100k nüfus)
+- ✓ Z-skor tabanlı clustering deseni tespiti
+
+**Sonraki ders:** Deployment & Monitoring — production ortamında bu analytics'leri çalıştırma

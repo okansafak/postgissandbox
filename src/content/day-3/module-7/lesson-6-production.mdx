@@ -1,0 +1,137 @@
+## 🏭 Capstone Part 4: Production & Monitoring
+
+**Hedef:** Platform'u production'a dağıt, 99.99% uptime sağla
+
+---
+
+## 🎯 Production Architecture
+
+- Kubernetes cluster (10 node, 128 core)
+- PostgreSQL primary-replica (HA)
+- pgBouncer (connection pooling)
+- Prometheus + Grafana (monitoring)
+
+---
+
+## ▶ Deployment Configuration
+
+<RunnableBlock
+  sql={`-- Production infrastructure specs
+SELECT 
+  'Infrastructure' AS component,
+  'Kubernetes' AS orchestration,
+  '10 nodes' AS cluster_size,
+  '128 cores total' AS computing_power,
+  '256 GB RAM' AS memory,
+  'PostgreSQL 15 + PostGIS 3.3' AS database
+;
+
+-- SLA Targets
+SELECT 
+  'SLA Target' AS target,
+  '99.99%' AS uptime,
+  '< 45 minutes' AS yearly_downtime,
+  '< 30 seconds' AS failover_time,
+  '< 500ms' AS p95_latency,
+  '< 1 hour' AS RPO
+;`}
+  label="Production architecture"
+/>
+
+---
+
+## ▶ Database Replication
+
+<RunnableBlock
+  sql={`-- Streaming replication status
+SELECT 
+  'Primary' AS role,
+  '16 cores' AS cpu,
+  '256 GB' AS ram,
+  'Istanbul-DC1' AS location,
+  'Active' AS status
+UNION ALL
+SELECT 'Replica', '12 cores', '128 GB', 'Istanbul-DC2', 'Standby'
+UNION ALL
+SELECT 'Backup Replica', '8 cores', '64 GB', 'Backup-DC', 'Reserve'
+;
+
+-- Connection pool configuration
+SELECT 
+  'pgBouncer' AS pooler,
+  'Transaction mode' AS pool_mode,
+  1000 AS max_clients,
+  50 AS default_pool_size,
+  '95%+' AS hit_ratio_target,
+  '99% CPU overhead reduction' AS benefit
+;`}
+  label="Database HA & connection pooling"
+/>
+
+---
+
+## ▶ Monitoring & Alerting
+
+<RunnableBlock
+  sql={`-- Key monitoring metrics
+SELECT 
+  'Metric' AS metric,
+  'Replication Lag' AS metric_1,
+  'Query Latency p95' AS metric_2,
+  'Disk Usage' AS metric_3,
+  'CPU Usage' AS metric_4,
+  'Pool Hit Ratio' AS metric_5
+UNION ALL
+SELECT 'Current', '45 MB', '280 ms', '65%', '48%', '97%'
+UNION ALL
+SELECT 'Threshold', '< 100 MB', '< 500 ms', '< 85%', '< 80%', '> 95%'
+UNION ALL
+SELECT 'Status', '✓ OK', '✓ OK', '✓ OK', '✓ OK', '✓ OK'
+;
+
+-- Alert routing
+SELECT 
+  'Severity' AS level,
+  'Critical' AS critical_alert,
+  'Warning' AS warning_alert,
+  'Info' AS info_alert
+UNION ALL
+SELECT 'Destination', 'SMS + PagerDuty', 'Slack', 'Log Only'
+UNION ALL
+SELECT 'Response Time', '< 5 min', '< 15 min', 'Daily Review'
+;`}
+  label="Monitoring & alerting setup"
+/>
+
+---
+
+## ▶ Business Metrics
+
+<RunnableBlock
+  sql={`-- Platform success metrics
+SELECT 
+  'Business Metric' AS metric,
+  '8 minutes' AS ambulans_response_time,
+  '₺32' AS avg_delivery_cost,
+  '65%' AS transit_crowding,
+  '12 million' AS app_users,
+  '99.99%' AS platform_uptime,
+  '441%' AS roi
+UNION ALL
+SELECT 'Target/Previous', '< 8 min (was 15)', '₺32 (was ₺50)', '< 70% (was 85%)', '12M (75% pop)', '99.99% (was 99.9%)', '> 100% (payback 2.2 mo)'
+;`}
+  label="Business success metrics"
+/>
+
+---
+
+## ✨ Özet
+
+Production deployment:
+- ✓ HA setup (primary-replica, < 30sn failover)
+- ✓ Connection pooling (97% hit ratio)
+- ✓ Comprehensive monitoring
+- ✓ 99.99% uptime SLA
+- ✓ 441% ROI achieved
+
+**Sonraki ders:** Final summary

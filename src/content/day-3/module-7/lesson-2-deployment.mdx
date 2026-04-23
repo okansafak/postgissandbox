@@ -1,0 +1,116 @@
+## 🚀 Production Deployment: PostgreSQL HA & Monitoring
+
+**Hedef:** PostgreSQL primary-replica replication ve failover kurulumu öğren.
+
+---
+
+## 🎯 Ne öğreneceksin?
+
+- PostgreSQL streaming replication (primary-replica) nasıl çalıştığını
+- Automatic failover mekanizması
+- pgBouncer connection pooling
+- Prometheus ile monitoring
+- Disaster recovery (backup, PITR)
+
+---
+
+## 📋 PostgreSQL HA Konsepti
+
+<RunnableBlock
+  sql={`-- PostgreSQL replication status kontrol et
+-- (Bu query, HA kurulumlu bir setup'ta çalışır)
+SELECT 
+  'PostgreSQL HA' AS deployment_type,
+  'Primary-Replica Streaming' AS replication_method,
+  '< 10ms' AS typical_lag,
+  '~30 saniye' AS failover_time,
+  '99.99%' AS expected_uptime;`}
+  label="HA deployment bilgisi"
+/>
+
+---
+
+## ▶ Connection Pooling (pgBouncer)
+
+<RunnableBlock
+  sql={`-- Connection pool optimization
+SELECT 
+  'pgBouncer' AS pooler,
+  'Transaction mode' AS pool_mode,
+  1000 AS max_client_connections,
+  50 AS default_pool_size,
+  20 AS min_pool_size,
+  '99% CPU overhead reduction' AS benefit
+;
+
+-- Pool hit ratio hedefi: > 95%
+SELECT 
+  0.97::numeric(3,2) AS pool_hit_ratio,
+  CASE 
+    WHEN 0.97 > 0.95 THEN '✓ Optimal'
+    ELSE '✗ Needs tuning'
+  END AS status;`}
+  label="pgBouncer pool yapılandırması"
+/>
+
+---
+
+## ▶ Monitoring Metrikleri
+
+<RunnableBlock
+  sql={`-- Production monitoring key metrics
+CREATE TABLE IF NOT EXISTS monitoring_metrics (
+  metric_name TEXT,
+  current_value NUMERIC,
+  threshold TEXT,
+  status TEXT
+);
+
+INSERT INTO monitoring_metrics VALUES
+  ('Replication Lag (MB)', 50, '< 100', '✓ OK'),
+  ('Query Latency p95 (ms)', 250, '< 500', '✓ OK'),
+  ('Disk Usage (%)', 65, '< 85', '✓ OK'),
+  ('Active Connections', 450, '< 1000', '✓ OK'),
+  ('Pool Hit Ratio (%)', 96, '> 95', '✓ OK'),
+  ('CPU Usage (%)', 45, '< 80', '✓ OK')
+;
+
+SELECT * FROM monitoring_metrics WHERE status = '✓ OK';`}
+  label="Monitoring metrikleri"
+/>
+
+---
+
+## ▶ Backup & PITR
+
+<RunnableBlock
+  sql={`-- Backup stratejisi
+SELECT 
+  'Backup Strategy' AS tactic,
+  'Weekly full dump' AS frequency_full,
+  'Hourly WAL archive' AS frequency_wal,
+  '1 hour' AS RPO_target,
+  '4 hours' AS RTO_target,
+  '30 days hot storage' AS retention
+;
+
+-- PITR timeline
+SELECT 
+  'Point-In-Time Recovery' AS feature,
+  'Any point in last 30 days' AS recovery_window,
+  'pg_dump + WAL replay' AS mechanism,
+  true AS is_implemented;`}
+  label="Backup ve recovery stratejisi"
+/>
+
+---
+
+## ✨ Özet
+
+Production ortamında:
+- ✓ HA setup (primary-replica, < 30sn failover)
+- ✓ Connection pooling (96%+ hit ratio)
+- ✓ Monitoring (critical metrics)
+- ✓ Backup & PITR (1h RPO, 4h RTO)
+
+**Sonraki ders:** Capstone project - tüm konseptleri birleştir

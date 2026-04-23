@@ -1,0 +1,116 @@
+## 🏗️ Capstone Part 1: İstanbul Unified Mobility Platform
+
+**Hedef:** Gerçek dünya projesini plan et - 16 milyon kişiye hizmet veren mobility platform.
+
+---
+
+## 🎯 Proje Tanımı
+
+İstanbul Belediyesi'nin ihtiyaç duyduğu:
+- **Transit:** 500 tramvay istasyonu, 1000+ otobüs hattı
+- **Emergency:** 500+ itfaiye, 400+ ambulans
+- **Logistics:** 50,000+ aktif araç (kargo, yemek, vb)
+
+---
+
+## ▶ Veri Modeli
+
+<RunnableBlock
+  sql={`-- Unified geographic_features core table
+CREATE TABLE IF NOT EXISTS geographic_features (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  geom GEOMETRY(POINT, 4326),
+  feature_type VARCHAR(50),
+  domain VARCHAR(50),
+  attributes JSONB
+);
+
+-- Sample data: İstanbul'un temel noktaları
+INSERT INTO geographic_features (name, geom, feature_type, domain, attributes) VALUES
+  ('Taksim', ST_SetSRID(ST_MakePoint(28.9850, 41.0368), 4326), 'landmark', 'transit', '{"station_type": "tram"}'),
+  ('Kadıköy Hastanesi', ST_SetSRID(ST_MakePoint(29.0306, 40.9897), 4326), 'facility', 'emergency', '{"type": "hospital"}'),
+  ('Pendik Lojistik Merkezi', ST_SetSRID(ST_MakePoint(29.2408, 40.8621), 4326), 'facility', 'logistics', '{"type": "warehouse"}')
+;
+
+SELECT COUNT(*) AS feature_count, domain FROM geographic_features GROUP BY domain;`}
+  label="Unified data model"
+/>
+
+---
+
+## ▶ Capacity Planning
+
+<RunnableBlock
+  sql={`-- Capacity requirements
+SELECT 
+  'Platform Size' AS metric,
+  '16,000,000' AS population_served,
+  '2,300,000' AS addresses,
+  '39' AS districts,
+  '86.4 million' AS daily_events_estimate,
+  '1000' AS concurrent_users,
+  '99.99%' AS uptime_sla
+;
+
+-- Storage estimate
+SELECT 
+  'Storage Requirement' AS component,
+  '50 GB' AS addresses_storage,
+  '10 GB' AS transit_network,
+  '5 GB' AS events_30days,
+  '2 GB' AS indexes,
+  '67 GB' AS total_minimum
+;
+
+-- Performance targets
+SELECT 
+  'Performance SLA' AS target,
+  '< 2 seconds' AS dashboard_load,
+  '< 500ms' AS drill_down,
+  '< 100ms' AS map_interaction,
+  '99.99%' AS uptime
+;`}
+  label="Platform capacity planning"
+/>
+
+---
+
+## ▶ Implementation Timeline
+
+<RunnableBlock
+  sql={`-- Project timeline
+SELECT 
+  'Phase' AS phase,
+  '1-2 weeks' AS data_ingestion,
+  '3-4 weeks' AS etl_pipeline,
+  '5-6 weeks' AS analytics_layer,
+  '7-8 weeks' AS optimization_engine,
+  '9-10 weeks' AS integration,
+  '11-12 weeks' AS testing,
+  '13-14 weeks' AS cutover,
+  '15 weeks' AS total_duration
+;
+
+-- Risk assessment
+SELECT 
+  'Risk Factor' AS factor,
+  'Data Quality' AS risk_1,
+  'Performance at Scale' AS risk_2,
+  'Integration Complexity' AS risk_3,
+  'Migration Timeline' AS risk_4
+WHERE true;`}
+  label="Implementation timeline ve risk assessment"
+/>
+
+---
+
+## ✨ Özet
+
+Capstone planning:
+- ✓ 16 milyon kişiye hizmet verme
+- ✓ 3 domain entegrasyonu (transit, emergency, logistics)
+- ✓ 99.99% uptime hedefi
+- ✓ 15 haftalık implementation
+
+**Sonraki ders:** ETL ve data integration
