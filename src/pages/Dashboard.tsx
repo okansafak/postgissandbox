@@ -40,12 +40,22 @@ export default function Dashboard() {
           <h1 className="text-2xl font-semibold text-text">PostGIS Akademi</h1>
           <p className="text-sm text-text-muted mt-0.5">Tarayıcıda çalışan PostGIS öğrenme platformu</p>
         </div>
-        <Link
-          to="/lesson/day-1/module-1/lesson-1"
-          className="px-4 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text-muted hover:text-text hover:border-accent transition-colors"
-        >
-          Oyun Alanı →
-        </Link>
+        <div className="flex items-center gap-2">
+          <a
+            href="/sunum/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/40 text-sm text-accent hover:bg-primary/20 hover:border-primary transition-colors"
+          >
+            Sunuma Git ↗
+          </a>
+          <Link
+            to="/lesson/day-1/module-1/lesson-1"
+            className="px-4 py-2 rounded-lg bg-surface-2 border border-border text-sm text-text-muted hover:text-text hover:border-accent transition-colors"
+          >
+            Oyun Alanı →
+          </Link>
+        </div>
       </div>
 
       {/* Global progress */}

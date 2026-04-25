@@ -21,6 +21,8 @@ No test runner is wired up yet (Vitest is a dependency but not configured).
 
 PGlite (PostgreSQL compiled to WASM) runs in a dedicated Web Worker and persists data to IndexedDB (`idb://postgis-akademi`). The app has no server and is deployable as a static site.
 
+`initDb()` is called eagerly at module load in `App.tsx` — not lazily — so the worker is always warming up on first render.
+
 ### Worker ↔ UI Protocol
 
 `src/pglite/worker.ts` initializes PGlite + PostGIS extension, then handles messages. `src/pglite/client.ts` sends tagged requests and matches responses via a `Map<id, {resolve,reject}>`. Requests time out after 30 seconds.
@@ -33,17 +35,23 @@ PGlite (PostgreSQL compiled to WASM) runs in a dedicated Web Worker and persists
 
 When you add a new MDX file, you must also update the `LESSON_FILENAME` map in [src/components/lesson/LessonContent.tsx](src/components/lesson/LessonContent.tsx). This hardcoded map translates `lesson-N` route slugs to the actual MDX filename (e.g., `lesson-2` → `lesson-2-create-topology`). Missing entries cause a "MDX dosyası bulunamadı" error at runtime.
 
-Lesson metadata (title, estimatedMinutes, level, tags, objectives) lives in `src/curriculum/structure.ts`. The sidebar, breadcrumbs, prev/next navigation, and exercise validation all derive from this file.
+MDX files are loaded via `import.meta.glob('../../content/**/*.mdx')`. LessonContent first checks `LESSON_FILENAME` for the full filename, then falls back to the raw slug.
 
-### Module Numbering
+Lesson metadata (title, estimatedMinutes, level, tags, objectives) lives in `src/curriculum/structure.ts`. The sidebar, breadcrumbs, prev/next navigation, and exercise validation all derive from this file. `lessons.csv` in the project root is a reference/audit document only — it is **not** imported by any code.
 
-`day-1/module-0` is a PostgreSQL refresher (Day 0 content) that is displayed as Module 0. The route uses the actual module number; `getModuleDisplayNumber(day, module)` converts to the display number shown in the UI.
+### Module Numbering and Routing
+
+`DAY_MODULE_SEQUENCE` in `structure.ts` defines the module order per day (e.g., day 1: `[1, 0, 2, 3, 4, 5]`). Module 0 is the PostgreSQL refresher shown as "Module 0" in the UI.
+
+**Critical:** The URL segment `module-N` uses the **display number**, not the actual module index. `getModuleDisplayNumber(day, module)` converts actual → display; `getActualModuleNumber(day, display)` reverses it. Always use these helpers when building or parsing lesson routes.
 
 ### MDX Components
 
-MDX files can use `<RunnableBlock sql="..." />`, which loads the SQL into the editor when the button is clicked — it does **not** auto-execute. The component map is defined in `LessonContent.tsx` (`mdxComponents`).
+MDX files can use `<RunnableBlock sql="..." />`, which loads the SQL into the editor when the button is clicked — it does **not** auto-execute. Optional props:
+- `description` — shows a toggleable explanation panel (blue background)
+- `label` — custom button text (default: "Editöre Yükle ve Çalıştır")
 
-Standard HTML elements (`h1`–`h3`, `p`, `ul`, `ol`, `code`, `pre`, `blockquote`, `table`, etc.) are overridden with Tailwind-styled versions.
+The component map is defined in `LessonContent.tsx` (`mdxComponents`). Standard HTML elements (`h1`–`h3`, `p`, `ul`, `ol`, `code`, `pre`, `blockquote`, `table`, etc.) are overridden with Tailwind-styled versions.
 
 ### Geometry Auto-Detection
 
@@ -51,13 +59,17 @@ Standard HTML elements (`h1`–`h3`, `p`, `ul`, `ol`, `code`, `pre`, `blockquote
 1. A hardcoded set of OIDs (`17001`, `17002`, `17003` — typical PostGIS geometry OIDs in PGlite)
 2. Value inspection fallback: strings that parse as GeoJSON or match hex WKB pattern
 
-When geometry columns are detected, the adapter runs a **wrapper query** wrapping the original SQL in a CTE and selecting `ST_AsGeoJSON(ST_Transform(geom, 4326))` for each geometry column. Results render automatically in the OpenLayers map.
+When geometry columns are detected, the adapter strips trailing semicolons/comments from the original SQL and wraps it in a CTE, selecting `ST_AsGeoJSON(ST_Transform(geom, 4326))` for each geometry column. Results render automatically in the OpenLayers map.
+
+### Map (SpatialMap)
+
+Default center is Turkey `[35, 39]` at zoom 5 with CARTO dark_all tiles. Auto-zoom uses `vectorSource.getExtent()` + `view.fit()` with 40 px padding, max zoom 16, and a 500 ms animation, triggered via `mapStore.shouldFit` / `fitHandled` flags. `mapStore.layers` is **replaced** (not appended) on each query that returns geometry.
 
 ### Exercise Validation
 
 `src/exercises/validator.ts` supports four validation kinds defined in `src/curriculum/structure.ts`:
 - `rowCount` — exact row count match
-- `exactRows` — deep row comparison (numbers rounded to 3 decimals), with optional order checking
+- `exactRows` — deep row comparison (numbers rounded to 3 decimals), with optional `orderMatters` flag
 - `geometryEquals` — stub, always passes (Phase 2)
 - `customValidator` — arbitrary `(rows) => boolean` function
 
@@ -67,17 +79,20 @@ When geometry columns are detected, the adapter runs a **wrapper query** wrappin
 
 ### State
 
-- `editorStore` — `sql`, `result`, `error`, `isRunning`; `STARTER_SQL` is the initial SELECT on app load
+- `editorStore` — `sql`, `result`, `error`, `isRunning`; `STARTER_SQL` is the initial SELECT on app load; no persistence
 - `mapStore` — `layers` (GeoJSON FeatureCollections), `shouldFit` / `fitHandled` flags for auto-zoom
-- `progressStore` — `completedLessons: string[]`, persisted to `localStorage`
+- `progressStore` — `completedLessons: string[]`, persisted to `localStorage` under key `postgis-akademi-progress`
+
+`CurriculumSidebar` persists its open/collapsed state to `localStorage` under keys `sidebar-open-days` and `sidebar-open-modules`. When a search query is active, all days and modules auto-expand.
 
 ### TypeScript
 
-Strict mode with `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noUnusedLocals`, `noUnusedParameters`. Build fails on violations.
+Strict mode with `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noUnusedLocals`, `noUnusedParameters`. Build fails on violations. `Lesson.day` is a strict literal union `0|1|2|3`, not `number`.
 
 ### Vite Config
 
 - PGlite packages excluded from esbuild optimization (`optimizeDeps.exclude`) — they are native ES modules
+- `assetsInclude: ['**/*.tar.gz']` — required for the PostGIS WASM extension bundle
 - Web Worker output format must be `'es'`
 - MDX rollup plugin must run with `enforce: 'pre'`
 - Path alias: `@` → `src/`
