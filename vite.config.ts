@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import mdx from '@mdx-js/rollup';
 import remarkGfm from 'remark-gfm';
 import path from 'path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, cpSync } from 'node:fs';
 import { extname } from 'node:path';
 
 export default defineConfig({
@@ -31,6 +31,12 @@ export default defineConfig({
           res.writeHead(200, { 'Content-Type': mimeMap[extname(filePath)] ?? 'text/plain' });
           res.end(readFileSync(filePath));
         });
+      },
+      closeBundle() {
+        // Production build: sunum/ → dist/sunum/
+        const src = path.join(__dirname, 'sunum');
+        const dest = path.join(__dirname, 'dist', 'sunum');
+        if (existsSync(src)) cpSync(src, dest, { recursive: true });
       },
     },
   ],
