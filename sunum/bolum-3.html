@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostGIS Akademi — Bölüm 3: Production, Ağ Analizi ve Proje</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      :root { --blue:#2563eb;--blue-light:#dbeafe;--teal:#0d9488;--teal-light:#ccfbf1;--white:#ffffff;--s50:#f8fafc;--s200:#e2e8f0;--s600:#475569;--s800:#1e293b;--s900:#0f172a;--border:rgba(255,255,255,0.08); }
+      * { box-sizing:border-box;margin:0;padding:0; }
+      body { font-family:'Inter',system-ui,sans-serif;background:linear-gradient(160deg,#0a1628 0%,#0e1d38 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column; }
+      .nav { position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:11px 28px;background:rgba(10,22,40,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border); }
+      .nav-brand { font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue); }
+      .nav-links { display:flex;gap:6px; }
+      .nav-links a { font-size:.76rem;color:rgba(255,255,255,.5);text-decoration:none;padding:5px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);transition:all 140ms; }
+      .nav-links a:hover { color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.06); }
+      .nav-links a.current { color:#fff;background:var(--blue);border-color:var(--blue); }
+      .progress { height:2px;background:rgba(255,255,255,.08); }
+      .progress-fill { height:100%;background:var(--blue);transition:width 250ms ease; }
+      .deck-outer { flex:1;display:flex;align-items:center;justify-content:center;padding:32px 20px 108px; }
+      .deck { width:min(980px,100%); }
+      .slide { display:none;background:var(--white);color:var(--s900);border-radius:16px;border-left:5px solid var(--blue);box-shadow:0 16px 48px rgba(0,0,0,.45);animation:appear 260ms ease; }
+      .slide.active { display:block; }
+      .slide-body { padding:36px 44px; }
+      .kicker { font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--blue);margin-bottom:10px; }
+      .slide h1 { font-size:clamp(1.7rem,3vw,2.6rem);font-weight:700;line-height:1.18;color:var(--s900);margin-bottom:10px;letter-spacing:-.01em; }
+      .slide h2 { font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:700;line-height:1.25;color:var(--s900);margin-bottom:10px; }
+      .slide-sub { font-size:.95rem;color:var(--s600);line-height:1.65;margin-bottom:18px;max-width:70ch; }
+      .hook { background:var(--blue-light);border-left:4px solid var(--blue);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .hook-header { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
+      .hook-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);margin-bottom:0; }
+      .hook p { font-size:.9rem;color:var(--s800);line-height:1.55;font-style:italic; }
+      .case { background:var(--teal-light);border-left:4px solid var(--teal);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .case-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--teal);margin-bottom:5px; }
+      .case p { font-size:.9rem;color:var(--s800);line-height:1.55; }
+      .phases { display:flex;flex-direction:column;gap:6px;margin-top:10px; }
+      .phase { display:flex;gap:12px;align-items:flex-start;background:var(--s50);border-radius:8px;padding:9px 13px; }
+      .phase-tag { display:flex;align-items:center;gap:5px;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blue);flex-shrink:0;min-width:108px;white-space:nowrap;padding-top:2px; }
+      .phase-body { flex:1;min-width:0; }
+      .phase-body p { font-size:.86rem;color:var(--s800);line-height:1.52;margin:0; }
+      code { font-family:'IBM Plex Mono',monospace;font-size:.81em;background:var(--s200);color:#1d4ed8;padding:1px 5px;border-radius:4px; }
+      .cta { display:inline-flex;align-items:center;gap:8px;margin-top:22px;background:var(--blue);color:var(--white);text-decoration:none;padding:11px 22px;border-radius:10px;font-weight:600;font-size:.88rem;transition:background 140ms; }
+      .cta:hover { background:#1d4ed8; }
+      .ctrl-bar { position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 24px;background:rgba(10,22,40,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border); }
+      .ctrl-btn { border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px 20px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(255,255,255,.07);color:#fff;transition:all 140ms; }
+      .ctrl-btn:hover:not(:disabled) { background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.38); }
+      .ctrl-btn:disabled { opacity:.28;cursor:not-allowed; }
+      .ctrl-status { font-size:.82rem;color:rgba(255,255,255,.5);min-width:240px;text-align:center; }
+      .q-btn { display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--blue);background:transparent;color:var(--blue);font-size:.68rem;font-weight:700;line-height:1;cursor:pointer;font-family:inherit;transition:background 130ms,color 130ms;flex-shrink:0; }
+      .q-btn:hover,.q-btn.q-active { background:var(--blue);color:var(--white); }
+      .answer-box { display:none;margin-top:7px;padding:8px 13px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px; }
+      .answer-box-lbl { display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0284c7;margin-bottom:3px; }
+      .answer-box p { font-size:.83rem;color:var(--s800);line-height:1.54;font-style:normal;margin:0; }
+      @keyframes appear { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <span class="nav-brand">PostGIS Akademi</span>
+      <div class="nav-links">
+        <a href="./index.html">Ana Sayfa</a>
+        <a href="./bolum-0.html">Bölüm 0</a>
+        <a href="./bolum-1.html">Bölüm 1</a>
+        <a href="./bolum-2.html">Bölüm 2</a>
+        <a href="./bolum-3.html" class="current">Bölüm 3</a>
+      </div>
+    </nav>
+    <div class="progress"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+
+    <div class="deck-outer"><div class="deck" id="deck">
+
+      <!-- 1: Kapak -->
+      <section class="slide active" data-slide-title="Kapak">
+        <div class="slide-body">
+          <p class="kicker">PostGIS Akademi — Bölüm 3</p>
+          <h1>Production, Ağ Analizi ve Proje</h1>
+          <p class="slide-sub">Kümeleme ve yoğunluk analitiğinden ağ analizine, topoloji ve güvenlikten production operasyonuna ve kapanış projesine — ileri seviye PostGIS uygulamaları.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Bölüm 3 Kapsamı</p></div>
+            <p>3.1 Kümeleme ve Yoğunluk Analizi &nbsp;·&nbsp; 3.2 Ağ Analizi (pgRouting) &nbsp;·&nbsp; 3.3 Topology ve İleri Geometri &nbsp;·&nbsp; 3.4 Güvenlik ve Erişim Kontrolü &nbsp;·&nbsp; 3.5 Production Operasyonu &nbsp;·&nbsp; 3.6 Kapanış Projesi</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Bu bölümün sonunda katılımcı; noktaları kümeleyebilir, ağ üzerinde en kısa yol kavramını uygulayabilir, satır düzeyinde erişim kontrolü tanımlayabilir ve gerçek bir acil durum analizi senaryosunu çözebilir.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2: Alt Modül 3.1 -->
+      <section class="slide" data-slide-title="3.1 — Kümeleme ve Yoğunluk Analizi">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 3.1 — Kümeleme ve Yoğunluk Analizi</p>
+          <h2>ST_ClusterDBSCAN ve Yoğunluk Haritalama</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-01">?</button>
+            </div>
+            <p>Şehirdeki trafik kazası noktalarında yüksek risk bölgelerini otomatik tespit etmek için ne kullanılır?</p>
+            <div class="answer-box" id="ans-01">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>ST_ClusterDBSCAN</code> — DBSCAN algoritması. Belirtilen yarıçap içinde minimum sayıda nokta bulunan bölgeler küme olarak etiketlenir. Gürültü noktalar (izole) <code>NULL</code> cluster_id alır; herhangi bir kümeye atanmaz.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Emniyet müdürlükleri kaza verilerini 100 m yarıçap ve minimum 5 olay eşiğiyle kümeleyerek kara nokta bölgelerini belirler. Trafik yatırım önceliği bu küme analizine dayanır; yıllık bütçe planlaması CBS çıktısına göre yapılır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>DBSCAN: yoğunluk bazlı, küme sayısı önceden belirtilmez. <code>eps</code>: komşuluk yarıçapı (koordinat birimi). <code>minpoints</code>: küme eşiği. KMeans alternatif: küme sayısı önceden belirlenir, gürültü kavramı yoktur. Heatmap: <code>ST_SquareGrid</code> + nokta sayımı.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT id, ST_ClusterDBSCAN(geom, eps := 100, minpoints := 5) OVER() AS cluster_id FROM kazalar;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-02">?</button></span>
+              <div class="phase-body">
+                <p>DBSCAN ile KMeans arasındaki temel fark nedir?</p>
+                <div class="answer-box" id="ans-02">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>DBSCAN: yoğunluk bazlı, küme sayısı belirtilmez, gürültü noktaları NULL atar. KMeans: küme sayısı önceden verilir, tüm noktalar bir kümeye atanır, gürültü kavramı yoktur. Düzensiz dağılım için DBSCAN daha uygundur.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-03">?</button></span>
+              <div class="phase-body">
+                <p><code>ST_SquareGrid(0.01, ST_Extent(geom))</code> ile grid oluştur; her hücredeki nokta sayısını say. Yoğunluk haritası için 5 renk sınıfı tanımla.</p>
+                <div class="answer-box" id="ans-03">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT g.geom, COUNT(p.id) AS yogunluk FROM ST_SquareGrid(0.01, (SELECT ST_Extent(geom) FROM noktalar)) g LEFT JOIN noktalar p ON ST_Within(p.geom, g.geom) GROUP BY g.geom;</code> → Harita sekmesinde yoğunluk grid'i görünür.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3: Alt Modül 3.2 -->
+      <section class="slide" data-slide-title="3.2 — Ağ Analizi (pgRouting)">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 3.2 — Ağ Analizi (pgRouting)</p>
+          <h2>En Kısa Yol Analizi ve Graf Topolojisi</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-04">?</button>
+            </div>
+            <p>PostGIS'te iki nokta arasındaki en kısa yol analizi için hangi eklenti kullanılır?</p>
+            <div class="answer-box" id="ans-04">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>pgRouting</code> — PostgreSQL graf algoritmaları eklentisi. Dijkstra, A*, Bellman-Ford gibi algoritmaları içerir. Yol ağı topolojisi (source/target/cost tablosu) oluşturulduktan sonra <code>pgr_dijkstra</code> ile en kısa yol hesaplanır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Ambulans rota optimizasyonu, lojistik dağıtım planlaması, belediye atık toplama güzergâh optimizasyonu — tümü ağ analizi ile çözülür. İBB acil servisi pgRouting tabanlı gerçek zamanlı rota sistemi kullanır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>pgRouting ≠ PostGIS çekirdeği — ayrı eklenti. Temel: source, target, cost sütunları. <code>pgr_createTopology</code> ile ağ topolojisi. <code>pgr_dijkstra</code> en kısa yol. PGlite sandbox'ta kısıtlı — üretim PostgreSQL önerilir.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT * FROM pgr_dijkstra('SELECT id, source, target, cost FROM yollar', 1, 10, directed := false);</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-05">?</button></span>
+              <div class="phase-body">
+                <p>Yol ağı topolojisi (<code>pgr_createTopology</code>) neden zorunludur?</p>
+                <div class="answer-box" id="ans-05">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Yol geometrileri kesişse de topoloji olmadan graf düğümleri (node) tanımlı değildir. Topoloji olmadan algoritma yolların birbirini kestiğini "bilmez" — geçersiz veya sonsuz rotalar üretir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-06">?</button></span>
+              <div class="phase-body">
+                <p>5 kenarlı basit bir yol ağı tablosu oluştur (id, source, target, cost, geom). pgr_dijkstra ile başlangıç ve bitiş düğüm arasındaki en kısa yolu hesapla.</p>
+                <div class="answer-box" id="ans-06">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>pgr_dijkstra: seq, path_seq, node, edge, cost, agg_cost sütunları döner. Rota üzerindeki kenarların geomlarını JOIN ile çekip haritada görselleştir.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4: Alt Modül 3.3 -->
+      <section class="slide" data-slide-title="3.3 — Topology ve İleri Geometri">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 3.3 — Topology ve İleri Geometri</p>
+          <h2>PostGIS Topology: Edge, Face, Node Modeli</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-07">?</button>
+            </div>
+            <p>PostGIS Topology ile standart geometri arasındaki temel fark nedir?</p>
+            <div class="answer-box" id="ans-07">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Standart geometri her nesneyi bağımsız saklar; ortak sınır paylaşımı yoktur. Topology ortak kenarları (edge, node, face) tek kez saklar — komşu geometrilerin sınır tutarlılığı otomatik garanti edilir.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Kadastro sistemlerinde komşu parsellerin ortak sınırı garanti altında olmalıdır; bir sınır güncellemesi cascade yayılmalıdır. Avrupa'nın INSPIRE direktifi uyumlu CBS sistemleri topology modeli gerektirir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>postgis_topology</code> eklentisi (PGlite'te yüklü). Temel nesneler: node (nokta), edge (çizgi), face (yüzey). <code>topology.CreateTopology</code>, <code>AddTopoGeometryColumn</code>, <code>ST_CreateTopoGeo</code>. Üretim PostgreSQL önerilir.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT topology.CreateTopology('kent_topo', 4326);</code><br/><code>SELECT topology.AddTopoGeometryColumn('kent_topo','public','parseller','topo_geom','POLYGON');</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-08">?</button></span>
+              <div class="phase-body">
+                <p>Topoloji düzeltme neden standart <code>ST_MakeValid</code>'den daha güçlüdür?</p>
+                <div class="answer-box" id="ans-08">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>ST_MakeValid geometriyi izole düzeltir; komşu nesnelerden habersizdir. TopoGeometry düzeltme ilişkisel bütünlüğü korur — komşu parsel sınırları güncelleme cascade'e katılır; çakışma veya boşluk oluşmaz.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-09">?</button></span>
+              <div class="phase-body">
+                <p>Basit bir topoloji şeması oluştur; 3 komşu poligon ekle. <code>topology.GetTopologySummary</code> ile edge, face, node sayılarını doğrula.</p>
+                <div class="answer-box" id="ans-09">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>3 komşu poligon için: 6+ edge (paylaşılan kenarlar tek kez), 4+ node (kesişim noktaları), 3 face. Komşular arasındaki ortak kenar yalnızca bir kez saklanır.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5: Alt Modül 3.4 -->
+      <section class="slide" data-slide-title="3.4 — Güvenlik ve Erişim Kontrolü">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 3.4 — Güvenlik ve Erişim Kontrolü</p>
+          <h2>Row-Level Security ve Mekansal Yetkilendirme</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-10">?</button>
+            </div>
+            <p>Bir kullanıcının yalnızca kendi şehrine ait mekansal verileri görmesini nasıl sağlarsınız?</p>
+            <div class="answer-box" id="ans-10">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Row-Level Security (RLS) politikası. Tablo RLS aktifleştirilir; <code>CREATE POLICY</code> ile her kullanıcı için <code>ST_Within(geom, kullanici_bolgesi)</code> koşulu tanımlanır — uygulama katmanı değişikliği gerektirmez.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>E-devlet CBS platformlarında her kullanıcı yalnızca yetkili bölgesindeki verileri görmeli; merkezi veri yönetimi ile yerel gizlilik politikası uygulanır. KVKK uyumluluk gereksinimleri veritabanı seviyesi erişim kontrolü gerektirir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>ALTER TABLE ENABLE ROW LEVEL SECURITY;</code> → <code>CREATE POLICY</code>. Mekansal RLS: USING koşuluna <code>ST_Within(geom, ...)</code> eklenir. GRANT/REVOKE ile schema ve tablo izinleri. postgis_tiger_geocoder ayrı izin gerektirir.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>ALTER TABLE tesisler ENABLE ROW LEVEL SECURITY;</code><br/><code>CREATE POLICY bolge_erisim ON tesisler USING (ST_Within(geom, (SELECT bolge FROM kullanici_bolgeler WHERE kull = current_user)));</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-11">?</button></span>
+              <div class="phase-body">
+                <p>SUPERUSER hesabı RLS politikalarına tabi midir?</p>
+                <div class="answer-box" id="ans-11">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Hayır. SUPERUSER tüm satırlara erişir, RLS'yi bypass eder. Uygulama bağlantı hesaplarının asla superuser olmaması kritiktir — en az yetki prensibi. <code>SET ROLE</code> ile normal kullanıcı simülasyonu yapılarak test edilebilir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-12">?</button></span>
+              <div class="phase-body">
+                <p>İki farklı kullanıcı için RLS politikası tanımla. Her kullanıcının yalnızca kendi bölgesindeki kayıtları gördüğünü <code>SET ROLE</code> ile doğrula.</p>
+                <div class="answer-box" id="ans-12">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SET ROLE kullanici_a; SELECT COUNT(*) FROM tesisler;</code> → yalnızca A bölgesi sayısı. <code>SET ROLE kullanici_b;</code> → yalnızca B bölgesi sayısı. RESET ROLE ile süper kullanıcıya dön.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6: Alt Modül 3.5 -->
+      <section class="slide" data-slide-title="3.5 — Production Operasyonu">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 3.5 — Production Operasyonu</p>
+          <h2>Yedekleme, İzleme ve Autovacuum Tuning</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-13">?</button>
+            </div>
+            <p>Production mekansal veritabanını yedeklemek için <code>pg_dump</code> yeterli midir?</p>
+            <div class="answer-box" id="ans-13">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Evet — pg_dump PostGIS uzantısı dahil tüm nesne tanımlarını ve veriyi yedekler. Ancak geri yükleme öncesinde hedef veritabanında PostGIS yüklü olmalıdır; aksi hâlde uzantı nesneleri geri yüklenemez.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Ulusal CBS altyapısında günlük pg_dump + haftalık PITR (Point-In-Time Recovery) kombinasyonu standart kabul edilir. RPO/RTO hedeflerine göre strateji belirlenir; mekansal veritabanı yedekleme boyutu beklenenden büyük olabilir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Yedekleme: <code>pg_dump -Fc</code>. Restore: <code>pg_restore</code>. İzleme: <code>pg_stat_activity</code> (uzun sorgu), <code>pg_locks</code> (kilitlenme). Tablo boyutu: <code>pg_size_pretty(pg_total_relation_size())</code>. Autovacuum: büyük geometri tablolarında eşik düşürülmeli.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>pg_dump -Fc -f yedek.dump mydb</code><br/><code>pg_restore -d yeni_db yedek.dump</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-14">?</button></span>
+              <div class="phase-body">
+                <p>Autovacuum büyük geometri tablolarında neden özel dikkat gerektirir?</p>
+                <div class="answer-box" id="ans-14">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Yoğun güncelleme dead tuple birikimini hızlandırır. Varsayılan eşik (20% + 50 satır) büyük tablolar için çok geç tetiklenebilir; tablo şişer, indeks ve sorgu performansı bozulur. Tablo bazında daha agresif ayar önerilir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-15">?</button></span>
+              <div class="phase-body">
+                <p><code>SELECT schemaname, relname, n_dead_tup, n_live_tup FROM pg_stat_user_tables ORDER BY n_dead_tup DESC;</code> ile dead tuple oranı yüksek tabloları bul.</p>
+                <div class="answer-box" id="ans-15">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>n_dead_tup / n_live_tup oranı yüksek tablo varsa <code>VACUUM ANALYZE tablo_adi;</code> çalıştır. Sonraki sorguda EXPLAIN ANALYZE ile performans farkını gözlemle.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7: Alt Modül 3.6 -->
+      <section class="slide" data-slide-title="3.6 — Kapanış Projesi">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 3.6 — Kapanış Projesi</p>
+          <h2>İstanbul Acil Durum Risk Analizi</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-16">?</button>
+            </div>
+            <p>Birden fazla mekansal kriteri tek bir risk skoruna nasıl dönüştürürsünüz?</p>
+            <div class="answer-box" id="ans-16">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Her kriter ayrı CTE (WITH) adımı olarak hesaplanır; JOIN ile birleştirilir. Ağırlıklı toplam: <code>kriter_a * w1 + kriter_b * w2</code>. ORDER BY ile en riskli bölgeler önce sıralanır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>İstanbul Büyükşehir Belediyesi Afet Koordinasyon Merkezi, deprem riski + nüfus yoğunluğu + altyapı kırılganlığını multi-criteria spatial analysis ile birleştirir. Müdahale ekipleri bu skorlamaya göre konuşlandırılır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Pipeline: ST_Within (bölge içi varlık sayımı) → ST_DWithin (mesafe filtresi) → ağırlıklı risk skoru → ST_Buffer (müdahale alanı) → ST_AsGeoJSON (görselleştirme). LATERAL JOIN ile per-row en yakın tesis.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>WITH risk AS (SELECT m.id, COUNT(b.id) AS bina_sayisi, MIN(ST_Distance(m.geom::geography, h.geom::geography)) AS yakin_hastane FROM mahalleler m LEFT JOIN binalar b ON ST_Within(b.geom,m.geom) CROSS JOIN LATERAL (SELECT geom FROM hastaneler ORDER BY geom &lt;-&gt; m.geom LIMIT 1) h GROUP BY m.id) SELECT *, bina_sayisi*0.7+(5000-LEAST(yakin_hastane,5000))*0.3 AS risk FROM risk ORDER BY risk DESC;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-17">?</button></span>
+              <div class="phase-body">
+                <p>Örnekte LATERAL JOIN neden kullanılmıştır?</p>
+                <div class="answer-box" id="ans-17">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Her mahalle için en yakın hastaneyi ayrı ayrı bulmak gerekir. LATERAL ile korelasyonlu alt sorgu satır başına çalışır. <code>ORDER BY geom &lt;-&gt; m.geom LIMIT 1</code> KNN operatörü ile GiST indeksini kullanır — çok hızlıdır.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-18">?</button></span>
+              <div class="phase-body">
+                <p>Risk sorgusunu çalıştır; en riskli 10 mahalleyi bul. Bu mahalleler için <code>ST_Buffer(geom::geography, 500)</code> ile müdahale alanı oluştur ve haritada görselleştir.</p>
+                <div class="answer-box" id="ans-18">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ST_Buffer(m.geom::geography,500)::geometry, risk FROM risk JOIN mahalleler m USING(id) ORDER BY risk DESC LIMIT 10;</code> → Harita sekmesinde 10 adet 500 m dairesel müdahale alanı görünür.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8: Kapanış -->
+      <section class="slide" data-slide-title="Program Sonu">
+        <div class="slide-body">
+          <p class="kicker">Bölüm 3 — Özet &amp; Program Kapanışı</p>
+          <h2>PostGIS Akademi Eğitimi Tamamlandı</h2>
+          <p class="slide-sub">SQL temellerinden production mekansal mimarisine; geometri veri modelinden ağ analizine; indeks stratejilerinden güvenlik politikalarına kadar kapsamlı bir PostGIS yetkinliği oluşturuldu.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Kazanımlar</p></div>
+            <p>DBSCAN kümeleme &nbsp;·&nbsp; pgRouting ağ analizi &nbsp;·&nbsp; Topology tutarlılığı &nbsp;·&nbsp; Row-Level Security &nbsp;·&nbsp; Production operasyon &nbsp;·&nbsp; Multi-criteria risk analizi</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Sonraki Adımlar</p>
+            <p>PostGIS resmi dokümantasyonu &nbsp;·&nbsp; pgRouting uygulamalı atölye &nbsp;·&nbsp; INSPIRE direktifi uyumlu topology proje &nbsp;·&nbsp; Gerçek İstanbul verisiyle kapanış projesi genişletme</p>
+          </div>
+          <a href="./index.html" class="cta">← Sunum Ana Sayfası</a>
+        </div>
+      </section>
+
+    </div></div>
+
+    <div class="ctrl-bar">
+      <button class="ctrl-btn" id="prevBtn" type="button">← Geri</button>
+      <span class="ctrl-status" id="slideStatus">1 / 8</span>
+      <button class="ctrl-btn" id="nextBtn" type="button">İleri →</button>
+    </div>
+
+    <script>
+      (function () {
+        var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+        var total=slides.length,idx=0;
+        var prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn');
+        var status=document.getElementById('slideStatus'),fill=document.getElementById('progressFill');
+        function render(){slides.forEach(function(s,i){var a=i===idx;s.classList.toggle('active',a);s.setAttribute('aria-hidden',String(!a));});var t=slides[idx].getAttribute('data-slide-title')||'';status.textContent=(idx+1)+' / '+total+(t?'  ·  '+t:'');fill.style.width=((idx+1)/total*100).toFixed(1)+'%';prevBtn.disabled=idx===0;nextBtn.disabled=idx===total-1;}
+        prevBtn.addEventListener('click',function(){if(idx>0){idx--;render();}});
+        nextBtn.addEventListener('click',function(){if(idx<total-1){idx++;render();}});
+        document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='PageDown'){if(idx<total-1){idx++;render();}}if(e.key==='ArrowLeft'||e.key==='PageUp'){if(idx>0){idx--;render();}}});
+        render();
+      }());
+      (function () {
+        document.querySelectorAll('.q-btn').forEach(function (btn) {
+          var box = document.getElementById(btn.getAttribute('data-answer'));
+          if (!box) return;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = box.style.display === 'block';
+            box.style.display = open ? 'none' : 'block';
+            btn.textContent = open ? '?' : '✓';
+            btn.classList.toggle('q-active', !open);
+          });
+        });
+      }());
+    </script>
+  </body>
+</html>

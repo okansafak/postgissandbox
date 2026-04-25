@@ -1,25 +1,25 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- PITR (Point-in-Time Recovery) kavramını açıklayabileceksin
-- WAL arşivleme + base backup kombinasyonunu özetleyebileceksin
-- Geri dönme senaryosunu adım adım anlatabileceksin
+- PITR (Point-in-Time Recovery) kavramını açıklamak
+- WAL arşivleme + base backup kombinasyonunu özetlemek
+- Geri dönme senaryosunu adım adım anlatmak
 
 ---
 
-## 📖 Kavram: PITR
+## PITR
 
-"Saat 14:30'da yanlışlıkla `DELETE FROM kadastro` çalıştırdım. 14:29'a dönebilir miyim?"
+"Saat 14:30'da yanlışlıkla `DELETE FROM kadastro` çalıştırıldı. 14:29'a dönmek mümkün mü?"
 
-**Evet — eğer WAL arşivleme aktifse.**
+**Evet — WAL arşivleme aktifse.**
 
 PITR = Base Backup + WAL Segment Oynatma:
-1. Son base backup'ı geri yükle
-2. Hatalı işlemden önceki zamana kadar WAL segment'lerini oynat
-3. `recovery_target_time` ile tam zaman belirle
+1. Son base backup geri yüklenir
+2. Hatalı işlemden önceki zamana kadar WAL segmentleri oynatılır
+3. `recovery_target_time` ile tam zaman belirlenir
 
 ---
 
-## 📖 PITR Kurulum Gereksinimleri
+## PITR Kurulum Gereksinimleri
 
 ```ini
 # postgresql.conf
@@ -40,7 +40,9 @@ recovery_target_action = promote
 
 ---
 
-## ▶ Canlı Örnek — WAL Ayarları Kontrol
+## Uygulama Örneği
+
+### PITR WAL ayarları
 
 <RunnableBlock
   sql={`-- PITR için gerekli WAL ayarları
@@ -58,11 +60,10 @@ WHERE name IN (
 )
 ORDER BY name;`}
   label="PITR WAL ayarları"
+  description="PITR için wal_level en az 'replica' olmalı, archive_mode = 'on' ve archive_command tanımlı olmalıdır. restore_command ve recovery_target_time kurtarma işlemi sırasında postgresql.conf'a eklenir. PGlite'ta archive_mode = off olması normaldir; bu ayarlar üretim sunucusuna özgüdür."
 />
 
----
-
-## ▶ Transaction ID ile Geri Dönme
+### Transaction ID simülasyonu
 
 <RunnableBlock
   sql={`-- Yanlış silme senaryosu simülasyonu
@@ -79,11 +80,10 @@ INSERT INTO kritik_veri (ad, geom) VALUES
 -- Transaction ID kaydını al (PITR'da kullanılır)
 SELECT txid_current() AS mevcut_xid;`}
   label="Transaction ID simülasyonu"
+  description="txid_current() mevcut işlemin transaction ID'sini döndürür. PITR'da recovery_target_xid ile bu ID öncesine geri dönülebilir; böylece belirli bir işlemden hemen önce durulur. Gerçek senaryoda kritik silme işleminden önce txid kayıt altına alınmalı ve kurtarmada bu değer kullanılmalıdır."
 />
 
----
-
-## ▶ pg_lsn ile Zaman Damgası
+### WAL LSN ve zaman damgası
 
 <RunnableBlock
   sql={`-- WAL LSN ve zaman damgası ilişkisi
@@ -97,11 +97,12 @@ SELECT
 -- recovery_target_time = '2024-01-15 14:29:00+03'
 -- recovery_target_xid = '12345678'`}
   label="WAL LSN ve zaman damgası"
+  description="pg_current_wal_lsn() anlık WAL konumunu hexadecimal LSN olarak döndürür. pg_walfile_name bu konumun fiziksel WAL dosya adını verir. Yorumdaki üç recovery_target seçeneği PITR'ın hangi noktaya kadar oynatacağını belirler: LSN (byte konum), time (zaman damgası) veya xid (işlem ID). Üretimde düzenli LSN kaydı tutmak kurtarmayı hızlandırır."
 />
 
 ---
 
-## 🧪 Dene — Checkpoint Zorla
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Checkpoint: WAL buffer'ı diske yaz
@@ -115,18 +116,13 @@ SELECT
   write_time
 FROM pg_control_checkpoint();`}
   label="Checkpoint durumu"
+  description="CHECKPOINT WAL buffer'ını diske yazarak kurtarma noktası oluşturur. pg_control_checkpoint() en son checkpoint'in LSN konumunu, önceki checkpoint'i ve zamanını gösterir. Checkpoint sıklığı checkpoint_timeout (varsayılan 5 dk) ve checkpoint_completion_target ayarlarıyla kontrol edilir. PITR kurtarması en yakın checkpoint'ten başlar."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **WAL arşivi doluysa:** Arşiv dolduğunda `archive_command` başarısız olur → PostgreSQL durabiliyor. Disk alanını izle.
-2. **PITR + PostGIS:** Geri yükleme sonrası `SELECT postgis_full_version()` ile extension sağlığını kontrol et.
-3. **`recovery_target_inclusive`:** Varsayılan `true` — hedef zamanı dahil. Hedef zamandaki kötü işlemi de oynatır. `false` yap veya bir saniye erken hedefle.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **PgBouncer** — bağlantı havuzu ile yüksek eş zamanlılık yönetimi.
+1. **WAL arşivi doluysa:** Arşiv dolu olduğunda `archive_command` başarısız olur; PostgreSQL durabilir. Disk alanı sürekli izlenmelidir.
+2. **PITR + PostGIS:** Geri yükleme sonrasında `SELECT postgis_full_version()` ile extension sağlığı doğrulanmalıdır.
+3. **`recovery_target_inclusive`:** Varsayılan `true` — hedef zamanı dahil eder ve hedef zamandaki kötü işlemi de oynatır. Hatalı işlemi dışlamak için `false` ayarlanmalı veya bir saniye erken hedeflenmelidir.

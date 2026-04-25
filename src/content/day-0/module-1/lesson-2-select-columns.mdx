@@ -1,0 +1,93 @@
+## Sütun Seçme, Hesaplama ve Alias
+
+**Hedef:** SELECT sorgusunda sütun yeniden adlandırmayı, aritmetik hesaplamayı ve `AS` anahtar sözcüğünü kullanmak.
+
+---
+
+## Öğrenim Hedefleri
+
+- `AS` ile sütunlara anlamlı takma adlar vermek
+- SELECT içinde aritmetik ifadeler yazmak
+- Metin birleştirme ve yerleşik fonksiyonları kullanmak
+
+---
+
+## Ön Hazırlık
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS sehirler (
+  id SERIAL PRIMARY KEY, ad TEXT, bolge TEXT, nufus INTEGER, alan_km2 NUMERIC
+);
+INSERT INTO sehirler (ad, bolge, nufus, alan_km2) VALUES
+  ('İstanbul','Marmara',15840900,5343),('Ankara','İç Anadolu',5782285,2516),
+  ('İzmir','Ege',4479525,3577),('Bursa','Marmara',3194720,10882),
+  ('Antalya','Akdeniz',2696249,20177),('Adana','Akdeniz',2258997,13844),
+  ('Konya','İç Anadolu',2279474,38873),('Gaziantep','Güneydoğu Anadolu',2154051,7642),
+  ('Mersin','Akdeniz',1922758,15853),('Trabzon','Karadeniz',839468,4685)
+ON CONFLICT DO NOTHING;
+SELECT COUNT(*) AS sehir_sayisi FROM sehirler;`}
+  label="Veri setini hazırla"
+  description="Bu blok önceki derste oluşturulan sehirler tablosunun varlığını garanti eder. IF NOT EXISTS ve ON CONFLICT DO NOTHING sayesinde tablo ve veriler zaten varsa hiçbir şey değişmez."
+/>
+
+---
+
+## Uygulama Örneği
+
+### AS ile sütun adı değiştirme
+
+<RunnableBlock
+  sql={`-- AS ile sütunlara Türkçe takma ad ver
+SELECT
+  ad        AS sehir_adi,
+  bolge     AS cografya_bolgesi,
+  nufus     AS nufus_sayisi,
+  alan_km2  AS yuzolcumu
+FROM sehirler;`}
+  label="Sütun takma adları (alias)"
+  description="AS anahtar sözcüğü sonuç tablosundaki sütun başlığını değiştirir; asıl sütun adı tabloda değişmez. Takma adlar boşluk içeriyorsa çift tırnak içine alınmalıdır (örneğin: AS sehir_adi). AS yazmak isteğe bağlıdır — sütun adının yanına doğrudan takma ad yazmak da geçerlidir, ancak AS kullanmak okunabilirliği artırır."
+/>
+
+### SELECT içinde hesaplama
+
+<RunnableBlock
+  sql={`-- Nüfus yoğunluğu hesapla: kişi / km²
+SELECT
+  ad,
+  nufus,
+  alan_km2,
+  ROUND(nufus / alan_km2, 1) AS yogunluk_kisi_km2
+FROM sehirler
+ORDER BY yogunluk_kisi_km2 DESC;`}
+  label="Nüfus yoğunluğu hesabı"
+  description="SELECT içinde aritmetik operatörler (+, -, *, /) doğrudan kullanılabilir. ROUND(değer, ondalık_basamak) sayıyı yuvarlar. Hesaplama her satır için ayrı ayrı yapılır; tabloya yeni bir sütun eklenmez, yalnızca sorgu sonucunda görünür. ORDER BY hesaplanmış alias'a (yogunluk_kisi_km2) göre sıralama yapılabilir."
+/>
+
+### Metin birleştirme
+
+<RunnableBlock
+  sql={`-- || operatörü ile metin birleştirme
+SELECT
+  ad || ' (' || bolge || ')' AS tam_tanim,
+  nufus
+FROM sehirler
+ORDER BY nufus DESC;`}
+  label="Metin birleştirme"
+  description="|| operatörü iki metni birleştirir; birden fazla birleştirme zincirleme yapılabilir. Sabit metin tek tırnak içinde yazılır: ' ('. Sayısal sütunlar metin birleştirmede kullanılmadan önce ::TEXT cast'i gerektirir."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Nüfusu milyon cinsinden göster
+SELECT
+  ad,
+  ROUND(nufus / 1000000.0, 2) AS nufus_milyon,
+  bolge
+FROM sehirler
+ORDER BY nufus_milyon DESC;`}
+  label="Nüfusu milyon cinsinden göster"
+  description="1000000.0 (noktalı) kullanılması tamsayı bölmesi yerine ondalıklı bölme sağlar. PostgreSQL'de iki tamsayıyı böldüğünüzde sonuç tamsayıya yuvarlanır: 5782285 / 1000000 = 5, ancak 5782285 / 1000000.0 = 5.782285. ROUND ile istenen basamak hassasiyeti belirlenir."
+/>

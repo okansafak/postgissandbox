@@ -1,0 +1,91 @@
+## Veritabanı Nedir? SELECT ile Veri Çekme
+
+**Hedef:** Veritabanı, tablo, satır ve sütun kavramlarını kavramak; ilk SQL sorgusunu yazmak.
+
+---
+
+## Öğrenim Hedefleri
+
+- Veritabanı, tablo, satır ve sütun kavramlarını açıklamak
+- `SELECT *` ile bir tablodaki tüm veriyi çekmek
+- Belirli sütunları seçerek sonucu daraltmak
+
+---
+
+## Veritabanı Nedir?
+
+Veritabanı, düzenli bir şekilde saklanmış veriler bütünüdür. Excel'deki bir tablo hayal edin — ama çok daha güçlü: milyonlarca satırı saniyeler içinde sorgulayabilir, onlarca tabloyu aynı anda birleştirebilirsiniz.
+
+**Dört temel kavram:**
+
+| Kavram | Açıklama | Excel Karşılığı |
+|---|---|---|
+| **Tablo** | Satır ve sütunlardan oluşan veri yapısı | Çalışma sayfası |
+| **Satır (Row)** | Tablodaki tek bir kayıt | Bir satır |
+| **Sütun (Column)** | Bir veri alanı (ad, nüfus, bölge…) | Bir sütun |
+| **Sorgu (Query)** | Veritabanına gönderilen SQL komutu | Formül |
+
+SQL (Structured Query Language) bu veritabanıyla konuşmak için kullanılan dildir. Bu bölümde SQL'in temellerini öğrenerek PostGIS'e sağlam bir zemin hazırlayacaksınız.
+
+---
+
+## Uygulama Örneği
+
+### Pratik veri setini oluştur
+
+<RunnableBlock
+  sql={`-- Türkiye şehirleri tablosu — tüm bölüm boyunca kullanılacak
+CREATE TABLE IF NOT EXISTS sehirler (
+  id     SERIAL PRIMARY KEY,
+  ad     TEXT,
+  bolge  TEXT,
+  nufus  INTEGER,
+  alan_km2 NUMERIC
+);
+
+INSERT INTO sehirler (ad, bolge, nufus, alan_km2) VALUES
+  ('İstanbul',  'Marmara',              15840900, 5343),
+  ('Ankara',    'İç Anadolu',            5782285, 2516),
+  ('İzmir',     'Ege',                   4479525, 3577),
+  ('Bursa',     'Marmara',               3194720, 10882),
+  ('Antalya',   'Akdeniz',               2696249, 20177),
+  ('Adana',     'Akdeniz',               2258997, 13844),
+  ('Konya',     'İç Anadolu',            2279474, 38873),
+  ('Gaziantep', 'Güneydoğu Anadolu',     2154051,  7642),
+  ('Mersin',    'Akdeniz',               1922758, 15853),
+  ('Trabzon',   'Karadeniz',              839468,  4685)
+ON CONFLICT DO NOTHING;
+
+SELECT 'Hazır' AS durum, COUNT(*) AS sehir_sayisi FROM sehirler;`}
+  label="Şehir veri setini oluştur"
+  description="CREATE TABLE IF NOT EXISTS tablo zaten varsa hata vermeden atlar. SERIAL PRIMARY KEY her yeni satıra otomatik artan bir kimlik atar. INSERT ... ON CONFLICT DO NOTHING tekrarlı çalıştırmada veri çakışmasını önler. Son SELECT tablonun doğru dolduğunu doğrular."
+/>
+
+### Tüm veriyi çek
+
+<RunnableBlock
+  sql={`-- SELECT * tüm sütunları ve tüm satırları getirir
+SELECT * FROM sehirler;`}
+  label="Tüm şehirleri listele"
+  description="SELECT * FROM tablo_adi en temel SQL sorgusudur. * (yıldız) 'tüm sütunlar' anlamına gelir. Sonuç tablodaki her satırı, her sütunuyla birlikte döndürür. Büyük tablolarda tüm sütunları çekmek gereksiz veri transferine yol açar; gerçek projelerde yalnızca ihtiyaç duyulan sütunlar belirtilmelidir."
+/>
+
+### Belirli sütunları seç
+
+<RunnableBlock
+  sql={`-- Yalnızca şehir adı ve nüfus bilgisi
+SELECT ad, nufus FROM sehirler;`}
+  label="Belirli sütunları seç"
+  description="SELECT sütun1, sütun2 biçiminde yalnızca istenen sütunlar virgülle ayrılarak listelenir. Sütun sırası SELECT'te yazılan sıraya göre belirlenir; tablodaki fiziksel sırayla ilişkisi yoktur. Bu yaklaşım hem okunabilirliği artırır hem de gereksiz veri transferini önler."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Şehir adı, bölgesi ve alanı — üç sütun birlikte
+SELECT ad, bolge, alan_km2 FROM sehirler;`}
+  label="Üç sütunu birlikte seç"
+  description="Birden fazla sütun virgülle ayrılarak seçilir. Bu sorgu her şehrin adını, bölgesini ve yüzölçümünü getirir. Sonuç tablosunun sütun başlıkları SELECT'te yazılan sütun adlarıyla aynıdır."
+/>

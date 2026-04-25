@@ -1,0 +1,130 @@
+## INSERT, UPDATE, DELETE ve CREATE TABLE
+
+**Hedef:** Tablolara veri eklemek, mevcut veriyi güncellemek, kayıt silmek ve yeni tablo oluşturmak.
+
+---
+
+## Öğrenim Hedefleri
+
+- `INSERT INTO` ile yeni satır eklemek
+- `UPDATE ... SET ... WHERE` ile mevcut satırı güncellemek
+- `DELETE FROM ... WHERE` ile satır silmek
+- `CREATE TABLE` ile yeni tablo oluşturmak ve veri tiplerini seçmek
+
+---
+
+## CREATE TABLE ve Veri Tipleri
+
+<RunnableBlock
+  sql={`-- Yeni bir ilçe tablosu oluştur
+DROP TABLE IF EXISTS ilceler;
+CREATE TABLE ilceler (
+  id          SERIAL PRIMARY KEY,
+  ad          TEXT NOT NULL,
+  sehir       TEXT NOT NULL,
+  nufus       INTEGER,
+  yuzolcumu   NUMERIC(10, 2),
+  kurulus_yil INTEGER,
+  aktif       BOOLEAN DEFAULT TRUE,
+  eklenme_tar DATE DEFAULT CURRENT_DATE
+);
+
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'ilceler'
+ORDER BY ordinal_position;`}
+  label="Tablo oluşturma ve yapıyı incele"
+  description="SERIAL otomatik artan tamsayı kimliğidir. NOT NULL o sütunun boş bırakılamayacağını belirtir. NUMERIC(10, 2) toplam 10 basamak, 2'si ondalık. DEFAULT değer sütuna yazılmadığında kullanılan varsayılan değeri belirtir. information_schema.columns tablonun yapısını — sütun adı, veri tipi, NULL izni ve varsayılan değer — listeleyen sistem görünümüdür."
+/>
+
+---
+
+## Uygulama Örneği
+
+### INSERT ile veri ekleme
+
+<RunnableBlock
+  sql={`-- Tek satır ekle
+INSERT INTO ilceler (ad, sehir, nufus, yuzolcumu, kurulus_yil)
+VALUES ('Kadıköy', 'İstanbul', 500000, 26.16, 1857);
+
+-- Birden fazla satır ekle
+INSERT INTO ilceler (ad, sehir, nufus, yuzolcumu, kurulus_yil)
+VALUES
+  ('Beşiktaş',  'İstanbul', 180000, 18.40, 1857),
+  ('Şişli',     'İstanbul', 270000, 29.93, 1908),
+  ('Çankaya',   'Ankara',   900000, 108.20, 1954),
+  ('Keçiören',  'Ankara',   750000,  73.11, 1987);
+
+SELECT * FROM ilceler ORDER BY sehir, nufus DESC;`}
+  label="Veri ekleme"
+  description="INSERT INTO tablo (sütunlar) VALUES (değerler) biçimiyle tek satır eklenir. Birden fazla satır için VALUES sonrasına virgülle ayrılmış parantez grupları eklenir. Listelenmeyen sütunlar DEFAULT değerlerini alır: aktif sütunu TRUE, eklenme_tar ise bugünün tarihini alır. Metin değerleri tek tırnak içinde yazılır."
+/>
+
+### UPDATE ile güncelleme
+
+<RunnableBlock
+  sql={`-- Kadıköy'ün nüfusunu güncelle
+UPDATE ilceler
+SET nufus = 512000
+WHERE ad = 'Kadıköy' AND sehir = 'İstanbul';
+
+-- Birden fazla sütunu aynı anda güncelle
+UPDATE ilceler
+SET nufus = nufus * 1.05,
+    aktif = TRUE
+WHERE sehir = 'Ankara';
+
+SELECT ad, sehir, nufus, aktif FROM ilceler ORDER BY sehir, ad;`}
+  label="Veri güncelleme"
+  description="UPDATE ... SET her sütunu yeni değerine atar. WHERE olmadan tüm satırlar güncellenir — bu genellikle istenmeyen bir sonuçtur ve üretimde kritik hataya yol açabilir. Mevcut değer üzerinde aritmetik yapılabilir: nufus * 1.05 mevcut nüfusu %5 artırır. Birden fazla sütun virgülle ayrılarak tek UPDATE'te güncellenebilir."
+/>
+
+### DELETE ile kayıt silme
+
+<RunnableBlock
+  sql={`-- Önce silinecek kaydı doğrula
+SELECT * FROM ilceler WHERE ad = 'Şişli';
+
+-- Şişli ilçesini sil
+DELETE FROM ilceler
+WHERE ad = 'Şişli' AND sehir = 'İstanbul';
+
+-- Silme sonucunu doğrula
+SELECT COUNT(*) AS kalan_ilce FROM ilceler;`}
+  label="Kayıt silme"
+  description="DELETE FROM tablo WHERE koşul koşulu sağlayan tüm satırları siler. WHERE olmadan DELETE tüm tabloyu siler — yalnızca TRUNCATE'e göre daha yavaş ama geri alınabilir (transaction içinde). Silmeden önce SELECT ile hangi satırların etkileneceğini görmek iyi bir pratiktir. TRUNCATE tabloyu tamamen boşaltır ve DELETE'e göre çok daha hızlıdır ama WHERE almaz."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Ankara ilçelerinin toplam nüfusunu hesapla
+SELECT
+  sehir,
+  COUNT(*)    AS ilce_sayisi,
+  SUM(nufus)  AS toplam_nufus,
+  MAX(nufus)  AS en_kalabalik_ilce_nufusu
+FROM ilceler
+GROUP BY sehir
+ORDER BY toplam_nufus DESC;`}
+  label="İlçe istatistikleri"
+  description="Bu sorgu oluşturduğunuz ve düzenlediğiniz tabloyu GROUP BY ile özetler. Bölüm 0'da öğrenilen tüm kavramlar burada bir araya gelir: tablo oluşturma, veri ekleme, güncelleme ve sorgulama. PostGIS'te geometri sütunu da bu şemaya eklenerek mekansal sorgular yapılır."
+/>
+
+---
+
+## Bölüm 0 Tamamlandı
+
+Bu bölümde SQL'in temel yapı taşlarını öğrendiniz:
+
+- `SELECT` ile veri çekme ve sütun seçme
+- `WHERE`, `ORDER BY`, `LIMIT`, `DISTINCT` ile sonuç yönetimi
+- `COUNT`, `SUM`, `AVG`, `MIN`, `MAX` toplama fonksiyonları
+- `GROUP BY` ve `HAVING` ile gruplama
+- `JOIN` ile tablolar arası ilişki
+- `INSERT`, `UPDATE`, `DELETE` ve `CREATE TABLE` ile veri yönetimi
+
+**Sıradaki adım:** Bölüm 1'de bu SQL bilgisini coğrafi veriye uygulayarak PostGIS'e başlıyorsunuz.

@@ -1,39 +1,43 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- WHERE içinde fonksiyon kullanmanın neden yavaşlattığını açıklayabileceksin
-- `ST_X`, `ST_Y`, `ST_SRID` gibi fonksiyonları fonksiyonel index ile hızlandırabileceksin
-- Hangi durumda yeniden yazma (rewrite), hangi durumda functional index gerektiğini söyleyebileceksin
+WHERE koşulunda bir fonksiyon sütuna uygulandığında PostgreSQL o sütundaki indeksi genellikle kullanamaz. Bu "non-sargable" kalıp mekansal sorgularda sıkça karşılaşılan bir performans sorunudur. Bu ders, hangi kalıpların indeksi atladığını ve her biri için doğru alternatifi ele almaktadır.
+
+- WHERE koşulunda fonksiyon kullanmanın neden yavaşlattığını açıklamak
+- `ST_X`, `ST_Y`, `ST_SRID` gibi fonksiyonları functional index ile hızlandırmak
+- Sorguyu yeniden yazmanın mümkün olduğu ve functional index gerektiren durumları ayırt etmek
 
 ---
 
-## 📖 Kavram: Sargable vs Non-Sargable
+## Sargable ve Non-Sargable Koşullar
 
 **Sargable** (Search ARGument ABLE): Sorgu koşulunun indeksi kullanabilmesi.
 
 ```sql
--- ❌ Non-sargable: fonksiyon sütun üzerinde → full scan
+-- Non-sargable: fonksiyon sütun üzerinde → full scan
 WHERE ST_X(geom) > 28.0
 
--- ✅ Sargable: bbox operatörü veya DWithin → index scan
+-- Sargable: bbox operatörü veya DWithin → index scan
 WHERE geom && ST_MakeEnvelope(28.0, 36.0, 36.0, 42.0, 4326)
 ```
 
-**Kural:** Sütunu fonksiyona sarma. Fonksiyonu sabit tarafa taşı veya fonksiyonel index oluştur.
+**Kural:** Sütunu fonksiyona sarmak yerine fonksiyonu sabit tarafa taşı veya functional index oluştur.
 
 ---
 
-## 📖 Yaygın Non-Sargable Kalıplar
+## Yaygın Non-Sargable Kalıplar
 
 | Non-Sargable | Sargable Alternatif |
 |---|---|
 | `ST_X(geom) BETWEEN 28 AND 29` | `geom && ST_MakeEnvelope(28,36,29,42,4326)` |
-| `ST_SRID(geom) = 4326` | Tablo constraint ile garanti et |
-| `ST_AsText(geom) LIKE 'POINT%'` | `GeometryType(geom) = 'POINT'` + index |
+| `ST_SRID(geom) = 4326` | Tablo kısıtlamasıyla garanti et |
+| `ST_AsText(geom) LIKE 'POINT%'` | `GeometryType(geom) = 'POINT'` + indeks |
 | `date_trunc('day', zaman) = '2024-01-01'` | `zaman >= '2024-01-01' AND zaman < '2024-01-02'` |
 
 ---
 
-## ▶ Canlı Örnek — ST_X Non-Sargable
+## Uygulama Örneği
+
+### ST_X ile non-sargable seq scan
 
 <RunnableBlock
   sql={`-- Hazırlık
@@ -50,26 +54,24 @@ ON CONFLICT DO NOTHING;
 CREATE INDEX IF NOT EXISTS idx_koord_geom ON koordinat_test USING gist(geom);
 ANALYZE koordinat_test;
 
--- ❌ ST_X ile filtre — seq scan
+-- ST_X ile filtre — seq scan
 EXPLAIN SELECT COUNT(*) FROM koordinat_test
 WHERE ST_X(geom) BETWEEN 28.0 AND 30.0;`}
   label="ST_X non-sargable seq scan"
+  description="GiST indeksi mevcut olmasına karşın WHERE ST_X(geom) BETWEEN ... koşulu 'Seq Scan' üretir. Planlayıcı ST_X fonksiyonunu sütun üzerinde uygulanan bir dönüşüm olarak görür ve GiST indeksini bu koşul için kullanamaz. Her 3000 satır için ST_X hesaplanır; bu büyük tablolarda ciddi bir yük oluşturur."
 />
 
----
-
-## ▶ Bbox ile Yeniden Yaz
+### Bbox ile yeniden yazma
 
 <RunnableBlock
-  sql={`-- ✅ Bbox ile yeniden yaz — index scan
+  sql={`-- Bbox ile yeniden yaz — index scan
 EXPLAIN SELECT COUNT(*) FROM koordinat_test
 WHERE geom && ST_MakeEnvelope(28.0, 36.0, 30.0, 42.0, 4326);`}
   label="Bbox rewrite — index scan"
+  description="ST_X BETWEEN koşulu ST_MakeEnvelope bbox sorgusuyla yeniden yazılır. && operatörü doğrudan GiST indeksini kullanır; EXPLAIN çıktısında 'Bitmap Index Scan' veya 'Index Scan' görünür. ST_MakeEnvelope(minx, miny, maxx, maxy, srid) boylamı 28.0-30.0, enlemı 36.0-42.0 ile sınırlar — bu Türkiye batı kuşağına karşılık gelir."
 />
 
----
-
-## ▶ Functional Index ile Çöz
+### Functional index ile çözüm
 
 <RunnableBlock
   sql={`-- Sorgular değiştirilemiyorsa → fonksiyonel index
@@ -80,11 +82,12 @@ CREATE INDEX IF NOT EXISTS idx_koord_st_x
 EXPLAIN SELECT COUNT(*) FROM koordinat_test
 WHERE ST_X(geom) BETWEEN 28.0 AND 30.0;`}
   label="Functional index ile ST_X"
+  description="Sorgu kaynağı değiştirilemiyorsa (ORM, üçüncü taraf uygulama) ST_X(geom) ifadesi üzerinde functional index oluşturulur. Bu indeks planlayıcının ST_X filtresini index scan ile çözmesini sağlar. Parantez sözdizimi zorunludur: CREATE INDEX ... ( (ST_X(geom)) ). İndeks her INSERT ve UPDATE'te ST_X hesaplayarak güncellenir."
 />
 
 ---
 
-## 🧪 Dene — ST_SRID Kontrolü
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- SRID filtresinin planını gör
@@ -97,18 +100,13 @@ ALTER TABLE koordinat_test
   ADD CONSTRAINT IF NOT EXISTS chk_srid
   CHECK (ST_SRID(geom) = 4326);`}
   label="SRID koşulu ve constraint"
+  description="WHERE ST_SRID(geom) = 4326 koşulu non-sargable'dır; ancak tablo GEOMETRY(POINT,4326) olarak tanımlandıysa tüm satırlar zaten 4326 olduğundan bu sorgunun anlamlı bir filtre işlevi yoktur. CHECK CONSTRAINT eklemek bu garantiyi şema düzeyinde zorlar ve SRID kontrolünü WHERE'den kaldırmayı mümkün kılar."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`ST_AsText` + `LIKE`:** En yavaş kalıp. Geometriyi stringe çevirip string ara — binlerce kez. Asla yapma. Geometry type için `GeometryType()`, koordinat için bbox/DWithin kullan.
-2. **Fonksiyonel index bakımı:** Her `INSERT`/`UPDATE`'te hesaplanır. Çok pahalı expression'lar için maliyeti değerlendir.
-3. **OR ile non-sargable:** `WHERE ST_X(geom) > 28 OR ST_Y(geom) < 40` — iki ayrı non-sargable OR. Çözüm: bbox union veya `ST_Intersects`.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **EXPLAIN FORMAT JSON** — araçlarla entegrasyon ve JSON planı programatik analiz.
+1. **`ST_AsText + LIKE` en yavaş kalıptır.** Geometriyi metne dönüştürüp metin arama yapmak her satır için iki pahalı işlem demektir. Geometry tipi için `GeometryType()`, koordinat aralığı için bbox veya `ST_DWithin` kullanılmalıdır.
+2. **Functional index her INSERT/UPDATE'te hesaplanır.** Pahalı bir ifade functional index olarak tanımlandığında yazma performansı olumsuz etkilenebilir; maliyet-fayda dengesi değerlendirilmelidir.
+3. **`OR` ile non-sargable koşullar birikmez.** `WHERE ST_X(geom) > 28 OR ST_Y(geom) < 40` iki ayrı non-sargable koşuldur. Çözüm olarak bbox birleşimi veya `ST_Intersects` kullanılmalıdır.

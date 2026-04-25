@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostGIS Akademi — Bölüm 1: Spatial SQL Fundamentals</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      :root { --blue:#2563eb;--blue-light:#dbeafe;--teal:#0d9488;--teal-light:#ccfbf1;--white:#ffffff;--s50:#f8fafc;--s200:#e2e8f0;--s600:#475569;--s800:#1e293b;--s900:#0f172a;--border:rgba(255,255,255,0.08); }
+      * { box-sizing:border-box;margin:0;padding:0; }
+      body { font-family:'Inter',system-ui,sans-serif;background:linear-gradient(160deg,#0a1628 0%,#0e1d38 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column; }
+      .nav { position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:11px 28px;background:rgba(10,22,40,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border); }
+      .nav-brand { font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue); }
+      .nav-links { display:flex;gap:6px; }
+      .nav-links a { font-size:.76rem;color:rgba(255,255,255,.5);text-decoration:none;padding:5px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);transition:all 140ms; }
+      .nav-links a:hover { color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.06); }
+      .nav-links a.current { color:#fff;background:var(--blue);border-color:var(--blue); }
+      .progress { height:2px;background:rgba(255,255,255,.08); }
+      .progress-fill { height:100%;background:var(--blue);transition:width 250ms ease; }
+      .deck-outer { flex:1;display:flex;align-items:center;justify-content:center;padding:32px 20px 108px; }
+      .deck { width:min(980px,100%); }
+      .slide { display:none;background:var(--white);color:var(--s900);border-radius:16px;border-left:5px solid var(--blue);box-shadow:0 16px 48px rgba(0,0,0,.45);animation:appear 260ms ease; }
+      .slide.active { display:block; }
+      .slide-body { padding:36px 44px; }
+      .kicker { font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--blue);margin-bottom:10px; }
+      .slide h1 { font-size:clamp(1.7rem,3vw,2.6rem);font-weight:700;line-height:1.18;color:var(--s900);margin-bottom:10px;letter-spacing:-.01em; }
+      .slide h2 { font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:700;line-height:1.25;color:var(--s900);margin-bottom:10px; }
+      .slide-sub { font-size:.95rem;color:var(--s600);line-height:1.65;margin-bottom:18px;max-width:70ch; }
+      .hook { background:var(--blue-light);border-left:4px solid var(--blue);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .hook-header { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
+      .hook-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);margin-bottom:0; }
+      .hook p { font-size:.9rem;color:var(--s800);line-height:1.55;font-style:italic; }
+      .case { background:var(--teal-light);border-left:4px solid var(--teal);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .case-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--teal);margin-bottom:5px; }
+      .case p { font-size:.9rem;color:var(--s800);line-height:1.55; }
+      .phases { display:flex;flex-direction:column;gap:6px;margin-top:10px; }
+      .phase { display:flex;gap:12px;align-items:flex-start;background:var(--s50);border-radius:8px;padding:9px 13px; }
+      .phase-tag { display:flex;align-items:center;gap:5px;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blue);flex-shrink:0;min-width:108px;white-space:nowrap;padding-top:2px; }
+      .phase-body { flex:1;min-width:0; }
+      .phase-body p { font-size:.86rem;color:var(--s800);line-height:1.52;margin:0; }
+      code { font-family:'IBM Plex Mono',monospace;font-size:.81em;background:var(--s200);color:#1d4ed8;padding:1px 5px;border-radius:4px; }
+      .cta { display:inline-flex;align-items:center;gap:8px;margin-top:22px;background:var(--blue);color:var(--white);text-decoration:none;padding:11px 22px;border-radius:10px;font-weight:600;font-size:.88rem;transition:background 140ms; }
+      .cta:hover { background:#1d4ed8; }
+      .ctrl-bar { position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 24px;background:rgba(10,22,40,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border); }
+      .ctrl-btn { border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px 20px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(255,255,255,.07);color:#fff;transition:all 140ms; }
+      .ctrl-btn:hover:not(:disabled) { background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.38); }
+      .ctrl-btn:disabled { opacity:.28;cursor:not-allowed; }
+      .ctrl-status { font-size:.82rem;color:rgba(255,255,255,.5);min-width:240px;text-align:center; }
+      .q-btn { display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--blue);background:transparent;color:var(--blue);font-size:.68rem;font-weight:700;line-height:1;cursor:pointer;font-family:inherit;transition:background 130ms,color 130ms;flex-shrink:0; }
+      .q-btn:hover,.q-btn.q-active { background:var(--blue);color:var(--white); }
+      .answer-box { display:none;margin-top:7px;padding:8px 13px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px; }
+      .answer-box-lbl { display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0284c7;margin-bottom:3px; }
+      .answer-box p { font-size:.83rem;color:var(--s800);line-height:1.54;font-style:normal;margin:0; }
+      @keyframes appear { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <span class="nav-brand">PostGIS Akademi</span>
+      <div class="nav-links">
+        <a href="./index.html">Ana Sayfa</a>
+        <a href="./bolum-0.html">Bölüm 0</a>
+        <a href="./bolum-1.html" class="current">Bölüm 1</a>
+        <a href="./bolum-2.html">Bölüm 2</a>
+        <a href="./bolum-3.html">Bölüm 3</a>
+      </div>
+    </nav>
+    <div class="progress"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+
+    <div class="deck-outer"><div class="deck" id="deck">
+
+      <!-- 1: Kapak -->
+      <section class="slide active" data-slide-title="Kapak">
+        <div class="slide-body">
+          <p class="kicker">PostGIS Akademi — Bölüm 1</p>
+          <h1>Spatial SQL Fundamentals</h1>
+          <p class="slide-sub">Platform kurulumundan PostgreSQL mimarisine, geometri veri modelinden projeksiyon sistemlerine, mekansal ilişkilerden ölçüm analitiğine — PostGIS'in temel yapı taşları.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Bölüm 1 Kapsamı</p></div>
+            <p>1.1 Kuruluma ve Platforma Giriş &nbsp;·&nbsp; 1.2 PostgreSQL Temelleri &nbsp;·&nbsp; 1.3 Geometri Temelleri &nbsp;·&nbsp; 1.4 SRID ve Projeksiyonlar &nbsp;·&nbsp; 1.5 Mekansal İlişkiler &nbsp;·&nbsp; 1.6 Ölçüm ve Temel Analitik</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Bu bölümün sonunda katılımcı; tarayıcı ortamında mekansal sorgu çalıştırabilir, doğru geometri tipini seçebilir, projeksiyon hatasını tespit edebilir ve mekansal ilişki sorgularını yazabilir.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2: Alt Modül 1.1 -->
+      <section class="slide" data-slide-title="1.1 — Kuruluma ve Platforma Giriş">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 1.1 — Kuruluma ve Platforma Giriş</p>
+          <h2>Platform: Sıfır Kurulum PostgreSQL + PostGIS</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-01">?</button>
+            </div>
+            <p>Tarayıcı ortamında kurulum yapmadan PostgreSQL + PostGIS çalıştırmak mümkün müdür?</p>
+            <div class="answer-box" id="ans-01">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Evet. PGlite, PostgreSQL'i WebAssembly'ye derler; tarayıcı sekmesinde tam PostGIS desteğiyle çalışır. Veri IndexedDB'ye kaydedilir — kurulum, sunucu veya ağ bağlantısı gerekmez.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Eğitim ve POC ortamlarında sıfır kurulum maliyeti sağlar. Kurumsal ekipler altyapı hazırlığı olmadan ilk günden üretken olabilir; ortam uyumsuzluğu sorunları tamamen ortadan kalkar.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>PGlite = PostgreSQL WASM. Üç panel: sol içerik, orta SQL editörü, sağ sonuç (Tablo / Harita / EXPLAIN). Mekansal sorgular geometry sütunu döndürdüğünde Harita sekmesi otomatik etkinleşir.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT postgis_version();</code> → PostGIS sürüm bilgisini döndürür. Platform hazır olduğunu doğrular.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-02">?</button></span>
+              <div class="phase-body">
+                <p>PGlite, production veritabanı olarak kullanılabilir mi?</p>
+                <div class="answer-box" id="ans-02">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Hayır. PGlite tek kullanıcı, tarayıcı içi sandbox'tır. Eşzamanlı bağlantı, WAL, replikasyon yoktur. Üretim için tam PostgreSQL sunucusu zorunludur.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-03">?</button></span>
+              <div class="phase-body">
+                <p><code>SELECT current_database(), current_schema(), version();</code> çalıştır. Sonuçların hangi sekmede göründüğünü not et.</p>
+                <div class="answer-box" id="ans-03">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>Tablo sekmesinde 3 sütunlu tek satır görünür. Harita sekmesi boş kalır — geometry sütunu yok. EXPLAIN sekmesinde basit SELECT planı görünür.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3: Alt Modül 1.2 -->
+      <section class="slide" data-slide-title="1.2 — PostgreSQL Temelleri ve Mimari">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 1.2 — PostgreSQL Temelleri ve Mimari</p>
+          <h2>Cluster, Database, Schema ve MVCC</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-04">?</button>
+            </div>
+            <p>Bir PostgreSQL sunucusunda (cluster) aynı anda kaç veritabanı bulunabilir?</p>
+            <div class="answer-box" id="ans-04">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Pratikte yüzlerce. Her veritabanı izole şema ve rol haklarına sahiptir. Ancak veritabanları arası direkt JOIN yapılamaz — bunun için foreign data wrapper (FDW) veya ayrı şema kullanılır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Kurumsal sistemlerde her uygulama/proje kendi veritabanında tutulur. MVCC sayesinde okuma işlemleri yazma işlemlerini bloklamaz — mekansal analizler production verisi üzerinde canlı çalışabilir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Cluster → Database → Schema → Table hiyerarşisi. MVCC: her transaction kendi snapshot'ını görür, satırları kilitlemez. İzolasyon seviyeleri: READ COMMITTED (varsayılan) → REPEATABLE READ → SERIALIZABLE.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT current_database(), current_schema(), pg_postmaster_start_time();</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-05">?</button></span>
+              <div class="phase-body">
+                <p>MVCC neden ölü satır (dead tuple) biriktirir ve bunu kim temizler?</p>
+                <div class="answer-box" id="ans-05">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>UPDATE/DELETE satırı fiziksel olarak silmez; eski sürümü "dead tuple" olarak bırakır, yeni sürümü yazar. Eski snapshot'lar ihtiyaç duymayınca VACUUM bu ölü satırları temizler ve alanı geri kazandırır.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-06">?</button></span>
+              <div class="phase-body">
+                <p><code>SELECT schemaname, tablename FROM pg_tables WHERE schemaname = 'public';</code> ile mevcut tabloları listele. PostGIS sistem tablolarını bul.</p>
+                <div class="answer-box" id="ans-06">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>geometry_columns ve spatial_ref_sys gibi PostGIS meta tablolarını göreceksin. spatial_ref_sys içinde binlerce EPSG kaydı bulunur — <code>SELECT COUNT(*) FROM spatial_ref_sys;</code> ile say.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4: Alt Modül 1.3 -->
+      <section class="slide" data-slide-title="1.3 — Geometri Temelleri">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 1.3 — Geometri Temelleri</p>
+          <h2>OGC Geometri Tipleri ve WKT / GeoJSON</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-07">?</button>
+            </div>
+            <p>Türkiye'nin idari il sınırlarını temsil etmek için hangi geometri tipi kullanılmalıdır ve neden?</p>
+            <div class="answer-box" id="ans-07">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>MULTIPOLYGON. İl sınırları birden fazla kapalı alan içerebilir (adalar, yarımadalar). POLYGON yalnızca tek kapalı alana izin verir; adaları olan iller MULTIPOLYGON olmadan doğru temsil edilemez.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Ulusal adres veritabanlarında her idari birim doğru geometri tipiyle temsil edilmezse mekansal sorgular yanlış sonuç üretir. TKGM parsel veritabanı POLYGON, il sınırları MULTIPOLYGON kullanır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>OGC Simple Features: POINT, LINESTRING, POLYGON + MULTI* varyantları + GEOMETRYCOLLECTION. WKT ile oluşturma: <code>ST_GeomFromText</code>. GeoJSON ile: <code>ST_GeomFromGeoJSON</code>. Doğrulama: <code>ST_IsValid</code>.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT ST_AsText(ST_GeomFromText('POLYGON((28 41,29 41,29 40,28 40,28 41))',4326));</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-08">?</button></span>
+              <div class="phase-body">
+                <p><code>ST_IsValid</code> false döndürüyorsa ne yapılmalıdır?</p>
+                <div class="answer-box" id="ans-08">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p><code>ST_MakeValid(geom)</code> ile onarım. <code>ST_IsValidReason(geom)</code> ile hata nedeni öğrenilir. En yaygın nedenler: self-intersection (kendini kesen kenar), ring direction hatası, degenerate polygon.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-09">?</button></span>
+              <div class="phase-body">
+                <p>Ankara (32.85, 39.93) ve İstanbul (28.97, 41.01) noktalarını MULTIPOINT olarak oluştur; <code>ST_NumGeometries</code> ile nokta sayısını sorgula.</p>
+                <div class="answer-box" id="ans-09">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ST_NumGeometries(ST_GeomFromText('MULTIPOINT((32.85 39.93),(28.97 41.01))',4326));</code> → 2 döner.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5: Alt Modül 1.4 -->
+      <section class="slide" data-slide-title="1.4 — SRID ve Projeksiyonlar">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 1.4 — SRID ve Projeksiyonlar</p>
+          <h2>Koordinat Referans Sistemi, ST_SetSRID ve ST_Transform</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-10">?</button>
+            </div>
+            <p>Ankara–İstanbul mesafesini ST_Distance ile metre cinsinden hesaplamak için hangi yaklaşım doğrudur?</p>
+            <div class="answer-box" id="ans-10">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>EPSG:4326 geometry tipi derece döndürür, metre değil. Çözüm: <code>::geography</code> cast ile gerçek dünya mesafesi (m) veya <code>ST_Transform(..., 32636)</code> ile UTM 36N metrik projeksiyona dönüştürmek.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Türkiye'de kadastral ölçümler EPSG:5253–5256 (TUREF/TM) ile yapılır. Yanlış projeksiyon seçimi metrelerce ölçüm hatasına yol açar; arazi değerleme sistemleri bu hatalardan etkilenir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>SRID = koordinat referans sistemi kimliği. <code>ST_SetSRID(geom, srid)</code> yalnızca meta veri atar — koordinatları DEĞİŞTİRMEZ. <code>ST_Transform(geom, hedef_srid)</code> koordinatları gerçekten dönüştürür.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT ST_Distance( ST_GeomFromText('POINT(28.97 41.01)',4326)::geography, ST_GeomFromText('POINT(32.85 39.93)',4326)::geography ) / 1000 AS km;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-11">?</button></span>
+              <div class="phase-body">
+                <p>ST_SetSRID ve ST_Transform karıştırılırsa ne olur?</p>
+                <div class="answer-box" id="ans-11">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Yanlış SRID atanmış geometriye ST_Transform uygulanırsa koordinatlar yanlış referans sisteminden dönüştürülür — sonuç tamamen hatalı konuma işaret eder. SetSRID = etiket, Transform = gerçek dönüşüm.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-12">?</button></span>
+              <div class="phase-body">
+                <p>İzmir koordinatlarını (27.14, 38.42) EPSG:4326'dan EPSG:32635'e (UTM 35N) dönüştür. Koordinat birimlerindeki değişimi gözlemle.</p>
+                <div class="answer-box" id="ans-12">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ST_AsText(ST_Transform(ST_GeomFromText('POINT(27.14 38.42)',4326),32635));</code> → Koordinatlar ~350000, ~4250000 civarı metre değerlerine dönüşür.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6: Alt Modül 1.5 -->
+      <section class="slide" data-slide-title="1.5 — Mekansal İlişkiler">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 1.5 — Mekansal İlişkiler</p>
+          <h2>DE-9IM: Contains, Intersects, DWithin ve Spatial Join</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-13">?</button>
+            </div>
+            <p>Bir mahalle poligonu içindeki tüm bina noktalarını bulmak için hangi fonksiyon kullanılır?</p>
+            <div class="answer-box" id="ans-13">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>ST_Within(bina, mahalle)</code> — binanın mahallenin tamamen içinde olduğunu test eder. Alternatif: <code>ST_Contains(mahalle, bina)</code> — simetrik sonuç, argüman sırası farklı. Her ikisi de GiST indeksi kullanır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Kent bilgi sistemlerinde her yapı, yol veya tesisin hangi idari birime ait olduğunu belirlemek mekansal join ile yapılır. Belediye vergi sistemleri bina-parsel eşleştirmesinde ST_Within kullanır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>DE-9IM modeli: Contains/Within (kapsama), Intersects (kesişme — en yaygın), Disjoint (ayrık), Touches (sınır temas), Overlaps (kısmi örtüşme), Crosses (boyut kesişme). DWithin: mesafe bazlı filtre.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT b.id FROM binalar b JOIN mahalleler m ON ST_Within(b.geom, m.geom) WHERE m.ad = 'Kadıköy';</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-14">?</button></span>
+              <div class="phase-body">
+                <p>ST_Intersects ile ST_Overlaps arasındaki fark nedir?</p>
+                <div class="answer-box" id="ans-14">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Intersects, herhangi bir kesişimi yakalar — biri diğerinin içindeyse de true döner. Overlaps yalnızca kısmi örtüşmeyi bulur: A, B'nin tamamen içindeyse veya B, A'nın tamamen içindeyse false döner.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-15">?</button></span>
+              <div class="phase-body">
+                <p>İki poligon oluştur; biri diğerini kısmen kaplasın. <code>ST_Intersects</code>, <code>ST_Overlaps</code>, <code>ST_Contains</code> sonuçlarını karşılaştır.</p>
+                <div class="answer-box" id="ans-15">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>Kısmi örtüşmede: Intersects=true, Overlaps=true, Contains=false. Biri tamamen içindeyken: Intersects=true, Overlaps=false, Contains=true.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7: Alt Modül 1.6 -->
+      <section class="slide" data-slide-title="1.6 — Ölçüm ve Temel Analitik">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 1.6 — Ölçüm ve Temel Analitik</p>
+          <h2>ST_Distance, ST_Area, ST_Buffer ve Centroid</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-16">?</button>
+            </div>
+            <p>ST_Area ile hesaplanan alan neden beklentinin çok uzağında çıkabilir?</p>
+            <div class="answer-box" id="ans-16">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>geometry tipiyle EPSG:4326'da alan derece² olarak hesaplanır, m² değil. 1 derece² ≈ 12.000 km². Doğru alan için <code>::geography</code> cast veya metrik projeksiyon (UTM) kullanılmalıdır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Arazi değerleme sistemleri m² cinsinden doğru alan gerektirir. Projeksiyon hatası milyonlarca liralık hatalı değerlemeye yol açabilir. Türkiye'de resmi alan hesaplamaları TUREF/TM projeksiyonuyla yapılır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>ST_Distance</code> (m, geography ile), <code>ST_Area</code> (m², geography), <code>ST_Length</code> (m), <code>ST_Centroid</code> (ağırlık merkezi — poligon dışında kalabilir), <code>ST_PointOnSurface</code> (her zaman içinde), <code>ST_Buffer</code> (tampon alan).</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT ST_Area(ST_GeomFromText('POLYGON((28 41,29 41,29 40,28 40,28 41))',4326)::geography) AS alan_m2;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-17">?</button></span>
+              <div class="phase-body">
+                <p>ST_Centroid bir adacık (donut) poligon için neden dışarıda kalabilir?</p>
+                <div class="answer-box" id="ans-17">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Centroid geometrik ağırlık merkezidir; halka veya çukur (concave) poligonda sınırın dışına düşer. ST_PointOnSurface geometrinin yüzeyinde garantili bir nokta döndürür — adres noktaları için tercih edilir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-18">?</button></span>
+              <div class="phase-body">
+                <p>Bir mahalleyi temsil eden poligon oluştur. ST_Centroid ile merkez noktasını bul, ardından 500 m ST_Buffer uygula. Sonucu haritada görselleştir.</p>
+                <div class="answer-box" id="ans-18">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ST_Buffer(ST_Centroid(geom)::geography, 500)::geometry FROM mahalleler LIMIT 1;</code> → Harita sekmesinde dairesel tampon poligonu görünür.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8: Kapanış -->
+      <section class="slide" data-slide-title="Bölüm Sonu">
+        <div class="slide-body">
+          <p class="kicker">Bölüm 1 — Özet</p>
+          <h2>Spatial SQL Fundamentals Tamamlandı</h2>
+          <p class="slide-sub">Platform mimarisinden geometri veri modeline, projeksiyon sistemlerinden mekansal ilişkilere ve ölçüm analitiğine — PostGIS'in temel yapı taşları artık kullanıma hazır.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Kazanımlar</p></div>
+            <p>PGlite ortamı &nbsp;·&nbsp; PostgreSQL hiyerarşi ve MVCC &nbsp;·&nbsp; OGC geometri tipleri &nbsp;·&nbsp; SRID / projeksiyon dönüşümü &nbsp;·&nbsp; Mekansal ilişki operatörleri &nbsp;·&nbsp; Ölçüm fonksiyonları</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Bir Sonraki Bölümde</p>
+            <p>Bölüm 2 — Sorgular, İndeks ve Performans: veri yükleme teknikleri, ileri geometri işlemleri, GiST indeksleme ve EXPLAIN ANALYZE ile sorgu optimizasyonu.</p>
+          </div>
+          <a href="./bolum-2.html" class="cta">Bölüm 2: Sorgular, İndeks ve Performans →</a>
+        </div>
+      </section>
+
+    </div></div>
+
+    <div class="ctrl-bar">
+      <button class="ctrl-btn" id="prevBtn" type="button">← Geri</button>
+      <span class="ctrl-status" id="slideStatus">1 / 8</span>
+      <button class="ctrl-btn" id="nextBtn" type="button">İleri →</button>
+    </div>
+
+    <script>
+      (function () {
+        var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+        var total=slides.length,idx=0;
+        var prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn');
+        var status=document.getElementById('slideStatus'),fill=document.getElementById('progressFill');
+        function render(){slides.forEach(function(s,i){var a=i===idx;s.classList.toggle('active',a);s.setAttribute('aria-hidden',String(!a));});var t=slides[idx].getAttribute('data-slide-title')||'';status.textContent=(idx+1)+' / '+total+(t?'  ·  '+t:'');fill.style.width=((idx+1)/total*100).toFixed(1)+'%';prevBtn.disabled=idx===0;nextBtn.disabled=idx===total-1;}
+        prevBtn.addEventListener('click',function(){if(idx>0){idx--;render();}});
+        nextBtn.addEventListener('click',function(){if(idx<total-1){idx++;render();}});
+        document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='PageDown'){if(idx<total-1){idx++;render();}}if(e.key==='ArrowLeft'||e.key==='PageUp'){if(idx>0){idx--;render();}}});
+        render();
+      }());
+      (function () {
+        document.querySelectorAll('.q-btn').forEach(function (btn) {
+          var box = document.getElementById(btn.getAttribute('data-answer'));
+          if (!box) return;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = box.style.display === 'block';
+            box.style.display = open ? 'none' : 'block';
+            btn.textContent = open ? '?' : '✓';
+            btn.classList.toggle('q-active', !open);
+          });
+        });
+      }());
+    </script>
+  </body>
+</html>

@@ -1,12 +1,12 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Within` ile mekansal RLS politikası yazabileceksin
-- Kullanıcı yetki alanı poligonu bazlı erişim kısıtlaması yapabileceksin
-- Mekansal politikanın performans etkisini değerlendirebileceksin
+- `ST_Within` ile mekansal RLS politikası yazmak
+- Kullanıcı yetki alanı poligonu bazlı erişim kısıtlaması uygulamak
+- Mekansal politikanın performans etkisini değerlendirmek
 
 ---
 
-## 📖 Kavram: Mekansal Erişim Kontrolü
+## Mekansal Erişim Kontrolü
 
 "İstanbul sorumlusu sadece İstanbul içindeki parselleri görsün."
 
@@ -23,7 +23,9 @@ CREATE POLICY mekansal_sinir ON parseller
 
 ---
 
-## ▶ Canlı Örnek — Yetki Alanı Tablosu
+## Uygulama Örneği
+
+### Yetki alanı ve nokta tablosu
 
 <RunnableBlock
   sql={`-- Kullanıcı yetki alanları
@@ -54,11 +56,10 @@ INSERT INTO yetkili_noktalar (ad, geom) VALUES
 
 SELECT COUNT(*) AS toplam FROM yetkili_noktalar;`}
   label="Yetki alanı ve nokta tablosu"
+  description="kullanici_bolge her kullanıcının erişim alanını POLYGON geometrisi olarak saklar; ST_MakeEnvelope dikdörtgen bölge oluşturur. yetkili_noktalar dört nokta içerir: iki İstanbul, bir Ankara, bir de her iki bölge dışında kalan Orta Anadolu noktası. Bu yapı mekansal RLS'nin neden hangi satırları gösterdiğini test etmek için tasarlanmıştır."
 />
 
----
-
-## ▶ Mekansal RLS Politikası
+### Mekansal RLS politikası
 
 <RunnableBlock
   sql={`ALTER TABLE yetkili_noktalar ENABLE ROW LEVEL SECURITY;
@@ -79,11 +80,10 @@ CREATE POLICY mekansal_erisim ON yetkili_noktalar
 -- Superuser her şeyi görür (politika bypass)
 SELECT ad, ST_AsText(geom) AS konum FROM yetkili_noktalar;`}
   label="Mekansal RLS politikası"
+  description="CREATE POLICY USING bloğu her satır için ST_Within kontrolü uygular. COALESCE kullanıcının kayıtlı yetki alanını çeker; kullanıcı kullanici_bolge tablosunda yoksa tüm dünyayı kapsayan fallback bbox kullanılır. Superuser BYPASSRLS ile politikayı atlar ve tüm 4 satırı görür. Normal kullanıcı yalnızca kendi bölge poligonu içindeki noktaları görür."
 />
 
----
-
-## ▶ Session Parametresi ile Simüle Et
+### İstanbul kullanıcısı simülasyonu
 
 <RunnableBlock
   sql={`-- Politika aktif ama superuser — manuel filtre ile test
@@ -96,11 +96,12 @@ FROM yetkili_noktalar n
 CROSS JOIN kullanici_bolge b
 WHERE b.kullanici = 'istanbul_usr';`}
   label="İstanbul kullanıcısı simülasyonu"
+  description="Superuser oturumunda SET ROLE ile kullanıcı değiştirilemediğinden mekansal politika manuel simüle edilir. CROSS JOIN kullanıcının bölge poligonunu her noktayla eşleştirir. ST_Within İstanbul bbox içindeki noktalar için 'Erişilebilir', dışındakiler için 'Kısıtlı' döndürür. Sonuçta 2 İstanbul noktası erişilebilir, Ankara ve Orta Anadolu kısıtlı görünür."
 />
 
 ---
 
-## 🧪 Dene — Ankara Kullanıcısı
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Ankara kullanıcısının görebileceği noktalar
@@ -111,18 +112,13 @@ FROM yetkili_noktalar n
 JOIN kullanici_bolge b ON b.kullanici = 'ankara_usr'
 WHERE ST_Within(n.geom, b.bolge);`}
   label="Ankara kullanıcısı görünür noktalar"
+  description="WHERE ST_Within(n.geom, b.bolge) Ankara bölgesi içindeki noktaları seçer. ST_Distance her noktanın Ankara bölgesinin merkezine olan uzaklığını km cinsinden hesaplar. Yalnızca 'Ankara Noktası 1' eşleşmeli; İstanbul ve Orta Anadolu noktaları filtrelenmelidir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Mekansal politika GIST indeksi kullanmaz doğrudan:** `ST_Within(geom, subquery)` her satırda subquery çalıştırır. Performans için: yetki alanını oturumda önbelleğe al veya materialized view kullan.
-2. **`current_user` vs `session_user`:** Rol değiştirildiğinde `current_user` değişir, `session_user` değişmez. Politikada `current_user` güvenli.
-3. **NULL geometri:** Kullanıcının yetki alanı yoksa `COALESCE` ile fallback ver — aksi halde politika her satırı reddeder.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **Read-only kullanıcı şablonu** — GeoServer ve QGIS için üretim yapılandırması.
+1. **Mekansal politika GIST indeksini doğrudan kullanmaz:** `ST_Within(geom, subquery)` her satırda alt sorguyu çalıştırır. Performans için yetki alanı oturumda önbelleğe alınmalı veya materialized view kullanılmalıdır.
+2. **`current_user` vs `session_user`:** Rol değiştirildiğinde `current_user` değişir, `session_user` değişmez. Politikada `current_user` güvenli seçimdir.
+3. **NULL geometri:** Kullanıcının yetki alanı yoksa `COALESCE` ile fallback verilmezse politika tüm satırları reddeder.

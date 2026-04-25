@@ -67,6 +67,17 @@ const mdxGlob = import.meta.glob<{ default: ComponentType }>('../../content/**/*
 
 /** MDX dosya adı haritası: "day-N/module-N" → lesson slug → filename */
 const LESSON_FILENAME: Record<string, Record<string, string>> = {
+  'day-0/module-1': {
+    'lesson-1': 'lesson-1-what-is-sql',
+    'lesson-2': 'lesson-2-data-types',
+    'lesson-3': 'lesson-2-select-columns',
+    'lesson-4': 'lesson-3-where-filtering',
+    'lesson-5': 'lesson-4-order-limit-distinct',
+    'lesson-6': 'lesson-5-aggregate-functions',
+    'lesson-7': 'lesson-6-group-by',
+    'lesson-8': 'lesson-7-join',
+    'lesson-9': 'lesson-8-insert-update-delete',
+  },
   'day-1/module-0': {
     'lesson-1': 'lesson-1-cluster-database-schema',
     'lesson-2': 'lesson-2-tablespace',
@@ -187,6 +198,15 @@ const LESSON_FILENAME: Record<string, Record<string, string>> = {
     'lesson-2': 'lesson-2-health-density',
     'lesson-3': 'lesson-3-unreachable-areas',
     'lesson-4': 'lesson-4-hotspot-analysis',
+  },
+  'day-3/module-7': {
+    'lesson-1': 'lesson-1-spatial-analytics',
+    'lesson-2': 'lesson-2-deployment',
+    'lesson-3': 'lesson-3-capstone-planning',
+    'lesson-4': 'lesson-4-data-integration',
+    'lesson-5': 'lesson-5-optimization',
+    'lesson-6': 'lesson-6-production',
+    'lesson-7': 'lesson-7-summary',
   },
 };
 

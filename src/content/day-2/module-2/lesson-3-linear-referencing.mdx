@@ -1,24 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_LineLocatePoint` ile noktanın çizgi üzerindeki konumunu bulabileceksin
-- `ST_LineInterpolatePoint` ile çizgi üzerinde belirli bir konumdaki noktayı bulabileceksin
-- Km bazlı yol konumlandırması yapabileceksin
+"Bu kaza yolun kaçıncı km'sinde?" veya "Araç güzergahın yüzde kaçını tamamladı?" gibi sorular lineer referanslama ile yanıtlanır. Bu ders, çizgi geometrisi üzerinde konum belirleme ve kesim yapma fonksiyonlarını ele almaktadır.
+
+- `ST_LineLocatePoint` ile noktanın çizgi üzerindeki konumunu bulmak
+- `ST_LineInterpolatePoint` ile çizgi üzerinde belirli bir konumdaki noktayı hesaplamak
+- `ST_LineSubstring` ile çizginin belirli bir dilimini çıkarmak
 
 ---
 
-## 📖 Kavram: Lineer Referanslama
+## Lineer Referanslama
 
-"Bu kaza yolun kaçıncı km'sinde?" veya "Araç güzergahın yüzde kaçını tamamladı?" gibi sorular **lineer referanslama** ile yanıtlanır.
-
-| Fonksiyon | Giriş | Çıktı |
+| Fonksiyon | Girdi | Çıktı |
 |---|---|---|
 | `ST_LineLocatePoint(line, point)` | Çizgi + Nokta | 0.0–1.0 (oran) |
 | `ST_LineInterpolatePoint(line, frac)` | Çizgi + Oran | Nokta |
 | `ST_LineSubstring(line, start, end)` | Çizgi + Oran aralığı | Alt çizgi |
 
+Tüm bu fonksiyonlar konumu çizgi uzunluğunun oransal değeri (fraction) üzerinden ifade eder: `0.0` başlangıç, `1.0` bitiş, `0.5` orta noktadır.
+
 ---
 
-## ▶ Canlı Örnek — Yol Üzerinde Kaza Konumu
+## Uygulama Örneği
+
+### Kaza yolun kaçıncı km'sinde?
 
 <RunnableBlock
   sql={`WITH yol AS (
@@ -38,11 +42,10 @@ SELECT
 FROM yol, kaza;`}
   label="Kaza yolun kaçıncı km'inde?"
   autoFit
+  description="ST_LineLocatePoint kaza noktasının yol çizgisi üzerindeki oransal konumunu (0.0–1.0) döndürür. Kaza doğrudan çizgi üzerinde olmayabilir; fonksiyon en yakın izdüşüm noktasını kullanır. Oran, toplam yol uzunluğuyla (km) çarpılarak kazanın kaçıncı km'de gerçekleştiği hesaplanır. kaza.geom harita sekmesinde noktayı görselleştirir."
 />
 
----
-
-## ▶ Her 100 km'de Bir Noktayı Bul
+### Her 100 km'de bir nokta
 
 <RunnableBlock
   sql={`WITH yol AS (
@@ -62,11 +65,10 @@ FROM yol y, uzunluk u,
 WHERE frac <= 1.0;`}
   label="Her 100 km'de bir nokta"
   autoFit
+  description="generate_series(0, 10) sayaç üretir; LATERAL hesaplama ile her 100 km için oransal konum (frac) hesaplanır. ST_LineInterpolatePoint o oransal konumdaki noktayı üretir. WHERE frac <= 1.0 yol uzunluğunu aşan noktaları eleler. Harita sekmesi çizgi boyunca eşit aralıklı nokta dizisini gösterir; bu kalıp şerit mesafe tabelası veya araç takip uygulamalarında kullanılır."
 />
 
----
-
-## ▶ Alt Güzergah: ST_LineSubstring
+### Alt güzergah kesimi
 
 <RunnableBlock
   sql={`WITH yol AS (
@@ -82,18 +84,13 @@ SELECT
 FROM yol;`}
   label="Güzergah alt kesiti"
   autoFit
+  description="ST_LineSubstring iki oransal konum arasındaki çizgi dilimini döndürür. İlk üç SELECT çizgiyi üç eşit parçaya böler; son sütun çizginin orta %50'sini seçer. geom sütunu (0.25–0.75 dilimi) haritada görselleştirilir. Bu fonksiyon bir yolun belirli bir bölümünü ayırmak — ör. bakım alanı, şantiye bölgesi — için kullanılır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_LineLocatePoint en yakın noktayı bulur:** Nokta tam çizgi üzerinde olmayabilir — çizgiye en yakın izdüşüm noktası kullanılır.
-2. **Çizgi yönü önemli:** `ST_LineLocatePoint` başlangıç noktasına olan oranı döndürür. Ters yönde oluşturulmuş çizgilerde 0 ve 1 yer değişir.
-3. **geography vs geometry:** Bu fonksiyonlar `geometry` tipinde çalışır. geography input için önce `::geometry` cast yap.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste noktanın bir çizgiye en yakın noktasını bul: **`ST_ClosestPoint` ve `ST_ShortestLine`**.
+1. **`ST_LineLocatePoint` en yakın noktayı projekte eder.** Nokta tam çizgi üzerinde olmak zorunda değildir; fonksiyon noktanın çizgiye dik izdüşümünü kullanır.
+2. **Çizgi yönü oranı etkiler.** `ST_LineLocatePoint` başlangıç noktasına olan oranı döndürür. Ters yönde oluşturulmuş çizgilerde 0 ve 1 değerleri yer değişir.
+3. **`geography` tipinde doğrudan çalışmaz.** Bu fonksiyonlar `geometry` tipini gerektirir. `geography` geometrisi için önce `::geometry` cast uygulanmalıdır; mesafe hesabında `::geography` kullanılabilir.

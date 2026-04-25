@@ -1,46 +1,46 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Intersects` ile iki geometrinin kesişip kesişmediğini test edebileceksin
-- `ST_Disjoint` ile tamamen ayrı geometrileri bulabileceksin
-- Mekansal WHERE koşulu olarak bu fonksiyonları kullanabileceksin
+`ST_Intersects`, PostGIS'teki en sık kullanılan mekansal filtre fonksiyonudur; büyük ölçüde GiST indeks desteğiyle bu konumunu kazanmıştır. Bu ders kesişim ve ayrıklık ilişkilerini, gerçek dünya sorgularında nasıl kullanıldığını ve performans açısından dikkat edilmesi gereken noktaları ele almaktadır.
+
+- `ST_Intersects` ile iki geometrinin ortak nokta paylaşıp paylaşmadığını test etmek
+- `ST_Disjoint` ile tamamen ayrı geometrileri belirlemek
+- Bu fonksiyonları mekansal WHERE koşulu olarak yazmak
 
 ---
 
-## 📖 Kavram
+## Kesişim ve Ayrıklık
 
 ### ST_Intersects(A, B)
-"A ve B **ortak bir nokta paylaşıyor** mu?" — en sık kullanılan mekansal filtre.
-
-Sınır dahil: iki poligon sadece kenarlarından dokunuyor olsa bile `true` döner.
+"A ve B ortak en az bir nokta paylaşıyor mu?" — sınır teması dahil. En yaygın mekansal filtre fonksiyonudur ve GiST indeksinden tam destek alır.
 
 ### ST_Disjoint(A, B)
-`ST_Intersects`'in tersi: "A ve B **hiç ortak nokta** paylaşmıyor mu?"
+`ST_Intersects`'in mantıksal tersidir: A ve B hiç ortak nokta paylaşmıyor mu?
 
-```
+```sql
 ST_Disjoint(A, B) = NOT ST_Intersects(A, B)
 ```
 
-> **Performans:** `ST_Intersects` **GIST indeksi kullanır** — büyük tablolarda hızlı. `ST_Contains` ve diğerleri de benzer. `ST_Disjoint` indeksten yararlanamaz — büyük tablolarda dikkatli kullan.
+> **Performans notu:** `ST_Intersects` GiST indeksi kullanarak önce sınırlayıcı kutu eleme yapar, ardından kesin geometrik test uygular. `ST_Disjoint` ise bu mekanizmadan yararlanamaz; büyük tablolarda `NOT ST_Intersects` tercih edilmelidir.
 
 ---
 
-## ▶ Canlı Örnek
+## Uygulama Örneği
+
+### Intersects ve Disjoint karşılaştırması
 
 <RunnableBlock
   sql={`WITH a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS geom),
      b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS geom),
      c AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((5 5,8 5,8 8,5 8,5 5))'), 4326) AS geom),
      d AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((4 0,6 0,6 2,4 2,4 0))'), 4326) AS geom)
-SELECT
-  'A-B (örtüşen)'    AS cift, ST_Intersects(a.geom,b.geom) AS intersects, ST_Disjoint(a.geom,b.geom) AS disjoint FROM a,b
+SELECT 'A-B (örtüşen)'    AS cift, ST_Intersects(a.geom,b.geom) AS intersects, ST_Disjoint(a.geom,b.geom) AS disjoint FROM a,b
 UNION ALL SELECT 'A-C (ayrı)',  ST_Intersects(a.geom,c.geom), ST_Disjoint(a.geom,c.geom) FROM a,c
 UNION ALL SELECT 'A-D (sınır)', ST_Intersects(a.geom,d.geom), ST_Disjoint(a.geom,d.geom) FROM a,d;`}
   label="Intersects ve Disjoint karşılaştırması"
+  description="Üç farklı ilişki türü test edilir: örtüşen (A-B), tamamen ayrı (A-C) ve yalnızca sınırdan temas eden (A-D) poligon çiftleri. ST_Intersects sınır temasını da true sayar; ST_Disjoint ise ST_Intersects'in tam tersi değeri döndürür. Bu karşılaştırma iki fonksiyonun tamamlayıcı ilişkisini gösterir."
 />
 
----
-
-## ▶ Gerçek Senaryo — Bölgeyle Kesişen Rotalar
+### Bölgeyle kesişen rotalar
 
 <RunnableBlock
   sql={`WITH istanbul_bolge AS (
@@ -61,13 +61,12 @@ SELECT
 FROM istanbul_bolge b, rotalar r;`}
   label="Bölgeyle kesişen rotalar"
   autoFit
+  description="İstanbul bölgesini temsil eden bir poligon ile üç farklı güzergah LINESTRING'i arasında kesişim testi yapılır. ST_Intersects bölge poligonundan geçen güzergahları filtreler. Bu sorgu, büyük veri setlerinde 'hangi yollar bu bölgeden geçiyor?' sorusunu yanıtlamak için kullanılan gerçek dünya kalıbıdır."
 />
 
 ---
 
-## 🧪 Dene
-
-Tamamen ayrı (disjoint) geometrileri filtrele:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH referans AS (
@@ -84,18 +83,13 @@ SELECT t.id, ST_GeometryType(t.geom) AS tip,
 FROM referans r, test t
 ORDER BY t.id;`}
   label="Kesişim filtresi"
+  description="Farklı geometri tiplerinden oluşan dört nesne referans poligonla test edilir: örtüşen poligon, tamamen dışarıdaki poligon, içerideki nokta ve dışarıdaki nokta. ST_Intersects tüm tip kombinasyonlarını destekler; sonuçlar kesişim durumuna göre true/false döner."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Disjoint büyük tablolarda yavaş:** `WHERE ST_Disjoint(a, b)` indeks kullanamaz. Bunun yerine `WHERE NOT ST_Intersects(a, b)` yaz — aynı sonuç, indeksli.
-2. **Sadece sınır teması:** İki poligon sadece bir kenar noktasıyla temas ediyorsa `ST_Intersects` → `true`. Yüzey örtüşmesi için `ST_Overlaps` kullan.
-3. **Geometri tipini karıştırma:** `ST_Intersects(point, point)` yalnızca aynı koordinatta `true` döner.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste daha ince topolojik ayrımlar: `ST_Touches`, `ST_Crosses`, `ST_Overlaps`.
+1. **ST_Disjoint büyük tablolarda yavaşlatır.** `WHERE ST_Disjoint(a, b)` indeksten yararlanamaz. Aynı sonucu `WHERE NOT ST_Intersects(a, b)` ile indeksli biçimde elde etmek mümkündür.
+2. **Yalnızca sınır teması:** İki poligon tek bir kenar noktasıyla temas ediyorsa `ST_Intersects` → `true`. Yüzey örtüşmesini filtrelemek için `ST_Overlaps` kullanılmalıdır.
+3. **Geometri tipi karışımı:** `ST_Intersects(point, point)` yalnızca tam olarak aynı koordinatta `true` döner; farklı konumlardaki iki nokta her zaman `false` üretir.

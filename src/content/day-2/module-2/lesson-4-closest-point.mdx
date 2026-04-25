@@ -1,24 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_ClosestPoint` ile bir geometrinin başka bir geometriye en yakın noktasını bulabileceksin
-- `ST_ShortestLine` ile iki geometri arasındaki en kısa çizgiyi çizebileceksin
-- Noktadan yola dik uzaklık hesaplayabileceksin
+Bir noktanın yola veya bölge sınırına olan dik uzaklığı, CBS analizinde sıkça hesaplanması gereken bir değerdir. Bu ders, iki geometri arasındaki en yakın nokta çiftini ve bunları birleştiren en kısa çizgiyi hesaplayan fonksiyonları ele almaktadır.
+
+- `ST_ClosestPoint` ile bir geometrinin başka bir geometriye en yakın noktasını bulmak
+- `ST_ShortestLine` ile iki geometri arasındaki en kısa çizgiyi elde etmek
+- Noktadan yola dik uzaklık hesaplamak
 
 ---
 
-## 📖 Kavram
+## En Yakın Nokta Fonksiyonları
 
 | Fonksiyon | Döndürür | Kullanım |
 |---|---|---|
 | `ST_ClosestPoint(A, B)` | A üzerindeki B'ye en yakın nokta | Yola en yakın konum |
-| `ST_ShortestLine(A, B)` | İki geometri arası en kısa çizgi | Görsel dik mesafe |
+| `ST_ShortestLine(A, B)` | İki geometri arasındaki en kısa çizgi | Görsel dik mesafe |
 | `ST_Distance(A, B)` | Minimum mesafe sayısı | Uzaklık hesabı |
 
-`ST_Length(ST_ShortestLine(A,B)) = ST_Distance(A,B)` — her zaman eşit.
+`ST_Length(ST_ShortestLine(A, B)) = ST_Distance(A, B)` — iki fonksiyon her zaman eşit mesafe üretir.
 
 ---
 
-## ▶ Canlı Örnek — Noktadan Yola Dik
+## Uygulama Örneği
+
+### Noktadan yola dik
 
 <RunnableBlock
   sql={`WITH yol AS (
@@ -31,15 +35,14 @@ SELECT
   ST_AsText(ST_ClosestPoint(yol.geom, nokta.geom)) AS yakin_nokta_yolda,
   ST_AsText(ST_ShortestLine(nokta.geom, yol.geom)) AS kisa_cizgi,
   ROUND(ST_Distance(nokta.geom::geography, yol.geom::geography)::numeric/1000,2) AS mesafe_km,
-  ST_ShortestLine(nokta.geom, yol.geom)  AS geom
+  ST_ShortestLine(nokta.geom, yol.geom) AS geom
 FROM yol, nokta;`}
   label="Noktadan yola en kısa çizgi"
   autoFit
+  description="ST_ClosestPoint yol çizgisi üzerindeki en yakın noktayı döndürür; bu, noktadan yola dik izdüşümün çizgi üzerindeki konumudur. ST_ShortestLine noktaları birleştiren dik çizgiyi geometri olarak üretir. ST_Distance elipsoid üzerinde metre cinsinden dik uzaklığı hesaplar. geom sütunu haritada dik çizgiyi görselleştirir."
 />
 
----
-
-## ▶ Birden Fazla Yola En Yakın
+### Birden fazla yola en yakın
 
 <RunnableBlock
   sql={`WITH yollar AS (
@@ -48,22 +51,23 @@ FROM yol, nokta;`}
   UNION ALL SELECT 2, 'E-5',
     ST_SetSRID(ST_GeomFromText('LINESTRING(28.8 40.9, 29.3 40.9)'), 4326)
 ),
-araç AS (
+arac AS (
   SELECT ST_SetSRID(ST_MakePoint(29.0, 40.95), 4326) AS geom
 )
 SELECT
   y.ad,
   ROUND(ST_Distance(a.geom::geography, y.geom::geography)::numeric, 0) AS mesafe_m,
   ST_ClosestPoint(y.geom, a.geom) AS yakin_nokta
-FROM yollar y, araç a
+FROM yollar y, arac a
 ORDER BY ST_Distance(a.geom::geography, y.geom::geography);`}
   label="Araca en yakın yol"
   autoFit
+  description="Araç konumuna iki yolun mesafesi hesaplanır ve mesafeye göre sıralanır. ST_Distance ::geography ile metre cinsinden kesin mesafe döndürür. ST_ClosestPoint her yol üzerinde araca en yakın noktayı bulur. ORDER BY ST_Distance sıralama yapar; bu satır sayısı küçük olduğundan ek indeks gerekmez. Büyük tablolarda ST_DWithin filtresi ve GiST indeksi eklenmelidir."
 />
 
 ---
 
-## 🧪 Dene — Polygon Kenara Uzaklık
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH bina AS (
@@ -81,18 +85,13 @@ SELECT
 FROM bina b, nokta n;`}
   label="Noktadan poligon kenara mesafe"
   autoFit
+  description="Nokta-LINESTRING yerine nokta-POLYGON mesafesi hesaplanır. ST_Distance nokta ile poligon arasındaki minimum mesafeyi döndürür; bu, noktadan en yakın kenara olan dik uzaklıktır. Nokta poligon içindeyse ST_Distance sıfır döner. ST_ClosestPoint poligon sınırı üzerindeki en yakın noktayı verir; ST_ShortestLine dik çizgiyi haritada görselleştirir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_ClosestPoint(A,B) ≠ ST_ClosestPoint(B,A):** `ST_ClosestPoint(A,B)` → **A üzerindeki** en yakın nokta. Sıra önemli.
-2. **İçerideki nokta için mesafe sıfır:** Nokta poligonun içindeyse `ST_Distance` → 0, `ST_ShortestLine` → uzunluk 0 nokta.
-3. **3D geometride farklı:** Z koordinatı varsa `ST_3DClosestPoint`, `ST_3DDistance` kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste yön hesabı: **`ST_Azimuth` ve `ST_Angle`**.
+1. **`ST_ClosestPoint(A, B)` ≠ `ST_ClosestPoint(B, A)`.** `ST_ClosestPoint(A, B)` → **A üzerindeki** en yakın noktayı döndürür. Argüman sırası sonucu doğrudan etkiler.
+2. **İçerideki nokta için mesafe sıfırdır.** Nokta poligon içindeyse `ST_Distance` → 0 döner; `ST_ShortestLine` sıfır uzunluklu bir nokta üretir.
+3. **3B geometride farklı fonksiyonlar gereklidir.** Z koordinatı olan geometriler için `ST_3DClosestPoint` ve `ST_3DDistance` kullanılmalıdır.

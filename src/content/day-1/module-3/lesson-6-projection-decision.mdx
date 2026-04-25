@@ -1,80 +1,79 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Proje gereksinimlerine göre koordinat sistemi seçim kararı verebileceksin
-- Depolama, hesaplama ve görüntüleme için hangi SRID'in uygun olduğunu belirleyebileceksin
-- Bu modülde öğrenilen tüm kavramları bir arada kullanabileceksin
+Projeksiyon seçimi tek bir doğru cevabı olmayan bir mühendislik kararıdır; ancak sistematik bir çerçeve belirsizliği önemli ölçüde azaltır. Bu ders, depolama — hesaplama — görüntüleme üçlüsünü yöneten kuralları ve modül boyunca öğrenilen tüm kavramların birlikte nasıl uygulandığını ele almaktadır.
+
+- Proje gereksinimlerine göre koordinat sistemi seçim kararı verebilmek
+- Depolama, hesaplama ve görüntüleme için uygun SRID'i belirleyebilmek
+- Modül kavramlarını birleşik bir iş akışında uygulayabilmek
 
 ---
 
-## 📖 Kavram: Karar Ağacı
+## Karar Çerçevesi
 
 ```
 Veri nasıl kullanılacak?
 │
-├── Dünya/ülke geneli veri → 4326 (WGS84) + geography cast
+├── Dünya/ülke geneli veri         → 4326 (WGS84) + geography cast
 │
-├── Web haritasına tile olarak aktarılacak → 3857 (Web Mercator)
+├── Web haritasına tile aktarımı   → 3857 (Web Mercator)
 │
-├── Hassas alan/mesafe ölçümü (Türkiye)
-│   ├── İstanbul/İzmir bölgesi → UTM 35N (32635)
-│   ├── Ankara/Konya bölgesi  → UTM 36N (32636)
-│   └── Doğu Türkiye          → UTM 37N (32637)
+├── Hassas alan/mesafe (Türkiye)
+│   ├── İstanbul / İzmir bölgesi  → UTM 35N (32635)
+│   ├── Ankara / Konya bölgesi    → UTM 36N (32636)
+│   └── Doğu Türkiye              → UTM 37N (32637)
 │
-└── Kadastro / resmi mühendislik → ITRF96 (5254-5259)
+└── Kadastro / resmi mühendislik   → ITRF96 (5254–5259)
 ```
 
 ---
 
-## 📖 Depolama vs Hesaplama vs Görüntüleme
+## Depolama, Hesaplama ve Görüntüleme
 
-| Aşama | Önerilen SRID | Neden |
+| Aşama | Önerilen SRID | Gerekçe |
 |---|---|---|
 | **Depolama** | 4326 | Evrensel, GeoJSON uyumlu, indeks dostlu |
-| **Mesafe/alan hesabı** | `::geography` veya UTM | Metre cinsinden doğru sonuç |
+| **Mesafe / alan hesabı** | `::geography` veya UTM | Metre cinsinden doğru sonuç |
 | **Web görüntüleme** | 3857 (tile) ya da 4326 (GeoJSON) | Harita kütüphanesi standardı |
-| **Raporlama / kadastro** | UTM veya ITRF96 | Yerel hassasiyet |
+| **Raporlama / kadastro** | UTM veya ITRF96 | Yerel hassasiyet gereksinimi |
 
-**Altın kural:** Veriyi 4326'da depola, hesabı geography veya uygun UTM'de yap.
+**Altın kural:** Veriyi 4326'da depola, hesabı `geography` veya uygun UTM ile yap.
 
 ---
 
-## ▶ Canlı Örnek — Tam Akış: Depola → Hesapla → Göster
+## Uygulama Örneği
+
+### Tam akış: depola, hesapla, göster
 
 <RunnableBlock
-  sql={`-- 1. Tablo oluştur: 4326'da depola
-CREATE TABLE IF NOT EXISTS noktalar_demo (
+  sql={`DROP TABLE IF EXISTS noktalar_demo;
+CREATE TABLE noktalar_demo (
   id   SERIAL PRIMARY KEY,
   ad   TEXT,
   geom GEOMETRY(POINT, 4326)
 );
 
--- 2. Veri yükle
 INSERT INTO noktalar_demo (ad, geom) VALUES
   ('İstanbul', ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)),
   ('Ankara',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)),
-  ('İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326))
-ON CONFLICT DO NOTHING;
+  ('İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326));
 
--- 3. Sorgula: mesafeyi geography ile hesapla, haritada 4326 göster
 SELECT
   a.ad AS kaynak,
   b.ad AS hedef,
   ROUND(ST_Distance(a.geom::geography, b.geom::geography)::numeric / 1000, 0) AS mesafe_km,
-  a.geom  -- harita için 4326
+  a.geom
 FROM noktalar_demo a
 CROSS JOIN noktalar_demo b
 WHERE a.id < b.id
 ORDER BY mesafe_km;`}
   label="Tam akış: depola + hesapla + göster"
+  description="CREATE TABLE 4326'da geometry kolonu tanımlar. INSERT ON CONFLICT DO NOTHING idempotent yükleme sağlar. CROSS JOIN ile her şehir çifti oluşturulur; WHERE a.id < b.id her çifti tek kez listeler. ST_Distance ::geography ile km hesabı yapar. a.geom sütunu harita render için 4326'da bırakılır."
 />
 
----
-
-## ▶ Egzersiz: UTM vs geography Karşılaştırması
+### geography vs UTM mesafe karşılaştırması
 
 <RunnableBlock
-  sql={`-- İzmir - İstanbul mesafesi: geography vs UTM 35N
-SELECT
+  sql={`SELECT
   'geography (elipsoid)' AS yontem,
   ROUND(ST_Distance(
     ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326)::geography,
@@ -88,22 +87,17 @@ SELECT
     ST_Transform(ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326), 32635)
   )::numeric / 1000, 1);`}
   label="geography vs UTM mesafe karşılaştırması"
+  description="İzmir-İstanbul mesafesi iki farklı yöntemle hesaplanır. Geography elipsoid yüzeyi üzerinde yay uzunluğunu, UTM 35N ise iki boyutlu düzlemdeki Öklid mesafesini verir. Sonuçlar ~0.1 km fark içinde olmalıdır; her ikisi de kabul edilebilir hassasiyette."
 />
 
-> İki yöntem ~0.1 km fark vermelidir — her ikisi de kabul edilebilir doğrulukta.
-
----
-
-## 🧪 Dene — Bölge Tespiti
-
-Koordinata göre hangi UTM dilimini kullanman gerektiğini söyleyen bir sorgu yaz:
+### Koordinata göre UTM dilim önerisi
 
 <RunnableBlock
   sql={`WITH test_noktalari AS (
-  SELECT 'Trabzon'  AS sehir, 39.726 AS lon UNION ALL
+  SELECT 'Trabzon'     AS sehir, 39.726 AS lon UNION ALL
   SELECT 'Diyarbakır', 40.228            UNION ALL
-  SELECT 'Konya',    32.483             UNION ALL
-  SELECT 'Çanakkale', 26.413
+  SELECT 'Konya',      32.483            UNION ALL
+  SELECT 'Çanakkale',  26.413
 )
 SELECT
   sehir,
@@ -113,24 +107,19 @@ SELECT
     WHEN lon BETWEEN 30 AND 36 THEN 'UTM 36N (32636)'
     WHEN lon BETWEEN 36 AND 42 THEN 'UTM 37N (32637)'
     ELSE 'Sınır bölge — kontrol et'
-  END AS onerilен_utm
+  END AS onerilen_utm
 FROM test_noktalari
 ORDER BY lon;`}
   label="Koordinata göre UTM dilim önerisi"
+  description="CASE ifadesi boylam aralıklarına göre önerilen UTM dilimini belirler. Bu mantık uygulamalarda otomatik projeksiyon seçimi için kullanılabilir. Dilim sınırlarında (30°E ve 36°E civarı) kalan noktalarda hangisinin daha uygun olduğu veri yoğunluğuna ve proje kapsamına göre kararlaştırılmalıdır."
 />
 
 ---
 
-## ⚠ Modül Özeti — Kritik Kurallar
+## Özet: Kritik Kurallar
 
-1. **Ham koordinatı depolarken:** `ST_SetSRID(ST_MakePoint(lon, lat), 4326)` — her zaman 4326 etiketle.
-2. **Dönüştürmek için:** `ST_Transform(geom, hedef_srid)` — kaynak SRID bilinmeli.
-3. **Mesafe/alan:** `::geography` veya UTM `ST_Transform` — asla SRID'siz `ST_Distance`.
-4. **Depolama formatı:** `geometry(POINT, 4326)` kolonu — UTM değil, 4326.
-5. **SetSRID ≠ Transform:** SetSRID etiketler, Transform dönüştürür.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 1.3 tamamlandı! Sırada **Modül 1.4 — Mekansal İlişkiler**: `ST_Contains`, `ST_Intersects`, `ST_DWithin` ve mekansal JOIN.
+1. **Ham koordinat depolamada:** `ST_SetSRID(ST_MakePoint(lon, lat), 4326)` — her zaman 4326 ile etiketle.
+2. **Koordinat dönüşümünde:** `ST_Transform(geom, hedef_srid)` — kaynak SRID bilinmeli ve doğru olmalı.
+3. **Mesafe ve alan hesabında:** `::geography` cast veya UTM `ST_Transform` — SRID'siz `ST_Distance` kullanılmaz.
+4. **Tablo kolonunda:** `GEOMETRY(POINT, 4326)` — UTM değil, 4326 ile depolanır.
+5. **SetSRID ≠ Transform:** SetSRID yalnızca etiketler; Transform koordinatları matematiksel olarak dönüştürür.

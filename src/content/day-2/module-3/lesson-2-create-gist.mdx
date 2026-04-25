@@ -1,18 +1,20 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `CREATE INDEX USING GIST` sözdizimini yazabileceksin
-- Concurrent index oluşturmanın farkını açıklayabileceksin
-- `pg_indexes` ile hangi indekslerin var olduğunu sorgulayabileceksin
+GiST indeksi oluşturma sözdizimini bilmek yeterli değildir; üretim ortamında hangi indeks varyantının ne zaman kullanılacağını da bilmek gerekir. Bu ders, temel, koşullu ve cast'lı sütun için GiST indeksi oluşturma yöntemlerini ele almaktadır.
+
+- `CREATE INDEX USING gist` sözdizimini yazmak
+- Concurrent indeks oluşturmanın farkını açıklamak
+- `pg_indexes` ile mevcut indeksleri sorgulamak
 
 ---
 
-## 📖 Kavram: CREATE INDEX Sözdizimi
+## CREATE INDEX Sözdizimi
 
 ```sql
 -- Temel
 CREATE INDEX idx_ad ON tablo USING gist(geom);
 
--- Concurrent (tablo kilitlemez, canlı sistemde)
+-- Concurrent (tablo kilitlemez, canlı sistemde önerilir)
 CREATE INDEX CONCURRENTLY idx_ad ON tablo USING gist(geom);
 
 -- Partial index (koşullu — daha küçük, daha hızlı)
@@ -24,7 +26,9 @@ CREATE INDEX idx_geog ON tablo USING gist(geography(geom));
 
 ---
 
-## ▶ Canlı Örnek — İndeks Oluştur ve Doğrula
+## Uygulama Örneği
+
+### GiST indeks oluştur ve doğrula
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS mekanlar_idx (
@@ -52,12 +56,11 @@ CREATE INDEX IF NOT EXISTS idx_mekanlar_geom ON mekanlar_idx USING gist(geom);
 SELECT indexname, indexdef
 FROM pg_indexes
 WHERE tablename = 'mekanlar_idx';`}
-  label="GIST indeks oluştur ve doğrula"
+  label="GiST indeks oluştur ve doğrula"
+  description="500 mekan noktası oluşturulur ve ANALYZE ile istatistikler güncellenir. CREATE INDEX IF NOT EXISTS idempotent bir ifadedir — indeks varsa hata vermez. pg_indexes sorgusu tablodaki tüm indekslerin adını ve tanımını döndürür; PRIMARY KEY için otomatik oluşturulan B-Tree indeksi ve yeni GiST indeksi görünür."
 />
 
----
-
-## ▶ Partial Index
+### Partial index ve istatistikler
 
 <RunnableBlock
   sql={`-- Sadece aktif mekanlar için partial index
@@ -75,11 +78,10 @@ SELECT
 FROM pg_stat_user_indexes
 WHERE tablename = 'mekanlar_idx';`}
   label="Partial index ve istatistikler"
+  description="WHERE aktif = TRUE koşuluyla partial index oluşturulur; bu indeks yalnızca aktif mekanların geometrisini içerir ve tam indeksten daha küçüktür. pg_stat_user_indexes idx_scan (kaç kez kullanıldı) ve idx_tup_read (kaç satır okundu) değerlerini tutar. Yeni oluşturulan indeksler henüz kullanılmadığından idx_scan = 0 görünür."
 />
 
----
-
-## ▶ Geography Functional Index
+### Geography functional index
 
 <RunnableBlock
   sql={`-- geography cast'li sorgular için functional index
@@ -93,18 +95,13 @@ WHERE ST_DWithin(
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
   200000);`}
   label="Geography functional index"
+  description="geom::geography cast'ini içeren sorgularda geometry sütunundaki standart GiST indeksi kullanılamaz. (geom::geography) ifadesine oluşturulan functional index bu boşluğu giderir. EXPLAIN çıktısında 'Index Scan using idx_mekanlar_geog' satırı indeksin devreye girdiğini doğrular. Parantez sözdizimi zorunludur: GIST((geom::geography))."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **CONCURRENTLY transaction içinde olmaz:** `CREATE INDEX CONCURRENTLY` bir transaction bloğu içinde çalışmaz. Bağımsız statement olarak çalıştır.
-2. **Partial index WHERE koşulu sorgu WHERE ile eşleşmeli:** `WHERE aktif=TRUE` ile oluşturulan partial index, `WHERE aktif=FALSE` sorgusunda kullanılmaz.
-3. **Çok fazla indeks:** Her INSERT/UPDATE tüm indeksleri günceller. Gereksiz indeksler yazma performansını düşürür. `pg_stat_user_indexes.idx_scan = 0` olanları kaldır.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste **SP-GIST** — nokta yoğun tablolarda ne zaman tercih edilir?
+1. **`CONCURRENTLY` transaction bloğu içinde çalışmaz.** `CREATE INDEX CONCURRENTLY` bir `BEGIN...COMMIT` bloğunun içine alınamaz; bağımsız bir ifade olarak çalıştırılmalıdır.
+2. **Partial index WHERE sorguyla birebir eşleşmelidir.** `WHERE aktif = TRUE` koşuluyla oluşturulan indeks, `WHERE aktif = FALSE` sorgusunda kullanılmaz; PostgreSQL koşul eşleşmesini katı biçimde kontrol eder.
+3. **Gereksiz indeksler yazma performansını düşürür.** Her INSERT ve UPDATE tüm indeksleri günceller. `pg_stat_user_indexes.idx_scan = 0` olan indeksler kaldırılmalıdır.

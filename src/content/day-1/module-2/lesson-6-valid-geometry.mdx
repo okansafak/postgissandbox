@@ -1,30 +1,31 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Geçersiz geometrinin ne olduğunu ve neden oluştuğunu açıklayabileceksin
-- `ST_IsValid` ve `ST_IsValidReason` ile hata tespit edebileceksin
-- `ST_MakeValid` ile bozuk geometriyi onarabıleceksin
-- Poligon validasyon kurallarını sayabileceksin
+Geçersiz geometri, PostGIS'te sessiz hatalar üretebilen en tehlikeli sorunlardan biridir: sorgu hata vermeden tamamlanır, ancak dönen sonuç anlamsal olarak yanlıştır. Bu ders geçersizlik nedenlerini, tespit yöntemlerini ve onarım araçlarını kapsamaktadır.
+
+- Geçersiz geometrinin ne olduğunu ve hangi koşullarda oluştuğunu açıklayabilmek
+- `ST_IsValid` ve `ST_IsValidReason` ile geçersizlik tespiti yapmak
+- `ST_MakeValid` ile bozuk geometriyi onarmak
 
 ---
 
-## 📖 Kavram: Geçerli Geometri Nedir?
+## Geçerli Geometri Nedir?
 
-OGC standardı geometry'nin geçerli olması için kurallar koyar. Bunlar ihlal edilince `ST_IsValid` → `false` döner ve bazı mekansal fonksiyonlar yanlış sonuç verir.
+OGC standardı geometrilerin belirli kurallara uymalarını zorunlu kılar. Bu kurallar ihlal edildiğinde `ST_IsValid` → `false` döner; bazı mekansal fonksiyonlar ise yanlış ya da beklenmedik sonuçlar üretir.
 
-### Sık Geçersizlik Nedenleri
+### Sık Karşılaşılan Geçersizlik Nedenleri
 
 | Sorun | Açıklama | Örnek |
 |---|---|---|
-| Kendi kendini kesen | Polygon kenarları çakışıyor | Kravat (bowtie) şekli |
-| Kapanmamış halka | İlk ≠ Son nokta | `POLYGON((0 0, 1 0, 1 1))` |
-| Ayrık delik | İç halka dış halkayı aşıyor | Delik dışarı taşmış |
+| Kendi kendini kesen poligon | Kenarlar çakışıyor | Kravat (bowtie) şekli |
+| Kapanmamış halka | İlk ≠ son nokta | `POLYGON((0 0, 1 0, 1 1))` |
+| Dışarı taşan delik | İç halka dış halkayı aşıyor | Delik poligon sınırının dışına çıkmış |
 | Tekrarlı nokta | Aynı koordinat üst üste | `LINESTRING(0 0, 0 0, 1 1)` |
 
 ---
 
-## ▶ Canlı Örnek — Geçersiz Geometri Tespiti
+## Uygulama Örneği
 
-Kravat (bowtie) şekli — poligon kendini kesiyor:
+### Geçerlilik kontrolü
 
 <RunnableBlock
   sql={`WITH geomler AS (
@@ -32,10 +33,10 @@ Kravat (bowtie) şekli — poligon kendini kesiyor:
     ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))') AS geom
   UNION ALL
   SELECT 'Kravat (geçersiz)',
-    ST_GeomFromText('POLYGON((0 0, 1 1, 1 0, 0 1, 0 0))')  -- kendi kendini kesiyor
+    ST_GeomFromText('POLYGON((0 0, 1 1, 1 0, 0 1, 0 0))')
   UNION ALL
   SELECT 'Kapanmamış (hata)',
-    ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1))')       -- son nokta eksik
+    ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1))')
 )
 SELECT
   ad,
@@ -43,33 +44,30 @@ SELECT
   ST_IsValidReason(geom) AS hata_nedeni
 FROM geomler;`}
   label="Geçerlilik kontrolü"
+  description="ST_IsValid OGC kurallarına uyumu boolean olarak döndürür. ST_IsValidReason geçersizliğin nedenini ve koordinatını metin olarak açıklar. Kravat poligonu 'Self-intersection', kapanmamış poligon ise 'Ring is not closed' hatası üretir."
 />
 
----
-
-## ▶ ST_MakeValid ile Onar
-
-`ST_MakeValid` geçersiz geometriyi OGC kurallarına uygun hale getirir. Kravat şekillerini `MULTIPOLYGON`'a böler:
+### ST_MakeValid ile onarım
 
 <RunnableBlock
   sql={`WITH bozuk AS (
   SELECT ST_GeomFromText('POLYGON((0 0, 1 1, 1 0, 0 1, 0 0))') AS geom
 )
 SELECT
-  ST_IsValid(geom)                     AS onceki_gecerli,
-  ST_IsValid(ST_MakeValid(geom))        AS sonraki_gecerli,
-  ST_GeometryType(ST_MakeValid(geom))   AS onarilan_tip,
-  ST_AsText(ST_MakeValid(geom))         AS onarilan_wkt
+  ST_IsValid(geom)                    AS onceki_gecerli,
+  ST_IsValid(ST_MakeValid(geom))       AS sonraki_gecerli,
+  ST_GeometryType(ST_MakeValid(geom))  AS onarilan_tip,
+  ST_AsText(ST_MakeValid(geom))        AS onarilan_wkt
 FROM bozuk;`}
   label="ST_MakeValid ile onarım"
+  description="ST_MakeValid geçersiz geometriyi OGC kurallarını karşılayan en yakın geçerli forma dönüştürür. Kravat poligonu iki ayrı üçgene bölündüğünden çıktı tipi POLYGON yerine MULTIPOLYGON olur. Orijinal şeklin korunup korunmadığını ST_AsText ile doğrulanır."
 />
 
----
-
-## ▶ Gerçek Veri Senaryosu — Toplu Doğrulama
+### Tabloda toplu doğrulama
 
 <RunnableBlock
-  sql={`CREATE TABLE IF NOT EXISTS test_parceller (
+  sql={`DROP TABLE IF EXISTS test_parceller;
+CREATE TABLE test_parceller (
   id   SERIAL PRIMARY KEY,
   geom GEOMETRY(POLYGON, 4326)
 );
@@ -81,31 +79,21 @@ INSERT INTO test_parceller (geom) VALUES
 
 SELECT
   id,
-  ST_IsValid(geom) AS gecerli,
+  ST_IsValid(geom)       AS gecerli,
   ST_IsValidReason(geom) AS neden
 FROM test_parceller;`}
   label="Tablo üzerinde doğrulama"
+  description="Gerçek veri yükleme senaryosunda bu sorgu tüm tablonun geçerlilik envanterini çıkarır. Geçersiz kayıtlar id ile tanımlanır; ardından UPDATE ... SET geom = ST_MakeValid(geom) ile toplu onarım yapılabilir."
 />
 
 ---
 
-## 🧪 Egzersiz
+## Alıştırma
 
-Verilen 5 noktayı `ST_MakePolygon` ile kapalı poligona çevir ve alan hesapla:
+Beş noktadan kapalı bir poligon oluşturun ve alan hesaplayın:
 
 <RunnableBlock
   sql={`SELECT
-  ST_Area(
-    ST_MakePolygon(
-      ST_MakeLine(ARRAY[
-        ST_MakePoint(28.9, 41.0),
-        ST_MakePoint(29.0, 41.0),
-        ST_MakePoint(29.0, 41.1),
-        ST_MakePoint(28.9, 41.1),
-        ST_MakePoint(28.9, 41.0)
-      ])
-    )::geography
-  ) AS alan_m2,
   ROUND(
     ST_Area(
       ST_MakePolygon(
@@ -120,18 +108,13 @@ Verilen 5 noktayı `ST_MakePolygon` ile kapalı poligona çevir ve alan hesapla:
     ) / 1000000, 2
   ) AS alan_km2;`}
   label="Poligon alanı hesapla"
+  description="ST_MakeLine beş noktadan kapalı bir LINESTRING, ST_MakePolygon bunu POLYGON'a çevirir. ::geography cast'i WGS84 koordinatlarını küresel projeksiyon formülüyle değerlendirerek alan sonucunu m² olarak verir. 1.000.000'e bölüm km² dönüşümü sağlar."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_IsValid false ≠ hata:** Bazı fonksiyonlar geçersiz geometriyle sessizce yanlış sonuç verir. Her zaman yükleme öncesi `ST_IsValid` kontrolü yap.
-2. **ST_MakeValid orijinal şekli değiştirebilir:** Kravat poligon `MULTIPOLYGON`'a bölünür. Beklediğin sonuç değilse `ST_IsValidDetail` ile detaylı analiz yap.
-3. **ST_Buffer(geom, 0) eski yöntem:** Eski versiyonlarda `ST_Buffer(geom, 0)` geçersizliği düzeltmek için kullanılırdı. Modern PostGIS'te `ST_MakeValid` kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 1.2 tamamlandı! Sırada **Modül 1.3 — SRID ve Projeksiyonlar** var: koordinat sistemleri, EPSG kodları ve `ST_Transform`.
+1. **ST_IsValid false hata mesajı vermez.** Bazı fonksiyonlar geçersiz geometriyle sessizce yanlış sonuç döndürür. Dış kaynaklardan yüklenen verilerde yükleme öncesi `ST_IsValid` kontrolü zorunlu tutulmalıdır.
+2. **ST_MakeValid orijinal şekli değiştirebilir.** Kravat poligon `MULTIPOLYGON`'a bölünür; bu beklenen davranıştır. Bölünme istenmeyen bir durumsa `ST_IsValidDetail` ile detaylı analiz yapılabilir.
+3. **`ST_Buffer(geom, 0)` artık önerilmez.** Eski sürümlerde geçersizliği düzeltmek için bu yöntem kullanılırdı. Modern PostGIS'te `ST_MakeValid` kullanılmalıdır.

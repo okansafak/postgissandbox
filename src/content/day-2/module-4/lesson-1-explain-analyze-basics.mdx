@@ -1,25 +1,27 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `EXPLAIN` ile `EXPLAIN ANALYZE` arasındaki farkı söyleyebileceksin
-- Plan çıktısının temel anatomisini (node tipi, cost, rows, actual time) okuyabileceksin
-- `BUFFERS` ve `FORMAT JSON` seçeneklerini kullanabileceksin
+Yavaş bir sorguyu iyileştirmek için önce hangi adımların zaman aldığını anlamak gerekir. `EXPLAIN` ve `EXPLAIN ANALYZE` komutları, planlayıcının sorguyu nasıl çözdüğünü ve gerçekte ne kadar süre harcadığını göstermektedir.
+
+- `EXPLAIN` ile `EXPLAIN ANALYZE` arasındaki farkı açıklamak
+- Plan çıktısının temel anatomisini okumak
+- `BUFFERS` ve `FORMAT JSON` seçeneklerini kullanmak
 
 ---
 
-## 📖 Kavram: EXPLAIN vs EXPLAIN ANALYZE
+## EXPLAIN ve EXPLAIN ANALYZE
 
 | Komut | Ne yapar? | Sorguyu çalıştırır mı? |
 |---|---|---|
 | `EXPLAIN` | Tahmini plan gösterir | **Hayır** |
 | `EXPLAIN ANALYZE` | Gerçek çalışma süresini ölçer | **Evet** |
 | `EXPLAIN (ANALYZE, BUFFERS)` | + bellek/disk erişim sayısı | Evet |
-| `EXPLAIN (FORMAT JSON)` | Makine-okunabilir çıktı | Hayır (varsayılan ANALYZE'sız) |
+| `EXPLAIN (FORMAT JSON)` | Makine-okunabilir çıktı | Hayır |
 
-**Temel kural:** Yavaş sorguyu debug ederken `EXPLAIN ANALYZE BUFFERS` kullan. Sadece plan görmek istiyorsan `EXPLAIN` yeterli.
+**Temel kural:** Yavaş sorguyu incelemek için `EXPLAIN ANALYZE BUFFERS` kullanılır. Yalnızca plan görmek için `EXPLAIN` yeterlidir.
 
 ---
 
-## 📖 Plan Anatomisi
+## Plan Anatomisi
 
 ```
 Seq Scan on noktalar_perf  (cost=0.00..1234.56 rows=50000 width=32)
@@ -30,7 +32,7 @@ Seq Scan on noktalar_perf  (cost=0.00..1234.56 rows=50000 width=32)
                              bitiş maliyeti
 ```
 
-`EXPLAIN ANALYZE` ile gerçek değerler de gelir:
+`EXPLAIN ANALYZE` ile gerçek değerler de eklenir:
 
 ```
   (actual time=0.043..12.345 rows=48923 loops=1)
@@ -41,7 +43,9 @@ Seq Scan on noktalar_perf  (cost=0.00..1234.56 rows=50000 width=32)
 
 ---
 
-## ▶ Canlı Örnek — İlk EXPLAIN ANALYZE
+## Uygulama Örneği
+
+### İlk EXPLAIN ANALYZE
 
 <RunnableBlock
   sql={`-- Basit bir plan okuyalım
@@ -54,11 +58,10 @@ WHERE ST_DWithin(
   100000
 );`}
   label="İlk EXPLAIN ANALYZE"
+  description="noktalar_perf tablosunda İstanbul'a 100 km içindeki noktaları sayan sorgunun planı incelenir. EXPLAIN ANALYZE gerçek çalışma sürelerini ölçer. Çıktıdaki 'Node Type' scan yöntemini (Seq Scan veya Index Scan), 'cost' planlayıcı maliyet tahminini, 'rows' tahmini ve gerçek satır sayısını, 'actual time' ise gerçek çalışma süresini milisaniye cinsinden gösterir."
 />
 
----
-
-## ▶ BUFFERS ile Bellek Erişimi
+### BUFFERS ile bellek erişimi
 
 <RunnableBlock
   sql={`EXPLAIN (ANALYZE, BUFFERS)
@@ -71,13 +74,12 @@ WHERE ST_DWithin(
 )
 LIMIT 10;`}
   label="EXPLAIN ANALYZE BUFFERS"
+  description="BUFFERS seçeneği bellek (shared buffer) ve disk erişim sayılarını ekler. 'Shared hit' sayfa önbellekten okunduğunu, 'shared read' diskten okunduğunu gösterir. Shared hit değeri shared read'den çok yüksekse önbellek soğudur ve disk okuması fazladır. Aynı sorguyu birkaç kez çalıştırmak önbelleği ısıtır ve hit/read oranını iyileştirir."
 />
-
-> **Shared hit:** sayfa önbellekten okundu. **Shared read:** diskten okundu. Hit >> Read → önbellek sıcak.
 
 ---
 
-## 🧪 Dene — FORMAT JSON
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- JSON formatında plan — araçlar bu formatı kullanır
@@ -85,18 +87,13 @@ EXPLAIN (FORMAT JSON)
 SELECT COUNT(*) FROM noktalar_perf
 WHERE geom && ST_MakeEnvelope(28.5, 40.8, 29.5, 41.5, 4326);`}
   label="JSON formatında plan"
+  description="FORMAT JSON planı hiyerarşik bir JSON nesnesi olarak döndürür. Bu format explain.depesz.com, pgAdmin ve DBeaver gibi araçlara yapıştırılarak görselleştirilebilir. Plan içindeki 'Node Type', 'Total Cost', 'Plan Rows' ve 'Actual Total Time' alanları programatik analiz için kullanılır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`EXPLAIN ANALYZE` DML'i gerçekten çalıştırır:** `UPDATE`, `DELETE`, `INSERT` ile kullanırsan veriyi değiştirir. `BEGIN; EXPLAIN ANALYZE ...; ROLLBACK;` yap.
-2. **İlk çalışma yavaş:** Önbellek soğuk, disk okuması fazla. Gerçekçi ölçüm için 2-3 kez çalıştır.
-3. **cost birimi rastgele:** `seq_page_cost=1.0` referansıyla hesaplanır. Farklı konfigürasyonlarda cost değerleri farklı olabilir — kendi başına anlamsız, karşılaştırmalı anlamlı.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste plan tiplerini yakından inceleyeceğiz: **Seq Scan, Index Scan, Bitmap Scan** — ne zaman hangisi?
+1. **`EXPLAIN ANALYZE` DML'yi gerçekten çalıştırır.** `UPDATE`, `DELETE` veya `INSERT` ile kullanıldığında veri değişir. `BEGIN; EXPLAIN ANALYZE ...; ROLLBACK;` kalıbıyla güvenli test yapılabilir.
+2. **İlk çalışma önbellek soğuktur.** İlk çalışmada disk okuması fazla olacağından gerçekçi ölçüm için sorgu 2–3 kez çalıştırılmalıdır.
+3. **`cost` birimi mutlak değildir.** `seq_page_cost=1.0` referansıyla hesaplanır; farklı konfigürasyonlarda aynı sorgunun cost değeri farklı olabilir. Cost değerleri ancak kendi aralarında karşılaştırıldığında anlamlıdır.

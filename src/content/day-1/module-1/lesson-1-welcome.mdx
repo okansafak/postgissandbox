@@ -1,59 +1,51 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Bu platformun nasıl çalıştığını kavrayacaksın
-- Sol paneli (ders), sağ üstü (SQL editörü) ve sağ alttaki (harita/tablo) göreceksin
-- İlk SQL sorgunu çalıştıracak ve sonucu göreceksin
+Bu platform, PostgreSQL ve PostGIS'i sıfır kurulumla doğrudan tarayıcıda öğrenmenizi sağlar. Dersin amacı üç panelli arayüzü kavramak ve ilk SQL sorgusunu başarıyla çalıştırmaktır.
+
+- Platformun üç panel yapısını tanımlamak
+- SQL editörünü kullanarak sorgu çalıştırmak
+- Sonuçları Tablo sekmesinde yorumlamak
 
 ---
 
-## 📖 Platform Nasıl Çalışır?
+## Platform Mimarisi
 
-PostGIS Akademi'ye hoş geldin! Bu platform **tamamen tarayıcında** çalışır — sunucu yok, kurulum yok.
+PostGIS Akademi tamamen tarayıcıda çalışır; sunucu yoktur, kurulum gerekmez. Ekran üç işlevsel bölgeye ayrılmıştır:
 
-Ekranın üç bölümü var:
-
-| Bölüm | Ne işe yarar? |
+| Bölge | İşlev |
 |---|---|
-| **Sol** (şu an okuduğun yer) | Ders içeriği — kavramlar, örnekler, egzersizler |
-| **Sağ üst** | SQL editörü — sorgularını buraya yaz ve çalıştır |
-| **Sağ alt** | Sonuçlar — Harita, Tablo veya EXPLAIN sekmesi |
+| **Sol panel** (şu an okuduğunuz yer) | Ders içeriği — kavramlar, örnekler, alıştırmalar |
+| **Sağ üst** | SQL editörü — sorgu yazma ve çalıştırma |
+| **Sağ alt** | Sonuç görünümü — Harita, Tablo veya EXPLAIN sekmesi |
 
-Aklındaki tek soru şu olmalı: **"Bu SQL ne yapar?"** — yaz, çalıştır, gör.
-
----
-
-## 🗄 Veritabanı Nerede?
-
-Tarayıcının içinde! **PGlite** sayesinde tam bir PostgreSQL + PostGIS veritabanı doğrudan sekmende çalışıyor. Veriler **IndexedDB**'de saklanır, tarayıcıyı kapatsın açsın veriler kaybolmaz.
-
-> Bu yüzden hiçbir şey kurmadan PostGIS öğrenebilirsin.
+Veritabanı, **PGlite** teknolojisi sayesinde tarayıcı sekmesinin içinde çalışır. Veriler **IndexedDB**'de saklanır; tarayıcı kapatılsa da kaybolmaz.
 
 ---
 
-## ▶ Canlı Örnek — İlk Sorgu
+## Uygulama Örneği
 
-Aşağıdaki butona bas. SQL editörüne yüklenecek, çalıştırınca "Tablo" sekmesinde sonucu göreceksin:
-
-<RunnableBlock sql="SELECT 'Merhaba PostGIS!' AS mesaj, version() AS pg_surum;" label="İlk sorguyu çalıştır" />
-
----
-
-## 🧪 Dene
-
-Editörde `mesaj` yerine kendi adını yaz:
-
-<RunnableBlock sql="SELECT 'Merhaba, [ADINIZ]!' AS mesaj;" label="Deneme" />
+<RunnableBlock
+  sql={`SELECT 'Merhaba PostGIS!' AS mesaj, version() AS pg_surumu;`}
+  label="İlk sorguyu çalıştır"
+  description="Bu sorgu iki sütun döndürür: sabit bir metin ifadesi ve PostgreSQL'in version() fonksiyonu. version(), sunucu sürüm dizesini, derleme bilgilerini ve mimarisini içerir. Tablo sekmesinde iki sütunlu bir satır görünmelidir."
+/>
 
 ---
 
-## ⚠ Tuzaklar
+## Pratik Uygulama
 
-- Sorgunu yazdıktan sonra **Ctrl+Enter** ya da **Çalıştır** butonuna basmalısın — editör otomatik çalıştırmaz.
-- SQL büyük/küçük harf duyarsızdır (`SELECT` = `select`), ama büyük harfle yazmak yaygın gelenektir.
-- Noktalı virgül (`;`) isteğe bağlıdır ama iyi alışkanlıktır.
+Editördeki `'Merhaba PostGIS!'` ifadesini değiştirerek kendi metninizdeki sonucu gözlemleyin:
+
+<RunnableBlock
+  sql={`SELECT 'Kendi metninizi buraya yazın' AS mesaj;`}
+  label="Metin değiştir"
+  description="SQL'deki tek tırnak içindeki metin bir string literaldir. İçeriği değiştirdiğinizde sonuç sütununda yeni değer görünür. Bu alıştırma editör → sorgu → sonuç döngüsünü pekiştirir."
+/>
 
 ---
 
-## 🔗 Sıradaki Ders
+## Yaygın Hatalar
 
-Bir sonraki derste **PGlite nedir ve PostgreSQL ile PostGIS arasındaki fark ne?** sorusunu yanıtlayacağız.
+- Sorgu yazıldıktan sonra **Ctrl+Enter** ya da **Çalıştır** butonuna basılmalıdır; editör otomatik çalıştırmaz.
+- SQL büyük/küçük harf duyarsızdır (`SELECT` = `select`), ancak büyük harf kullanımı yaygın bir gelenektir.
+- Noktalı virgül (`;`) isteğe bağlıdır; iyi bir alışkanlık olarak eklenebilir.

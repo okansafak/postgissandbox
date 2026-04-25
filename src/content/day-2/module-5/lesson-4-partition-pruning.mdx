@@ -1,56 +1,56 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Partition pruning'in nasıl çalıştığını EXPLAIN ile doğrulayabileceksin
-- `enable_partition_pruning` parametresini test için kullanabileceksin
-- Dinamik parametreler (prepared statements) ile pruning davranışını anlayabileceksin
+Tablo bölümlemenin performans kazanımı büyük ölçüde partition pruning'e dayanır. Pruning'in çalışıp çalışmadığını doğrulamak ve hangi koşullarda çalışmadığını anlamak, bölümlü tablo tasarımını doğru yapmak için kritik öneme sahiptir.
+
+- Partition pruning'i EXPLAIN ile doğrulamak
+- `enable_partition_pruning` parametresini test için kullanmak
+- Hangi WHERE koşullarının pruning'i devre dışı bıraktığını anlamak
 
 ---
 
-## 📖 Kavram: Partition Pruning
+## Partition Pruning
 
-Planner sorgu WHERE koşulunu partition sınırlarıyla karşılaştırır:
-- Eşleşmeyen partition'lar plan dışında bırakılır (**static pruning**)
+Planlayıcı WHERE koşulunu partition sınırlarıyla karşılaştırır:
+- Eşleşmeyen bölümler planın dışında bırakılır (**static pruning**)
 - Çalışma zamanında bilinen parametreler için de çalışır (**runtime pruning**)
 
 ```
 EXPLAIN
 SELECT * FROM gps_kayit WHERE zaman >= '2024-01-01' AND zaman < '2024-02-01';
 
-→ Bitmap Heap Scan on gps_kayit_2024_01  ← sadece bu
+→ Bitmap Heap Scan on gps_kayit_2024_01  ← sadece bu bölüm
    (gps_kayit_2024_02 ve _03 planda YOK)
 ```
 
 ---
 
-## 📖 Pruning Çalışmadığında
+## Pruning'in Çalışmadığı Durumlar
 
-Pruning, partition key **doğrudan** karşılaştırılıyorsa çalışır:
+Pruning, partition key **doğrudan** karşılaştırıldığında çalışır:
 
 | Sorgu | Pruning? |
 |---|---|
-| `WHERE zaman = '2024-01-15'` | ✅ Evet |
-| `WHERE zaman::date = '2024-01-15'` | ❌ Hayır (fonksiyon var) |
-| `WHERE sehir = 'istanbul'` | ✅ Evet |
-| `WHERE UPPER(sehir) = 'ISTANBUL'` | ❌ Hayır |
+| `WHERE zaman = '2024-01-15'` | Evet |
+| `WHERE zaman::date = '2024-01-15'` | Hayır (fonksiyon var) |
+| `WHERE sehir = 'istanbul'` | Evet |
+| `WHERE UPPER(sehir) = 'ISTANBUL'` | Hayır |
 
 ---
 
-## ▶ Canlı Örnek — Pruning Doğrulama
+## Uygulama Örneği
+
+### Pruning aktif
 
 <RunnableBlock
-  sql={`-- Önceki derslerden gps_kayit tablosu var olmalı
--- Yoksa önce lesson-2'yi çalıştır
-
--- Pruning aktif
+  sql={`-- Önceki derste oluşturulan gps_kayit tablosu gereklidir
 EXPLAIN
 SELECT COUNT(*) FROM gps_kayit
 WHERE zaman >= '2024-02-01' AND zaman < '2024-03-01';`}
   label="Partition pruning aktif"
+  description="Şubat 2024 tarih aralığını sorgulayan EXPLAIN planı incelenir. Yalnızca gps_kayit_2024_02 bölümü planda görünmeli; Ocak ve Mart bölümleri listelenmemelidir. 'Subplans Removed' satırı budanan bölüm sayısını gösterir. Bu doğrulama pruning'in gerçekten çalıştığını kanıtlar."
 />
 
----
-
-## ▶ Pruning Kapalıyken Karşılaştır
+### Pruning kapalıyken karşılaştırma
 
 <RunnableBlock
   sql={`-- Pruning'i kapat
@@ -59,39 +59,40 @@ SET enable_partition_pruning = off;
 EXPLAIN
 SELECT COUNT(*) FROM gps_kayit
 WHERE zaman >= '2024-02-01' AND zaman < '2024-03-01';`}
-  label="Pruning kapalı — tüm partitionlar taranır"
+  label="Pruning kapalı — tüm bölümler taranır"
+  description="enable_partition_pruning = off planlayıcının bölüm eleme yapmasını engeller. Aynı WHERE koşuluyla yapılan sorguda artık üç bölümün (gps_kayit_2024_01, _02, _03) tamamı planda görünür. Bu karşılaştırma pruning'in plan üzerindeki etkisini somut biçimde gösterir."
 />
 
 <RunnableBlock
   sql={`-- Geri aç
 SET enable_partition_pruning = on;`}
   label="Pruning'i yeniden aç"
+  description="Pruning kapatılarak yapılan test tamamlandıktan sonra enable_partition_pruning = on ile varsayılan davranış geri yüklenir. Bu ayar oturum bazlı olduğundan yalnızca mevcut bağlantıyı etkiler."
 />
 
----
-
-## ▶ Fonksiyon ile Pruning Kaçırılır
+### Fonksiyon ile pruning'i bozmak
 
 <RunnableBlock
-  sql={`-- ❌ Cast ile pruning çalışmaz
+  sql={`-- Cast ile pruning çalışmaz
 EXPLAIN
 SELECT COUNT(*) FROM gps_kayit
 WHERE zaman::date = '2024-01-15';
 
--- ✅ Doğru yol: range koşulu
+-- Doğru yol: range koşulu
 -- EXPLAIN
 -- SELECT COUNT(*) FROM gps_kayit
 -- WHERE zaman >= '2024-01-15' AND zaman < '2024-01-16';`}
   label="Cast pruning'i kırar"
+  description="WHERE zaman::date = '2024-01-15' ifadesinde partition key (zaman) bir fonksiyona (::date) sarıldığından pruning çalışmaz; tüm bölümler taranır. Doğru alternatif, değere fonksiyon uygulanmak yerine aralık koşulu kullanmaktır: zaman >= '...' AND zaman < '...'. Bu kural tüm fonksiyon kullanımları için geçerlidir: UPPER(), date_trunc(), ST_Transform() vb."
 />
 
 ---
 
-## ▶ Her İki Filtre Birlikte — Optimum Plan
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Zaman partition pruning + mekan index
--- (gps_kayit_2024_01 üzerinde idx_gps_kayit_01_geom olmalı)
+  sql={`-- Zaman partition pruning + mekan indeksi
+-- (gps_kayit_2024_01 üzerinde GiST indeksi olmalı)
 EXPLAIN ANALYZE
 SELECT arac, COUNT(*) AS kayit
 FROM gps_kayit
@@ -102,39 +103,14 @@ WHERE zaman >= '2024-01-01' AND zaman < '2024-02-01'
     30000)
 GROUP BY arac
 ORDER BY kayit DESC;`}
-  label="Pruning + GIST indeks birlikte"
+  label="Pruning + GiST indeks birlikte"
+  description="İdeal plan: zaman koşulu pruning ile Ocak 2024 bölümünü seçer; ST_DWithin bu bölümdeki GiST indeksini kullanır. Bölümleme ve mekansal indeks birlikte çalışarak hem zaman hem mekan filtreli sorguları verimli hale getirir. EXPLAIN ANALYZE çıktısında yalnızca gps_kayit_2024_01 bölümünün işlendiği ve Index Scan kullanıldığı görülür."
 />
 
 ---
 
-## 🧪 Dene — Kaç Partition Tarandı?
+## Yaygın Hatalar
 
-<RunnableBlock
-  sql={`-- Tüm partition'ları tara (pruning yok — koşul yok)
-EXPLAIN SELECT COUNT(*) FROM gps_kayit;
-
--- vs sadece bir ay:
-EXPLAIN SELECT COUNT(*) FROM gps_kayit
-WHERE zaman >= '2024-01-01' AND zaman < '2024-02-01';`}
-  label="Tüm tabloya karşı tek partition"
-/>
-
----
-
-## ⚠ Tuzaklar
-
-1. **Partition sayısı arttıkça plan oluşturma süresi artar:** 1000 partition'lı tablo için planner overhead önemli olabilir. PG 12+ ile iyileştirildi.
-2. **`pg_partman` extension:** Otomatik partition oluşturma ve eski partition'ları arşivleme için. PGlite'ta mevcut değil.
-3. **Global index yok:** PostgreSQL global (cross-partition) unique constraint/index oluşturulamaz (PK hariç, o da partition key içeriyorsa). Tasarımda göz önünde bulundur.
-
----
-
-## 🔗 Sıradaki Ders
-
-**Gün 2 tamamlandı!** Şimdiye kadar öğrendiklerin:
-- Veri yükleme (CSV, GeoJSON, staging)
-- Geometri işleme (simplify, subdivide, linear referencing)
-- Performans (GIST, SP-GIST, partial/functional index, EXPLAIN ANALYZE)
-- Büyük veri (VACUUM, range/list partitioning, pruning)
-
-Sıradaki gün: **Gün 3 — İleri PostGIS**: topology, raster, 3D, ve gerçek dünya projeleri.
+1. **Bölüm sayısı arttıkça planlama süresi uzar.** 1000 bölümlü tablo için planlayıcı her bölümü değerlendirmelidir; planlama overhead önemli hale gelebilir. PostgreSQL 12 ve sonraki sürümler bu konuda belirgin iyileştirmeler içerir.
+2. **Global (cross-partition) unique index oluşturulamaz.** Bölüm anahtarını içeren PRIMARY KEY hariç, tüm bölümler kapsayan global unique kısıtlama oluşturulamaz. Bu sınırlama tasarım aşamasında göz önünde bulundurulmalıdır.
+3. **`pg_partman` extension otomasyonu sağlar.** Yeni bölüm oluşturma ve eski bölüm arşivleme otomatikleştirilebilir; ancak PGlite bu extension'ı desteklemez.

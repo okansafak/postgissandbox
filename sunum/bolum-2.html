@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostGIS Akademi — Bölüm 2: Sorgular, İndeks ve Performans</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      :root { --blue:#2563eb;--blue-light:#dbeafe;--teal:#0d9488;--teal-light:#ccfbf1;--white:#ffffff;--s50:#f8fafc;--s200:#e2e8f0;--s600:#475569;--s800:#1e293b;--s900:#0f172a;--border:rgba(255,255,255,0.08); }
+      * { box-sizing:border-box;margin:0;padding:0; }
+      body { font-family:'Inter',system-ui,sans-serif;background:linear-gradient(160deg,#0a1628 0%,#0e1d38 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column; }
+      .nav { position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:11px 28px;background:rgba(10,22,40,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border); }
+      .nav-brand { font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue); }
+      .nav-links { display:flex;gap:6px; }
+      .nav-links a { font-size:.76rem;color:rgba(255,255,255,.5);text-decoration:none;padding:5px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);transition:all 140ms; }
+      .nav-links a:hover { color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.06); }
+      .nav-links a.current { color:#fff;background:var(--blue);border-color:var(--blue); }
+      .progress { height:2px;background:rgba(255,255,255,.08); }
+      .progress-fill { height:100%;background:var(--blue);transition:width 250ms ease; }
+      .deck-outer { flex:1;display:flex;align-items:center;justify-content:center;padding:32px 20px 108px; }
+      .deck { width:min(980px,100%); }
+      .slide { display:none;background:var(--white);color:var(--s900);border-radius:16px;border-left:5px solid var(--blue);box-shadow:0 16px 48px rgba(0,0,0,.45);animation:appear 260ms ease; }
+      .slide.active { display:block; }
+      .slide-body { padding:36px 44px; }
+      .kicker { font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--blue);margin-bottom:10px; }
+      .slide h1 { font-size:clamp(1.7rem,3vw,2.6rem);font-weight:700;line-height:1.18;color:var(--s900);margin-bottom:10px;letter-spacing:-.01em; }
+      .slide h2 { font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:700;line-height:1.25;color:var(--s900);margin-bottom:10px; }
+      .slide-sub { font-size:.95rem;color:var(--s600);line-height:1.65;margin-bottom:18px;max-width:70ch; }
+      .hook { background:var(--blue-light);border-left:4px solid var(--blue);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .hook-header { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
+      .hook-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);margin-bottom:0; }
+      .hook p { font-size:.9rem;color:var(--s800);line-height:1.55;font-style:italic; }
+      .case { background:var(--teal-light);border-left:4px solid var(--teal);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .case-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--teal);margin-bottom:5px; }
+      .case p { font-size:.9rem;color:var(--s800);line-height:1.55; }
+      .phases { display:flex;flex-direction:column;gap:6px;margin-top:10px; }
+      .phase { display:flex;gap:12px;align-items:flex-start;background:var(--s50);border-radius:8px;padding:9px 13px; }
+      .phase-tag { display:flex;align-items:center;gap:5px;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blue);flex-shrink:0;min-width:108px;white-space:nowrap;padding-top:2px; }
+      .phase-body { flex:1;min-width:0; }
+      .phase-body p { font-size:.86rem;color:var(--s800);line-height:1.52;margin:0; }
+      code { font-family:'IBM Plex Mono',monospace;font-size:.81em;background:var(--s200);color:#1d4ed8;padding:1px 5px;border-radius:4px; }
+      .cta { display:inline-flex;align-items:center;gap:8px;margin-top:22px;background:var(--blue);color:var(--white);text-decoration:none;padding:11px 22px;border-radius:10px;font-weight:600;font-size:.88rem;transition:background 140ms; }
+      .cta:hover { background:#1d4ed8; }
+      .ctrl-bar { position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 24px;background:rgba(10,22,40,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border); }
+      .ctrl-btn { border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px 20px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(255,255,255,.07);color:#fff;transition:all 140ms; }
+      .ctrl-btn:hover:not(:disabled) { background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.38); }
+      .ctrl-btn:disabled { opacity:.28;cursor:not-allowed; }
+      .ctrl-status { font-size:.82rem;color:rgba(255,255,255,.5);min-width:240px;text-align:center; }
+      .q-btn { display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--blue);background:transparent;color:var(--blue);font-size:.68rem;font-weight:700;line-height:1;cursor:pointer;font-family:inherit;transition:background 130ms,color 130ms;flex-shrink:0; }
+      .q-btn:hover,.q-btn.q-active { background:var(--blue);color:var(--white); }
+      .answer-box { display:none;margin-top:7px;padding:8px 13px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:7px; }
+      .answer-box-lbl { display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0284c7;margin-bottom:3px; }
+      .answer-box p { font-size:.83rem;color:var(--s800);line-height:1.54;font-style:normal;margin:0; }
+      @keyframes appear { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <span class="nav-brand">PostGIS Akademi</span>
+      <div class="nav-links">
+        <a href="./index.html">Ana Sayfa</a>
+        <a href="./bolum-0.html">Bölüm 0</a>
+        <a href="./bolum-1.html">Bölüm 1</a>
+        <a href="./bolum-2.html" class="current">Bölüm 2</a>
+        <a href="./bolum-3.html">Bölüm 3</a>
+      </div>
+    </nav>
+    <div class="progress"><div class="progress-fill" id="progressFill" style="width:14.3%"></div></div>
+
+    <div class="deck-outer"><div class="deck" id="deck">
+
+      <!-- 1: Kapak -->
+      <section class="slide active" data-slide-title="Kapak">
+        <div class="slide-body">
+          <p class="kicker">PostGIS Akademi — Bölüm 2</p>
+          <h1>Sorgular, İndeks ve Performans</h1>
+          <p class="slide-sub">Veri yükleme ve dönüştürme tekniklerinden ileri geometri işlemlerine, mekansal indeksleme stratejilerinden sorgu planı analizine — üretim kalitesinde PostGIS kullanımı.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Bölüm 2 Kapsamı</p></div>
+            <p>2.1 Veri Yükleme ve Dönüştürme &nbsp;·&nbsp; 2.2 Geometri İşlemleri (Advanced) &nbsp;·&nbsp; 2.3 İndeks ve Performans &nbsp;·&nbsp; 2.4 EXPLAIN ANALYZE ile Sorgu Optimizasyonu &nbsp;·&nbsp; 2.5 Büyük Veri ve Partitioning</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Bu bölümün sonunda katılımcı; harici veriyi PostGIS'e yükleyebilir, mekansal indeks oluşturabilir, yavaş sorguları EXPLAIN ANALYZE ile tanılayabilir ve büyük geometri tablolarını partition edebilir.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2: Alt Modül 2.1 -->
+      <section class="slide" data-slide-title="2.1 — Veri Yükleme ve Dönüştürme">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 2.1 — Veri Yükleme ve Dönüştürme</p>
+          <h2>COPY, shp2pgsql ve ogr2ogr ile Toplu Yükleme</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-01">?</button>
+            </div>
+            <p>Milyonlarca satırı INSERT ile tek tek yazmak yerine hangi yöntem kullanılmalıdır?</p>
+            <div class="answer-box" id="ans-01">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>COPY</code> komutu — dosyadan toplu yükleme için optimize edilmiştir. INSERT'e kıyasla 10–50× hızlıdır; transaction log ek yükü minimumdur. GeoJSON/Shapefile için <code>ogr2ogr</code> veya <code>shp2pgsql</code> kullanılır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Belediye CBS departmanları günlük TKGM, OSM ve sensör verilerini otomatik ETL pipeline ile yükler. ogr2ogr 200+ formatı destekler; GeoJSON, GML, KML, Shapefile dahil tüm yaygın CBS formatlarından aktarım sağlar.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>COPY</code> (sunucu dosyası), <code>\copy</code> (psql istemci yerel dosya), <code>shp2pgsql -I -s 4326</code> (Shapefile→SQL, -I ile GiST indeks), <code>ogr2ogr -f "PostgreSQL"</code> (200+ format). CSV WKT: <code>ST_GeomFromText(wkt_col, srid)</code>.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>ogr2ogr -f "PostgreSQL" PG:"dbname=mydb" mahalleler.geojson -nln mahalleler</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-02">?</button></span>
+              <div class="phase-body">
+                <p>Büyük yükleme sırasında GiST indeksler açık olmalı mı, kapalı mı?</p>
+                <div class="answer-box" id="ans-02">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>İndeksleri kaldırıp yükleme sonrası yeniden oluşturmak daha hızlıdır. Her satır eklenişinde indeks güncellenir; toplu yüklemede bu maliyet birikerek kritik yavaşlamaya yol açar. Sonradan: <code>CREATE INDEX CONCURRENTLY</code>.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-03">?</button></span>
+              <div class="phase-body">
+                <p>CSV'deki lon/lat sütunlarını <code>ST_MakePoint(lon, lat)</code> ile geometry'ye çevirerek tabloya yükle. <code>ST_SRID</code> ile SRID'i doğrula.</p>
+                <div class="answer-box" id="ans-03">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>INSERT INTO noktalar(geom) SELECT ST_SetSRID(ST_MakePoint(lon,lat),4326) FROM ham_veri;</code> → ST_SRID(geom) = 4326 döner. Harita sekmesinde noktalar görünür.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3: Alt Modül 2.2 -->
+      <section class="slide" data-slide-title="2.2 — Geometri İşlemleri (Advanced)">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 2.2 — Geometri İşlemleri (Advanced)</p>
+          <h2>Simplify, Küme İşlemleri ve ST_SubDivide</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-04">?</button>
+            </div>
+            <p>Yüksek çözünürlüklü kıyı şeridi geometrisi web haritasını neden yavaşlatır ve çözüm nedir?</p>
+            <div class="answer-box" id="ans-04">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Gereksiz nokta yoğunluğu bant genişliği ve render süresini artırır. <code>ST_SimplifyPreserveTopology</code> ile nokta sayısı azaltılır; komşu geometrilerin sınır ilişkisi bozulmaz. Web tile'ları için %90+ azaltım yapılabilir.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Ulusal kadastro sistemlerinde idari sınırlar için simplify zorunludur. İstanbul kıyı şeridinin 1:1000 ölçekli geometrisi web haritasında 1:50000 ölçekte gereksiz detay içerir; simplify ile veri boyutu %95 küçülür.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Basitleştirme: <code>ST_Simplify</code> (hızlı, topoloji bozabilir), <code>ST_SimplifyPreserveTopology</code> (güvenli). Hizalama: <code>ST_SnapToGrid</code>. Küme: <code>ST_Union</code>, <code>ST_Intersection</code>, <code>ST_Difference</code>, <code>ST_SymDifference</code>. Bölme: <code>ST_SubDivide</code>.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT ST_SimplifyPreserveTopology(geom, 0.001) FROM il_sinirlari WHERE ad = 'İstanbul';</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-05">?</button></span>
+              <div class="phase-body">
+                <p><code>ST_Difference(A,B)</code> ile <code>ST_SymDifference(A,B)</code> farkı nedir?</p>
+                <div class="answer-box" id="ans-05">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Difference(A,B): A'dan B'nin çıkarılması. SymDifference(A,B): her iki geometrinin birbirinde olmayan kısımları — matematiksel XOR. Sıra önemlidir: Difference asimetrik, SymDifference simetriktir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-06">?</button></span>
+              <div class="phase-body">
+                <p>İki komşu il poligonu oluştur. <code>ST_Intersection</code> ile ortak sınırı bul; <code>ST_Length</code> ile metre cinsinden uzunluğunu hesapla.</p>
+                <div class="answer-box" id="ans-06">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ST_Length(ST_Intersection(a.geom,b.geom)::geography) AS ortak_sinir_m FROM iller a, iller b WHERE a.ad='İl1' AND b.ad='İl2';</code> → metre cinsinden ortak sınır uzunluğu.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4: Alt Modül 2.3 -->
+      <section class="slide" data-slide-title="2.3 — İndeks ve Performans">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 2.3 — İndeks ve Performans</p>
+          <h2>GiST Mekansal İndeks, ANALYZE ve VACUUM</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-07">?</button>
+            </div>
+            <p>Mekansal indeks olmadan 1 milyon satırlık tabloda <code>ST_Intersects</code> sorgusu kaç satırı tarar?</p>
+            <div class="answer-box" id="ans-07">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Tüm 1 milyon satırı — Sequential Scan. GiST indeksi ile bounding-box eleme aşamasında küçük bir alt kümeye düşer; yalnızca aday geometriler için hassas test yapılır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Türkiye parsel veritabanı (50M+ kayıt): GiST indeks olmadan il sınırı kesişim sorgusu dakikalar alır. İndeksle milisaniyelere düşer. Büyük geometri tablolarında indeks = production şartıdır.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>GiST = R-tree bounding box hiyerarşisi. İki aşama: (1) <code>&amp;&amp;</code> BB eleme, (2) hassas geometri testi. <code>ANALYZE</code>: kolon istatistikleri günceller. <code>VACUUM</code>: dead tuple temizler. <code>CONCURRENTLY</code>: production'da kesintisiz indeks oluşturma.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>CREATE INDEX CONCURRENTLY idx_geom ON noktalar USING GIST(geom);</code><br/><code>ANALYZE noktalar;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-08">?</button></span>
+              <div class="phase-body">
+                <p><code>ORDER BY ST_Distance(...)</code> sorgusunda GiST indeksi otomatik kullanılır mı?</p>
+                <div class="answer-box" id="ans-08">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Hayır. Standart ST_Distance için GiST devreye girmez. KNN operatörü <code>&lt;-&gt;</code> ile <code>ORDER BY geom &lt;-&gt; hedef LIMIT n</code> yazılırsa GiST indeksi devreye girer ve en yakın N noktayı hızla bulur.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-09">?</button></span>
+              <div class="phase-body">
+                <p><code>SET enable_indexscan = off;</code> ile indeksi devre dışı bırak; aynı mekansal sorguyu EXPLAIN ANALYZE ile çalıştır. Sonra <code>enable_indexscan = on;</code> ile karşılaştır.</p>
+                <div class="answer-box" id="ans-09">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>İndekssiz: Seq Scan, yüksek actual time. İndeksli: Bitmap Index Scan veya Index Scan, çok daha düşük actual time. Fark 10–100× olabilir.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5: Alt Modül 2.4 -->
+      <section class="slide" data-slide-title="2.4 — EXPLAIN ANALYZE ile Sorgu Optimizasyonu">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 2.4 — EXPLAIN ANALYZE ile Sorgu Optimizasyonu</p>
+          <h2>Sorgu Planı Okuma ve Optimizasyon Stratejileri</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-10">?</button>
+            </div>
+            <p><code>EXPLAIN</code> ve <code>EXPLAIN ANALYZE</code> arasındaki kritik fark nedir?</p>
+            <div class="answer-box" id="ans-10">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>EXPLAIN tahmini plan gösterir, sorguyu çalıştırmaz — hızlıdır. EXPLAIN ANALYZE sorguyu gerçekten çalıştırır; her adımda <em>actual time</em> + gerçek satır sayısı raporlar. Tanı için ANALYZE zorunludur.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Production mekansal veritabanı izlemede SLA ihlalleri genellikle güncel olmayan istatistik (ANALYZE eksik) veya eksik indeks nedeniyledir. EXPLAIN ANALYZE ile kök neden dakikalar içinde tespit edilir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Sequential Scan = tüm tablo — büyük tabloda kırmızı bayrak. Index Scan = GiST devrede. Rows estimate ≠ actual rows → ANALYZE gerekli. BUFFERS ile bellek/disk hit oranı. Partial index, Materialized View, CTE inlining (PG12+).</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM binalar WHERE ST_DWithin(geom::geography, ST_MakePoint(28.97,41.01)::geography, 1000);</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-11">?</button></span>
+              <div class="phase-body">
+                <p>Planlayıcı indeks varken Sequential Scan seçiyorsa olası nedenler nelerdir?</p>
+                <div class="answer-box" id="ans-11">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>1) İstatistikler güncel değil (ANALYZE çalıştır). 2) Planlayıcı tablonun büyük bölümünün döneceğini tahmin ediyor (seçicilik düşük — index yerine seqscan daha verimli). 3) <code>random_page_cost</code> çok yüksek ayarlı.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-12">?</button></span>
+              <div class="phase-body">
+                <p>Bir mekansal sorgu seç; EXPLAIN ANALYZE çıktısında en yüksek <em>actual time</em>'a sahip düğümü bul ve iyileştirme önerisini yaz.</p>
+                <div class="answer-box" id="ans-12">
+                  <span class="answer-box-lbl">Yöntem</span>
+                  <p>EXPLAIN ANALYZE çıktısında <code>actual time=X..Y</code> değerlerini karşılaştır. En yüksek Y değerli düğüm darboğazdır. Seq Scan ise → indeks ekle. Rows estimate büyük sapma → ANALYZE çalıştır.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6: Alt Modül 2.5 -->
+      <section class="slide" data-slide-title="2.5 — Büyük Veri ve Partitioning">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 2.5 — Büyük Veri ve Partitioning</p>
+          <h2>Table Partitioning, TOAST ve Materialized View</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-13">?</button>
+            </div>
+            <p>500 milyon kayıtlık GPS takip tablosunda yalnızca geçen haftanın verisi sorgulanıyorsa, tüm tablo taranır mı?</p>
+            <div class="answer-box" id="ans-13">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Partitioning olmadan evet. RANGE partitioning ile planlayıcı yalnızca ilgili haftalık/aylık partition'ı tarar — partition pruning otomatik çalışır; toplam veri boyutundan bağımsız sorgu süresi sabit kalır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Filo takip sistemleri araç konum verilerini aylık partition'lara böler. 10 milyar satırda bile aylık rapor saniyeler içinde döner. Trafik izleme sistemleri LIST partition ile il bazında erişim hızını optimize eder.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>RANGE (zaman bazlı), LIST (bölge/il kodu). Partition pruning = yalnızca ilgili partition taranır. TOAST: büyük geometriler otomatik ayrılır. Materialized View: pahalı hesap önbelleği. CLUSTER: fiziksel satır sırası GiST'e göre düzenlenir.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>CREATE TABLE konum (id BIGINT, geom GEOMETRY, zaman TIMESTAMPTZ) PARTITION BY RANGE (zaman);</code><br/><code>CREATE TABLE konum_2024 PARTITION OF konum FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-14">?</button></span>
+              <div class="phase-body">
+                <p>Partition key yanlış seçilirse ne olur?</p>
+                <div class="answer-box" id="ans-14">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Pruning çalışmaz; tüm partition'lar taranır ve partitioning avantajı kaybolur. Key, en sık filtrelenen sütun olmalıdır. Zaman serisi için tarih, coğrafi veri için bölge kodu iyi adaydır.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-15">?</button></span>
+              <div class="phase-body">
+                <p><code>ST_SubDivide(geom, 128)</code> ile büyük karmaşık bir poligonu parçalara böl. EXPLAIN ANALYZE ile bölünmüş vs. orijinal üzerinde indeks verimliliğini karşılaştır.</p>
+                <div class="answer-box" id="ans-15">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p>ST_SubDivide büyük poligonu maksimum 128 noktada alt parçalara böler. Her parçanın BB'si küçülür — GiST daha iyi eleme yapar; kesişim sorguları 2–5× hızlanır.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7: Kapanış -->
+      <section class="slide" data-slide-title="Bölüm Sonu">
+        <div class="slide-body">
+          <p class="kicker">Bölüm 2 — Özet</p>
+          <h2>Sorgular, İndeks ve Performans Tamamlandı</h2>
+          <p class="slide-sub">COPY/ogr2ogr ile toplu veri yükleme, ST_Simplify/ST_Union ile ileri geometri işlemleri, GiST indeks mimarisi, EXPLAIN ANALYZE ile sorgu tanılama ve tablo partitioning stratejileri uygulandı.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Kazanımlar</p></div>
+            <p>Toplu veri yükleme &nbsp;·&nbsp; Geometri simplify ve küme işlemleri &nbsp;·&nbsp; GiST + ANALYZE + VACUUM &nbsp;·&nbsp; EXPLAIN ANALYZE ile darboğaz tespiti &nbsp;·&nbsp; Partition pruning stratejisi</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Bir Sonraki Bölümde</p>
+            <p>Bölüm 3 — Production, Ağ Analizi ve Proje: kümeleme analitiği, pgRouting, topology, row-level security, production operasyonu ve kapanış projesi.</p>
+          </div>
+          <a href="./bolum-3.html" class="cta">Bölüm 3: Production, Ağ Analizi ve Proje →</a>
+        </div>
+      </section>
+
+    </div></div>
+
+    <div class="ctrl-bar">
+      <button class="ctrl-btn" id="prevBtn" type="button">← Geri</button>
+      <span class="ctrl-status" id="slideStatus">1 / 7</span>
+      <button class="ctrl-btn" id="nextBtn" type="button">İleri →</button>
+    </div>
+
+    <script>
+      (function () {
+        var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+        var total=slides.length,idx=0;
+        var prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn');
+        var status=document.getElementById('slideStatus'),fill=document.getElementById('progressFill');
+        function render(){slides.forEach(function(s,i){var a=i===idx;s.classList.toggle('active',a);s.setAttribute('aria-hidden',String(!a));});var t=slides[idx].getAttribute('data-slide-title')||'';status.textContent=(idx+1)+' / '+total+(t?'  ·  '+t:'');fill.style.width=((idx+1)/total*100).toFixed(1)+'%';prevBtn.disabled=idx===0;nextBtn.disabled=idx===total-1;}
+        prevBtn.addEventListener('click',function(){if(idx>0){idx--;render();}});
+        nextBtn.addEventListener('click',function(){if(idx<total-1){idx++;render();}});
+        document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='PageDown'){if(idx<total-1){idx++;render();}}if(e.key==='ArrowLeft'||e.key==='PageUp'){if(idx>0){idx--;render();}}});
+        render();
+      }());
+      (function () {
+        document.querySelectorAll('.q-btn').forEach(function (btn) {
+          var box = document.getElementById(btn.getAttribute('data-answer'));
+          if (!box) return;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = box.style.display === 'block';
+            box.style.display = open ? 'none' : 'block';
+            btn.textContent = open ? '?' : '✓';
+            btn.classList.toggle('q-active', !open);
+          });
+        });
+      }());
+    </script>
+  </body>
+</html>

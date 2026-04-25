@@ -1,23 +1,27 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Tüm bir tablodaki geometrileri toplu `UPDATE` ile dönüştürebileceksin
-- `ST_SetSRID + ST_Transform` zincirini doğru sırada uygulayabileceksin
-- `ANALYZE` sonrası istatistiklerin neden güncellendiğini açıklayabileceksin
+Gerçek dünya veri setlerinde koordinat sistemleri çoğunlukla tutarsızdır: bazı satırlar SRID etiketsiz gelir, bazıları yanlış SRID ile etiketlenmiştir, bazıları farklı projeksiyon sistemlerinde yer alır. Bu ders, bir tablodaki tüm geometrileri SQL `UPDATE` ile toplu biçimde standart bir koordinat sistemine taşıma yöntemini ele almaktadır.
+
+- Tüm bir tablodaki geometrileri toplu `UPDATE` ile dönüştürmek
+- `ST_SetSRID` ve `ST_Transform` zincirini doğru sırada uygulamak
+- `ANALYZE` komutunun sorgu planlayıcı için önemi
 
 ---
 
-## 📖 Kavram: Toplu Dönüşüm
+## Toplu Dönüşüm
 
 Gerçek veri genellikle karışık gelir:
-- Bazı satırlar SRID=-1 (etiketsiz)
-- Bazıları yanlış SRID ile etiketli
-- Bazıları UTM'de, bazıları 4326'da
+- Bazı satırlarda `SRID = -1` (etiketsiz)
+- Bazılarında yanlış SRID etiketi
+- Bazıları UTM'de, bazıları EPSG:4326'da
 
-**Çözüm:** `UPDATE` + `ST_Transform(ST_SetSRID(geom, kaynak), hedef)`
+Çözüm: `UPDATE` + `ST_Transform(ST_SetSRID(geom, kaynak_srid), hedef_srid)` zinciri.
 
 ---
 
-## ▶ Senaryo: Karışık SRID'li Tablo
+## Uygulama Örneği
+
+### Karışık SRID'li tablo
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS karisik_noktalar (
@@ -32,24 +36,23 @@ INSERT INTO karisik_noktalar (ad, geom, kaynak_srid) VALUES
   ('İstanbul', ST_SetSRID(ST_MakePoint(28.979,41.015),4326), 4326),
   -- SRID eksik
   ('Ankara',   ST_MakePoint(32.854,39.930),                  -1),
-  -- UTM 36N olması gereken ama etiket yanlış
+  -- UTM 36N koordinatları
   ('Koordinat A', ST_SetSRID(ST_MakePoint(500000,4400000),32636), 32636)
 ON CONFLICT DO NOTHING;
 
 SELECT id, ad, ST_SRID(geom) AS mevcut_srid, ST_AsText(geom) AS geom_text
 FROM karisik_noktalar;`}
   label="Karışık SRID tablosu"
+  description="Üç farklı SRID senaryosunu temsil eden bir tablo oluşturulur: EPSG:4326 ile doğru etiketlenmiş nokta, SRID eksik nokta (0 döner) ve UTM 36N koordinatları. ST_SRID mevcut SRID değerini döndürür; geom_text ham koordinat değerlerini gösterir. UTM koordinatları WGS84'te anlamsız büyük sayılar olarak görünür."
 />
 
----
-
-## ▶ Toplu Düzeltme: SRID=-1 Olanları Etiketle
+### Toplu SRID düzeltmesi
 
 <RunnableBlock
-  sql={`-- Adım 1: SRID=-1 olanları 4326 olarak etiketle
+  sql={`-- Adım 1: SRID=0 olanları 4326 olarak etiketle
 UPDATE karisik_noktalar
 SET geom = ST_SetSRID(geom, 4326)
-WHERE ST_SRID(geom) = -1 OR ST_SRID(geom) IS NULL;
+WHERE ST_SRID(geom) = 0;
 
 -- Adım 2: UTM 36N olanları 4326'ya dönüştür
 UPDATE karisik_noktalar
@@ -62,11 +65,10 @@ SELECT id, ad, ST_SRID(geom) AS yeni_srid,
   ROUND(ST_Y(geom)::numeric, 4) AS lat
 FROM karisik_noktalar;`}
   label="Toplu SRID düzeltmesi"
+  description="İki aşamalı UPDATE: ilk UPDATE ST_SetSRID ile yalnızca etiket ekler — koordinat değerlerini değiştirmez. İkinci UPDATE ST_Transform ile UTM koordinatlarını WGS84'e matematiksel olarak dönüştürür. Sıralama önemlidir: ST_Transform kaynak SRID'i bilmek zorundadır, bu nedenle etiketleme önce yapılır. Sonuç olarak tüm satırlar SRID=4326 ile anlamlı lon/lat değerleri taşır."
 />
 
----
-
-## ▶ ALTER COLUMN ile Tip Kısıtlaması Ekle
+### Typed tabloya aktarım ve ANALYZE
 
 <RunnableBlock
   sql={`-- Tüm geometriler 4326'ya döndükten sonra kısıtlama ekle
@@ -85,12 +87,13 @@ WHERE ST_SRID(geom) = 4326;
 ANALYZE noktalar_typed;
 
 SELECT COUNT(*) AS aktarilan FROM noktalar_typed;`}
-  label="Typed tabloye aktar + ANALYZE"
+  label="Typed tabloya aktar + ANALYZE"
+  description="GEOMETRY(POINT, 4326) tip kısıtlaması tabloya yazılabilecek geometri türünü ve koordinat sistemini sınırlar; bu da yanlış geometri tipinin eklenmesini önler. ANALYZE komutu tablonun istatistiklerini güncelleyerek sorgu planlayıcısının daha iyi indeks ve JOIN kararları almasını sağlar. Büyük INSERT veya UPDATE işlemleri sonrasında çalıştırılması önerilir."
 />
 
 ---
 
-## 🧪 Dene — Toplu Transform
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- UTM noktalarını 4326'ya dönüştür
@@ -101,24 +104,19 @@ WITH utm_noktalar AS (
 )
 SELECT
   ad,
-  ST_AsText(geom)                 AS utm_35n,
+  ST_AsText(geom)                    AS utm_35n,
   ST_AsText(ST_Transform(geom,4326)) AS wgs84,
   ST_Transform(geom,4326)            AS geom
 FROM utm_noktalar;`}
   label="UTM → WGS84 toplu dönüşüm"
   autoFit
+  description="UTM 35N (EPSG:32635) koordinatlarındaki üç nokta ST_Transform ile WGS84'e dönüştürülür. utm_35n sütunu orijinal metre cinsinden koordinatları, wgs84 sütunu dönüştürülmüş derece cinsinden koordinatları gösterir. geom sütunu harita bileşeni için WGS84 geometrisi döndürür. Bu dönüşüm tersine çevrilebilir: ST_Transform(geom_4326, 32635) ile geri UTM'e dönüştürülebilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **UPDATE öncesi backup:** `CREATE TABLE backup AS SELECT * FROM tablo` — UPDATE geri alınamaz.
-2. **ANALYZE ne zaman?** Tablo verisinin %10'dan fazlası değişince query planner eski istatistiklerle çalışabilir. Büyük INSERT/UPDATE sonrası `ANALYZE tablo` çalıştır.
-3. **SET geom = ST_Transform(geom, 4326) sonsuz döngü:** Zaten 4326 olan satırlara WHERE koşulu koy — aksi hâlde 4326→4326 dönüşümü zararsız ama gereksiz yavaş.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 2.1 tamamlandı! Sırada **Modül 2.2 — İleri Geometri İşlemleri**: `ST_Simplify`, `ST_Subdivide`, lineer referanslama.
+1. **UPDATE öncesinde yedek alınmalıdır.** `CREATE TABLE backup AS SELECT * FROM tablo` ile anlık kopya oluşturulmalıdır; `UPDATE` işlemi geri alınamaz.
+2. **ANALYZE ne zaman gereklidir.** Tablo verisinin %10'undan fazlası değiştiğinde sorgu planlayıcı eski istatistiklerle çalışır. Büyük INSERT veya UPDATE işlemleri sonrasında `ANALYZE tablo` çalıştırılmalıdır.
+3. **WHERE koşulsuz `ST_Transform`.** Zaten EPSG:4326'da olan satırlara WHERE koşulu eklenmezse `4326 → 4326` dönüşümü gereksiz yere her satır için tekrarlanır; işlem yavaşlar ancak veriyi bozmaz.

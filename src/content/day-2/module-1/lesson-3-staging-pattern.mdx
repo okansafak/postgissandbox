@@ -1,27 +1,31 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Staging tablosu desenini açıklayabileceksin
-- Ham veriyi temizleyip hedef tabloya aktarabileceksin
-- `ON CONFLICT`, `WHERE` koşulları ve NULL kontrollerini kullanabileceksin
+Ham veriyi doğrudan hedef tabloya yazmak, temizlenmemiş verilerin kalıcı olarak sisteme girmesine yol açar. Staging deseni bu riski yönetmenin endüstri standardı yaklaşımıdır: ham veri önce ayrı bir tabloda saklanır, doğrulanır, ardından temizlenmiş haliyle hedef tabloya aktarılır.
+
+- Staging tablosu desenini açıklamak
+- Ham veriyi temizleyip hedef tabloya aktarmak
+- `ON CONFLICT`, `WHERE` koşulları ve NULL kontrollerini uygulamak
 
 ---
 
-## 📖 Kavram: Staging Deseni
+## Staging Deseni
 
-Ham veriyi doğrudan hedef tabloya koymak hatalara davetiye çıkarır. **Staging deseni**:
+Ham veriyi doğrudan hedef tabloya koymak hatalara zemin hazırlar. Staging deseni üç aşamalı bir akış önerir:
 
 ```
 Ham veri → Staging (TEXT) → Temizle/Doğrula → Hedef (geometry)
 ```
 
-Avantajları:
+Bu yaklaşımın avantajları:
 - Ham veri kaybolmaz (rollback imkânı)
-- Dönüşüm hatası orijinali etkilemez
-- Raporlama: kaç satır başarılı/başarısız?
+- Dönüşüm hataları orijinali etkilemez
+- Kaç satırın başarılı/başarısız olduğu raporlanabilir
 
 ---
 
-## ▶ Tam Staging Akışı
+## Uygulama Örneği
+
+### Staging'e ham veri yükleme
 
 <RunnableBlock
   sql={`-- 1. Staging tablosu — her şey TEXT
@@ -44,11 +48,10 @@ INSERT INTO stg_mekanlar (ham_ad, ham_tur, ham_lon, ham_lat) VALUES
 
 SELECT * FROM stg_mekanlar;`}
   label="Staging'e ham veri yükle"
+  description="Tüm sütunları TEXT türünde olan bir staging tablosu oluşturulur; böylece geçersiz koordinatlar bile hata fırlатmadan kabul edilir. Beş satırdan üçü sorunlu: virgüllü ondalık, geçersiz metin ve NULL değer. yukleme_ts sütunu yükleme zamanını otomatik kaydeder ve sonraki aşamalarda hangi verinin ne zaman geldiğini izlemeye olanak tanır."
 />
 
----
-
-## ▶ Doğrulama: Geçerli / Geçersiz Satırlar
+### Doğrulama raporu
 
 <RunnableBlock
   sql={`SELECT
@@ -62,11 +65,10 @@ SELECT * FROM stg_mekanlar;`}
   END AS durum
 FROM stg_mekanlar;`}
   label="Staging doğrulama raporu"
+  description="CASE ifadesi her satırı dört olası duruma göre sınıflandırır: NULL koordinat, geçersiz boylam, geçersiz enlem veya geçerli. REPLACE(ham_lon,',','.') virgüllü ondalıkları normalleştirir; regex ~'^-?[0-9]+\.?[0-9]*$' sayısal formata uygunluğu test eder. Bu rapor hedef tabloya aktarılmadan önce veri kalitesini sayısal olarak ortaya koyar."
 />
 
----
-
-## ▶ Temiz Satırları Hedef Tabloya Aktar
+### Temiz satırları hedef tabloya aktarma
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS mekanlar (
@@ -97,28 +99,22 @@ ON CONFLICT DO NOTHING;
 -- Kaç satır aktarıldı?
 SELECT COUNT(*) AS hedef_kayit FROM mekanlar;`}
   label="Temiz satırları aktar"
+  description="WHERE koşulu yalnızca doğrulama raporunda 'Geçerli' olarak işaretlenen satırları seçer: NULL olmayan ve sayısal regex'e uyan koordinatlar. REPLACE virgüllü ondalıkları ::FLOAT cast öncesinde normalleştirir. ON CONFLICT DO NOTHING aynı sorgunun tekrar çalışmasında çakışmaları önler. Sonuç sayısının 2 (geçerli satır sayısı) olması beklenir."
 />
 
----
-
-## ▶ Haritada Gör
+### Temizlenen mekanları haritada görüntüle
 
 <RunnableBlock
   sql={`SELECT geom, ad AS label FROM mekanlar;`}
   label="Temizlenen mekanlar haritada"
   autoFit
+  description="Staging'den geçerek hedef tabloya aktarılan geçerli mekanlar haritada görselleştirilir. Geçersiz koordinat içeren satırlar filtrelendiğinden yalnızca doğrulanmış noktalar görünür."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`::FLOAT` hata fırlatır:** `'hatalı'::FLOAT` → `ERROR`. `REPLACE` + regex koşul ile önce filtrele.
-2. **Staging'i silme:** Yükleme tamamlandıktan sonra staging tablosunu `DROP` yerine `TRUNCATE` yap — şema kalsın, veri gitsin.
-3. **Duplicate kayıtlar:** `ON CONFLICT DO NOTHING` sadece PRIMARY KEY/UNIQUE çakışmasında atlar. Coğrafi duplicate için `ST_DWithin` + EXISTS koşulu kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste tablodaki tüm SRID sorunlarını toplu düzelten yöntem: `ST_SetSRID + ST_Transform` kombinasyonu.
+1. **`::FLOAT` geçersiz metinde hata fırlatır.** `'hatalı'::FLOAT` → `ERROR`. Regex koşuluyla önceden filtreleme yapmak zorunludur.
+2. **Staging tablosunu `DROP` ile silme.** Yükleme tamamlandıktan sonra staging tablosunu `TRUNCATE` ile temizlemek yeterlidir — şema korunur, veri gider. `DROP` şemayı da siler ve sonraki yükleme döngüsünde yeniden oluşturma gerekir.
+3. **Coğrafi duplicate tespiti.** `ON CONFLICT DO NOTHING` yalnızca PRIMARY KEY/UNIQUE kısıt çakışmasında atlar. Coğrafi olarak aynı konumdaki tekrar kayıtları filtrelemek için `WHERE NOT EXISTS (SELECT 1 FROM mekanlar WHERE ST_DWithin(...))` kalıbı kullanılmalıdır.

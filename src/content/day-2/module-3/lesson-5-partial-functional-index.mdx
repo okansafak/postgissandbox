@@ -1,22 +1,24 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Partial index ile belirli bir koşul için optimize edilmiş indeks oluşturabileceksin
-- Functional index ile cast'lı sütun sorgularını hızlandırabileceksin
-- Hangi durumda hangi indeks türünün uygun olduğuna karar verebileceksin
+Her sütun değeri için indeks oluşturmak her zaman en verimli yaklaşım değildir. Belirli bir koşulu sağlayan satır altkümeleri veya cast'lı sütun ifadeleri için özel indeks türleri daha küçük ve daha hızlı indeksler üretir. Bu ders, partial ve functional index kavramlarını ele almaktadır.
+
+- Partial index ile belirli bir koşul için optimize edilmiş indeks oluşturmak
+- Functional index ile cast'lı sütun sorgularını hızlandırmak
+- Hangi durumda hangi indeks türünün uygun olduğuna karar verebilmek
 
 ---
 
-## 📖 Kavram
+## Partial Index ve Functional Index
 
 ### Partial Index
 
-Tablonun yalnızca **belirli bir koşulu sağlayan** satırlarını indeksler. Daha küçük → daha hızlı.
+Tablonun yalnızca **belirli bir koşulu sağlayan** satırlarını indeksler. Daha küçük boyut, daha hızlı tarama.
 
 ```sql
 -- Sadece aktif kayıtlar için
 CREATE INDEX ON mekanlar USING gist(geom) WHERE aktif = TRUE;
 
--- Sadece İstanbul için
+-- Sadece İstanbul sınırları içindeki noktalar için
 CREATE INDEX ON noktalar USING gist(geom)
   WHERE ST_Contains(
     ST_MakeEnvelope(28.5,40.8,29.5,41.5,4326), geom
@@ -25,7 +27,7 @@ CREATE INDEX ON noktalar USING gist(geom)
 
 ### Functional Index
 
-Bir **ifade** (expression) üzerine indeks. `geom::geography` gibi cast'ları kapsar.
+Bir **ifade** üzerine indeks. `geom::geography` gibi cast'ları kapsar.
 
 ```sql
 CREATE INDEX ON mekanlar USING gist( (geom::geography) );
@@ -33,7 +35,9 @@ CREATE INDEX ON mekanlar USING gist( (geom::geography) );
 
 ---
 
-## ▶ Partial Index: Aktif Mekanlar
+## Uygulama Örneği
+
+### Partial index sorgu planı
 
 <RunnableBlock
   sql={`-- Tablo: 1000 mekan, yarısı aktif değil
@@ -65,11 +69,10 @@ WHERE aktif = TRUE
   AND ST_DWithin(geom::geography,
     ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 200000);`}
   label="Partial index sorgu planı"
+  description="1000 mekanın yarısı aktif=FALSE olarak ayarlanır; partial index yalnızca aktif=TRUE satırlarını (500 nokta) indeksler. EXPLAIN sorgu planında 'Index Cond: (aktif = true)' ve 'Index Scan using idx_aktif_geom' satırları görünür. Tam GiST indeksi 1000 satır içerirken partial index 500 satır içerdiğinden daha küçük ve daha hızlıdır."
 />
 
----
-
-## ▶ Functional Index: geography Cast
+### Functional geography index
 
 <RunnableBlock
   sql={`-- geography sorgular için functional index
@@ -83,11 +86,10 @@ WHERE ST_DWithin(
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
   100000);`}
   label="Functional geography index"
+  description="geom::geography cast içeren ST_DWithin sorgularında geometry sütununun standart GiST indeksi yeterli olmayabilir. (geom::geography) ifadesine functional index oluşturulduğunda planlayıcı bu indeksi kullanabilir. EXPLAIN çıktısında 'Index Scan using idx_mekanlar_geog' satırı beklenir. Parantez sözdizimi zorunludur: gist((geom::geography))."
 />
 
----
-
-## 🧪 Dene — İndeks Boyutları
+### İndeks boyutları
 
 <RunnableBlock
   sql={`SELECT
@@ -97,18 +99,13 @@ FROM pg_stat_user_indexes
 WHERE tablename = 'mekanlar_part'
 ORDER BY pg_relation_size(indexrelid) DESC;`}
   label="İndeks boyutları"
+  description="pg_size_pretty her indeksin disk boyutunu okunabilir biçimde (KB, MB) gösterir. Partial index tam GiST indeksinden daha küçük olmalıdır; çünkü yalnızca 500 aktif kaydı içerir. Functional index (geography) ise geometry indeksinden farklı bir boyut profiline sahiptir. Bu karşılaştırma hangi indeksin ne kadar yer kapladığını somutlaştırır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Partial index WHERE sorguyla birebir eşleşmeli:** `WHERE aktif = TRUE` indeksi `WHERE aktif = 't'` sorgusunda kullanılmaz — PostgreSQL koşul eşleşmesine sıkı bakır.
-2. **Functional index parantez gerektirir:** `CREATE INDEX ON t USING gist((geom::geography))` — double parantez zorunlu. Tek parantez syntax hatası.
-3. **INDEX seçimi: planner kararı verir:** İndeks var diye her zaman kullanılmaz. Planner tablo boyutu ve seçicilik oranına göre karar verir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste hangi indekslerin kullanıldığını gösteren sistem tablosu: **`pg_stat_user_indexes`**.
+1. **Partial index WHERE koşulu sorgu WHERE koşuluyla birebir eşleşmelidir.** `WHERE aktif = TRUE` koşuluyla oluşturulan indeks, `WHERE aktif = 't'` biçimindeki sorguda kullanılmaz. PostgreSQL koşul eşleşmesini katı biçimde kontrol eder.
+2. **Functional index çift parantez gerektirir.** `CREATE INDEX ON t USING gist((geom::geography))` — cast ifadesi mutlaka parantez içinde yazılmalıdır. Tek parantez sözdizimi hatasına neden olur.
+3. **İndeks seçimi planlayıcı tarafından yapılır.** İndeks mevcut olsa bile planlayıcı tablo boyutu ve seçicilik oranına göre sequential scan'ı tercih edebilir; bu genellikle doğru bir karardır.

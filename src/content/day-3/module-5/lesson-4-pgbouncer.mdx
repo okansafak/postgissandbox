@@ -1,35 +1,37 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- PgBouncer'ın ne yaptığını ve neden gerekli olduğunu açıklayabileceksin
-- Session, transaction ve statement pooling modlarını karşılaştırabileceksin
-- PostGIS için hangi pool modunun uygun olduğunu söyleyebileceksin
+- PgBouncer'ın işlevini ve neden gerekli olduğunu açıklamak
+- Session, transaction ve statement pooling modlarını karşılaştırmak
+- PostGIS için hangi pool modunun uygun olduğunu belirlemek
 
 ---
 
-## 📖 Kavram: Bağlantı Havuzu
+## Bağlantı Havuzu
 
-**Problem:** Her PostgreSQL bağlantısı ~5-10 MB RAM tüketir. 1000 eş zamanlı kullanıcı = 5-10 GB RAM sadece bağlantılara.
+**Problem:** Her PostgreSQL bağlantısı yaklaşık 5–10 MB RAM tüketir. 1000 eş zamanlı kullanıcı yalnızca bağlantılar için 5–10 GB RAM anlamına gelir.
 
 **PgBouncer çözümü:**
 - Uygulama → PgBouncer (binlerce bağlantı)
-- PgBouncer → PostgreSQL (100-300 gerçek bağlantı)
-- Havuz: boş bağlantıları bekleyen sorgulara ver
+- PgBouncer → PostgreSQL (100–300 gerçek bağlantı)
+- Havuz: boş bağlantıları bekleyen sorgulara dağıtır
 
 ---
 
-## 📖 Pool Modları
+## Pool Modları
 
 | Mod | Bağlantı tutulur | PostGIS uyumu | Kullanım |
 |---|---|---|---|
 | **Session** | Oturum boyunca | Tam uyumlu | Prepared statements, SET |
-| **Transaction** | İşlem boyunca | Çoğunlukla OK | Web uygulaması |
-| **Statement** | Her sorgu | ❌ Multi-statement yok | Çok basit okuma |
+| **Transaction** | İşlem boyunca | Çoğunlukla uyumlu | Web uygulaması |
+| **Statement** | Her sorgu | Çok ifadeli SQL desteklenmez | Çok basit okuma |
 
-**PostGIS için:** Transaction veya Session pooling. Statement pooling kullanma — `ST_*` fonksiyon çağrıları ve prepared statements sorun çıkarır.
+**PostGIS için:** Transaction veya Session pooling tercih edilmeli. Statement pooling, `ST_*` fonksiyon çağrıları ve prepared statements nedeniyle sorun çıkarır.
 
 ---
 
-## ▶ Canlı Örnek — Bağlantı Sayısı İzle
+## Uygulama Örneği
+
+### Bağlantı durumu
 
 <RunnableBlock
   sql={`-- Mevcut bağlantı sayısı
@@ -41,11 +43,10 @@ SELECT
 FROM pg_stat_activity
 WHERE pid != pg_backend_pid();`}
   label="Bağlantı durumu"
+  description="pg_stat_activity mevcut PostgreSQL bağlantılarını listeler. COUNT(*) FILTER (WHERE state = 'active') aktif sorgu çalıştıran bağlantıları, 'idle' ise bağlı ama işlemsiz olanları sayar. pid != pg_backend_pid() bu sorgunun kendisini dışarıda bırakır. en_uzun_bosta_sn uzun süre boşta kalan bağlantıları tespit etmek için kullanılır."
 />
 
----
-
-## ▶ Maksimum Bağlantı Ayarı
+### Bağlantı ve bellek ayarları
 
 <RunnableBlock
   sql={`-- PostgreSQL bağlantı limitleri
@@ -62,11 +63,12 @@ WHERE name IN (
 )
 ORDER BY name;`}
   label="Bağlantı ve bellek ayarları"
+  description="max_connections PostgreSQL'in kabul edebileceği maksimum bağlantı sayısını belirler. superuser_reserved_connections bu limitten superuser'lara ayrılan payı gösterir. work_mem sıralama ve hash işlemleri için bağlantı başına bellek; shared_buffers paylaşılan buffer boyutu. PgBouncer max_connections'ı PostgreSQL seviyesinde düşük tutarak belleği korur."
 />
 
 ---
 
-## 📖 PgBouncer Konfigürasyon Şablonu
+## PgBouncer Konfigürasyon Şablonu
 
 ```ini
 # pgbouncer.ini
@@ -90,7 +92,7 @@ server_reset_query = DISCARD ALL
 
 ---
 
-## 🧪 Dene — Idle Bağlantıları Temizle
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Uzun süredir boşta olan bağlantıları kapat
@@ -100,18 +102,13 @@ WHERE state = 'idle'
   AND state_change < now() - interval '10 minutes'
   AND pid != pg_backend_pid();`}
   label="Idle bağlantıları kapat"
+  description="pg_terminate_backend belirtilen pid'in bağlantısını zorla kapatır. WHERE state = 'idle' yalnızca işlemsiz bağlantıları hedef alır. state_change < now() - interval '10 minutes' 10 dakikadır boşta kalan bağlantıları filtreler. pid != pg_backend_pid() bu sorgunun kendi bağlantısını kapatmasını önler. PgBouncer bunu otomatik yönetir; bu sorgu manuel acil müdahale içindir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Transaction pooling + prepared statements:** PgBouncer transaction modunda prepared statements farklı bağlantıya dağılabilir → hata. `prepare_threshold = 0` ile devre dışı bırak veya session pool kullan.
-2. **PostGIS SET komutları:** `SET search_path`, `SET enable_seqscan` gibi SET komutları transaction pooling'de session'dan session'a geçmez — her sorguda tekrar gönder.
-3. **PgBouncer izleme:** `SHOW POOLS`, `SHOW CLIENTS`, `SHOW SERVERS` komutları PgBouncer admin konsolundan çalıştırılır (port 6432, `pgbouncer` database'e bağlanarak).
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **İzleme** — `pg_stat_activity`, cache hit oranı ve dead tuple izleme.
+1. **Transaction pooling + prepared statements:** PgBouncer transaction modunda prepared statements farklı bağlantıya dağıtılabilir ve hata üretir. `prepare_threshold = 0` ile devre dışı bırakılmalı veya session pool kullanılmalıdır.
+2. **PostGIS SET komutları:** `SET search_path`, `SET enable_seqscan` gibi komutlar transaction pooling'de oturumlar arası taşınmaz; her sorguda yeniden gönderilmelidir.
+3. **PgBouncer izleme:** `SHOW POOLS`, `SHOW CLIENTS`, `SHOW SERVERS` komutları PgBouncer admin konsolundan çalıştırılır (port 6432, `pgbouncer` veritabanına bağlanarak).

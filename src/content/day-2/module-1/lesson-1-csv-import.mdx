@@ -1,24 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- CSV verisini PGlite'ta bir tabloya aktarabileceksin
-- Enlem/boylam sütunlarından geometry sütunu oluşturabileceksin
-- Temiz veri yükleme adımlarını açıklayabileceksin
+Mekansal verinin en yaygın kaynaklarından biri CSV dosyalarıdır; konum bilgisi genellikle enlem/boylam sütunları biçiminde saklanır. Bu ders, metin tabanlı koordinat değerlerini PostGIS geometry sütununa dönüştürmenin adımlarını ve yaygın hata senaryolarını ele almaktadır.
+
+- CSV verisini PGlite'ta bir tabloya aktarmak
+- Enlem/boylam sütunlarından geometry sütunu oluşturmak
+- Temiz veri yükleme adımlarını açıklamak
 
 ---
 
-## 📖 Kavram: Tarayıcıda Veri Yükleme
+## Tarayıcıda Veri Yükleme
 
-Sunucu tarafı araçları (`COPY`, `psql \copy`, `shp2pgsql`) bu sandboxta doğrudan kullanılamaz. Bunun yerine:
+Sunucu tarafı araçları (`COPY`, `psql \copy`, `shp2pgsql`) bu sandbox ortamında doğrudan kullanılamaz. Kullanılabilecek alternatifler:
 
 1. **INSERT VALUES** — küçük test verisi için
-2. **Programatik INSERT** — JavaScript'ten PGlite API
-3. **Staging tablosu deseni** — metin olarak yükle, sonra geometry'ye çevir
+2. **Programatik INSERT** — JavaScript'ten PGlite API ile
+3. **Staging tablosu deseni** — veriyi metin olarak yükle, ardından geometry'ye dönüştür
 
-Bu derste SQL `INSERT` ile bir CSV'yi simüle ederek nokta tablosu oluşturacağız.
+Bu ders, SQL `INSERT` ifadeleriyle bir CSV dosyasını simüle ederek nokta tablosu oluşturma akışını göstermektedir.
 
 ---
 
-## ▶ Canlı Örnek — CSV Simülasyonu: Nokta Tablosu
+## Uygulama Örneği
+
+### Staging tablosu oluştur
 
 <RunnableBlock
   sql={`-- Staging tablosu: ham metin
@@ -40,11 +44,10 @@ INSERT INTO csv_staging (ad, lon_text, lat_text) VALUES
 
 SELECT * FROM csv_staging;`}
   label="Staging tablosu oluştur"
+  description="Koordinatları metin (TEXT) olarak tutan bir staging tablosu oluşturulur ve altı İstanbul semti eklenir. Staging yaklaşımında ham veri her zaman orijinal haliyle korunur; dönüşüm hataları hedef tabloyu etkilemez. Son SELECT staging tablosunun içeriğini doğrular."
 />
 
----
-
-## ▶ Staging → Gerçek Tablo
+### Staging'den geometry tablosuna aktarım
 
 <RunnableBlock
   sql={`-- Hedef tablo: geometry sütunu ile
@@ -70,21 +73,21 @@ ON CONFLICT DO NOTHING;
 
 SELECT id, ad, ST_AsText(geom) AS wkt FROM noktalar;`}
   label="Staging → geometry tablosu"
+  description="Staging tablosundaki metin koordinatları ::FLOAT cast ile sayıya çevrilir; ST_MakePoint(lon, lat) ile POINT geometrisi oluşturulur; ST_SetSRID SRID=4326 atar. ON CONFLICT DO NOTHING çift yükleme girişimlerini sessizce atlar. Sonuç olarak hedef tablonun WKT gösterimi doğrulanır."
 />
 
----
-
-## ▶ Haritada Gör
+### Nokta tablosunu haritada görüntüle
 
 <RunnableBlock
   sql={`SELECT geom, ad AS label FROM noktalar;`}
   label="Nokta tablosunu haritada gör"
   autoFit
+  description="Harita bileşeninin geometry sütununu otomatik algılaması için geom sütunu SELECT'e dahil edilir. label sütunu (ad AS label) her noktanın harita üzerindeki etiketini belirler. autoFit tüm noktaları ekrana sığdırmak için harita görünümünü otomatik ayarlar."
 />
 
 ---
 
-## 🧪 Dene — SRID Eksik Veriyi Düzelt
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- SRID'siz yüklenmiş veri senaryosu
@@ -101,18 +104,13 @@ INSERT INTO bozuk_noktalar (ad, geom) VALUES
 -- SRID kontrol et
 SELECT id, ad, ST_SRID(geom) AS srid FROM bozuk_noktalar;`}
   label="SRID eksik tablo"
+  description="ST_MakePoint SRID bilgisi taşımaz; bu nedenle tabloya eklenen geometrilerin SRID değeri 0 (belirsiz) olur. ST_SRID fonksiyonu her satır için mevcut SRID'i döndürür ve sorunun varlığını kanıtlar. Bu tablo bir sonraki adımda ST_SetSRID ile toplu düzeltme için temel oluşturur."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Virgüllü ondalık sayı:** Bazı CSV'lerde `28,979` (virgül) gelir. PostgreSQL nokta `.` bekler. `REPLACE(lon_text, ',', '.')::FLOAT` ile düzelt.
-2. **Enlem/boylam yer değişimi:** CSV'de `lat, lon` sırası, PostGIS `ST_MakePoint(lon, lat)` bekler. Sütun adlarını dikkatli kontrol et.
-3. **NULL değerler:** `lon_text` veya `lat_text` NULL ise `ST_MakePoint` NULL döner — `WHERE lon_text IS NOT NULL AND lat_text IS NOT NULL` koşulu ekle.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste GeoJSON formatında veri yüklemeyi göreceğiz: `ST_GeomFromGeoJSON`.
+1. **Virgüllü ondalık sayı.** Bazı CSV dosyalarında `28,979` (virgül) biçiminde koordinatlar bulunur. PostgreSQL nokta (`.`) bekler. `REPLACE(lon_text, ',', '.')::FLOAT` ifadesiyle düzeltilmelidir.
+2. **Enlem/boylam sırası.** CSV'de `lat, lon` sırası kullanılabilir; ancak `ST_MakePoint(lon, lat)` sırası bekler. Sütun adları dikkatle kontrol edilmelidir.
+3. **NULL koordinatlar.** `lon_text` veya `lat_text` NULL olduğunda `ST_MakePoint` NULL döndürür. `WHERE lon_text IS NOT NULL AND lat_text IS NOT NULL` koşuluyla bu satırlar filtrelenmelidir.

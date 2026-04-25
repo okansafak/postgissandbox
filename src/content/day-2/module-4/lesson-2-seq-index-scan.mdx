@@ -1,29 +1,33 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Sequential Scan, Index Scan ve Bitmap Heap Scan arasındaki farkı açıklayabileceksin
-- Planlayıcının neden bazen index varken seq scan seçtiğini anlayabileceksin
-- `enable_seqscan` ile zorlamalı test yapabileceksin
+İndeks var diye her sorguda index scan kullanılmaz; planlayıcı her zaman en ucuz yolu tercih eder. Bu derste üç temel scan tipinin ne anlama geldiği, hangi koşullarda hangi scan'ın seçildiği ve planlayıcı kararlarının nasıl test edilebileceği ele alınmaktadır.
+
+- Sequential Scan, Index Scan ve Bitmap Heap Scan arasındaki farkı açıklamak
+- Planlayıcının indeks varken Seq Scan seçtiği durumları anlamak
+- `enable_seqscan` ile zorlamalı test yapmak
 
 ---
 
-## 📖 Kavram: Üç Temel Scan Tipi
+## Üç Temel Scan Tipi
 
-| Scan Tipi | Ne zaman? | Index kullanır mı? |
+| Scan Tipi | Ne zaman seçilir? | İndeks kullanır mı? |
 |---|---|---|
 | **Seq Scan** | Tablonun büyük bölümü okunacak | Hayır |
 | **Index Scan** | Az satır döndürecek, seçici sorgu | Evet |
-| **Bitmap Heap Scan** | Orta seçicilik; önce index, sonra heap | Evet (Bitmap Index Scan ile) |
+| **Bitmap Heap Scan** | Orta seçicilik; önce indeks, sonra heap | Evet (Bitmap Index Scan ile) |
 
-**Önemli:** Index var diye index kullanılmaz. Planner cost karşılaştırır:
-- 1000 satırdan 900'ünü okuyacaksan → Seq Scan daha ucuz (random I/O vs sequential I/O)
-- 1000 satırdan 10'unu okuyacaksan → Index Scan daha ucuz
+**Önemli:** Planlayıcı maliyet hesabı yapar:
+- 1000 satırdan 900'ü okunacaksa → Seq Scan daha ucuz (sıralı I/O)
+- 1000 satırdan 10'u okunacaksa → Index Scan daha ucuz (seçici erişim)
 
 ---
 
-## ▶ Seq Scan vs Index Scan
+## Uygulama Örneği
+
+### Büyük seçim — Seq Scan
 
 <RunnableBlock
-  sql={`-- Önce hazırlık tablosu (5000 kayıt)
+  sql={`-- Hazırlık tablosu (5000 kayıt)
 CREATE TABLE IF NOT EXISTS noktalar_scan (
   id   SERIAL PRIMARY KEY,
   tur  TEXT,
@@ -43,11 +47,10 @@ ANALYZE noktalar_scan;
 -- Büyük seçim → Seq Scan beklenir
 EXPLAIN SELECT COUNT(*) FROM noktalar_scan WHERE tur = 'normal';`}
   label="Büyük seçim — Seq Scan"
+  description="5000 kaydın 4950'si (yüzde 99) 'normal' türündedir. Bu kadar büyük bir seçimde indeks kullanmak (rastgele erişim) sıralı taramadan daha pahalıdır; planlayıcı Seq Scan seçer. tur sütununda GiST indeksi yoktur; ancak geom üzerindeki GiST indeksi de bu sorgu için uygulanamaz. EXPLAIN çıktısında 'Seq Scan on noktalar_scan' beklenir."
 />
 
----
-
-## ▶ Küçük Seçim → Index Scan
+### Küçük alan — Index Scan
 
 <RunnableBlock
   sql={`-- Küçük alan sorgusu → Index Scan beklenir
@@ -59,11 +62,10 @@ WHERE ST_DWithin(
   10000  -- 10 km
 );`}
   label="Küçük alan — Index Scan"
+  description="10 km yarıçaplı dar bir alan sorgusu tablonun çok küçük bir bölümünü döndürür. Bu koşulda GiST indeks taraması Seq Scan'dan çok daha ucuzdur; planlayıcı 'Index Scan' veya 'Bitmap Index Scan' seçer. 'actual rows' gerçekte dönen satır sayısını gösterir; bu değer 5000'den çok küçük olmalıdır."
 />
 
----
-
-## ▶ Bitmap Heap Scan
+### Geniş alan — Bitmap Heap Scan
 
 <RunnableBlock
   sql={`-- Orta boyut alan → Bitmap Heap Scan
@@ -75,11 +77,12 @@ WHERE ST_DWithin(
   500000  -- 500 km — geniş alan
 );`}
   label="Geniş alan — Bitmap Heap Scan"
+  description="500 km yarıçaplı geniş alan Türkiye'nin önemli bir bölümünü kapsar; tablonun orta büyüklükte bir kısmı döner. Bu durumda planlayıcı Bitmap Heap Scan seçebilir: önce 'Bitmap Index Scan' ile GiST indeksini kullanarak aday sayfalara bir bit haritası oluşturur, ardından 'Bitmap Heap Scan' ile bu sayfalardaki satırları okur. Bu yaklaşım tam Index Scan'dan ve Seq Scan'dan daha verimli olabilir."
 />
 
 ---
 
-## 🧪 Dene — Seq Scan'ı Zorla Kapat
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Seq scan'ı geçici kapat — planner index'e zorla
@@ -91,20 +94,13 @@ SELECT COUNT(*) FROM noktalar_scan WHERE tur = 'normal';
 -- Geri aç!
 SET enable_seqscan = on;`}
   label="Seq Scan kapatılınca plan değişir"
+  description="enable_seqscan = off planlayıcıyı Seq Scan'ı yüksek maliyetli göstermeye zorlar; alternatif varsa Index Scan seçilir. Bir INDEX SCAN seçildiğinde maliyet neden Seq Scan'dan yüksektir — bu, planlayıcının doğru seçim yaptığını doğrular. Bu ayar yalnızca test amaçlıdır; üretim ortamında değiştirilmemelidir."
 />
 
-> `SET enable_seqscan = off` sadece test için. Üretimde bu ayarı değiştirme — planner başka kötü kararlar verebilir.
-
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Planner her zaman doğru değil:** İstatistikler bayatsa yanlış plan seçilir. `ANALYZE` çalıştır.
-2. **Küçük tablo = Seq Scan:** 100 satırlık tablo için index scan overhead'i seq scan'dan pahalıdır. Bu normaldir.
-3. **Bitmap Scan `Recheck Cond`:** `EXPLAIN` çıktısında `Recheck Cond` satırı görürsün — bu index scan sonrası gerçek geometri testinin yapıldığını gösterir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste plan çıktısını daha derinlemesine okuyacağız: **cost ve rows tahmini nasıl yorumlanır?**
+1. **Planlayıcı her zaman doğru değildir.** İstatistikler eskiyse yanlış plan seçilebilir. `ANALYZE` çalıştırılmalıdır.
+2. **Küçük tablolarda Seq Scan normaldir.** 100 satırlık bir tablo için Index Scan ek yükü (random I/O, indeks okuma) Seq Scan'dan pahalıdır; bu planlayıcı hatası değildir.
+3. **Bitmap Scan `Recheck Cond` içerir.** EXPLAIN çıktısında `Recheck Cond` satırı, indeks taraması sonrasında gerçek geometri testinin yapıldığını gösterir; bu iki aşamalı filtrelemenin kesin faz adımıdır.

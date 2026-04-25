@@ -1,14 +1,16 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- PostgreSQL declarative partitioning sözdizimini yazabileceksin
-- `PARTITION BY RANGE` ile zaman veya sayısal bölümleme yapabileceksin
-- Partition pruning'in nasıl çalıştığını EXPLAIN ile doğrulayabileceksin
+Milyonlarca kayıt içeren büyük tablolar belirli bir noktadan sonra düz indekslerle yönetilemez hale gelir. Tablo bölümleme (partitioning), veriyi mantıksal parçalara ayırarak hem sorgu performansını hem de bakım verimliliğini artırır. Bu ders, tarih veya sayısal aralığa göre bölümlemeyi ele almaktadır.
+
+- PostgreSQL declarative partitioning sözdizimini yazmak
+- `PARTITION BY RANGE` ile zaman veya sayısal bölümleme yapmak
+- Partition pruning'in nasıl çalıştığını EXPLAIN ile doğrulamak
 
 ---
 
-## 📖 Kavram: Declarative Partitioning
+## Declarative Partitioning
 
-Büyük tablo (10M+ satır) → sorgu performansı düşer → Çözüm: tabloyu parçalara böl.
+Büyük tablolarda sorgu performansı düşer; çözüm veriyi mantıksal parçalara bölmektir.
 
 **Range Partitioning:** Belirli sütunun değer aralığına göre bölümleme.
 
@@ -21,17 +23,19 @@ CREATE TABLE olcumler (
   sicaklik   REAL
 ) PARTITION BY RANGE (zaman);
 
--- Partition'lar
+-- Bölüm (partition)
 CREATE TABLE olcumler_2024_q1
   PARTITION OF olcumler
   FOR VALUES FROM ('2024-01-01') TO ('2024-04-01');
 ```
 
-**Avantaj:** `WHERE zaman BETWEEN '2024-01' AND '2024-04'` → sadece ilgili partition okunur (**partition pruning**).
+**Avantaj:** `WHERE zaman BETWEEN '2024-01' AND '2024-04'` → yalnızca ilgili bölüm okunur (**partition pruning**).
 
 ---
 
-## ▶ Canlı Örnek — GPS Kayıt Partitioning
+## Uygulama Örneği
+
+### Range partition kurulumu
 
 <RunnableBlock
   sql={`-- Ana tablo
@@ -42,7 +46,7 @@ CREATE TABLE IF NOT EXISTS gps_kayit (
   geom   GEOMETRY(POINT, 4326)
 ) PARTITION BY RANGE (zaman);
 
--- Aylık partition'lar
+-- Aylık bölümler
 CREATE TABLE IF NOT EXISTS gps_kayit_2024_01
   PARTITION OF gps_kayit
   FOR VALUES FROM ('2024-01-01') TO ('2024-02-01');
@@ -67,28 +71,24 @@ SELECT tableoid::regclass AS partition, COUNT(*) AS kayit
 FROM gps_kayit
 GROUP BY tableoid;`}
   label="Range partition kurulumu"
+  description="Zaman sütununa göre üç aylık bölümü olan GPS kayıt tablosu oluşturulur. 1500 kayıt üç bölüme yaklaşık eşit dağılır: 1 Ocak 00:00'dan itibaren her saat bir kayıt eklendiğinden Ocak ~744, Şubat ~672, Mart ~84 kayıt alır. tableoid::regclass her kaydın hangi fiziksel tabloya (bölüme) yazıldığını gösterir."
 />
 
----
-
-## ▶ Partition Pruning Gözlemle
+### Partition pruning gözlemi
 
 <RunnableBlock
-  sql={`-- Partition pruning: sadece Ocak partition'ı taranır
+  sql={`-- Partition pruning: sadece Ocak bölümü taranır
 EXPLAIN
 SELECT COUNT(*) FROM gps_kayit
 WHERE zaman BETWEEN '2024-01-01' AND '2024-01-31 23:59:59';`}
   label="Partition pruning — EXPLAIN"
+  description="Yalnızca Ocak 2024 tarih aralığını kapsayan sorgunun planı incelenir. EXPLAIN çıktısında gps_kayit_2024_02 ve gps_kayit_2024_03 bölümlerinin planda yer almaması pruning'in çalıştığını gösterir. Pruning olmadan üç bölüm de taranacaktır; pruning ile yalnızca ilgili bölüm okunur."
 />
 
-> Planda `gps_kayit_2024_02` ve `gps_kayit_2024_03` görünmüyorsa — pruning çalışıyor!
-
----
-
-## ▶ Partition Üzerine İndeks
+### Partition üzerine GiST indeksi
 
 <RunnableBlock
-  sql={`-- Her partition'a ayrı GIST indeks
+  sql={`-- Her bölüme ayrı GiST indeks
 CREATE INDEX IF NOT EXISTS idx_gps_kayit_01_geom
   ON gps_kayit_2024_01 USING gist(geom);
 
@@ -100,7 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_gps_kayit_03_geom
 
 ANALYZE gps_kayit;
 
--- Hem zaman hem mekan filtresi → tek partition + index
+-- Hem zaman hem mekan filtresi → tek bölüm + indeks
 EXPLAIN ANALYZE
 SELECT COUNT(*) FROM gps_kayit
 WHERE zaman >= '2024-01-01' AND zaman < '2024-02-01'
@@ -108,15 +108,16 @@ WHERE zaman >= '2024-01-01' AND zaman < '2024-02-01'
     geom::geography,
     ST_SetSRID(ST_MakePoint(29.1, 41.0),4326)::geography,
     20000);`}
-  label="Partition + GIST indeks birlikte"
+  label="Partition + GiST indeks birlikte"
+  description="Her bölüme ayrı GiST indeksi eklendikten sonra hem zaman hem mekan filtresi içeren sorgu incelenir. Planlayıcı önce pruning ile Ocak 2024 bölümünü seçer, ardından bu bölümdeki GiST indeksini kullanarak 20 km içindeki noktaları bulur. EXPLAIN ANALYZE çıktısında tek bölüm adı ve Index Scan beklenir."
 />
 
 ---
 
-## 🧪 Dene — Partition Listesi
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Hangi partition'lar var, boyutları ne?
+  sql={`-- Hangi bölümler var, boyutları ne?
 SELECT
   child.relname AS partition,
   pg_size_pretty(pg_relation_size(child.oid)) AS boyut,
@@ -127,18 +128,13 @@ JOIN pg_class parent ON pg_inherits.inhparent = parent.oid
 JOIN pg_class child  ON pg_inherits.inhrelid  = child.oid
 WHERE parent.relname = 'gps_kayit';`}
   label="Partition listesi ve boyutları"
+  description="pg_inherits kataloğu bölümlü tablo ile fiziksel bölümler arasındaki ilişkiyi tutar. Bu sorgu her bölümün adını, disk boyutunu ve satır sayısını listeler. Boyut dengesi bölüm stratejisinin ne kadar verimli olduğunu gösterir; aşırı dengesiz bölümler yeniden tasarım gerektirebilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Partition key NULL olamaz:** `PARTITION BY RANGE (zaman)` — `zaman IS NULL` veri eklenince hata. Default partition oluştur: `CREATE TABLE gps_kayit_default PARTITION OF gps_kayit DEFAULT;`
-2. **İndeks parent'a eklenmez:** `CREATE INDEX ON gps_kayit` yeni partition'ları kapsamaz. Her partition için veya `pg_partman` extension ile otomatikleştir.
-3. **Çok küçük partition:** Her partition için overhead var. Saatlik partition çoğu senaryoda gereksiz — aylık veya üç aylık yeterli.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **List Partitioning** — ülke, şehir veya kategori bazlı bölümleme.
+1. **Partition key NULL değer kabul etmez.** `PARTITION BY RANGE (zaman)` tanımlı tabloya `zaman IS NULL` değeriyle satır eklendiğinde hata oluşur. `CREATE TABLE ... DEFAULT` bölümü oluşturarak bu durum yönetilebilir.
+2. **Üst tabloya eklenen indeks yeni bölümleri kapsamaz.** Her yeni bölüm için ayrı indeks oluşturulmalı ya da `pg_partman` extension ile otomatikleştirilmelidir.
+3. **Çok küçük bölümler overhead artırır.** Saatlik bölümleme çoğu senaryo için gereksizdir; aylık veya üç aylık bölümleme genellikle yeterlidir.

@@ -1,0 +1,94 @@
+## ORDER BY, LIMIT ve DISTINCT
+
+**Hedef:** Sorgu sonuçlarını sıralamak, sayıyı sınırlamak ve tekrarlayan değerleri tekilleştirmek.
+
+---
+
+## Öğrenim Hedefleri
+
+- `ORDER BY` ile tek veya çok sütuna göre sıralama yapmak
+- `LIMIT` ve `OFFSET` ile sayfalama uygulamak
+- `DISTINCT` ile yinelenen değerleri kaldırmak
+
+---
+
+## Ön Hazırlık
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS sehirler (
+  id SERIAL PRIMARY KEY, ad TEXT, bolge TEXT, nufus INTEGER, alan_km2 NUMERIC
+);
+INSERT INTO sehirler (ad, bolge, nufus, alan_km2) VALUES
+  ('İstanbul','Marmara',15840900,5343),('Ankara','İç Anadolu',5782285,2516),
+  ('İzmir','Ege',4479525,3577),('Bursa','Marmara',3194720,10882),
+  ('Antalya','Akdeniz',2696249,20177),('Adana','Akdeniz',2258997,13844),
+  ('Konya','İç Anadolu',2279474,38873),('Gaziantep','Güneydoğu Anadolu',2154051,7642),
+  ('Mersin','Akdeniz',1922758,15853),('Trabzon','Karadeniz',839468,4685)
+ON CONFLICT DO NOTHING;
+SELECT COUNT(*) AS sehir_sayisi FROM sehirler;`}
+  label="Veri setini hazırla"
+  description="Tablo ve veriler yoksa oluşturur; varsa değiştirmeden devam eder."
+/>
+
+---
+
+## Uygulama Örneği
+
+### ORDER BY ile sıralama
+
+<RunnableBlock
+  sql={`-- En kalabalık 5 şehir — büyükten küçüğe
+SELECT ad, bolge, nufus
+FROM sehirler
+ORDER BY nufus DESC
+LIMIT 5;`}
+  label="En kalabalık 5 şehir"
+  description="ORDER BY sıralama sütununu belirler. DESC azalan (büyükten küçüğe), ASC artan (küçükten büyüğe) sıra demektir; varsayılan ASC'dir. LIMIT N yalnızca ilk N satırı döndürür. Bu kombinasyon 'Top-N' sorgusu olarak yaygın biçimde kullanılır."
+/>
+
+### Çok sütuna göre sıralama
+
+<RunnableBlock
+  sql={`-- Önce bölgeye göre (A-Z), sonra nüfusa göre (büyükten küçüğe) sırala
+SELECT ad, bolge, nufus
+FROM sehirler
+ORDER BY bolge ASC, nufus DESC;`}
+  label="Çoklu sütun sıralaması"
+  description="ORDER BY'a virgülle ayrılmış birden fazla sütun verilebilir. Sıralama soldan sağa öncelik sırasıyla uygulanır: önce bolge'ye göre alfabetik sıralanır; aynı bölge içindeki şehirler nüfusa göre büyükten küçüğe sıralanır. Her sütun için ASC/DESC bağımsız olarak belirtilebilir."
+/>
+
+### OFFSET ile sayfalama
+
+<RunnableBlock
+  sql={`-- 2. sayfa: 4-6. sıralar (OFFSET 3, LIMIT 3)
+SELECT ad, nufus
+FROM sehirler
+ORDER BY nufus DESC
+OFFSET 3
+LIMIT 3;`}
+  label="Sayfalama (OFFSET + LIMIT)"
+  description="OFFSET N ilk N satırı atlar; LIMIT M sonraki M satırı döndürür. Sayfa 1 için OFFSET 0 (veya yazmadan), sayfa 2 için OFFSET = LIMIT, sayfa 3 için OFFSET = 2*LIMIT. Web uygulamalarında listeleme sayfaları bu şekilde oluşturulur. ORDER BY olmadan OFFSET belirsiz sonuçlar üretir; her zaman sıralama ile birlikte kullanılmalıdır."
+/>
+
+### DISTINCT ile tekilleştirme
+
+<RunnableBlock
+  sql={`-- Kaç farklı bölge var?
+SELECT DISTINCT bolge FROM sehirler ORDER BY bolge;`}
+  label="Benzersiz bölgeler"
+  description="DISTINCT yinelenen değerleri kaldırarak her değerden yalnızca bir örnek gösterir. SELECT COUNT(DISTINCT sütun) ise farklı değerlerin sayısını döndürür. DISTINCT ON (sütun) PostgreSQL'e özgü bir özellik olup gruplama olmadan her grup için ilk satırı seçmeye yarar."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- En küçük alanlı 3 şehir (yüzölçümü küçükten büyüğe)
+SELECT ad, alan_km2, bolge
+FROM sehirler
+ORDER BY alan_km2 ASC
+LIMIT 3;`}
+  label="En küçük 3 şehir (alana göre)"
+  description="ASC küçükten büyüğe (artan) sıralamadır. Bu sorgu en küçük yüzölçümüne sahip 3 şehri listeler. ORDER BY + LIMIT kombinasyonu büyük tablolarda özellikle yararlıdır; veritabanı tüm veriyi taramak yerine erken durabilir."
+/>

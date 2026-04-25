@@ -1,30 +1,32 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_ClusterKMeans` sözdizimini yazabileceksin
-- Window function ile küme atamalarını yapabileceksin
-- Küme merkezlerini hesaplayıp haritada gösterebileceksin
+- `ST_ClusterKMeans` sözdizimini uygulamak
+- Window function ile küme atamalarını gerçekleştirmek
+- Küme merkezlerini hesaplayıp haritada görselleştirmek
 
 ---
 
-## 📖 Kavram: K-Means Kümeleme
+## K-Means Kümeleme
 
-K-Means: k adet küme merkezi seç, her noktayı en yakın merkeze ata, merkezleri güncelle — yakınsayana dek tekrar et.
+K-Means algoritması k adet küme merkezi seçer, her noktayı en yakın merkeze atar ve merkezleri günceller; bu süreç yakınsayana kadar tekrarlanır.
 
 **SQL sözdizimi:**
 ```sql
 ST_ClusterKMeans(geom, k) OVER ()
 ```
 
-`OVER ()` zorunlu — window function olarak çalışır. Tüm tabloya uygular.
+`OVER ()` zorunludur — window function olarak çalışır ve tüm tabloyu tek pencere olarak işler.
 
-**Bölge tanımlama kullanım senaryosu:**
+**Bölge tanımlama senaryosu:**
 - k = şube sayısı
 - Her nokta en yakın şubeye atanır
 - Küme merkezi = yeni şube konumu adayı
 
 ---
 
-## ▶ Canlı Örnek — 5 Hizmet Bölgesi
+## Uygulama Örneği
+
+### 5 hizmet bölgesi
 
 <RunnableBlock
   sql={`-- 5 bölgeye böl: her kaza hangi bölgeye düşüyor?
@@ -43,11 +45,10 @@ FROM (
 GROUP BY kume_id
 ORDER BY kaza_sayisi DESC;`}
   label="5 hizmet bölgesi"
+  description="ST_ClusterKMeans 500 noktayı 5 bölgeye atar. AVG(CASE WHEN agir THEN 1 ELSE 0 END) * 100 her bölgedeki ağır kaza yüzdesini hesaplar. ST_Centroid(ST_Collect(geom)) bölge ağırlık merkezini döndürür. Sonuç hangi bölgenin en kalabalık ve en tehlikeli olduğunu gösterir."
 />
 
----
-
-## ▶ Küme Merkezlerini Haritada Göster
+### Küme merkezi noktaları
 
 <RunnableBlock
   sql={`-- Küme merkezi geometrileri — haritada görünür
@@ -61,11 +62,10 @@ FROM (
 ) sub
 GROUP BY kume_id;`}
   label="Küme merkezi noktaları"
+  description="Her kümenin ağırlık merkezi POINT geometrisi olarak döndürülür. geom sütunu harita görünümünde otomatik olarak render edilir. Bu noktalar kaza yoğunluğuna göre hesaplanmış ideal hizmet merkezi konumlarıdır."
 />
 
----
-
-## ▶ Küme Sayısı Etkisi
+### Küme sayısının etkisi
 
 <RunnableBlock
   sql={`-- k=3 vs k=7: hangi bölünme daha anlamlı?
@@ -82,11 +82,12 @@ FROM (
 GROUP BY k3_kume
 ORDER BY nokta_sayisi DESC;`}
   label="k=3 küme boyutları"
+  description="k=3 ile her kümenin kapsadığı alan hesaplanır. ST_ConvexHull kümedeki noktaları çevreleyen dışbükey poligonu oluşturur; ST_Area geography cast'i ile metre kare cinsinden alan hesaplanır ve km²'ye çevrilir. Farklı k değerleriyle bu sorgu karşılaştırılarak en anlamlı bölünme seçilir."
 />
 
 ---
 
-## 🧪 Dene — Alt Küme Üzerine KMeans
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Sadece ağır kazalar: 3 bölge
@@ -103,18 +104,13 @@ FROM (
 ) sub
 GROUP BY kume_id;`}
   label="Ağır kazalara özel KMeans"
+  description="WHERE agir = TRUE filtresi yalnızca ağır kazaları seçer; K-Means yalnızca bu alt küme üzerinde çalışır. Böylece tüm kaza yoğunluğu yerine ağır kaza yoğunluğuna göre öncelikli müdahale bölgeleri tespit edilir. Üç küme merkezi ambulans veya acil servis konumları için aday olabilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **k > nokta sayısı:** `k` değeri tablodaki satır sayısından büyük olamaz — hata verir.
-2. **Deterministic değil:** Her çalıştırmada başlangıç merkezi rastgele seçilir, sonuç değişebilir. Tekrarlanabilirlik için `pg_catalog.setseed(0.5)` ile seed set et.
-3. **Geography ile çalışmaz doğrudan:** `ST_ClusterKMeans` geometry sütunu bekler. Cast gerekirse: önceden `ST_Transform(geom, 3857)` yap, sonra geri dönüştür.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste gürültü tolere eden kümeleme: **ST_ClusterDBSCAN** ile kara nokta tespiti.
+1. **k > nokta sayısı:** `k` değeri tablodaki satır sayısından büyük olamaz; hata üretir.
+2. **Deterministic değil:** Her çalıştırmada başlangıç merkezi rastgele seçildiğinden sonuç değişebilir. Tekrarlanabilirlik için `pg_catalog.setseed(0.5)` ile seed ayarlanmalıdır.
+3. **Geography ile doğrudan çalışmaz:** `ST_ClusterKMeans` geometry sütunu bekler. Metre cinsinden hesaplama gerekiyorsa `ST_Transform(geom, 3857)` ile dönüşüm yapılmalıdır.

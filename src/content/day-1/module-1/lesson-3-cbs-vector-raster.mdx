@@ -1,95 +1,84 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- CBS'in (Coğrafi Bilgi Sistemi) temel amacını açıklayabileceksin
-- **Vektör** ve **raster** veri tiplerini ayırt edebileceksin
-- PostGIS'in bu tablodaki yerini tanımlayabileceksin
+Coğrafi Bilgi Sistemi (CBS), yalnızca bir yazılım kategorisi değil; konum verisini depolama, analiz ve görselleştirme için bütünleşik bir yaklaşımdır. Bu ders, CBS'in temel kavramlarını ve PostGIS'in bu ekosistemde nasıl konumlandığını açıklamaktadır.
 
----
-
-## 📖 Kavram: CBS Nedir?
-
-**CBS (Coğrafi Bilgi Sistemi / GIS — Geographic Information System)**, gerçek dünya konumlarına bağlı verileri depolayan, analiz eden ve görselleştiren bir sistemdir.
-
-Örnekler:
-- "İstanbul'daki tüm hastaneler nerede?" → nokta verisi
-- "E-5 karayolunun güzergahı" → çizgi verisi
-- "Türkiye'nin il sınırları" → poligon verisi
-- "Ankara'nın uydu görüntüsü" → raster verisi
+- CBS'in temel işlevini tanımlamak
+- Vektör ve raster veri arasındaki farkı ayırt edebilmek
+- PostGIS'in bu ayrımdaki rolünü belirleyebilmek
 
 ---
 
-## 📖 Kavram: Vektör vs Raster
+## CBS Nedir?
+
+CBS (Coğrafi Bilgi Sistemi / GIS — Geographic Information System), gerçek dünya konumlarına bağlı verileri depolayan, analiz eden ve görselleştiren bir sistem bütünüdür. Pek çok günlük karar gerçekte bir mekansal soruyu yanıtlar:
+
+- İstanbul'daki hastanelerin dağılımı → nokta verisi
+- E-5 karayolunun güzergahı → çizgi verisi
+- Türkiye il sınırları → poligon verisi
+- Ankara'nın uydu görüntüsü → raster verisi
+
+---
+
+## Vektör ve Raster
 
 ### Vektör Veri
 
-Koordinatlarla tanımlı geometriler. Üç temel tip:
+Koordinatlarla tanımlı geometrilerden oluşur. Üç temel tip ve bunların çoklu versiyonları vardır:
 
-| Tip | Türkçe | Örnek |
+| Tip | Türkçe | Gerçek Dünya Örneği |
 |---|---|---|
-| `POINT` | Nokta | Hastane, ATM, POI |
-| `LINESTRING` | Çizgi / Polizincir | Yol, nehir, rota |
+| `POINT` | Nokta | Hastane, ATM, GPS konumu |
+| `LINESTRING` | Çizgi | Yol, nehir, rota |
 | `POLYGON` | Poligon | İl sınırı, bina, parsel |
 
-Çoklu versiyonları da var: `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`.
-
-**PostGIS vektör verilerle çalışır.** `ST_*` fonksiyonlarının tamamı vektör geometrisi üzerinde işlem yapar.
+**PostGIS, öncelikli olarak vektör verilerle çalışır.** `ST_*` fonksiyonlarının büyük çoğunluğu vektör geometrisi üzerinde işlem yapar.
 
 ### Raster Veri
 
-Piksellerden oluşan ızgara. Her hücrenin bir değeri var.
+Piksellerden oluşan bir ızgaradır; her hücre sayısal bir değer taşır.
 
 | Özellik | Vektör | Raster |
 |---|---|---|
-| Format | Koordinat listeleri | Piksel matrisi |
-| Örnek | İl sınırı, yol | Uydu görüntüsü, DEM |
-| PostGIS desteği | ✅ Tam destek | `postgis_raster` extension |
-| Bu kursta | ✅ Kullanıyoruz | ℹ️ Kavramsal anlatım |
-
-> Bu kursun tamamı **vektör** verilerle ilgilidir. Raster konusu Gün 3'te kısaca ele alınır.
+| Temsil | Koordinat listeleri | Piksel matrisi |
+| Örnek | İl sınırı, yol | Uydu görüntüsü, sayısal yükseklik modeli |
+| PostGIS desteği | Tam destek | `postgis_raster` eklentisi |
+| Bu programda | Tüm modüller | Kavramsal düzeyde |
 
 ---
 
-## ▶ Canlı Örnek — Geometri Tipi Sorgulama
-
-PostGIS'e farklı geometri tipleri üretelim ve tiplerini sorgulayalım:
+## Uygulama Örneği
 
 <RunnableBlock
   sql={`SELECT
-  'POINT'       AS tip, ST_GeometryType(ST_MakePoint(28.9, 41.0))  AS sonuc
+  'POINT'       AS tip, ST_GeometryType(ST_MakePoint(28.9, 41.0))          AS sonuc
 UNION ALL
 SELECT
   'LINESTRING'  AS tip, ST_GeometryType(ST_MakeLine(
                           ST_MakePoint(28.9, 41.0),
-                          ST_MakePoint(32.8, 39.9)))               AS sonuc
+                          ST_MakePoint(32.8, 39.9)))                        AS sonuc
 UNION ALL
 SELECT
   'POLYGON'     AS tip, ST_GeometryType(ST_Buffer(
                           ST_MakePoint(28.9, 41.0)::geography, 1000)::geometry) AS sonuc;`}
   label="Geometri tiplerini gör"
+  description="ST_MakePoint nokta, ST_MakeLine iki noktadan çizgi, ST_Buffer ise bir geometri etrafında tampon (alan) üretir. ST_GeometryType her birinin OGC tip adını döndürür. UNION ALL üç satırı tek sonuç kümesinde birleştirir."
 />
 
 ---
 
-## 🧪 Dene
-
-`ST_MakePoint` ile Ankara'nın koordinatını oluştur (`32.854, 39.930`) ve geometri tipini sorgula:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`SELECT
   ST_GeometryType(ST_MakePoint(32.854, 39.930)) AS tip,
   ST_AsText(ST_MakePoint(32.854, 39.930))       AS wkt_gosterim;`}
   label="Ankara noktası"
+  description="ST_MakePoint(32.854, 39.930) Ankara'nın boylam-enlem koordinatlarından bir POINT geometrisi üretir. ST_AsText bunu 'POINT(32.854 39.930)' biçiminde okunabilir WKT (Well-Known Text) formatına çevirir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-- **"Harita" ≠ "Raster":** Görsel haritalar genelde raster gibi görünür ama altındaki veri vektör olabilir. OpenStreetMap veritabanı tamamen vektör veridir.
-- **PostGIS raster işleyebilir ama farklı:** `postgis_raster` ayrı bir extension. Bu kurs kapsamında değil.
-
----
-
-## 🔗 Sıradaki Ders
-
-Bir sonraki derste **ilk gerçek harita sorgunuzu** çalıştıracaksınız: `ST_MakePoint` ile İstanbul'u haritada göreceksiniz.
+- **Görsel harita ≠ raster:** OpenStreetMap gibi web haritaları raster görünümlü olabilir; ancak altındaki kaynak veri tamamen vektörden oluşur.
+- **`postgis_raster` ayrı bir eklentidir.** Bu eğitim programının kapsamı vektör analiz ile sınırlıdır.

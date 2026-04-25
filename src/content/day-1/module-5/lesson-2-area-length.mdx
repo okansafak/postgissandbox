@@ -1,20 +1,22 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Area`, `ST_Perimeter`, `ST_Length` fonksiyonlarını doğru birimde kullanabileceksin
-- Poligon alanını m² ve km² cinsinden hesaplayabileceksin
-- Bir lineer geometrinin uzunluğunu metreyle ölçebileceksin
+Alan ve uzunluk hesapları, CBS analizinin temel çıktıları arasında yer alır; ancak koordinat sistemine bağlı birim sorunu bu hesapları da etkiler. Bu ders, poligon alanını ve çevresini m²/km² cinsinden, çizgi uzunluğunu ise metreyle doğru biçimde elde etmenin yollarını göstermektedir.
+
+- `ST_Area`, `ST_Perimeter`, `ST_Length` fonksiyonlarını doğru birimde kullanmak
+- Poligon alanını m² ve km² cinsinden hesaplamak
+- Lineer bir geometrinin uzunluğunu metreyle ölçmek
 
 ---
 
-## 📖 Kavram
+## Alan ve Uzunluk Fonksiyonları
 
 | Fonksiyon | Girdi | Çıktı |
 |---|---|---|
-| `ST_Area(geom)` | Polygon/MultiPolygon | Alan (SRID birimiyle) |
-| `ST_Perimeter(geom)` | Polygon/MultiPolygon | Çevre (SRID birimiyle) |
-| `ST_Length(geom)` | LineString/MultiLineString | Uzunluk (SRID birimiyle) |
+| `ST_Area(geom)` | Polygon / MultiPolygon | Alan (SRID birimiyle) |
+| `ST_Perimeter(geom)` | Polygon / MultiPolygon | Çevre (SRID birimiyle) |
+| `ST_Length(geom)` | LineString / MultiLineString | Uzunluk (SRID birimiyle) |
 
-**Birim kuralı** aynı: `geometry` 4326 → derece², `::geography` → m² / m.
+Birim kuralı mesafe hesabıyla aynıdır: `geometry` EPSG:4326 → derece² / derece; `::geography` → m² / m.
 
 ```sql
 -- Doğru:
@@ -25,7 +27,9 @@ ST_Perimeter(geom::geography)  -- m
 
 ---
 
-## ▶ Canlı Örnek — İstanbul Bölgesi Alanı
+## Uygulama Örneği
+
+### Bölge alanı ve çevresi
 
 <RunnableBlock
   sql={`WITH istanbul AS (
@@ -39,11 +43,10 @@ SELECT
   ROUND(ST_Perimeter(geom::geography)::numeric / 1000, 0) AS cevre_km
 FROM istanbul;`}
   label="Bölge alanı ve çevresi"
+  description="İstanbul bölgesini temsil eden bir dikdörtgen poligon için üç ölçüm hesaplanır. ST_Area ::geography ile elipsoid üzerinde m² cinsinden alan döndürür; 1.000.000'a bölüm km²'ye çevirir. ST_Perimeter çevre uzunluğunu metreyle verir; 1000'e bölüm km'ye dönüştürür. ::numeric cast ROUND fonksiyonunun çalışması için gereklidir."
 />
 
----
-
-## ▶ Çizgi Uzunluğu
+### Çizgi uzunluğu
 
 <RunnableBlock
   sql={`WITH rota AS (
@@ -57,11 +60,10 @@ SELECT
 FROM rota;`}
   label="Rota uzunluğu (km)"
   autoFit
+  description="Üç noktadan oluşan bir LINESTRING güzergahının toplam uzunluğu hesaplanır. ST_Length ::geography ile her segmentin elipsoid üzerindeki uzunluğunu toplar ve metre cinsinden döndürür; 1000'e bölüm km'ye çevirir. ST_NPoints geometrideki toplam nokta sayısını (bu örnekte 3) verir."
 />
 
----
-
-## ▶ Şehir Karşılaştırması
+### İlçe alan karşılaştırması
 
 <RunnableBlock
   sql={`WITH ilce_alanlari AS (
@@ -78,13 +80,12 @@ SELECT
 FROM ilce_alanlari
 ORDER BY alan_km2 DESC;`}
   label="İlçe alan karşılaştırması"
+  description="İki ilçeyi temsil eden dikdörtgen poligonlar için alan ve çevre değerleri hesaplanır. ST_Area ve ST_Perimeter ::geography cast ile metre cinsinden sonuç üretir; bölüm işlemleri km² ve km'ye çevirir. Sonuçlar en büyük alandan küçüğe doğru sıralanır."
 />
 
 ---
 
-## 🧪 Egzersiz
-
-Bir dikdörtgen poligon oluştur (İstanbul-Ankara-İzmir çevresini kapsayan). Alanını km² ve çevresini km cinsinden hesapla:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH kutu AS (
@@ -99,18 +100,13 @@ SELECT
 FROM kutu;`}
   label="Büyük bölge alanı"
   autoFit
+  description="İstanbul–Ankara–İzmir üçgenini kapsayan bir dikdörtgen bölge için alan ve çevre hesaplanır. geom sütununun SELECT'e dahil edilmesi harita sekmesinin poligonu göstermesini sağlar. Sonuçlar Türkiye'nin batı yarısının yaklaşık 500.000 km² büyüklüğünde olduğunu doğrular."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Area(geometry 4326):** Derece² döndürür, ~`0.009` gibi küçük bir sayı. Metrekare değil! `::geography` ekle.
-2. **MultiPolygon toplam alan:** `ST_Area(multipolygon)` tüm parçaların toplam alanını verir. Parça parça için `ST_GeometryN` ile döngüye gir.
-3. **ST_Length sadece lineer geometri:** `ST_Length(polygon)` → hata verir. Poligon çevresi için `ST_Perimeter` kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste etiket konumu belirlemek için: `ST_Centroid` vs `ST_PointOnSurface`.
+1. **`ST_Area(geometry 4326)` derece² döndürür.** Sonuç ~`0.009` gibi küçük bir sayıdır. Metrekare değil, derece kareyi temsil eder. `::geography` eklemek zorunludur.
+2. **MultiPolygon toplam alan.** `ST_Area(multipolygon)` tüm parçaların toplam alanını verir. Parça bazında ölçüm için `ST_GeometryN` ile döngüye girilmesi gerekir.
+3. **`ST_Length` yalnızca lineer geometri kabul eder.** `ST_Length(polygon)` hata üretir. Poligon çevresi için `ST_Perimeter` kullanılmalıdır.

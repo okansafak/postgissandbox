@@ -1,29 +1,33 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_NPoints`, `ST_NumGeometries` ile yapısal bilgi çekebileceksin
-- `ST_SRID`, `ST_CoordDim`, `ST_GeometryType` fonksiyonlarını kullanabileceksin
-- `ST_Envelope` ile sınırlayıcı dikdörtgeni hesaplayabileceksin
+Geometri ile çalışırken tipi, koordinat sistemini, boyutunu ve yapısal özelliklerini sorgulamak analitik sürecin ayrılmaz bir parçasıdır. Bu ders PostGIS'in introspection (iç yapı sorgulama) fonksiyonlarını ve sınırlayıcı kutu hesaplamalarını kapsamaktadır.
+
+- `ST_NPoints`, `ST_NumGeometries` ile yapısal bilgi çekmek
+- `ST_SRID`, `ST_CoordDim`, `ST_GeometryType` fonksiyonlarını kullanmak
+- `ST_Envelope` ile sınırlayıcı dikdörtgen hesaplamak
 
 ---
 
-## 📖 Kavram: Geometry Introspection
+## Geometri Introspection Fonksiyonları
 
-Bir geometri hakkında "kaç nokta var?", "hangi tip?", "hangi koordinat sistemi?" gibi soruları yanıtlayan fonksiyonlar:
+Bir geometri nesnesinin iç yapısını sorgulamak için kullanılan temel fonksiyonlar:
 
 | Fonksiyon | Açıklama | Örnek Çıktı |
 |---|---|---|
-| `ST_GeometryType(g)` | Tip adı | `ST_LineString` |
-| `ST_SRID(g)` | Koordinat sistemi ID'si | `4326` |
-| `ST_CoordDim(g)` | Koordinat boyutu (2D/3D) | `2` veya `3` |
+| `ST_GeometryType(g)` | OGC tip adı | `ST_LineString` |
+| `ST_SRID(g)` | Koordinat sistemi kodu | `4326` |
+| `ST_CoordDim(g)` | Koordinat boyutu | `2` veya `3` |
 | `ST_NPoints(g)` | Toplam nokta sayısı | `5` |
 | `ST_NumGeometries(g)` | MULTI* içindeki parça sayısı | `3` |
-| `ST_IsEmpty(g)` | Boş mu? | `false` |
+| `ST_IsEmpty(g)` | Boş geometri mi? | `false` |
 | `ST_Envelope(g)` | Sınırlayıcı dikdörtgen (POLYGON) | `POLYGON((...))` |
 | `ST_Extent(g)` | Aggregate sınırlayıcı kutu | `BOX(...)` |
 
 ---
 
-## ▶ Canlı Örnek — Bir Geometrinin Tüm Metadata'sı
+## Uygulama Örneği
+
+### Tek geometrinin tam metadata özeti
 
 <RunnableBlock
   sql={`WITH geom AS (
@@ -33,21 +37,18 @@ Bir geometri hakkında "kaç nokta var?", "hangi tip?", "hangi koordinat sistemi
   ) AS g
 )
 SELECT
-  ST_GeometryType(g)  AS tip,
-  ST_SRID(g)          AS srid,
-  ST_CoordDim(g)      AS boyut,
-  ST_NPoints(g)       AS nokta_sayisi,
-  ST_IsEmpty(g)       AS bos_mu,
-  ST_AsText(ST_Envelope(g)) AS envelope_wkt
+  ST_GeometryType(g)         AS tip,
+  ST_SRID(g)                 AS srid,
+  ST_CoordDim(g)             AS boyut,
+  ST_NPoints(g)              AS nokta_sayisi,
+  ST_IsEmpty(g)              AS bos_mu,
+  ST_AsText(ST_Envelope(g))  AS envelope_wkt
 FROM geom;`}
   label="Geometri metadata özeti"
+  description="Tek bir CTE içinde oluşturulan LINESTRING üzerinde altı farklı introspection fonksiyonu uygulanır. ST_CoordDim 2D/3D ayrımını, ST_NPoints tüm segmentlerin köşe noktası sayısını, ST_Envelope ise geometriyi tamamen kapsayan minimum dikdörtgeni döndürür."
 />
 
----
-
-## ▶ ST_Envelope: Sınırlayıcı Kutu
-
-`ST_Envelope` geometriyi kapsayan en küçük dikdörtgeni döndürür. Haritada zoom için kullanışlı:
+### ST_Envelope: Sınırlayıcı kutu
 
 <RunnableBlock
   sql={`WITH sehirler AS (
@@ -63,13 +64,14 @@ SELECT
 FROM sehirler;`}
   label="3 şehrin sınırlayıcı kutusu"
   autoFit
+  description="ST_Collect önce üç noktayı MULTIPOINT'te birleştirir. ST_Envelope bu koleksiyonu kapsayan minimum eksen-hizalı dikdörtgeni (POLYGON) döndürür. Harita zoom seviyesini otomatik ayarlamak veya mekansal indeks sorgularını optimize etmek için kullanılır."
 />
 
 ---
 
-## 🧪 Dene
+## Pratik Uygulama
 
-`ST_Extent` bir aggregate — birden fazla satırın toplam bounding box'ını verir:
+### Aggregate bounding box
 
 <RunnableBlock
   sql={`WITH noktalar AS (
@@ -81,13 +83,10 @@ FROM sehirler;`}
 SELECT ST_Extent(geom)::text AS turkiye_bbox
 FROM noktalar;`}
   label="Aggregate bounding box"
+  description="ST_Extent bir aggregate fonksiyondur: GROUP BY gibi birden fazla satırdaki geometrilerin tamamını kapsayan en küçük dikdörtgeni tek bir BOX değeri olarak döndürür. ST_Envelope'dan farkı, ayrı satırlardaki geometriler üzerinde çalışmasıdır."
 />
 
----
-
-## 🧪 Egzersiz
-
-`MULTIPOLYGON` oluştur ve `ST_NumGeometries` ile parça sayısını doğrula:
+### MULTIPOLYGON metadata
 
 <RunnableBlock
   sql={`WITH mp AS (
@@ -103,18 +102,13 @@ SELECT
   ST_GeometryType(geom)  AS tip
 FROM mp;`}
   label="MULTIPOLYGON metadata"
+  description="Üç ayrı POLYGON içeren bu MULTIPOLYGON üzerinde ST_NumGeometries 3 döndürür. ST_NPoints tüm parçaların tüm köşe noktalarını toplar: her kare poligon 5 nokta (kapama dahil) içerdiğinden toplam 15 olmalıdır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_NPoints MULTI tiplerinde tüm parçaları sayar:** `MULTILINESTRING` içindeki her segmentin tüm noktaları toplanır.
-2. **ST_Extent vs ST_Envelope:** `ST_Extent` aggregate (GROUP BY kullanılır), `ST_Envelope` tek geometri için.
-3. **3D geometri:** `ST_CoordDim` → 3 ise Z koordinatı var. `ST_Z(point)` ile Z değerine ulaşabilirsin. 2D fonksiyonlar Z'yi yok sayar.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki ve son derste **geçersiz geometri** problemlerini göreceğiz: neden oluşur, nasıl tespit edilir, nasıl düzeltilir.
+1. **ST_NPoints MULTI tiplerinde tüm parçaları sayar.** `MULTILINESTRING` içindeki her segmentin tüm noktaları toplanır; yalnızca ilk parçanın sayısı değildir.
+2. **ST_Extent ve ST_Envelope karıştırılmamalıdır.** `ST_Extent` birden fazla satırın aggregate toplamıdır; `ST_Envelope` tek bir geometri üzerinde çalışır.
+3. **3D geometriler:** `ST_CoordDim` → 3 sonucu Z koordinatı bulunduğunu gösterir. Z değerine `ST_Z(point)` ile erişilir; 2D fonksiyonlar Z boyutunu yok sayar.

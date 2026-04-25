@@ -1,115 +1,154 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `CreateTopology` ile topoloji şeması oluşturabileceksin
-- `ST_CreateTopoGeo` veya `toTopoGeom` ile geometrileri topolojiye dönüştürebileceksin
-- Topoloji tablolarını (`edge_data`, `node`, `face`) sorgulayabileceksin
+- Topoloji veri yapısını (node / edge / face) anlamak
+- Manuel topoloji simülasyonu ile kenar paylaşımını gözlemlemek
+- `ST_Intersection` ve `ST_Touches` ile ortak sınırları sorgulamak
 
 ---
 
-## 📖 Kavram: Topoloji Veri Yapısı
+## Topoloji Veri Yapısı
 
-`CreateTopology('isim', srid, precision)` şu tabloları oluşturur:
+PostGIS Topology extension şu tabloları yönetir (PGlite'ta WASM ile desteklenmez; bu derste kavramsal simülasyon uygulanır):
 
 | Tablo | İçerik |
 |---|---|
-| `isim.node` | Düğümler (noktalar) |
-| `isim.edge_data` | Kenarlar (çizgiler + sol/sağ yüz referansı) |
-| `isim.face` | Yüzeyler (poligonlar) |
-| `isim.relation` | Feature → topoloji element bağlantısı |
+| `node` | Düğümler (köşe noktaları) |
+| `edge_data` | Kenarlar (çizgiler + sol/sağ yüz referansı) |
+| `face` | Yüzeyler (poligonlar) |
+| `relation` | Feature → topoloji element bağlantısı |
+
+Aynı yapı standart PostGIS tabloları ile simüle edilebilir.
 
 ---
 
-## ▶ Canlı Örnek — Topoloji Oluştur
+## Uygulama Örneği
+
+### Topoloji şeması oluşturma
 
 <RunnableBlock
-  sql={`-- postgis_topology extension yükle
-CREATE EXTENSION IF NOT EXISTS postgis_topology;
+  sql={`-- Topoloji yapısını simüle eden tablolar (temiz başlangıç)
+DROP TABLE IF EXISTS topo_edge;
+DROP TABLE IF EXISTS topo_face;
+DROP TABLE IF EXISTS topo_node;
 
--- Yeni topoloji: 'kadastro_topo', SRID 4326, precision 0.00001 derece
-SELECT CreateTopology('kadastro_topo', 4326, 0.00001);`}
-  label="Topoloji şeması oluştur"
-/>
-
----
-
-## ▶ TopoGeometry Sütunu Ekle
-
-<RunnableBlock
-  sql={`-- Parsel tablosuna topoloji sütunu ekle
-CREATE TABLE IF NOT EXISTS kadastro (
-  id    SERIAL PRIMARY KEY,
-  ad    TEXT,
-  tgeom TOPOGEOMETRY
+CREATE TABLE topo_node (
+  node_id SERIAL PRIMARY KEY,
+  geom    GEOMETRY(POINT, 4326)
 );
 
--- Topoloji sütununu kaydet
-SELECT AddTopoGeometryColumn(
-  'kadastro_topo',  -- topoloji adı
-  'public',         -- şema
-  'kadastro',       -- tablo
-  'tgeom',          -- sütun
-  'POLYGON'         -- tip
-);`}
-  label="TopoGeometry sütunu ekle"
+CREATE TABLE topo_edge (
+  edge_id    SERIAL PRIMARY KEY,
+  left_face  INT DEFAULT -1,
+  right_face INT DEFAULT -1,
+  geom       GEOMETRY(LINESTRING, 4326)
+);
+
+CREATE TABLE topo_face (
+  face_id SERIAL PRIMARY KEY,
+  ad      TEXT,
+  geom    GEOMETRY(POLYGON, 4326)
+);
+
+SELECT 'Topoloji şeması hazır' AS durum,
+       'node + edge + face tabloları oluşturuldu' AS bilgi;`}
+  label="Topoloji şeması oluştur"
+  description="Gerçek PostGIS Topology extension şemasını taklit eden üç tablo oluşturulur. topo_node kavşak noktalarını, topo_edge paylaşımlı kenarları (left_face/right_face referanslarıyla), topo_face poligon yüzeylerini tutar. DROP TABLE IF EXISTS önceki çalıştırmalardan kalan tabloları temizler."
 />
 
----
-
-## ▶ Geometri Topolojiye Dönüştür
+### Parsel ve topoloji verisini yükleme
 
 <RunnableBlock
-  sql={`-- Parselleri topolojiye ekle
-INSERT INTO kadastro (ad, tgeom)
-SELECT ad, toTopoGeom(geom, 'kadastro_topo', 1, 0.00001)
-FROM parseller_basit;
+  sql={`-- Parsel tablosunu oluştur (yoksa)
+CREATE TABLE IF NOT EXISTS parseller_basit (
+  id   INT PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POLYGON, 4326)
+);
 
--- Topoloji düğümlerini gör
-SELECT node_id, ST_AsText(geom) AS konum
-FROM kadastro_topo.node;`}
-  label="Geometriyi topolojiye dönüştür"
+-- Komşu 3 parsel: A-B ortak sağ kenar, A-C ortak üst kenar
+INSERT INTO parseller_basit (id, ad, geom) VALUES
+  (1, 'Parsel A', ST_GeomFromText('POLYGON((29.00 41.00,29.02 41.00,29.02 41.02,29.00 41.02,29.00 41.00))',4326)),
+  (2, 'Parsel B', ST_GeomFromText('POLYGON((29.02 41.00,29.04 41.00,29.04 41.02,29.02 41.02,29.02 41.00))',4326)),
+  (3, 'Parsel C', ST_GeomFromText('POLYGON((29.00 41.02,29.02 41.02,29.02 41.04,29.00 41.04,29.00 41.02))',4326))
+ON CONFLICT (id) DO NOTHING;
+
+-- Yüzleri topo_face'e yükle
+INSERT INTO topo_face (ad, geom) SELECT ad, geom FROM parseller_basit;
+
+-- Her parselin köşelerini düğüm olarak ekle
+INSERT INTO topo_node (geom)
+SELECT DISTINCT dp.geom::geometry(POINT, 4326)
+FROM parseller_basit p, ST_DumpPoints(ST_Boundary(p.geom)) dp;
+
+SELECT
+  (SELECT COUNT(*) FROM topo_node) AS dugum_sayisi,
+  (SELECT COUNT(*) FROM topo_face) AS yuz_sayisi;`}
+  label="Parsel ve topoloji verisini yükle"
+  description="3 komşu parsel parseller_basit tablosuna eklenir ve topo_face'e kopyalanır. ST_DumpPoints(ST_Boundary(geom)) her poligonun sınır noktalarını tek tek döküyor; DISTINCT aynı koordinattaki çakışan köşeleri tekilleştirir. Sayım düğüm ve yüzey tablosunun doğru dolduğunu doğrular."
 />
 
----
-
-## ▶ Topoloji Kenarlarını İncele
+### Paylaşılan kenarları çıkarma
 
 <RunnableBlock
-  sql={`-- Kenar tablosu: shared edges burada
+  sql={`-- Komşu parseller arasındaki shared edge'leri bul ve topo_edge'e ekle
+INSERT INTO topo_edge (left_face, right_face, geom)
+SELECT
+  a.face_id AS left_face,
+  b.face_id AS right_face,
+  ST_Intersection(a.geom, b.geom)::geometry(LINESTRING, 4326)
+FROM topo_face a
+JOIN topo_face b ON a.face_id < b.face_id
+  AND ST_Touches(a.geom, b.geom)
+  AND ST_GeometryType(ST_Intersection(a.geom, b.geom)) IN ('ST_LineString', 'ST_MultiLineString');
+
+-- Sonucu göster
+SELECT
+  e.edge_id,
+  f1.ad AS sol_parsel,
+  f2.ad AS sag_parsel,
+  ROUND(ST_Length(e.geom::geography)::numeric) AS kenar_uzunluk_m
+FROM topo_edge e
+JOIN topo_face f1 ON e.left_face = f1.face_id
+JOIN topo_face f2 ON e.right_face = f2.face_id;`}
+  label="Paylaşılan kenarları çıkar"
+  description="ST_Touches AND a.face_id < b.face_id komşu yüz çiftlerini tespit eder. ST_Intersection ortak sınırı hesaplar. ST_GeometryType filtresi yalnızca çizgi geometrilerini kabul eder (nokta temaslarını dışlar). Her paylaşımlı kenar left_face ve right_face referanslarıyla topo_edge'e kaydedilir. ST_Length kenar uzunluğunu metre olarak döndürür."
+/>
+
+### Kenar verisi
+
+<RunnableBlock
+  sql={`-- Kenar tablosu: her kenar hangi iki yüze ait?
 SELECT
   edge_id,
-  start_node,
-  end_node,
-  left_face,
-  right_face,
+  left_face  AS sol_yuz_id,
+  right_face AS sag_yuz_id,
   ST_AsText(geom) AS kenar_wkt
-FROM kadastro_topo.edge_data;`}
+FROM topo_edge
+ORDER BY edge_id;`}
   label="Kenar verisi"
+  description="topo_edge tablosunun tamamı listelenir. left_face ve right_face sütunları her kenarın hangi iki parsel arasında paylaşıldığını gösterir. WKT formatındaki kenar geometrisi paylaşımlı sınırın koordinatlarını verir. Topoloji veri modelinde aynı kenar her iki parsele referans olarak kullanılır — koordinatlar tekrar saklanmaz."
 />
 
 ---
 
-## 🧪 Dene — Topoloji Üzerinden Geometri Al
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- TopoGeometry'den standart geometry'ye geri dön
+  sql={`-- topo_face üzerinden standart geometri sorgusu
 SELECT
-  ad,
-  ST_AsText(tgeom::geometry) AS wkt,
-  ST_Area(tgeom::geometry::geography) AS alan_m2
-FROM kadastro;`}
-  label="TopoGeometry → Geometry dönüşümü"
+  f.ad,
+  ST_AsText(f.geom) AS wkt,
+  ROUND(ST_Area(f.geom::geography)::numeric) AS alan_m2
+FROM topo_face f
+ORDER BY f.face_id;`}
+  label="Yüzey geometrisi sorgula"
+  description="topo_face her parselin tam poligon geometrisini tutar. ST_Area(geom::geography) gerçek yüzey alanını metre kare cinsinden hesaplar. Topoloji modelinde yüzey sorgusunun basit geometri sorgusundan farkı yoktur; ancak güncelleme yalnızca topo_edge üzerinde yapılarak tüm komşu yüzleri etkiler."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`CreateTopology` idempotent değil:** Aynı isimle tekrar çağrılırsa hata. `DropTopology('kadastro_topo')` ile önce sil.
-2. **Precision çok büyük:** `precision = 1.0` (1 derece) çok geniş snap — yakın kenarlar birleşir. Genellikle `0.00001` (≈1m) güvenli.
-3. **PGlite'ta topology desteği:** Extension yüklü olsa bile bazı fonksiyonlar WASM'da çalışmayabilir. Hata alırsan kavramsal anlatım izini takip et.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **Topolojik güncellemenin avantajı** — komşu parsel otomatik değişimi.
+1. **Gerçek PostGIS Topology:** Production ortamında `CREATE EXTENSION postgis_topology` + `CreateTopology()` + `toTopoGeom()` API'si çok daha güçlüdür. Bu derste kavramsal simülasyon uygulandı.
+2. **Precision toleransı:** Gerçek topolojide `precision = 0.00001` (≈1 m) snap toleransı önerilir. Çok büyük tolerans farklı parselleri birleştirebilir.
+3. **Duplicate düğümler:** Simülasyonda `DISTINCT` ile önlendi; gerçek topoloji bunu otomatik yönetir.

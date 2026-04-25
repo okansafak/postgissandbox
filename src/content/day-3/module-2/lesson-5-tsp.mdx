@@ -1,28 +1,30 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Gezgin Satıcı Problemi'ni (TSP) açıklayabileceksin
-- Greedy nearest-neighbor heuristiğini SQL ile uygulayabileceksin
-- Teslimat güzergahı için pratik çözüm üretebileceksin
+- Gezgin Satıcı Problemi'ni (TSP) tanımlamak
+- Greedy nearest-neighbor heuristiğini SQL ile uygulamak
+- Teslimat güzergahı için pratik çözüm üretmek
 
 ---
 
-## 📖 Kavram: TSP
+## Gezgin Satıcı Problemi (TSP)
 
 "N nokta ziyaret edilecek, başlangıca geri dön — toplam mesafeyi minimize et."
 
-TSP NP-hard: Exact çözüm 20+ nokta için yıllarca sürebilir. Gerçek uygulamada **heuristik** kullanılır:
+TSP NP-hard bir problemdir: Tam çözüm 20'den fazla nokta için yıllarca sürebilir. Gerçek uygulamalarda **heuristik** kullanılır:
 
 | Yöntem | Kalite | Hız |
 |---|---|---|
-| **Greedy nearest-neighbor** | %20-25 optimal üstü | Çok hızlı |
+| **Greedy nearest-neighbor** | %20–25 optimal üstü | Çok hızlı |
 | **2-opt swap** | Çok iyi | Orta |
 | **pgr_TSP** (concorde) | Optimal | Yavaş |
 
-PGlite'ta pgr_TSP yok — greedy yaklaşımı SQL ile göstereceğiz.
+PGlite'ta pgr_TSP bulunmadığından greedy yaklaşım SQL ile uygulanır.
 
 ---
 
-## ▶ Canlı Örnek — 5 Durak Teslimat
+## Uygulama Örneği
+
+### Mesafe matrisi
 
 <RunnableBlock
   sql={`-- 5 teslimat noktası
@@ -50,11 +52,10 @@ CROSS JOIN teslimat_noktalari b
 WHERE a.id < b.id
 ORDER BY km;`}
   label="Mesafe matrisi"
+  description="5 teslimat noktası oluşturulur ve CROSS JOIN ile her çift arasındaki kuş uçuşu mesafesi km cinsinden hesaplanır. WHERE a.id < b.id çift sayımı önler. Mesafe matrisi TSP algoritmasının girdi verisini oluşturur; en yakın komşular üstte listelenir."
 />
 
----
-
-## ▶ Greedy Nearest-Neighbor
+### Greedy nearest-neighbor güzergah
 
 <RunnableBlock
   sql={`-- Greedy: Depo'dan başla, her adımda en yakın ziyaret edilmemiş noktaya git
@@ -99,11 +100,10 @@ FROM guzergah
 WHERE array_length(ziyaret_edildi, 1) = 5
 ORDER BY toplam_km;`}
   label="Greedy nearest-neighbor güzergah"
+  description="CROSS JOIN LATERAL her adımda mevcut konumdan en yakın ziyaret edilmemiş noktayı bulur. NOT t.id = ANY(g.ziyaret_edildi) ziyaret edilmiş noktaları dışlar. array_length < 5 5 nokta tamamlandığında rekürsiyon durur. Depoya dönüş mesafesi son hesaplamada eklenir. WHERE array_length = 5 tamamlanmış güzergahları seçer."
 />
 
----
-
-## ▶ Güzergah Geometrisini Çiz
+### Güzergah geometrisi
 
 <RunnableBlock
   sql={`-- Güzergahı tek LineString olarak çiz
@@ -121,11 +121,12 @@ SELECT
   ) AS rota_geom
 FROM sira;`}
   label="Güzergah geometrisi"
+  description="Greedy algoritmasının ürettiği sıra dizisi LineString geometrisine dönüştürülür. unnest(dugum_sira) WITH ORDINALITY dizi elemanlarını sıra numarasıyla birlikte genişletir. JOIN ile her ID'nin koordinatı alınır. ST_MakeLine noktaları sıralı olarak bağlayarak güzergah çizgisini oluşturur ve haritada gösterir."
 />
 
 ---
 
-## 🧪 Dene — En Kötü Güzergah ile Karşılaştır
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Tüm permütasyonların toplam mesafesi (5! = 120 kombinasyon)
@@ -149,18 +150,13 @@ WHERE b<>c AND b<>d AND b<>e AND c<>d AND c<>e AND d<>e
 ORDER BY toplam_km
 LIMIT 5;`}
   label="Tüm permütasyonların en kısa 5'i"
+  description="5 nokta için 4! = 24 benzersiz güzergah (depo sabit) Cartesian çarpım yöntemiyle üretilir. WHERE koşulları tekrar ziyareti önler. VALUES yapısı ardışık kenar çiftlerini tanımlar; her çiftin mesafesi hesaplanır ve toplanır. En kısa 5 güzergah listelenerek greedy sonucunun optimale ne kadar yakın olduğu karşılaştırılabilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Greedy optimal değil:** Greedy %20-30 daha uzun güzergah üretebilir. Küçük setlerde tam çözüm, büyüklerde 2-opt veya OR-Tools kullan.
-2. **Gerçek yol vs kuş uçuşu:** Bu örnekte kuş uçuşu mesafe kullandık. Gerçek projede Dijkstra/OSRM ile yol mesafesi al.
-3. **pgr_TSP:** pgRouting mevcut olduğunda `pgr_tsp(matrix, start_id)` çağrısı yeterli — Concorde solver kullanır.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 3.2 tamamlandı! Sırada **Modül 3.3 — Topology**: paylaşımlı kenar kavramı ve kadastro verisi.
+1. **Greedy optimal değil:** Greedy %20–30 daha uzun güzergah üretebilir. Küçük setlerde tam çözüm, büyük setlerde 2-opt veya OR-Tools tercih edilmelidir.
+2. **Gerçek yol vs kuş uçuşu:** Bu örnekte kuş uçuşu mesafesi kullanıldı. Gerçek projelerde Dijkstra/OSRM ile yol mesafesi hesaplanmalıdır.
+3. **pgr_TSP:** pgRouting mevcut olduğunda `pgr_tsp(matrix, start_id)` çağrısı yeterlidir; Concorde solver en iyi sonucu verir.

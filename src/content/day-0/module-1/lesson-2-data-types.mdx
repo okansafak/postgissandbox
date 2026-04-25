@@ -1,0 +1,406 @@
+## PostgreSQL Veri Tipleri
+
+**Hedef:** Tablolarda kullanılan tüm temel PostgreSQL veri tiplerini tanımak ve her tip için doğru kullanım senaryosunu belirlemek.
+
+---
+
+## Öğrenim Hedefleri
+
+- Tam sayı, ondalık ve kayan noktalı tiplerin farkını açıklamak
+- `NUMERIC` ile `REAL` arasındaki hassasiyet farkını bilmek
+- `TIMESTAMPTZ` ile `TIMESTAMP` arasındaki kritik saat dilimi ayrımını anlamak
+- `JSONB`, dizi, enum ve range tiplerini doğru bağlamda kullanmak
+
+---
+
+## Sayısal Tipler
+
+<RunnableBlock
+  sql={`-- Tam sayı tiplerinin sınırları
+SELECT
+  (-32768)::SMALLINT           AS smallint_min,
+  32767::SMALLINT              AS smallint_max,
+  (-2147483648)::INTEGER       AS integer_min,
+  2147483647::INTEGER          AS integer_max,
+  9223372036854775807::BIGINT  AS bigint_max;`}
+  label="Tam sayı tipleri ve sınırları"
+  description="SMALLINT 2 bayt, INTEGER 4 bayt, BIGINT 8 bayt yer kaplar. Nüfus sayıları için INTEGER yeterlidir; satır sayacı veya log ID gibi milyarı aşacak değerler için BIGINT gerekir. SERIAL ve BIGSERIAL ise aynı tiplerin otomatik artan versiyonlarıdır — PRIMARY KEY sütunlarında kullanılır."
+/>
+
+<RunnableBlock
+  sql={`-- SERIAL ile otomatik ID oluşturma
+DROP TABLE IF EXISTS siparis;
+CREATE TABLE siparis (
+  id        SERIAL PRIMARY KEY,
+  musteri   TEXT NOT NULL,
+  tutar_tl  NUMERIC(12, 2) NOT NULL
+);
+INSERT INTO siparis (musteri, tutar_tl) VALUES
+  ('Ayşe Kaya', 1250.75),
+  ('Mehmet Öz',  890.00),
+  ('Fatma Demir', 3400.50);
+SELECT * FROM siparis;`}
+  label="SERIAL PRIMARY KEY kullanımı"
+  description="SERIAL, PostgreSQL'in SEQUENCE mekanizması üzerine kuruludur; her INSERT sırasında id sütunu otomatik olarak bir artar. NUMERIC(12, 2) toplam 12 basamak, 2'si ondalık anlamına gelir — para değerleri için REAL yerine her zaman NUMERIC kullanılmalıdır."
+/>
+
+<RunnableBlock
+  sql={`-- Ondalık hassasiyet: NUMERIC vs REAL vs DOUBLE PRECISION
+SELECT
+  0.1::NUMERIC + 0.2::NUMERIC               AS numeric_sonuc,
+  0.1::REAL    + 0.2::REAL                  AS real_sonuc,
+  0.1::DOUBLE PRECISION + 0.2::DOUBLE PRECISION AS double_sonuc,
+  (0.1::NUMERIC + 0.2::NUMERIC) = 0.3      AS numeric_esit_mi,
+  (0.1::REAL    + 0.2::REAL)    = 0.3::REAL AS real_esit_mi;`}
+  label="Kayan nokta hassasiyet testi"
+  description="NUMERIC tam ondalık aritmetik yapar ve 0.3'e eşit bulur. REAL yalnızca 6, DOUBLE PRECISION 15 anlamlı basamak saklar; her ikisinde de 0.1 + 0.2 = 0.3 eşitliği false dönebilir. Finansal hesaplamalarda ve eşitlik karşılaştırmalarında NUMERIC zorunludur; REAL yalnızca bilimsel yaklaşık hesaplamalar için uygundur."
+/>
+
+---
+
+## Metin Tipleri
+
+<RunnableBlock
+  sql={`-- TEXT, VARCHAR ve CHAR davranış farkları
+DROP TABLE IF EXISTS metin_karsilastir;
+CREATE TABLE metin_karsilastir (
+  alan_kodu   CHAR(6),
+  proje_adi   VARCHAR(50),
+  aciklama    TEXT
+);
+INSERT INTO metin_karsilastir VALUES
+  ('PRJ001', 'Kentsel Dönüşüm', 'Kadıköy ilçesi parsel revizyonu'),
+  ('PRJ002', 'Yol Ağı',         NULL);
+
+SELECT
+  alan_kodu,
+  length(alan_kodu)   AS char_uzunluk,   -- her zaman 6
+  octet_length(alan_kodu) AS char_bayt,
+  proje_adi,
+  length(proje_adi)   AS varchar_uzunluk,
+  aciklama
+FROM metin_karsilastir;`}
+  label="Metin tipleri karşılaştırması"
+  description="CHAR(6) değeri sağdan boşlukla doldurur — length() her zaman 6 döndürür; bu WHERE koşullarında beklenmedik eşleşmelere yol açabilir. VARCHAR(n) en fazla n karakter kabul eder, kullanılmayan alanı saklamaz. TEXT PostgreSQL'e özgüdür, uzunluk sınırı yoktur ve depolama/performans açısından VARCHAR ile eşdeğerdir — genel kullanım için TEXT tercih edilir. NULL boş string ile aynı değildir: length(NULL) → NULL."
+/>
+
+---
+
+## Tarih ve Saat Tipleri
+
+<RunnableBlock
+  sql={`-- Tarih ve saat tiplerini karşılaştır
+SELECT
+  '2024-06-15'::DATE                          AS tarih,
+  '14:30:00'::TIME                            AS saat,
+  '2024-06-15 14:30:00'::TIMESTAMP            AS timestamp_no_tz,
+  '2024-06-15 14:30:00+03'::TIMESTAMPTZ       AS timestamp_tz,
+  '2 years 3 months 10 days'::INTERVAL        AS aralik,
+  CURRENT_DATE                                AS bugun,
+  NOW()                                       AS simdi;`}
+  label="Tarih ve saat tipleri"
+  description="DATE yalnızca yıl-ay-gün bilgisi tutar; saat yoktur. TIME hh:mm:ss formatında saat saklar. TIMESTAMP tarih+saat tutar ancak saat dilimi bilgisi saklamaz — sunucu saat dilimi değiştiğinde yanlış yorumlanır. TIMESTAMPTZ ise değeri UTC'ye çevirerek saklar ve sorgu sırasında istemcinin saat dilimine göre gösterir — dağıtık sistemlerde zorunludur. INTERVAL iki tarih arasındaki fark veya belirli bir süreyi temsil eder."
+/>
+
+<RunnableBlock
+  sql={`-- TIMESTAMPTZ aritmetiği ve INTERVAL
+DROP TABLE IF EXISTS toplanti;
+CREATE TABLE toplanti (
+  id         SERIAL PRIMARY KEY,
+  baslik     TEXT,
+  baslangic  TIMESTAMPTZ NOT NULL,
+  sure       INTERVAL    NOT NULL
+);
+INSERT INTO toplanti (baslik, baslangic, sure) VALUES
+  ('Proje Kick-off',   '2024-09-01 09:00:00+03', '2 hours'),
+  ('Haftalık Kontrol', '2024-09-08 10:00:00+03', '45 minutes'),
+  ('Yıllık Değerlendirme', '2024-12-31 14:00:00+03', '3 hours 30 minutes');
+
+SELECT
+  baslik,
+  baslangic,
+  baslangic + sure                                 AS bitis_zamani,
+  EXTRACT(DOW  FROM baslangic)                     AS hafta_gunu,  -- 0=Paz
+  DATE_TRUNC('month', baslangic)::DATE             AS ay_baslangici,
+  AGE(baslangic, CURRENT_TIMESTAMP)                AS ne_kadar_once
+FROM toplanti
+ORDER BY baslangic;`}
+  label="TIMESTAMPTZ ile tarih aritmetiği"
+  description="INTERVAL aritmetiği ay sonu ve gün sonu geçişlerini otomatik yönetir. EXTRACT(DOW ...) haftanın gününü sayısal (0=Pazar) döndürür. DATE_TRUNC zaman damgasını belirtilen birime yuvarlar; '2024-09-08 10:00' için DATE_TRUNC('month') → '2024-09-01'. AGE() iki zaman arasındaki farkı yıl-ay-gün-saat hassasiyetinde INTERVAL olarak döndürür."
+/>
+
+---
+
+## Boolean ve İkili Veri
+
+<RunnableBlock
+  sql={`-- BOOLEAN ve üç değerli mantık (TRUE / FALSE / NULL)
+DROP TABLE IF EXISTS proje_durumu;
+CREATE TABLE proje_durumu (
+  proje_adi   TEXT,
+  tamamlandi  BOOLEAN,
+  onaylandi   BOOLEAN
+);
+INSERT INTO proje_durumu VALUES
+  ('Kadastro Revizyonu', TRUE,  TRUE),
+  ('Yol Etüdü',          FALSE, TRUE),
+  ('Çevre Planı',        TRUE,  NULL),  -- onay bekliyor
+  ('Arşiv',              NULL,  FALSE); -- durum belirsiz
+
+SELECT
+  proje_adi,
+  tamamlandi,
+  onaylandi,
+  tamamlandi AND onaylandi   AS her_ikisi,
+  tamamlandi OR  onaylandi   AS en_az_biri,
+  NOT tamamlandi             AS tamamlanmadi
+FROM proje_durumu;`}
+  label="Boolean üç değerli mantık"
+  description="BOOLEAN TRUE, FALSE veya NULL (bilinmiyor) değerlerini alır. NULL içeren AND/OR işlemleri SQL'in üç değerli mantığına göre çalışır: TRUE AND NULL → NULL, FALSE AND NULL → FALSE, TRUE OR NULL → TRUE. NOT NULL → NULL. Bu davranış WHERE koşullarında beklenmedik satır kayıplarına yol açabilir; NULL değerleri için IS NULL / IS NOT NULL kullanılmalıdır."
+/>
+
+<RunnableBlock
+  sql={`-- BYTEA: ikili veri saklama
+SELECT
+  'Merhaba'::BYTEA                          AS metin_binary,
+  length('Merhaba'::BYTEA)                  AS bayt_sayisi,
+  encode('PostGIS'::BYTEA, 'hex')           AS hex_gosterim,
+  encode('PostGIS'::BYTEA, 'base64')        AS base64_gosterim,
+  decode('506f737447495300', 'hex')         AS hex_to_bytea;`}
+  label="BYTEA ikili veri"
+  description="BYTEA ham ikili veriyi saklar — resimler, PDF dosyaları, dijital imzalar. encode() BYTEA'yı hex veya base64 metin gösterimine çevirir; decode() tersini yapar. Büyük dosyalar için genellikle dosya yolu TEXT olarak saklanır ve dosyanın kendisi dış depolama (S3, NFS) alanında tutulur; küçük ikili nesneler (küçük resimler, sertifikalar) doğrudan BYTEA olarak depolanabilir."
+/>
+
+---
+
+## UUID Tipi
+
+<RunnableBlock
+  sql={`-- UUID: evrensel benzersiz kimlik
+DROP TABLE IF EXISTS veri_kaydi;
+CREATE TABLE veri_kaydi (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  kayit_adi   TEXT NOT NULL,
+  olusturuldu TIMESTAMPTZ DEFAULT NOW()
+);
+INSERT INTO veri_kaydi (kayit_adi) VALUES
+  ('İstanbul Parsel Verisi'),
+  ('Ankara Yol Ağı'),
+  ('İzmir Uydu Görüntüsü');
+
+SELECT id, kayit_adi, olusturuldu FROM veri_kaydi;`}
+  label="UUID primary key"
+  description="gen_random_uuid() kriptografik olarak güçlü rastgele bir UUID (version 4) üretir. UUID, SERIAL'e göre iki avantaj sağlar: farklı veritabanları arasında birleştirme yapılırken kimlik çakışması olmaz; uygulama katmanı sunucuya sormadan ID üretebilir. Dezavantajı sekansiyel olmadığından B-tree indeks büyümesini olumsuz etkileyebilir — çok yüksek yazma hızlarında ULID veya sıralı UUID tercih edilir."
+/>
+
+---
+
+## JSON Tipleri
+
+<RunnableBlock
+  sql={`-- JSON vs JSONB karşılaştırması
+DROP TABLE IF EXISTS mekansal_meta;
+CREATE TABLE mekansal_meta (
+  id       SERIAL PRIMARY KEY,
+  katman   TEXT,
+  meta_j   JSON,   -- metin saklama
+  meta_jb  JSONB   -- ikili saklama, indekslenebilir
+);
+INSERT INTO mekansal_meta (katman, meta_j, meta_jb) VALUES
+  ('Bina',    '{"kat": 5, "yil": 2018, "malzeme": "beton"}',
+              '{"kat": 5, "yil": 2018, "malzeme": "beton"}'),
+  ('Parsel',  '{"ada": "120", "parsel": "4", "alan_m2": 850.5}',
+              '{"ada": "120", "parsel": "4", "alan_m2": 850.5}');
+
+SELECT
+  katman,
+  meta_jb->>'malzeme'           AS malzeme,
+  (meta_jb->>'kat')::INTEGER    AS kat_sayisi,
+  (meta_jb->>'alan_m2')::NUMERIC AS alan,
+  jsonb_object_keys(meta_jb)    AS anahtarlar
+FROM mekansal_meta;`}
+  label="JSONB sorgulama"
+  description="JSON metni olduğu gibi saklar ve her sorguda ayrıştırır. JSONB ikili formatta saklar: sıralama değişebilir, yinelenen anahtarlar kaldırılır, ancak sorgular çok daha hızlıdır ve GIN indeks ile desteklenir. ->> operatörü JSON'dan metin değeri çeker; sayısal işlem için ::INTEGER veya ::NUMERIC cast'i gerekir. jsonb_object_keys() tüm anahtar adlarını satır olarak döndürür. Genel kullanımda JSONB tercih edilmelidir."
+/>
+
+<RunnableBlock
+  sql={`-- JSONB GIN indeksi ve @> operatörü
+DROP TABLE IF EXISTS ozellikler;
+CREATE TABLE ozellikler (
+  id   SERIAL PRIMARY KEY,
+  veri JSONB
+);
+INSERT INTO ozellikler (veri) VALUES
+  ('{"tip": "okul", "ilce": "Kadıköy", "kapasite": 500}'),
+  ('{"tip": "hastane", "ilce": "Şişli", "yatak": 200}'),
+  ('{"tip": "okul", "ilce": "Beşiktaş", "kapasite": 300}'),
+  ('{"tip": "park", "ilce": "Kadıköy", "alan_m2": 12000}');
+
+-- @> operatörü: JSONB içinde belirtilen alt belgeyi içeriyor mu?
+SELECT veri->>'tip' AS tip, veri->>'ilce' AS ilce
+FROM ozellikler
+WHERE veri @> '{"tip": "okul"}';`}
+  label="JSONB içerik sorgusu (@> operatörü)"
+  description="@> operatörü 'sol JSONB, sağ JSONB'yi içeriyor mu?' sorusunu test eder. GIN indeks oluşturulduğunda (CREATE INDEX ON tablo USING GIN(veri)) bu operatör tam tarama yerine indeks kullanır. Benzer şekilde ? operatörü 'bu anahtar mevcut mu?' sorgular. JSONB esnekliği sayesinde şemanın önceden bilinmediği coğrafi nesne özelliklerini saklamak için PostGIS projelerinde yaygın kullanılır."
+/>
+
+---
+
+## Dizi (Array) Tipleri
+
+<RunnableBlock
+  sql={`-- Dizi tipleri: INTEGER[], TEXT[], NUMERIC[]
+DROP TABLE IF EXISTS izleme_istasyonu;
+CREATE TABLE izleme_istasyonu (
+  id            SERIAL PRIMARY KEY,
+  ad            TEXT,
+  koordinat     NUMERIC[],   -- [lon, lat]
+  olcum_saatleri INTEGER[],  -- gün içi saat dilimi (0-23)
+  etiketler     TEXT[]
+);
+INSERT INTO izleme_istasyonu (ad, koordinat, olcum_saatleri, etiketler) VALUES
+  ('Kadıköy İstasyonu', ARRAY[29.023, 40.990], ARRAY[6,12,18], ARRAY['hava','gurultu']),
+  ('Şişli İstasyonu',   ARRAY[28.988, 41.060], ARRAY[8,14,20], ARRAY['hava','trafik']);
+
+SELECT
+  ad,
+  koordinat[1]               AS boylam,
+  koordinat[2]               AS enlem,
+  array_length(etiketler, 1) AS etiket_sayisi,
+  etiketler[1]               AS ilk_etiket,
+  'hava' = ANY(etiketler)    AS hava_var_mi
+FROM izleme_istasyonu;`}
+  label="Dizi tipi kullanımı"
+  description="PostgreSQL dizileri 1'den başlar (0'dan değil). array_length(dizi, boyut) dizinin uzunluğunu döndürür. ANY(dizi) bir değerin dizi içinde mevcut olup olmadığını test eder. UNNEST(dizi) diziyi satırlara açar — GROUP BY veya JOIN işlemlerinde kullanılabilir. Dizi tipleri normalleştirilmiş ilişkisel tasarıma göre ikinci dereceden tercih edilir; ancak sabit veya küçük boyutlu listeler için pratiktir."
+/>
+
+---
+
+## Ağ Adresi Tipleri
+
+<RunnableBlock
+  sql={`-- INET, CIDR ve MACADDR tipleri
+DROP TABLE IF EXISTS ag_cihazi;
+CREATE TABLE ag_cihazi (
+  id       SERIAL PRIMARY KEY,
+  cihaz    TEXT,
+  ip_adr   INET,
+  ag_blok  CIDR,
+  mac_adr  MACADDR
+);
+INSERT INTO ag_cihazi (cihaz, ip_adr, ag_blok, mac_adr) VALUES
+  ('Sunucu-1', '192.168.1.10',  '192.168.1.0/24', '08:00:27:ab:cd:ef'),
+  ('Sunucu-2', '10.0.0.55',     '10.0.0.0/8',     '08:00:27:12:34:56'),
+  ('Router',   '192.168.0.1',   '192.168.0.0/24', '00:1a:2b:3c:4d:5e');
+
+SELECT
+  cihaz,
+  ip_adr,
+  masklen(ag_blok)                  AS alt_ag_maske,
+  network(ip_adr)                   AS ag_adresi,
+  broadcast(ip_adr::CIDR)           AS broadcast,
+  ip_adr << '192.168.0.0/16'::CIDR AS yerel_ag_mi
+FROM ag_cihazi;`}
+  label="Ağ adresi tipleri"
+  description="INET hem IPv4 hem IPv6 adreslerini saklar ve isteğe bağlı alt ağ maskesi içerebilir. CIDR ağ adresini kanonik formda saklar. <<  operatörü 'sol INET, sağ CIDR bloğunun içinde mi?' sorgular — güvenlik duvarı kuralları veya coğrafi IP eşleme tablolarında kullanılır. MACADDR donanım adresleri için uygundur; PostgreSQL farklı ayırıcı formatları (: veya -) kabul eder ve kanonik forma çevirir."
+/>
+
+---
+
+## Enum Tipleri
+
+<RunnableBlock
+  sql={`-- Enum tipi tanımlama ve kullanım
+DROP TYPE IF EXISTS proje_tipi CASCADE;
+CREATE TYPE proje_tipi AS ENUM (
+  'kentsel_donusum', 'altyapi', 'cevre', 'ulasim', 'diger'
+);
+
+DROP TABLE IF EXISTS proje_kayit;
+CREATE TABLE proje_kayit (
+  id    SERIAL PRIMARY KEY,
+  ad    TEXT NOT NULL,
+  tip   proje_tipi NOT NULL,
+  yil   INTEGER
+);
+INSERT INTO proje_kayit (ad, tip, yil) VALUES
+  ('Kadıköy Sahil Düzenlemesi', 'cevre',            2024),
+  ('Metro Hattı Uzatma',        'ulasim',           2025),
+  ('Gecekondu Dönüşümü',        'kentsel_donusum',  2024);
+
+SELECT ad, tip, yil
+FROM proje_kayit
+WHERE tip IN ('cevre', 'ulasim')
+ORDER BY tip, yil;`}
+  label="Enum tipi kullanımı"
+  description="ENUM sabit değer kümesiyle kısıtlı bir metin tipidir — yanlış değer girildiğinde hata verir ve olası değerleri belgeler. Depolama olarak ENUM TEXT'ten daha verimlidir (4 bayt). Dezavantajı: değer ekleme/kaldırma için ALTER TYPE gerekir ve bazı ORM araçlarıyla uyumsuzluk çıkabilir. Alternatif olarak ayrı bir referans tablosu (CHECK constraint veya FOREIGN KEY ile) daha esnek bir çözüm sunar."
+/>
+
+---
+
+## Range Tipleri
+
+<RunnableBlock
+  sql={`-- Range tipleri: int4range, daterange, tstzrange
+-- daterange işlemleri
+SELECT
+  '[2024-06-01, 2024-06-15)'::daterange         AS aralik,
+  upper('[2024-06-01, 2024-06-15)'::daterange)  AS bitis_gunu,
+  lower('[2024-06-01, 2024-06-15)'::daterange)  AS baslangic_gunu,
+  '[2024-06-01, 2024-06-15)'::daterange @> '2024-06-10'::date AS iceride_mi,
+  '[2024-06-01, 2024-06-15)'::daterange && '[2024-06-12, 2024-06-20)'::daterange AS cakisiyor_mu;`}
+  label="Range tipi operatörleri"
+  description="PostgreSQL range tipleri bir aralığı tek sütunda saklar: int4range (INTEGER), int8range (BIGINT), numrange (NUMERIC), daterange (DATE), tsrange (TIMESTAMP), tstzrange (TIMESTAMPTZ). Köşeli parantez [] dahil, yuvarlak parantez () hariç sınırı belirtir. @> operatörü 'değer aralığın içinde mi?', && operatörü 'iki aralık kesişiyor mu?' sorgular. EXCLUDE USING GIST kısıtı aralık çakışmalarını veritabanı düzeyinde engeller."
+/>
+
+---
+
+## Pratik Uygulama: Kapsamlı Tablo Tasarımı
+
+<RunnableBlock
+  sql={`-- Tüm öğrenilen tipleri kullanan gerçekçi bir tablo
+DROP TABLE IF EXISTS mekansal_proje;
+CREATE TABLE mekansal_proje (
+  id             UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  proje_kodu     CHAR(8)        NOT NULL UNIQUE,
+  proje_adi      TEXT           NOT NULL,
+  proje_tipi     TEXT           NOT NULL
+                   CHECK (proje_tipi IN ('kentsel','altyapi','cevre','ulasim')),
+  baslangic      DATE           NOT NULL,
+  tamamlanma     TIMESTAMPTZ,
+  butce_tl       NUMERIC(15, 2) DEFAULT 0 CHECK (butce_tl >= 0),
+  tamamlandi_mi  BOOLEAN        DEFAULT FALSE,
+  koordinatlar   NUMERIC[],
+  etiketler      TEXT[],
+  meta           JSONB,
+  basvuru_ip     INET
+);
+
+INSERT INTO mekansal_proje
+  (proje_kodu, proje_adi, proje_tipi, baslangic, butce_tl,
+   koordinatlar, etiketler, meta, basvuru_ip)
+VALUES
+  ('PRJ00001', 'İstanbul Yaya Ağı', 'kentsel',   '2024-01-15', 2500000.00,
+   ARRAY[28.979, 41.015], ARRAY['yaya','imar'],
+   '{"faz": 1, "sorumlu": "CBS Birimi"}'::JSONB, '192.168.1.10'),
+  ('PRJ00002', 'Ankara Park Analizi', 'cevre',   '2024-03-01', 850000.50,
+   ARRAY[32.854, 39.930], ARRAY['yesil','analiz'],
+   '{"faz": 2, "sorumlu": "Planlama"}'::JSONB,   '10.0.0.22');
+
+SELECT
+  proje_kodu,
+  proje_adi,
+  proje_tipi,
+  baslangic,
+  butce_tl,
+  tamamlandi_mi,
+  etiketler[1]                              AS ilk_etiket,
+  meta->>'sorumlu'                          AS sorumlu_birim,
+  koordinatlar[1]                           AS boylam,
+  koordinatlar[2]                           AS enlem,
+  (CURRENT_DATE - baslangic) || ' gün'      AS gecen_sure
+FROM mekansal_proje
+ORDER BY baslangic;`}
+  label="Kapsamlı tablo tasarımı"
+  description="DROP TABLE IF EXISTS önce eski versiyonu temizler; her çalıştırmada taze şema oluşur. Bu tablo Bölüm 0'da öğrenilen tüm tipleri bir arada kullanır: UUID (PRIMARY KEY), CHAR(8), TEXT + CHECK (kısıtlı tip alanı), DATE ve TIMESTAMPTZ, NUMERIC(15,2), BOOLEAN, NUMERIC[] (koordinat dizisi), TEXT[] (etiket dizisi), JSONB, INET. Süre hesabı DATE - DATE → INTEGER (gün sayısı) döndürür; bunu INTERVAL'e çevirmek için * INTERVAL '1 day' kullanılır. Bir sonraki adım: koordinatlar sütununun PostGIS geometry tipine dönüştürülmesi — bu Modül 1'in konusudur."
+/>

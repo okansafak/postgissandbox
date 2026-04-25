@@ -5,6 +5,7 @@ import { useProgressStore } from '@/store/progressStore';
 import { ArrowLeft, ChevronRight, Check, Dot, Search } from '@/components/ui/Icons';
 
 const SECTION_LABELS: Record<number, string> = {
+  0: "Bölüm 0 — SQL'e Giriş",
   1: 'Bölüm 1 — Spatial SQL Fundamentals',
   2: 'Bölüm 2 — Sorgular, İndeks ve Performans',
   3: 'Bölüm 3 — Production, Ağ Analizi ve Proje',
@@ -19,24 +20,39 @@ export default function CurriculumSidebar() {
   const completedLessons = useProgressStore((s) => s.completedLessons);
 
   const tree = getCurriculumTree();
-  const days = [1, 2, 3] as const;
+  const days = [0, 1, 2, 3] as const;
 
-  const [openDays, setOpenDays] = useState<Set<number>>(
-    () => new Set([(activeMeta?.day ?? Number(activeDay.replace('day-', ''))) || 1]),
-  );
-  const [openModules, setOpenModules] = useState<Set<string>>(
-    () => new Set([
+  const activeDay_ = activeMeta?.day ?? (Number(activeDay.replace('day-', '')) || 1);
+
+  const [openDays, setOpenDays] = useState<Set<number>>(() => {
+    const saved = localStorage.getItem('sidebar-open-days');
+    if (saved) {
+      try { return new Set(JSON.parse(saved) as number[]); } catch { /* ignore */ }
+    }
+    return new Set([(activeMeta?.day ?? Number(activeDay.replace('day-', ''))) || 1]);
+  });
+
+  const [openModules, setOpenModules] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('sidebar-open-modules');
+    if (saved) {
+      try { return new Set(JSON.parse(saved) as string[]); } catch { /* ignore */ }
+    }
+    const activeDayModules = tree
+      .filter((n) => n.day === activeDay_)
+      .map((n) => `day-${n.day}-module-${n.module}`);
+    return new Set(activeDayModules.length > 0 ? activeDayModules : [
       activeMeta
         ? `day-${activeMeta.day}-module-${activeMeta.module}`
         : `${activeDay}-${activeModule}`,
-    ]),
-  );
+    ]);
+  });
   const [query, setQuery] = useState('');
 
   function toggleDay(day: number) {
     setOpenDays((prev) => {
       const next = new Set(prev);
       if (next.has(day)) { next.delete(day); } else { next.add(day); }
+      localStorage.setItem('sidebar-open-days', JSON.stringify([...next]));
       return next;
     });
   }
@@ -45,6 +61,7 @@ export default function CurriculumSidebar() {
     setOpenModules((prev) => {
       const next = new Set(prev);
       if (next.has(key)) { next.delete(key); } else { next.add(key); }
+      localStorage.setItem('sidebar-open-modules', JSON.stringify([...next]));
       return next;
     });
   }

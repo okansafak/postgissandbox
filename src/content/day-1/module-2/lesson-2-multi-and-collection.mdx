@@ -1,33 +1,37 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON` tiplerini açıklayabileceksin
-- `GEOMETRYCOLLECTION`'ın ne işe yaradığını anlayacaksın
-- `ST_Collect` ile ayrı geometrileri birleştirebileceksin
+Gerçek dünya coğrafi nesneleri her zaman tek parçadan oluşmaz: bir ilin birden fazla adası, bir güzergahın köprü gibi kesintilerle bölünmüş segmentleri olabilir. Bu tür nesneleri tek bir kayıtta doğru modellemenin yolu çoklu geometri tiplerini kullanmaktır.
+
+- `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON` tiplerini işlevsel olarak açıklayabilmek
+- `GEOMETRYCOLLECTION`'ın hangi durumlarda gerektiğini belirlemek
+- `ST_Collect` ile ayrı geometrileri birleştirmek
 
 ---
 
-## 📖 Kavram: Neden Multi?
+## Neden MULTI Tipler?
 
-Gerçek veri her zaman tek parça olmaz:
+Bir veritabanı tablosunda her satır genellikle tek bir coğrafi nesneyi temsil eder. Ancak bazı nesneler birden fazla ayrık parçadan oluşur:
 
-| Senaryo | Tek mi? | Çok mu? |
+| Senaryo | Tek Parça | Çok Parça |
 |---|---|---|
-| Bir şehrin merkezi | `POINT` | — |
+| Tek şehir merkezi | `POINT` | — |
 | Birden fazla şube | — | `MULTIPOINT` |
-| Tek yol | `LINESTRING` | — |
-| Kesintili yol (köprü arası) | — | `MULTILINESTRING` |
+| Kesintisiz yol | `LINESTRING` | — |
+| Köprüyle bölünmüş güzergah | — | `MULTILINESTRING` |
 | Tek il | `POLYGON` | — |
-| Adalar (İstanbul'un iki yakası) | — | `MULTIPOLYGON` |
+| Adaları olan il (İstanbul) | — | `MULTIPOLYGON` |
 
-**MULTI\*** tipleri aynı türden birden fazla geometriyi **tek kayıtta** tutar. Bu veri normalleştirmesi için kritiktir: bir il kaydı `MULTIPOLYGON` olabilir.
+`MULTI*` tipler, aynı türden birden fazla geometriyi **tek bir veritabanı kaydında** tutar. Bu yaklaşım veri bütünlüğünü korur: bir il tüm parçalarıyla tek satırda saklanır.
 
 ### GEOMETRYCOLLECTION
 
-Farklı türleri aynı anda tutar — nokta + çizgi + alan. Genellikle veri girişinde ya da heterogen analiz sonuçlarında görülür.
+Farklı türleri (nokta + çizgi + alan) aynı kayıtta tutar. Veri aktarım işlemlerinde ya da heterojen analiz sonuçlarında görülür; sorgularda tip kısıtlaması gerektirdiğinden dikkatli kullanılmalıdır.
 
 ---
 
-## ▶ Canlı Örnek — MULTI tipleri
+## Uygulama Örneği
+
+### MULTI tip örnekleri
 
 <RunnableBlock
   sql={`SELECT
@@ -42,13 +46,10 @@ SELECT
   'MULTIPOLYGON',
   ST_AsText(ST_GeomFromText('MULTIPOLYGON(((28.9 41.0,29.0 41.0,29.0 41.1,28.9 41.0)),((29.2 41.0,29.3 41.0,29.3 41.1,29.2 41.0)))'));`}
   label="MULTI tip örnekleri"
+  description="Her MULTI tip kendi WKT sözdizimine sahiptir: MULTIPOINT'te her nokta ayrı parantez içindedir, MULTILINESTRING'de her segment ayrı listedir, MULTIPOLYGON'da her poligon kendi iç ve dış halkalarıyla sarmalanır. ST_AsText bu iç yapıyı metin olarak döndürür."
 />
 
----
-
-## ▶ ST_Collect: Satırları Birleştir
-
-`ST_Collect(geom)` bir aggregate fonksiyondur — birden fazla satırdaki geometrileri tek `GEOMETRYCOLLECTION` veya `MULTI*`'ya dönüştürür:
+### ST_Collect ile satırları birleştir
 
 <RunnableBlock
   sql={`WITH sehirler AS (
@@ -65,13 +66,12 @@ SELECT
 FROM sehirler;`}
   label="ST_Collect ile 3 nokta → MULTIPOINT"
   autoFit
+  description="ST_Collect bir aggregate fonksiyondur: GROUP BY gibi birden fazla satırdaki geometrileri tek bir MULTI* veya GEOMETRYCOLLECTION nesnesine toplar. Burada üç POINT satırı tek MULTIPOINT'e dönüşür. ST_NumGeometries toplanan parça sayısını doğrular."
 />
 
 ---
 
-## 🧪 Dene
-
-`ST_NumGeometries` bir MULTI geometrinin kaç parçadan oluştuğunu döndürür:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`SELECT
@@ -83,18 +83,13 @@ FROM sehirler;`}
     )')
   ) AS parca_sayisi;`}
   label="3 parçalı MULTIPOLYGON"
+  description="ST_NumGeometries, MULTI* veya GEOMETRYCOLLECTION içindeki ayrı geometri parçalarının sayısını döndürür. Üç bağımsız POLYGON içeren bu MULTIPOLYGON için sonuç 3'tür."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Collect ≠ ST_Union:** `ST_Collect` geometrileri toplar ama **çakışmaları birleştirmez**. `ST_Union` geometrik birleşim yapar (yavaş ama doğru alan toplamı için gerekli).
-2. **GEOMETRYCOLLECTION sorgularda sorun çıkarabilir:** Bazı fonksiyonlar (ör. `ST_Area`) sadece POLYGON/MULTIPOLYGON ile çalışır. Karışık tip gelirse `ST_CollectionExtract` ile filtrele.
-3. **WKT'de MULTIPOINT sözdizimi:** `MULTIPOINT((x1 y1),(x2 y2))` — her nokta parantez içinde.
-
----
-
-## 🔗 Sıradaki Ders
-
-Bir sonraki derste geometrilerin **metin temsil formatlarını** — WKT, EWKT ve GeoJSON — karşılaştıracağız.
+1. **ST_Collect ≠ ST_Union:** `ST_Collect` geometrileri bir koleksiyona toplar, çakışan alanları birleştirmez. `ST_Union` gerçek geometrik birleşim yapar; alan toplamı hesabı için doğru sonuç verir ancak daha yavaştır.
+2. **GEOMETRYCOLLECTION ile işlem dikkat gerektirir:** `ST_Area` gibi fonksiyonlar yalnızca POLYGON/MULTIPOLYGON üzerinde çalışır. Karma tipte bir koleksiyonda `ST_CollectionExtract` ile belirli tip filtrelenmeli, ardından işlem uygulanmalıdır.
+3. **MULTIPOINT sözdizimi:** `MULTIPOINT((x1 y1),(x2 y2))` — her nokta kendi parantezi içinde olmalıdır.

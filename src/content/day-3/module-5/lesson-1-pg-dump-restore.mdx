@@ -1,12 +1,12 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `pg_dump` ve `pg_restore` ile yedekleme/geri yükleme stratejisini açıklayabileceksin
-- PostGIS için `--no-acl --no-owner` seçeneklerini kullanabileceksin
-- Sadece geometri tablolarını yedekleyen seçici dump komutunu yazabileceksin
+- `pg_dump` ve `pg_restore` ile yedekleme/geri yükleme stratejisini açıklamak
+- PostGIS için `--no-acl --no-owner` seçeneklerini uygulamak
+- Sadece geometri tablolarını yedekleyen seçici dump komutunu yazmak
 
 ---
 
-## 📖 Kavram: Yedekleme Stratejileri
+## Yedekleme Stratejileri
 
 | Yöntem | Komut | Boyut | Hız | Kullanım |
 |---|---|---|---|---|
@@ -15,11 +15,11 @@
 | Directory format | `pg_dump -Fd` | Orta | Paralel | Büyük DB |
 | Base backup | `pg_basebackup` | Tam disk | Hızlı | PITR, replica |
 
-**PostGIS ek dikkat:** `geometry` tipi extension ile gelir. Geri yükleme öncesi extension kurulu olmalı.
+**PostGIS ek dikkat:** `geometry` tipi extension ile gelir. Geri yükleme öncesinde extension kurulu olmalıdır.
 
 ---
 
-## 📖 Temel Yedekleme Komutları
+## Temel Yedekleme Komutları
 
 ```bash
 # Tek tablo dump (sadece mekansal tablolar)
@@ -38,26 +38,27 @@ pg_restore -d cbs_db_yeni \
   mekansal_yedek.dump
 ```
 
-**`--no-acl --no-owner`:** Yetki ve sahiplik bilgilerini dahil etme — farklı sunucuya taşımada zorunlu.
+**`--no-acl --no-owner`:** Yetki ve sahiplik bilgilerini dışarıda bırakır; farklı sunucuya taşımada zorunludur.
 
 ---
 
-## ▶ Canlı Örnek — pg_dump Simülasyonu
+## Uygulama Örneği
+
+### pg_dump INSERT satırı simülasyonu
 
 <RunnableBlock
-  sql={`-- PGlite'ta pg_dump yok, ama COPY ile eşdeğer export
--- Tablo içeriğini CSV formatında yaz
-COPY (
-  SELECT id, ST_AsText(geom) AS wkt_geom
-  FROM noktalar_perf
-  LIMIT 10
-) TO STDOUT WITH (FORMAT CSV, HEADER);`}
-  label="COPY TO ile export simülasyonu"
+  sql={`-- PGlite'ta pg_dump / COPY TO STDOUT yok
+-- pg_dump çıktısını simüle eden SELECT sorgusu:
+SELECT
+  'INSERT INTO noktalar_perf (id, geom) VALUES (' ||
+  id || ', ST_GeomFromText(''' || ST_AsText(geom) || ''', ' || ST_SRID(geom) || '));' AS dump_satiri
+FROM noktalar_perf
+LIMIT 10;`}
+  label="pg_dump INSERT satırı simülasyonu"
+  description="PGlite COPY TO STDOUT ve pg_dump desteklemez. Bu sorgu pg_dump'ın SQL format (-Fp) çıktısındaki INSERT satırlarını simüle eder. ST_AsText WKT formatını, ST_SRID koordinat sistemini döndürür. Gerçek pg_dump COPY satırları üretir ve sıkıştırma yapar; bu simülasyon kavramsal demonstrasyon amacıyla kullanılır."
 />
 
----
-
-## ▶ Yedek Sağlamlık Kontrolü
+### Yedek öncesi tablo durumu
 
 <RunnableBlock
   sql={`-- Yedek almadan önce tablo durumunu kaydet
@@ -70,11 +71,10 @@ JOIN pg_class ON pg_class.relname = pg_stat_user_tables.relname
 ORDER BY pg_total_relation_size(oid) DESC
 LIMIT 10;`}
   label="Yedek öncesi tablo durumu"
+  description="Yedek öncesi tablo büyüklüklerinin kaydedilmesi geri yükleme sonrası doğrulama için referans oluşturur. pg_total_relation_size tablo + indeks + toast toplam boyutunu verir. pg_size_pretty okunabilir format sağlar. n_live_tup satır sayısını gösterir; bu değer geri yükleme sonrası karşılaştırılmalıdır."
 />
 
----
-
-## ▶ PostGIS Yedek Planı
+### Extension versiyonları
 
 <RunnableBlock
   sql={`-- PostGIS extension kontrolü (geri yüklemede önce kurulmalı)
@@ -86,11 +86,12 @@ FROM pg_available_extensions
 WHERE name IN ('postgis', 'postgis_topology')
 ORDER BY name;`}
   label="Extension versiyonları"
+  description="pg_available_extensions mevcut ve kurulu extension versiyonlarını listeler. installed_version NULL ise extension kurulu değildir. Geri yükleme hedef sunucusunda installed_version boş ise önce CREATE EXTENSION postgis çalıştırılmalıdır; aksi halde geometry tipi tanınmaz ve restore başarısız olur."
 />
 
 ---
 
-## 🧪 Dene — Hangi Tablolar Yedeklenmeli?
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Geometry içeren tablolar — öncelikli yedek listesi
@@ -103,18 +104,13 @@ FROM geometry_columns
 WHERE f_table_schema = 'public'
 ORDER BY tablo;`}
   label="Mekansal tablo listesi"
+  description="geometry_columns görünümü public şemadaki tüm geometry sütunlarını listeler. Bu liste pg_dump komutuna -t parametresi olarak geçirilecek tablo adlarını belirler. Seçici dump ile yalnızca mekansal tablolar yedeklenerek dump boyutu ve geri yükleme süresi önemli ölçüde azaltılır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Extension dump'a dahil edilmez:** `pg_dump` `CREATE EXTENSION postgis` komutu üretmez (extension dışarıda). Geri yükleme öncesi `CREATE EXTENSION` manuel koşturulmalı.
-2. **Büyük geometri tabloları:** `geometry` sütunu büyük veri — `pg_dump` sıkıştırma (Fc format) önemli. 1GB tablo → ~200MB dump.
-3. **PITR (Point-in-Time Recovery):** SQL dump anlık snapshot. Süregelen işlemler için WAL arşivleme + pg_basebackup gerekir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **Replikasyon** — streaming vs logical replication farkı.
+1. **Extension dump'a dahil edilmez:** `pg_dump` `CREATE EXTENSION postgis` komutu üretmez. Geri yükleme öncesinde `CREATE EXTENSION` manuel çalıştırılmalıdır.
+2. **Büyük geometri tabloları:** `geometry` sütunu büyük veri taşır; `pg_dump` sıkıştırma (Fc format) kritik önem taşır. 1 GB tablo yaklaşık 200 MB dump'a sıkıştırılır.
+3. **PITR (Point-in-Time Recovery):** SQL dump anlık snapshot'tır. Süregelen işlemler için WAL arşivleme + pg_basebackup gerekir.

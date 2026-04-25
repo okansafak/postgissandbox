@@ -1,20 +1,20 @@
-## 🏆 Görev 2: İlçe Bazlı Sağlık Yoğunluğu
+## Görev 2: İlçe Bazlı Sağlık Yoğunluğu
 
-**Hedef:** Her ilçedeki sağlık kuruluşu sayısını ve nüfus başına sağlık kuruluşu oranını hesapla.
-
----
-
-## 🎯 Ne öğreneceksin?
-
-- Mekansal JOIN ile ilçe-kuruluş ilişkisi kurabileceksin
-- Nüfus başına normalize edilmiş sağlık göstergesi üretebileceksin
-- Sonuçları haritada görselleştirebileceksin
+**Hedef:** Her ilçedeki sağlık kuruluşu sayısı ve nüfus başına sağlık kuruluşu oranının hesaplanması.
 
 ---
 
-## ⚙ Ön Hazırlık — Veri setini kur
+## Öğrenim Hedefleri
 
-> Bu dersi ilk defa açıyorsan veya Görev 1'i çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
+- Mekansal JOIN ile ilçe-kuruluş ilişkisi kurmak
+- Nüfus başına normalize edilmiş sağlık göstergesi üretmek
+- Sonuçları haritada görselleştirmek
+
+---
+
+## Ön Hazırlık
+
+Bu dersi ilk defa açıyorsan veya Görev 1'i çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS istanbul_ilceler (
@@ -49,11 +49,14 @@ SELECT 'Hazır' AS durum,
   (SELECT COUNT(*) FROM istanbul_ilceler) AS ilce,
   (SELECT COUNT(*) FROM saglik_kuruluslari) AS saglik;`}
   label="Veri setini hazırla (Görev 1'i atladıysan)"
+  description="Önceki derste oluşturulan iki tablo yoksa burada yeniden kurulur. ON CONFLICT DO NOTHING mevcut verileri korur. Sayım sonucu 10 ilçe ve 8 sağlık kuruluşu görünmelidir."
 />
 
 ---
 
-## ▶ İlçe Bazlı Sağlık Sayımı
+## Uygulama Örneği
+
+### İlçe sağlık yoğunluğu
 
 <RunnableBlock
   sql={`SELECT
@@ -71,11 +74,10 @@ LEFT JOIN saglik_kuruluslari s
 GROUP BY i.id, i.ilce, i.nufus
 ORDER BY yuz_bin_kisi_basi DESC;`}
   label="İlçe sağlık yoğunluğu"
+  description="ST_Within mekansal JOIN ile her sağlık kuruluşu ilgili ilçeye bağlanır. LEFT JOIN sağlık kuruluşu bulunmayan ilçeleri de listeler. COUNT FILTER tipine göre hastane ve sağlık ocağı ayrı sayılır. yuz_bin_kisi_basi = kuruluş_sayısı / nüfus * 100000 normalize gösterge sağlar; nüfus farklılıklarına rağmen adil karşılaştırma yapılır."
 />
 
----
-
-## ▶ Harita için İlçe + Yoğunluk
+### İlçe kapsam haritası
 
 <RunnableBlock
   sql={`-- İlçe poligonları + sağlık skoru — haritada renklendir
@@ -94,11 +96,10 @@ LEFT JOIN saglik_kuruluslari s ON ST_Within(s.geom, i.geom)
 GROUP BY i.id, i.ilce, i.geom
 ORDER BY kuruluş_sayisi;`}
   label="İlçe kapsam haritası"
+  description="Her ilçe poligonu kapsam kategorisiyle etiketlenir: 0 kuruluş = kapsamsiz, 1 = dusuk, 2-3 = orta, 4+ = yuksek. geom sütunu haritada ilçe poligonlarını render eder; renk kodlaması haritanın kapsam_seviye değerine göre yapılabilir. Bu görselleştirme müdahale önceliklerini coğrafi olarak ortaya koyar."
 />
 
----
-
-## ▶ En Az Kapsanan İlçeler
+### Düşük kapsamlı ilçeler
 
 <RunnableBlock
   sql={`-- En düşük sağlık kapsamı
@@ -106,18 +107,21 @@ SELECT
   i.ilce,
   i.nufus,
   COALESCE(COUNT(s.id), 0) AS kuruluş,
-  CASE WHEN COUNT(s.id) = 0 THEN '⚠ Hiç kuruluş yok!' ELSE 'OK' END AS uyari
+  CASE WHEN COUNT(s.id) = 0 THEN 'Hiç kuruluş yok!' ELSE 'OK' END AS uyari
 FROM istanbul_ilceler i
 LEFT JOIN saglik_kuruluslari s ON ST_Within(s.geom, i.geom)
 GROUP BY i.id, i.ilce, i.nufus
 HAVING COUNT(s.id) < 2
 ORDER BY i.nufus DESC;`}
   label="Düşük kapsamlı ilçeler"
+  description="HAVING COUNT(s.id) < 2 yalnızca 0 veya 1 sağlık kuruluşu olan ilçeleri seçer. ORDER BY i.nufus DESC en kalabalık yetersiz kapsamlı ilçeyi öne alır; bu müdahale öncelik sıralamasında kullanılır. COALESCE sıfır kuruluş durumunda NULL yerine 0 döndürür."
 />
 
 ---
 
-## ▶ Sağlık Kuruluşu Centroid Haritası
+## Pratik Uygulama
+
+### Sağlık kuruluşları harita
 
 <RunnableBlock
   sql={`-- Her sağlık kuruluşunun konumu — haritada nokta olarak
@@ -129,11 +133,10 @@ SELECT
 FROM saglik_kuruluslari
 ORDER BY tur, ad;`}
   label="Sağlık kuruluşları harita"
+  description="Tüm sağlık kuruluşları POINT geometrisiyle listelenir. geom sütunu haritada otomatik render edilir. tur sütunu hastane ve sağlık ocağı arasındaki ayrımı gösterir; renk kodlamasıyla haritada görsel fark yaratılabilir. İlçe sınırlarının üzerinde gösterildiğinde hangi ilçenin hizmet aldığı net olarak görünür."
 />
 
----
-
-## 🧪 Dene — En Yoğun İlçedeki Hastaneler
+### En kalabalık ilçenin sağlık kurumları
 
 <RunnableBlock
   sql={`-- En kalabalık ilçedeki tüm sağlık kuruluşları
@@ -144,10 +147,5 @@ SELECT s.ad, s.tur, s.geom
 FROM saglik_kuruluslari s
 JOIN en_kalabalik e ON ST_Within(s.geom, e.geom);`}
   label="En kalabalık ilçenin sağlık kurumları"
+  description="CTE nüfusu en yüksek ilçeyi seçer. ST_Within JOIN ile bu ilçe sınırları içindeki sağlık kuruluşları listelenir. Nüfusu en yüksek ilçenin kuruluş sayısı ve türü kapasite yeterliliğini değerlendirmek için kullanılır. Sonuçta Bağcılar (750K nüfus) muhtemelen tek hastaneyle görünecektir."
 />
-
----
-
-## 🔗 Sıradaki Görev
-
-Görev 3: **Erişilemez bölgeler** — hangi ilçelerde en yakın toplanma alanı 2 km'den uzakta?

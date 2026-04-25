@@ -1,24 +1,26 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Ham yol geometrisinden düğüm-kenar topolojisi oluşturabileceksin
-- `ST_StartPoint`, `ST_EndPoint` ile kenar uç noktalarını çıkarabileceksin
-- Topoloji doğrulaması yapabileceksin
+- Ham yol geometrisinden düğüm-kenar topolojisi oluşturmak
+- `ST_StartPoint`, `ST_EndPoint` ile kenar uç noktalarını çıkarmak
+- Topoloji doğrulaması yapmak
 
 ---
 
-## 📖 Kavram: Topoloji Oluşturma
+## Topoloji Oluşturma
 
-Ham yol verisi (LineString'ler) → Ağ analizi için düğüm-kenar modeline dönüştürme:
+Ham yol verisi (LineString'ler) ağ analizine hazır düğüm-kenar modeline şu adımlarla dönüştürülür:
 
 1. Her çizginin başlangıç ve bitiş noktasını bul
 2. Aynı koordinata denk gelen noktaları tek bir düğüm ID ile tanımla
 3. Her çizgiye `source` ve `target` düğüm ID'si ata
 
-`pgr_createTopology` bunu otomatik yapar — ama PGlite'ta mevcut olmadığından SQL ile yapacağız.
+`pgr_createTopology` bunu otomatik gerçekleştirir; ancak PGlite'ta mevcut olmadığından aynı işlem SQL ile adım adım uygulanır.
 
 ---
 
-## ▶ Canlı Örnek — Ham Çizgilerden Topoloji
+## Uygulama Örneği
+
+### Ham yol uç noktaları
 
 <RunnableBlock
   sql={`-- Ham yol verisini simüle et (uçları bağlı olmayan LineString'ler)
@@ -44,11 +46,10 @@ SELECT
   ST_AsText(ST_EndPoint(geom))   AS bitis
 FROM ham_yollar;`}
   label="Ham yol uç noktaları"
+  description="5 LineString'den oluşan kapalı bir döngü ve çapraz bağlantı içeren test ağı oluşturulur. ST_StartPoint geometrinin ilk koordinatını, ST_EndPoint son koordinatını döndürür. Aynı koordinat birden fazla çizgi tarafından paylaşılıyorsa ortak bir düğüm oluşturulacaktır."
 />
 
----
-
-## ▶ Düğüm ID'si Ata
+### Benzersiz düğümlere ID atama
 
 <RunnableBlock
   sql={`-- Aynı koordinat = aynı düğüm ID
@@ -65,11 +66,10 @@ dugumler AS (
 )
 SELECT dugum_id, ST_AsText(geom) AS koordinat FROM dugumler ORDER BY dugum_id;`}
   label="Benzersiz düğümlere ID ata"
+  description="UNION (UNION ALL değil) aynı koordinatları tekilleştirir. ROW_NUMBER() OVER her benzersiz koordinata sıralı bir tam sayı ID atar. X/Y koordinatına göre sıralama sonucu deterministik kılar. Sonuçta her kavşak konumu tek bir düğüm ID ile temsil edilir."
 />
 
----
-
-## ▶ Kenar Tablosunu Tamamla
+### Tamamlanmış kenar tablosu
 
 <RunnableBlock
   sql={`-- source/target ID'li kenar tablosu oluştur
@@ -95,11 +95,12 @@ JOIN dugumler ds ON ST_Equals(ds.geom, ST_StartPoint(y.geom))
 JOIN dugumler dt ON ST_Equals(dt.geom, ST_EndPoint(y.geom))
 ORDER BY y.id;`}
   label="Tamamlanmış kenar tablosu"
+  description="Her LineString'e source ve target düğüm ID'si atanır. ST_Equals geometrik eşitlik kontrolü yapar; aynı koordinattaki iki nokta eşit sayılır. ST_Length(geom::geography) kenar uzunluğunu metre cinsinden hesaplar. Sonuç pgRouting'in beklediği source/target/cost şemasına uygundur."
 />
 
 ---
 
-## 🧪 Dene — Bağlantı Kontrolü
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Hangi düğümler hangi kenarlarla bağlı? (bağlantılılık analizi)
@@ -122,18 +123,13 @@ JOIN ham_yollar y ON
 GROUP BY d.dugum_id
 ORDER BY d.dugum_id;`}
   label="Düğüm bağlantı sayıları"
+  description="Her düğümün kaç kenara bağlandığı hesaplanır. Bağlantı sayısı 1 olan düğümler çıkmaz sokak sonlarıdır; 2 olanlar geçiş noktasıdır; 3 veya daha fazla olanlar gerçek kavşaklardır. Bu analiz ağ bağlantılılığını doğrulamak için kullanılır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Yakın ama eşit olmayan noktalar:** GPS verisi küçük koordinat farkları içerebilir. `ST_Equals` yerine `ST_DWithin(pt1, pt2, 0.00001)` kullan veya önce snap uygula.
-2. **T-junction (üçlü kavşak):** Bir çizginin ortasından başka çizgi başlıyorsa `ST_StartPoint`/`ST_EndPoint` yetersiz. Ham veriyi `ST_Node` ile önce parçala.
-3. **pgr_createTopology kolaylığı:** Gerçek projede `pgr_createTopology('tablo', 0.00001)` tüm bu adımları otomatik yapar. Kavramsal anlamak için el yapımı gösterdik.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **Dijkstra algoritması** — SQL recursive CTE ile en kısa yol.
+1. **Yakın ama eşit olmayan noktalar:** GPS verisi küçük koordinat farkları içerebilir. `ST_Equals` yerine `ST_DWithin(pt1, pt2, 0.00001)` kullanılmalı veya önceden snap uygulanmalıdır.
+2. **T-junction (üçlü kavşak):** Bir çizginin ortasından başka çizgi başlıyorsa `ST_StartPoint`/`ST_EndPoint` yetersiz kalır. Ham veri `ST_Node` ile önce parçalanmalıdır.
+3. **pgr_createTopology kolaylığı:** Gerçek projelerde `pgr_createTopology('tablo', 0.00001)` tüm bu adımları otomatik gerçekleştirir. Burada aynı adımlar kavramsal anlamak amacıyla elle uygulandı.

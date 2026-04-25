@@ -1,14 +1,16 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `EXPLAIN (FORMAT JSON)` çıktısını parse edip temel metrikleri çıkarabileceksin
-- Hangi node'un en çok zaman harcadığını bulabileceksin
-- `Planning Time` ve `Execution Time` değerlerini yorumlayabileceksin
+Metin biçimindeki EXPLAIN çıktısı insan tarafından okunabilir; ancak programatik analiz için JSON formatı daha uygundur. Bu ders, JSON plan formatını nasıl okuyup temel metrikleri nasıl çıkaracağını ve hangi node'un darboğaz oluşturduğunu nasıl bulacağını ele almaktadır.
+
+- `EXPLAIN (FORMAT JSON)` çıktısını parse ederek temel metrikleri çıkarmak
+- Hangi node'un en çok zaman harcadığını bulmak
+- `Planning Time` ve `Execution Time` değerlerini yorumlamak
 
 ---
 
-## 📖 Kavram: JSON Plan Formatı
+## JSON Plan Formatı
 
-`FORMAT JSON` ile plan hiyerarşik bir JSON objesi olarak döner:
+`FORMAT JSON` seçeneği plan hiyerarşisini yapısal bir JSON nesnesi olarak döndürür:
 
 ```json
 [{
@@ -28,11 +30,13 @@
 }]
 ```
 
-Bu format `explain.depesz.com`, pgAdmin, DBeaver gibi araçlara yapıştırılabilir.
+Bu format `explain.depesz.com`, pgAdmin ve DBeaver gibi araçlara yapıştırılarak görselleştirilebilir.
 
 ---
 
-## ▶ Canlı Örnek — JSON Plan
+## Uygulama Örneği
+
+### JSON plan çıktısı
 
 <RunnableBlock
   sql={`EXPLAIN (ANALYZE, FORMAT JSON)
@@ -44,17 +48,15 @@ WHERE ST_DWithin(
   150000
 );`}
   label="EXPLAIN JSON çıktısı"
+  description="FORMAT JSON seçeneği mekansal sorgunun planını hiyerarşik JSON formatında üretir. 'Node Type', 'Total Cost', 'Plan Rows', 'Actual Rows', 'Actual Total Time', 'Planning Time' ve 'Execution Time' alanları sorgu performansının tam fotoğrafını verir. Bu çıktı bir JSON editörüne yapıştırılarak ağaç görünümünde incelenebilir."
 />
 
----
-
-## ▶ JSON'dan Metrik Çıkar
+### JSON planından metrik çıkarma
 
 <RunnableBlock
   sql={`-- JSON planı parse et ve temel metrikleri göster
-WITH plan_json AS (
-  SELECT (
-    EXPLAIN (ANALYZE, FORMAT JSON)
+WITH plan_data AS (
+  SELECT (EXPLAIN (ANALYZE, FORMAT JSON)
     SELECT COUNT(*) FROM noktalar_perf
     WHERE ST_DWithin(
       geom::geography,
@@ -67,70 +69,35 @@ SELECT
   (plan->'Plan'->>'Total Cost')::numeric AS toplam_maliyet,
   plan->>'Planning Time'                 AS planlama_ms,
   plan->>'Execution Time'                AS yurutme_ms
-FROM plan_json;`}
+FROM plan_data;`}
   label="JSON planından metrik çıkarma"
+  description="WITH CTE içinde EXPLAIN JSON sonucu saklanır; ardından JSON operatörleriyle temel metrikler çıkarılır. ->'Plan' JSON nesnesini, ->>'Node Type' metin değerini döndürür. [0] JSON dizisinin ilk (ve tek) elemanını seçer. Planlama süresi (Planning Time) bazen yürütme süresinden (Execution Time) uzun olabilir; bu durum çok karmaşık sorgu şemalarında görülür."
 />
 
 ---
 
-## ▶ En Pahalı Node'u Bul
-
-<RunnableBlock
-  sql={`-- Recursive CTE ile tüm node'ları düzleştir
-WITH RECURSIVE nodes AS (
-  SELECT (
-    EXPLAIN (ANALYZE, FORMAT JSON)
-    SELECT a.id, COUNT(b.id)
-    FROM noktalar_perf a
-    LEFT JOIN noktalar_perf b
-      ON ST_DWithin(a.geom::geography, b.geom::geography, 5000)
-    WHERE a.id <= 10
-    GROUP BY a.id
-  )[0]->'Plan' AS node
-  UNION ALL
-  SELECT jsonb_array_elements(node->'Plans') FROM nodes
-  WHERE node ? 'Plans'
-)
-SELECT
-  node->>'Node Type'                    AS node_tipi,
-  (node->>'Actual Total Time')::numeric AS ms
-FROM nodes
-WHERE node->>'Actual Total Time' IS NOT NULL
-ORDER BY ms DESC
-LIMIT 10;`}
-  label="En pahalı node — recursive CTE"
-/>
-
----
-
-## 🧪 Dene — Planning Time Problemi
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Planlama süresi bazen execution'dan uzun olabilir
--- Karmaşık sorgu şemasında bu olur
 EXPLAIN (ANALYZE, FORMAT JSON)
 SELECT
   a.id,
   ST_AsText(a.geom) AS wkt,
-  COUNT(b.id) AS yakın_nokta
+  COUNT(b.id) AS yakin_nokta
 FROM noktalar_perf a
 JOIN noktalar_perf b
   ON ST_DWithin(a.geom::geography, b.geom::geography, 1000)
 WHERE a.id BETWEEN 1 AND 5
 GROUP BY a.id, a.geom;`}
   label="Planlama süresi ölçümü"
+  description="Aynı tablonun kendisiyle ST_DWithin join'i yapılan karmaşık sorgunun JSON planı incelenir. 'Planning Time' ve 'Execution Time' değerleri karşılaştırılır. a.id BETWEEN 1 AND 5 yalnızca 5 satırı dış taraf olarak kullandığından arama alanı sınırlıdır; ancak nested loop join iç tarafı her dış satır için tekrar çalıştırır. Bu kalıp büyük tablolarda her zaman pahalıdır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **JSON plan `EXPLAIN` sonucunun ilk elementi:** Sonuç bir JSON array'dir — `[0]` ile al.
-2. **`Actual Total Time` cumulative:** Parent node, tüm child node sürelerini içerir. En uzun leaf node asıl darboğazdır.
-3. **PGlite'ta JSON fonksiyonları:** PGlite `->` ve `->>` JSON operatörlerini destekler ama `jsonb_path_query` desteği sınırlı olabilir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 2.4 tamamlandı! Sırada **Modül 2.5 — Büyük Veri ve Partitioning**: VACUUM, tablo partitioning ve partition pruning.
+1. **JSON plan `EXPLAIN` sonucunun ilk elemanıdır.** Sonuç bir JSON dizisidir — `[0]` ile ilk eleman alınmalıdır.
+2. **`Actual Total Time` kümülatiftir.** Parent node, tüm child node sürelerini kapsayan toplam süreyi gösterir. Gerçek darboğazı bulmak için en uzun yaprak (leaf) node incelenmelidir.
+3. **PGlite'ta JSON işlemleri sınırlı olabilir.** PGlite `->` ve `->>` JSON operatörlerini destekler; ancak `jsonb_path_query` gibi gelişmiş fonksiyonlar desteklenmeyebilir.

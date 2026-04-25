@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostGIS Akademi — Bölüm 0: SQL'e Giriş</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      :root { --blue:#2563eb;--blue-light:#dbeafe;--teal:#0d9488;--teal-light:#ccfbf1;--white:#ffffff;--s50:#f8fafc;--s200:#e2e8f0;--s600:#475569;--s800:#1e293b;--s900:#0f172a;--border:rgba(255,255,255,0.08); }
+      * { box-sizing:border-box;margin:0;padding:0; }
+      body { font-family:'Inter',system-ui,sans-serif;background:linear-gradient(160deg,#0a1628 0%,#0e1d38 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column; }
+      .nav { position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:11px 28px;background:rgba(10,22,40,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border); }
+      .nav-brand { font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal); }
+      .nav-links { display:flex;gap:6px; }
+      .nav-links a { font-size:.76rem;color:rgba(255,255,255,.5);text-decoration:none;padding:5px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);transition:all 140ms; }
+      .nav-links a:hover { color:#fff;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.06); }
+      .nav-links a.current { color:#fff;background:var(--teal);border-color:var(--teal); }
+      .progress { height:2px;background:rgba(255,255,255,.08); }
+      .progress-fill { height:100%;background:var(--teal);transition:width 250ms ease; }
+      .deck-outer { flex:1;display:flex;align-items:center;justify-content:center;padding:32px 20px 108px; }
+      .deck { width:min(980px,100%); }
+      .slide { display:none;background:var(--white);color:var(--s900);border-radius:16px;border-left:5px solid var(--teal);box-shadow:0 16px 48px rgba(0,0,0,.45);animation:appear 260ms ease; }
+      .slide.active { display:block; }
+      .slide-body { padding:36px 44px; }
+      .kicker { font-size:.68rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--teal);margin-bottom:10px; }
+      .slide h1 { font-size:clamp(1.7rem,3vw,2.6rem);font-weight:700;line-height:1.18;color:var(--s900);margin-bottom:10px;letter-spacing:-.01em; }
+      .slide h2 { font-size:clamp(1.1rem,2.2vw,1.6rem);font-weight:700;line-height:1.25;color:var(--s900);margin-bottom:10px; }
+      .slide-sub { font-size:.95rem;color:var(--s600);line-height:1.65;margin-bottom:18px;max-width:70ch; }
+      .hook { background:var(--teal-light);border-left:4px solid var(--teal);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .hook-header { display:flex;align-items:center;gap:6px;margin-bottom:5px; }
+      .hook-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--teal);margin-bottom:0; }
+      .hook p { font-size:.9rem;color:var(--s800);line-height:1.55;font-style:italic; }
+      .case { background:var(--blue-light);border-left:4px solid var(--blue);border-radius:8px;padding:11px 16px;margin:10px 0; }
+      .case-lbl { font-size:.66rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);margin-bottom:5px; }
+      .case p { font-size:.9rem;color:var(--s800);line-height:1.55; }
+      .phases { display:flex;flex-direction:column;gap:6px;margin-top:10px; }
+      .phase { display:flex;gap:12px;align-items:flex-start;background:var(--s50);border-radius:8px;padding:9px 13px; }
+      .phase-tag { display:flex;align-items:center;gap:5px;font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal);flex-shrink:0;min-width:108px;white-space:nowrap;padding-top:2px; }
+      .phase-body { flex:1;min-width:0; }
+      .phase-body p { font-size:.86rem;color:var(--s800);line-height:1.52;margin:0; }
+      code { font-family:'IBM Plex Mono',monospace;font-size:.81em;background:var(--s200);color:#0f766e;padding:1px 5px;border-radius:4px; }
+      .cta { display:inline-flex;align-items:center;gap:8px;margin-top:22px;background:var(--teal);color:var(--white);text-decoration:none;padding:11px 22px;border-radius:10px;font-weight:600;font-size:.88rem;transition:background 140ms; }
+      .cta:hover { background:#0f766e; }
+      .ctrl-bar { position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 24px;background:rgba(10,22,40,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border); }
+      .ctrl-btn { border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px 20px;font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(255,255,255,.07);color:#fff;transition:all 140ms; }
+      .ctrl-btn:hover:not(:disabled) { background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.38); }
+      .ctrl-btn:disabled { opacity:.28;cursor:not-allowed; }
+      .ctrl-status { font-size:.82rem;color:rgba(255,255,255,.5);min-width:240px;text-align:center; }
+      .q-btn { display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--teal);background:transparent;color:var(--teal);font-size:.68rem;font-weight:700;line-height:1;cursor:pointer;font-family:inherit;transition:background 130ms,color 130ms;flex-shrink:0; }
+      .q-btn:hover,.q-btn.q-active { background:var(--teal);color:var(--white); }
+      .answer-box { display:none;margin-top:7px;padding:8px 13px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:7px; }
+      .answer-box-lbl { display:block;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:3px; }
+      .answer-box p { font-size:.83rem;color:var(--s800);line-height:1.54;font-style:normal;margin:0; }
+      @keyframes appear { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <span class="nav-brand">PostGIS Akademi</span>
+      <div class="nav-links">
+        <a href="./index.html">Ana Sayfa</a>
+        <a href="./bolum-0.html" class="current">Bölüm 0</a>
+        <a href="./bolum-1.html">Bölüm 1</a>
+        <a href="./bolum-2.html">Bölüm 2</a>
+        <a href="./bolum-3.html">Bölüm 3</a>
+      </div>
+    </nav>
+    <div class="progress"><div class="progress-fill" id="progressFill" style="width:11.1%"></div></div>
+
+    <div class="deck-outer"><div class="deck" id="deck">
+
+      <!-- 1: Kapak -->
+      <section class="slide active" data-slide-title="Kapak">
+        <div class="slide-body">
+          <p class="kicker">PostGIS Akademi — Bölüm 0</p>
+          <h1>SQL'e Giriş</h1>
+          <p class="slide-sub">PostGIS'e başlamadan önce tamamlanması önerilen SQL temelleri. SELECT'ten JOIN'e, toplama fonksiyonlarından veri yönetimine — 7 adımda pratik SQL yetkinliği.</p>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-00">?</button>
+            </div>
+            <p>Hiç SQL yazmamış biri, bu bölümün sonunda PostGIS sorgularını okuyup anlayabilir mi?</p>
+            <div class="answer-box" id="ans-00">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Evet. SELECT, WHERE, GROUP BY ve JOIN — PostGIS sorgularının %90'ında kullanılan yapılar — bu bölümün konusudur. Geometri sözdizimi yeni olacak, ancak SQL iskeleti tamamen tanıdık gelecek.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Bu Bölümü Kimin Alması Gerekir?</p>
+            <p>Excel'de çalışmış ancak SQL yazmamış katılımcılar; veya SQL'i tazelemek isteyenler. Temel SQL bilgisi olanlar doğrudan Bölüm 1'e geçebilir.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2: Alt Modül 0.1 -->
+      <section class="slide" data-slide-title="0.1 — SELECT ve Veri Modeli">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.1 — SELECT ve Veri Modeli</p>
+          <h2>Tablo Yapısı ve SELECT ile Veri Çekme</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-01">?</button>
+            </div>
+            <p>Bir veritabanı tablosu ile Excel sayfası arasındaki en kritik yapısal fark nedir?</p>
+            <div class="answer-box" id="ans-01">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Her satır PRIMARY KEY ile eşsiz biçimde tanımlanır; hücreler doğrudan düzenlenemez — yalnızca SQL komutlarıyla değiştirilebilir. Bu kısıtlama veri bütünlüğünü ve eş zamanlı erişimi mümkün kılar.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>İBB kentsel dönüşüm birimi 39 ilçenin parsel ve bina verilerini TKGM veritabanından SELECT sorgusuyla çekerek aylık yoğunluk raporları üretmektedir. 2.3 milyon satır saniyeler içinde filtrelenebilir; aynı veriyi Excel'de açmak mümkün değildir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Tablo = satır + sütun + veri tipi kısıtı. <code>SELECT *</code> tüm sütunları, <code>SELECT sütun1, sütun2</code> seçili sütunları getirir. <code>AS</code> ile alias tanımlanır. SELECT hesaplama yapabilir ama tabloyu değiştirmez.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT ad, nufus, nufus / alan_km2 AS yogunluk FROM sehirler ORDER BY yogunluk DESC;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-02">?</button></span>
+              <div class="phase-body">
+                <p>SELECT içindeki <code>nufus / alan_km2 AS yogunluk</code> hesabı tabloya kalıcı yeni sütun ekler mi?</p>
+                <div class="answer-box" id="ans-02">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Hayır. SELECT içindeki hesaplamalar yalnızca sorgu sonucu için geçerlidir; fiziksel tablo değişmez. Kalıcı sütun için <code>ALTER TABLE ... ADD COLUMN</code> veya <code>CREATE VIEW</code> gerekir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-03">?</button></span>
+              <div class="phase-body">
+                <p>Nüfusu 1 milyonun üzerindeki şehirleri büyükten küçüğe sırala; yalnızca ad ve nüfus sütunlarını göster.</p>
+                <div class="answer-box" id="ans-03">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ad, nufus FROM sehirler WHERE nufus > 1000000 ORDER BY nufus DESC;</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3: Alt Modül 0.2 -->
+      <section class="slide" data-slide-title="0.2 — Veri Tipleri">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.2 — Veri Tipleri</p>
+          <h2>PostgreSQL Veri Tipleri ve Doğru Seçim</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-04">?</button>
+            </div>
+            <p>Finansal veri için neden TEXT veya REAL yerine NUMERIC kullanılmalıdır?</p>
+            <div class="answer-box" id="ans-04">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>TEXT sayısal işlemlere izin vermez. REAL (kayan nokta) yuvarlama hatası üretir: 0.1 + 0.2 = 0.30000000000000004. <code>NUMERIC(15,2)</code> kesin ondalık hesap sağlar — muhasebe sistemleri için zorunludur.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>TÜİK nüfus değerlerini INTEGER ile saklar — REAL'in yuvarlama hatası istatistik tutarsızlığı yaratır. İBB acil olay sistemi TIMESTAMPTZ kullanır: UTC'de saklanan zaman İstanbul ve Avrupa ofisleri için otomatik yerel saate çevrilir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Tam sayı: <code>INTEGER</code> / <code>BIGINT</code> / <code>SERIAL</code>. Ondalık: <code>NUMERIC(p,s)</code> (kesin), <code>REAL</code> (yaklaşık). Metin: <code>TEXT</code> (tercih), <code>VARCHAR(n)</code>. Zaman: <code>DATE</code>, <code>TIMESTAMPTZ</code>. Diğer: <code>BOOLEAN</code>, <code>UUID</code>, <code>JSONB</code>. PostGIS: <code>geometry</code> / <code>geography</code>.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>CREATE TABLE sehirler (id SERIAL PRIMARY KEY, ad TEXT NOT NULL, nufus INTEGER, alan_km2 NUMERIC(10,2), kurulis DATE);</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-05">?</button></span>
+              <div class="phase-body">
+                <p>Coğrafi koordinatlar (enlem/boylam) için hangi tip kullanılmalıdır?</p>
+                <div class="answer-box" id="ans-05">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Ayrı NUMERIC sütunlar yerine PostGIS <code>geometry(POINT, 4326)</code> tipi. Mekansal indeksleme, projeksiyon dönüşümü ve mesafe hesabı geometry tipiyle doğrudan yapılır — iki ayrı sayı sütunu bu özellikleri desteklemez.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-06">?</button></span>
+              <div class="phase-body">
+                <p>Bir acil olay tablosu tasarla: id, aciklama, onem_derecesi, kayit_zamani, kapandi_mi sütunları için doğru veri tiplerini seç.</p>
+                <div class="answer-box" id="ans-06">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>id BIGSERIAL, aciklama TEXT, onem_derecesi SMALLINT, kayit_zamani TIMESTAMPTZ, kapandi_mi BOOLEAN DEFAULT false</code>. Geometri sütunu için: <code>konum geometry(POINT, 4326)</code>.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4: Alt Modül 0.3 -->
+      <section class="slide" data-slide-title="0.3 — WHERE ile Filtreleme">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.3 — WHERE ile Filtreleme</p>
+          <h2>Koşullu Filtreleme: Operatörler ve Mantıksal Bağlaçlar</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-07">?</button>
+            </div>
+            <p>10 milyonluk bir tabloda WHERE ile filtreleme tüm tabloyu okumak zorunda mı?</p>
+            <div class="answer-box" id="ans-07">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>İndeksli sütunda hayır. Veritabanı indeks ağacından ilgili sayfaları doğrudan bulur; tüm tabloyu taramaz. PostGIS'te geometri sütunları için GiST indeksi bu görevi üstlenir.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Kadastro sistemleri WHERE koşuluyla ilçe ve ada-parsel bazlı filtreleme yaparak sorgu süresini %95 oranında kısaltır. Günlük on binlerce sorgu bu sayede milisaniyeler içinde yanıt verir; indekssiz aynı sorgu dakikalar alırdı.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Karşılaştırma: <code>=</code> <code>!=</code> <code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code>. Mantıksal: <code>AND</code> <code>OR</code> <code>NOT</code>. Özel: <code>LIKE 'İst%'</code>, <code>IN ('Ankara','İzmir')</code>, <code>BETWEEN 1 AND 5</code>, <code>IS NULL</code> / <code>IS NOT NULL</code>.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT ad, nufus FROM sehirler WHERE nufus > 1000000 AND bolge IN ('Marmara','Ege') AND ad LIKE 'İ%';</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-08">?</button></span>
+              <div class="phase-body">
+                <p><code>WHERE nufus > 1000000 OR bolge = 'Ege'</code> ile AND arasındaki sonuç farkı nedir?</p>
+                <div class="answer-box" id="ans-08">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>OR: iki koşuldan biri yeterliyse satır dahil edilir — nüfusu 1M+ VEYA Ege bölgesindeki tüm şehirler. AND: her iki koşul aynı anda sağlanmalıdır — nüfusu 1M+ VE Ege bölgesinde (çok daha küçük küme).</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-09">?</button></span>
+              <div class="phase-body">
+                <p>Adı 'A' ile başlayan VEYA nüfusu 500.000'in altındaki şehirleri listele. NULL nüfuslu kayıtları hariç tut.</p>
+                <div class="answer-box" id="ans-09">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT * FROM sehirler WHERE (ad LIKE 'A%' OR nufus &lt; 500000) AND nufus IS NOT NULL;</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5: Alt Modül 0.4 -->
+      <section class="slide" data-slide-title="0.4 — Sıralama ve Limit">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.4 — Sıralama ve Limit</p>
+          <h2>ORDER BY, LIMIT, OFFSET ve DISTINCT</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-10">?</button>
+            </div>
+            <p>Nüfusa göre en büyük 5 şehri bulmak için SQL'in en kısa yolu nedir?</p>
+            <div class="answer-box" id="ans-10">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>SELECT ad, nufus FROM sehirler ORDER BY nufus DESC LIMIT 5;</code> — ORDER BY büyükten küçüğe sıralar, LIMIT ilk 5'i alır. İndekssiz ORDER BY büyük tablolarda pahalı olabilir; indeks seçimi kritiktir.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>AFAD, deprem anında en yüksek nüfus yoğunluğuna sahip ilçeleri <code>ORDER BY yogunluk DESC LIMIT 10</code> ile belirleyerek kaynak tahsisini otomatik önceriklendirir. Web uygulamalarında sayfalama LIMIT + OFFSET ile oluşturulur.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>ORDER BY sütun DESC/ASC</code> — çok sütun: <code>ORDER BY bolge ASC, nufus DESC</code>. <code>LIMIT n</code>: ilk n satır. <code>OFFSET m</code>: ilk m'i atla. <code>DISTINCT</code>: tekrarlayan değerleri kaldırır, her değerden bir örnek döndürür.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT DISTINCT bolge FROM sehirler ORDER BY bolge ASC;</code><br/><code>SELECT ad, nufus FROM sehirler ORDER BY nufus DESC LIMIT 5 OFFSET 10;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-11">?</button></span>
+              <div class="phase-body">
+                <p>ORDER BY büyük tablolarda neden pahalı olabilir?</p>
+                <div class="answer-box" id="ans-11">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Sıralama O(n log n) karmaşıklığında; milyonlarca satırda bellek yetersizse geçici disk yazımı (temp file) devreye girer. Çözüm: sıralama sütununa B-tree indeks. Mekansal sorgularda <code>ORDER BY geom &lt;-&gt; nokta</code> için GiST indeksi gerekir.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-12">?</button></span>
+              <div class="phase-body">
+                <p>Nüfusça 3. ile 7. sıradaki şehirleri listele (baştan 2'yi atla, 5 tane getir).</p>
+                <div class="answer-box" id="ans-12">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ad, nufus FROM sehirler ORDER BY nufus DESC LIMIT 5 OFFSET 2;</code> → 3.–7. büyük şehirler sıralı olarak gelir.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6: Alt Modül 0.5 -->
+      <section class="slide" data-slide-title="0.5 — Toplama Fonksiyonları ve Gruplama">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.5 — Toplama Fonksiyonları ve Gruplama</p>
+          <h2>COUNT, SUM, AVG — GROUP BY ve HAVING</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-13">?</button>
+            </div>
+            <p>Her bölgenin ortalama nüfusunu tek sorguda görmek için ne gerekir?</p>
+            <div class="answer-box" id="ans-13">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>SELECT bolge, AVG(nufus) FROM sehirler GROUP BY bolge;</code> — GROUP BY satırları bölgeye göre kümelere ayırır, her küme için AVG ayrı hesaplanır. PostGIS'te: ilçe bazlı toplam alan hesabı için aynı yapı kullanılır.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>Sağlık Bakanlığı, <code>GROUP BY il</code> ile her ildeki yatak sayısını topluyor; <code>HAVING SUM(yatak) &lt; 500</code> ile yetersiz kapasiteli illeri otomatik olarak kritik listesine alıyor. TÜİK bölgesel istatistik bültenlerini aynı yapıyla üretiyor.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p>Fonksiyonlar: <code>COUNT(*)</code> (NULL dahil), <code>COUNT(sütun)</code> (NULL hariç), <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>. <code>HAVING</code>: gruplama sonrası filtre (WHERE satır filtreler, HAVING grup filtreler). SQL sırası: FROM→WHERE→GROUP BY→HAVING→SELECT→ORDER BY.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT bolge, COUNT(*) AS sehir_sayisi, AVG(nufus)::INT AS ort_nufus FROM sehirler GROUP BY bolge HAVING COUNT(*) > 2 ORDER BY ort_nufus DESC;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-14">?</button></span>
+              <div class="phase-body">
+                <p>Neden <code>WHERE COUNT(*) > 2</code> yazılamaz?</p>
+                <div class="answer-box" id="ans-14">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>WHERE, GROUP BY'dan önce çalışır; bu aşamada henüz gruplama yapılmamıştır — COUNT değeri bilinmez. Gruplama sonrası filtre için HAVING kullanılır. Bu SQL çalışma sırasının doğal bir sonucudur.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-15">?</button></span>
+              <div class="phase-body">
+                <p>İlçe başına toplam bina sayısını hesapla; 50'den az binası olan ilçeleri hariç tut. Sonuçları büyükten küçüğe sırala.</p>
+                <div class="answer-box" id="ans-15">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT ilce, COUNT(*) AS bina_sayisi FROM binalar GROUP BY ilce HAVING COUNT(*) >= 50 ORDER BY bina_sayisi DESC;</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7: Alt Modül 0.6 -->
+      <section class="slide" data-slide-title="0.6 — JOIN ile Tablo İlişkileri">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.6 — JOIN ile Tablo İlişkileri</p>
+          <h2>INNER JOIN, LEFT JOIN ve Mekansal JOIN</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-16">?</button>
+            </div>
+            <p>Şehir bilgileri bir tabloda, bölge detayları başka tabloda saklanıyorsa ikisini nasıl birleştirirsiniz?</p>
+            <div class="answer-box" id="ans-16">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p><code>FROM sehirler s JOIN bolgeler b ON s.bolge_id = b.id</code>. PostGIS'te en sık kullanılan JOIN: <code>JOIN ilceler i ON ST_Within(bina.geom, i.geom)</code> — birleştirme koşulu PRIMARY KEY değil geometrik ilişkidir.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>TKGM'de parsel-mülk sahiplik zinciri 4 tabloyu JOIN ederek sorgulanmaktadır: parsel → ada → ilçe → il. PostGIS'te 5. tablo geometri içerir; mekansal JOIN (<code>ST_Intersects</code>) ile bağlanır. Tüm zincirleme JOIN'ler milisaniyeler içinde yanıt verir.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>INNER JOIN</code>: her iki tabloda eşleşme varsa satır dahil. <code>LEFT JOIN</code>: sol tablodaki tüm satırlar; sağda eşleşme yoksa NULL. <code>CROSS JOIN</code>: kartezyen çarpım. PostGIS LATERAL: per-row alt sorgu, en yakın tesis bulmada kullanılır.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>SELECT s.ad, b.bolge_adi, s.nufus FROM sehirler s JOIN bolgeler b ON s.bolge_id = b.id WHERE s.nufus > 500000;</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-17">?</button></span>
+              <div class="phase-body">
+                <p>LEFT JOIN ile INNER JOIN ne zaman aynı sonucu verir?</p>
+                <div class="answer-box" id="ans-17">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Sol tablodaki her satırın sağ tabloda mutlaka bir eşleşmesi olduğunda. Hiçbir NULL gelmeyecekse INNER = LEFT. Uygulamada: her şehrin bir bölge kaydı varsa ikisi özdeştir — ancak bu durum her zaman garanti edilemez.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-18">?</button></span>
+              <div class="phase-body">
+                <p>Her bölgenin en kalabalık şehrini listele. (İpucu: GROUP BY + MAX veya alt sorgu gerekir.)</p>
+                <div class="answer-box" id="ans-18">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>SELECT b.bolge_adi, s.ad, s.nufus FROM sehirler s JOIN bolgeler b ON s.bolge_id = b.id WHERE s.nufus = (SELECT MAX(nufus) FROM sehirler s2 WHERE s2.bolge_id = s.bolge_id);</code></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8: Alt Modül 0.7 -->
+      <section class="slide" data-slide-title="0.7 — DML: INSERT, UPDATE, DELETE">
+        <div class="slide-body">
+          <p class="kicker">Alt Modül 0.7 — Veri Yönetimi (DML)</p>
+          <h2>INSERT, UPDATE, DELETE ve CREATE TABLE</h2>
+          <div class="hook">
+            <div class="hook-header">
+              <p class="hook-lbl">Açılış Sorusu</p>
+              <button class="q-btn" type="button" data-answer="ans-19">?</button>
+            </div>
+            <p>SQL yalnızca veri okumak için mi kullanılır? Gerçek zamanlı olay kaydı nasıl yapılır?</p>
+            <div class="answer-box" id="ans-19">
+              <span class="answer-box-lbl">Yanıt</span>
+              <p>Hayır. INSERT yeni kayıt ekler, UPDATE mevcut kaydı değiştirir, DELETE siler. Gerçek zamanlı sistemlerde her yeni olay <code>INSERT</code> ile anlık yazılır. PostGIS'te geometri sütununa: <code>ST_SetSRID(ST_MakePoint(lon, lat), 4326)</code> değeri eklenir.</p>
+            </div>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Endüstriyel Bağlam</p>
+            <p>112 Acil Yardım sistemi her çağrıyı saniyeler içinde INSERT ile kaydeder; aktif çağrıların koordinatları UPDATE ile güncellenir; kapanan vakalar DELETE değil arşiv tablosuna INSERT + <code>kapandi = true</code> UPDATE ile işaretlenir — veri kaybedilmez.</p>
+          </div>
+          <div class="phases">
+            <div class="phase">
+              <span class="phase-tag">Kavram</span>
+              <div class="phase-body"><p><code>INSERT INTO tablo(sütunlar) VALUES(...);</code> — çok satır aynı anda. <code>UPDATE tablo SET sütun = değer WHERE koşul;</code> — WHERE olmadan tüm tablo güncellenir. <code>DELETE FROM tablo WHERE koşul;</code> — WHERE olmadan tüm tablo silinir. Önce SELECT ile etkilenecek satırları görün.</p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Örnek</span>
+              <div class="phase-body"><p><code>INSERT INTO sehirler(ad, nufus, bolge_id) VALUES('Muğla', 1020000, 3);</code><br/><code>UPDATE sehirler SET nufus = 1050000 WHERE ad = 'Muğla';</code></p></div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Kritik Soru <button class="q-btn" type="button" data-answer="ans-20">?</button></span>
+              <div class="phase-body">
+                <p>UPDATE'de WHERE koşulu yazılmazsa ne olur? Nasıl önlenir?</p>
+                <div class="answer-box" id="ans-20">
+                  <span class="answer-box-lbl">Yanıt</span>
+                  <p>Tablodaki tüm satırlar güncellenir — geri dönüşü zordur. Önlem: işlemi <code>BEGIN;</code> ile başlat, UPDATE'den önce <code>SELECT</code> ile etkilenecek satırları gör, onaylarsan <code>COMMIT;</code>, hatalıysa <code>ROLLBACK;</code> ile iptal et.</p>
+                </div>
+              </div>
+            </div>
+            <div class="phase">
+              <span class="phase-tag">Bağımsız Çalışma <button class="q-btn" type="button" data-answer="ans-21">?</button></span>
+              <div class="phase-body">
+                <p>Yeni bir şehir ekle, nüfusunu güncelle, ardından silmeden önce SELECT ile doğrula. Tüm işlemi transaction içinde yap.</p>
+                <div class="answer-box" id="ans-21">
+                  <span class="answer-box-lbl">Beklenen Çıktı</span>
+                  <p><code>BEGIN; INSERT INTO sehirler(ad,nufus) VALUES('Test',100); UPDATE sehirler SET nufus=200 WHERE ad='Test'; SELECT * FROM sehirler WHERE ad='Test'; ROLLBACK;</code> → Test şehri eklenip silinir, tablo etkilenmez.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9: Kapanış -->
+      <section class="slide" data-slide-title="Bölüm Sonu">
+        <div class="slide-body">
+          <p class="kicker">Bölüm 0 — Özet</p>
+          <h2>SQL'e Giriş Tamamlandı</h2>
+          <p class="slide-sub">SELECT'ten JOIN'e, toplama fonksiyonlarından veri yönetimine kadar PostGIS sorgularının SQL iskeletini oluşturan tüm yapılar artık kullanıma hazır.</p>
+          <div class="hook">
+            <div class="hook-header"><p class="hook-lbl">Kazanımlar</p></div>
+            <p>SELECT ve veri modeli &nbsp;·&nbsp; Veri tipleri &nbsp;·&nbsp; WHERE filtreleme &nbsp;·&nbsp; ORDER BY / LIMIT / DISTINCT &nbsp;·&nbsp; GROUP BY / HAVING / Aggregate &nbsp;·&nbsp; JOIN &nbsp;·&nbsp; INSERT / UPDATE / DELETE</p>
+          </div>
+          <div class="case">
+            <p class="case-lbl">Bir Sonraki Bölümde</p>
+            <p>Bölüm 1 — Spatial SQL Fundamentals: PGlite platformu, PostGIS geometri modeli, projeksiyon sistemleri, mekansal ilişkiler ve ölçüm fonksiyonları.</p>
+          </div>
+          <a href="./bolum-1.html" class="cta">Bölüm 1: Spatial SQL Fundamentals →</a>
+        </div>
+      </section>
+
+    </div></div>
+
+    <div class="ctrl-bar">
+      <button class="ctrl-btn" id="prevBtn" type="button">← Geri</button>
+      <span class="ctrl-status" id="slideStatus">1 / 9</span>
+      <button class="ctrl-btn" id="nextBtn" type="button">İleri →</button>
+    </div>
+
+    <script>
+      (function () {
+        var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+        var total=slides.length,idx=0;
+        var prevBtn=document.getElementById('prevBtn'),nextBtn=document.getElementById('nextBtn');
+        var status=document.getElementById('slideStatus'),fill=document.getElementById('progressFill');
+        function render(){slides.forEach(function(s,i){var a=i===idx;s.classList.toggle('active',a);s.setAttribute('aria-hidden',String(!a));});var t=slides[idx].getAttribute('data-slide-title')||'';status.textContent=(idx+1)+' / '+total+(t?'  ·  '+t:'');fill.style.width=((idx+1)/total*100).toFixed(1)+'%';prevBtn.disabled=idx===0;nextBtn.disabled=idx===total-1;}
+        prevBtn.addEventListener('click',function(){if(idx>0){idx--;render();}});
+        nextBtn.addEventListener('click',function(){if(idx<total-1){idx++;render();}});
+        document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='PageDown'){if(idx<total-1){idx++;render();}}if(e.key==='ArrowLeft'||e.key==='PageUp'){if(idx>0){idx--;render();}}});
+        render();
+      }());
+      (function () {
+        document.querySelectorAll('.q-btn').forEach(function (btn) {
+          var box = document.getElementById(btn.getAttribute('data-answer'));
+          if (!box) return;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = box.style.display === 'block';
+            box.style.display = open ? 'none' : 'block';
+            btn.textContent = open ? '?' : '✓';
+            btn.classList.toggle('q-active', !open);
+          });
+        });
+      }());
+    </script>
+  </body>
+</html>

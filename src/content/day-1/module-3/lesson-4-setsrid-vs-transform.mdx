@@ -1,88 +1,71 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_SetSRID` ile `ST_Transform` arasındaki farkı kesin olarak açıklayabileceksin
-- Yanlış kullanımın nasıl sessiz hatalara yol açtığını görebileceksin
-- Doğru dönüşüm zincirini yazabileceksin
+`ST_SetSRID` ve `ST_Transform` PostGIS'te en sık karıştırılan fonksiyonlar arasındadır. İkisi de SRID içeren bir geometri döndürür; ancak yaptıkları şey temelden farklıdır. Bu farkı kavramak, sessiz koordinat hatalarını önlemenin temelidir.
+
+- `ST_SetSRID` ile `ST_Transform` arasındaki kesin farkı açıklayabilmek
+- Yanlış kullanımın nasıl tespit edilemez hatalara yol açtığını gözlemlemek
+- Doğru dönüşüm zincirini yazmak
 
 ---
 
-## 📖 Kavram: İki Farklı İşlem
-
-Bu iki fonksiyon sıkça karıştırılır — ama tamamen farklı şeyler yapar:
+## İki Farklı İşlem
 
 ### ST_SetSRID — Etiket Yapıştır
 
-Koordinatları **değiştirmez**. Sadece geometriye "bu koordinatlar X sisteminde" etiketi yapıştırır.
+Koordinatları **değiştirmez**. Geometriye yalnızca "bu koordinatlar X sistemindedir" etiketini yapıştırır. Koordinatlar zaten doğru sistemde girilmişse kullanılır.
 
 ```sql
--- Koordinatlar aynı kalır, sadece SRID değişir
+-- Koordinatlar aynı kalır, yalnızca SRID etiketi değişir
 ST_SetSRID(geom, 4326)
 ```
 
-**Ne zaman kullan:** Koordinatlar zaten doğru sistemde yazılmış ama SRID etiketi eksik.
+### ST_Transform — Gerçek Koordinat Dönüşümü
 
-### ST_Transform — Gerçek Dönüşüm
-
-Koordinatları **matematiksel olarak dönüştürür**. 4326'dan 32636'ya gidildiğinde lon/lat → X/Y (metre) olur.
+Koordinatları matematiksel olarak dönüştürür. EPSG:4326'dan UTM'e geçildiğinde lon/lat değerleri metre cinsinden X/Y koordinatlarına çevrilir.
 
 ```sql
--- Koordinatlar değişir: 28.9 derece → 500000 metre civarı
+-- Koordinatlar değişir: 28.979 derece → ~500.000 metre
 ST_Transform(ST_SetSRID(geom, 4326), 32636)
 ```
 
-**Ne zaman kullan:** Farklı koordinat sistemine geçmek istiyorsun.
+### Kullanım Kuralı
 
----
-
-## 📖 Kural: Önce SetSRID, Sonra Transform
+Transform çalışabilmesi için geometrinin kaynak SRID'ini bilmesi gerekir. Bu nedenle standart zincir şu sırayı izler:
 
 ```
 Ham koordinatlar → ST_SetSRID(geom, kaynak_srid) → ST_Transform(..., hedef_srid)
 ```
 
-Transform için geometrinin kaynak SRID'ini **bilmesi** gerekir. SetSRID olmadan Transform hata verir.
-
 ---
 
-## ▶ Canlı Örnek — SetSRID vs Transform
+## Uygulama Örneği
+
+### SetSRID vs Transform farkı
 
 <RunnableBlock
   sql={`WITH istanbul AS (
   SELECT ST_MakePoint(28.979, 41.015) AS raw_geom
 )
 SELECT
-  -- Sadece SetSRID: koordinatlar değişmez
-  ST_AsText(ST_SetSRID(raw_geom, 4326))              AS setsrid_sonuc,
-
-  -- Transform: derece → metre (UTM 36N)
-  ST_AsText(ST_Transform(ST_SetSRID(raw_geom, 4326), 32636)) AS transform_sonuc,
-
-  -- Transform: derece → Web Mercator
-  ST_AsText(ST_Transform(ST_SetSRID(raw_geom, 4326), 3857))  AS webmercator_sonuc
+  ST_AsText(ST_SetSRID(raw_geom, 4326))                        AS setsrid_sonuc,
+  ST_AsText(ST_Transform(ST_SetSRID(raw_geom, 4326), 32636))   AS transform_utm36n,
+  ST_AsText(ST_Transform(ST_SetSRID(raw_geom, 4326), 3857))    AS transform_webmercator
 FROM istanbul;`}
   label="SetSRID vs Transform farkı"
+  description="setsrid_sonuc sütununda koordinatlar değişmez (28.979, 41.015 olarak kalır); yalnızca SRID etiketi eklenir. transform_utm36n sütununda koordinatlar tamamen değişir: boylam/enlem değerleri onlarca binlerle ifade edilen metre değerlerine dönüşür. Bu tek sorgu iki fonksiyonun davranış farkını doğrudan gösterir."
 />
 
----
-
-## ▶ Yanlış Kullanım — Sessiz Hata
+### Yanlış kullanım — sessiz hata
 
 <RunnableBlock
-  sql={`-- ⚠ YANLIŞ: SetSRID ile "dönüşüm yapmaya" çalışmak
--- Koordinatlar değişmez, sadece etiket değişir
-SELECT
+  sql={`SELECT
   ST_AsText(ST_SetSRID(ST_MakePoint(28.979, 41.015), 32636)) AS yanlis_32636,
-  -- Bu koordinatlar 32636 sisteminde anlamsız!
-  ST_SRID(ST_SetSRID(ST_MakePoint(28.979, 41.015), 32636))   AS srid_etiketi;
-
--- ✅ DOĞRU: Önce 4326 etiketle, sonra 32636'ya dönüştür
--- SELECT ST_Transform(ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326), 32636);`}
+  ST_SRID(ST_SetSRID(ST_MakePoint(28.979, 41.015), 32636))   AS srid_etiketi;`}
   label="Yanlış SetSRID kullanımı"
+  description="Bu sorgu hata vermez. Koordinatlar (28.979, 41.015) derece değerleri olarak kalmaya devam eder; ancak SRID etiketi 32636 (UTM metre sistemi) olarak işaretlenir. Sonraki hesaplamalarda bu geometri UTM sisteminde gibi işleme alınır; sonuçlar sistematik olarak hatalı olur. SetSRID asla dönüştürme yapmaz."
 />
 
----
-
-## ▶ Pratik: 4326 → 32636 → Geri 4326
+### 4326 → UTM → 4326 gidiş-dönüş
 
 <RunnableBlock
   sql={`WITH istanbul_4326 AS (
@@ -92,21 +75,15 @@ istanbul_utm AS (
   SELECT ST_Transform(geom, 32636) AS geom FROM istanbul_4326
 )
 SELECT
-  ST_AsText(istanbul_4326.geom)       AS baslangic_4326,
-  ST_AsText(istanbul_utm.geom)        AS utm_36n,
-  -- Geri dönüşüm
+  ST_AsText(istanbul_4326.geom)              AS baslangic_4326,
+  ST_AsText(istanbul_utm.geom)               AS utm_36n,
   ST_AsText(ST_Transform(istanbul_utm.geom, 4326)) AS geri_4326
 FROM istanbul_4326, istanbul_utm;`}
   label="4326 → UTM → 4326 gidiş-dönüş"
+  description="İki CTE ile önce 4326→32636 dönüşümü yapılır, ardından geri dönüşüm uygulanır. Koordinatlar orijinal değerlere kayan nokta hassasiyeti sınırları içinde döner (örn. 28.9789999... yerine 28.979). Bu gidiş-dönüş tutarlılığı, dönüşüm zincirinin doğruluğunu doğrular."
 />
 
-> Gidiş-dönüş sonucunda orijinal koordinatlara çok yakın bir değer görmelisin (kayan nokta hassasiyeti farkı normal).
-
----
-
-## 🧪 Dene
-
-İstanbul'u UTM 35N (32635) sistemine dönüştür ve X, Y koordinatlarını ayrı sütunlarda göster:
+### UTM X/Y koordinatları
 
 <RunnableBlock
   sql={`WITH utm AS (
@@ -120,18 +97,13 @@ SELECT
   ROUND(ST_Y(geom)::numeric, 0) AS utm_y_metre
 FROM utm;`}
   label="İstanbul UTM 35N koordinatları"
+  description="ST_X ve ST_Y fonksiyonları dönüştürülmüş geometrinin X (Easting) ve Y (Northing) bileşenlerini metre cinsinden döndürür. UTM Zone 35N'de İstanbul için X yaklaşık 430.000 metre, Y yaklaşık 4.540.000 metre civarında çıkmalıdır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Transform SRID bilinmiyorsa hata:** `ST_Transform` çağrılmadan önce geometrinin SRID'i -1 ise `ERROR: invalid srid`. `ST_SetSRID` ile etiketle.
-2. **SetSRID dönüşüm yapmaz:** `ST_SetSRID(geom, 32636)` geometriyi UTM'e dönüştürmez — koordinatları düzeltmez. Bu çok yaygın bir hatadır.
-3. **Birden fazla Transform zinciri:** `ST_Transform(ST_Transform(geom, 32636), 4326)` geçerlidir — her adımda SRID güncellenir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste Türkiye'de hangi EPSG kodlarının kullanıldığını ve hangi bölge için hangisinin seçileceğini öğreneceğiz.
+1. **ST_Transform SRID bilinmiyorsa hata verir.** Geometrinin SRID değeri -1 ise `ERROR: invalid srid` hatası alınır. `ST_SetSRID` ile önce etiketlenmesi gerekir.
+2. **SetSRID dönüşüm yapmaz.** `ST_SetSRID(geom, 32636)` geometriyi UTM'e dönüştürmez; yalnızca SRID etiketini değiştirir. Bu en yaygın hatadır.
+3. **Zincirleme dönüşümler geçerlidir.** `ST_Transform(ST_Transform(geom, 32636), 4326)` çalışır; her adımda SRID güncellenir.

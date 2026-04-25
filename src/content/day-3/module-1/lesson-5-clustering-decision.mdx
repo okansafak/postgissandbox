@@ -1,26 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- KMeans, DBSCAN ve Grid'in güçlü/zayıf yönlerini karşılaştırabileceksin
-- Proje gereksinimlerine göre doğru yöntemi seçebileceksin
-- Her iki fonksiyonu birlikte (pipeline) kullanabileceksin
+- KMeans, DBSCAN ve Grid yöntemlerinin güçlü ve zayıf yönlerini karşılaştırmak
+- Proje gereksinimlerine göre doğru yöntemi seçmek
+- Her iki fonksiyonu birlikte (pipeline) kullanmak
 
 ---
 
-## 📖 Karar Matrisi
+## Karar Matrisi
 
 | Soru | KMeans | DBSCAN | Grid |
 |---|---|---|---|
-| Küme sayısı önceden bilinir mi? | ✅ Gerekir | ❌ Otomatik | ❌ Grid boyutuna bağlı |
-| Outlier/gürültü var mı? | ❌ Etkiler | ✅ Dışlar | ➖ Boş hücreler |
-| Düzensiz şekil kümeleri? | ❌ Yuvarlak | ✅ Her şekil | ❌ Kare/altıgen |
-| Görsel yoğunluk haritası? | ❌ | ❌ | ✅ İdeal |
-| Performans (100K+ nokta)? | ✅ Hızlı | ➖ Orta | ➖ Orta |
-| Şube/bölge optimizasyonu? | ✅ İdeal | ❌ | ❌ |
-| Anomali/hotspot tespiti? | ❌ | ✅ İdeal | ➖ Yaklaşık |
+| Küme sayısı önceden bilinir mi? | Gerekir | Otomatik | Grid boyutuna bağlı |
+| Outlier/gürültü var mı? | Etkiler | Dışlar | Boş hücreler |
+| Düzensiz şekil kümeleri? | Hayır (yuvarlak) | Her şekil | Hayır (kare/altıgen) |
+| Görsel yoğunluk haritası? | — | — | İdeal |
+| Performans (100K+ nokta)? | Hızlı | Orta | Orta |
+| Şube/bölge optimizasyonu? | İdeal | — | — |
+| Anomali/hotspot tespiti? | — | İdeal | Yaklaşık |
 
 ---
 
-## ▶ Canlı Örnek — Pipeline: DBSCAN → KMeans
+## Uygulama Örneği
+
+### DBSCAN → KMeans pipeline
 
 <RunnableBlock
   sql={`-- 1. DBSCAN ile gürültüyü dışla
@@ -51,11 +53,10 @@ FROM (
 GROUP BY kmeans_id
 ORDER BY nokta_sayisi DESC;`}
   label="DBSCAN + KMeans pipeline"
+  description="İki aşamalı pipeline: önce DBSCAN 800 metre / 4 nokta parametresiyle gürültü noktalarını tespit eder ve dışlar (dbscan_cid IS NOT NULL). Ardından temizlenmiş nokta seti üzerinde KMeans 3 hizmet bölgesi oluşturur. Gürültüden arındırılmış KMeans bölgeleri aykırı değerlerden etkilenmediğinden daha dengeli ve güvenilir sonuç verir."
 />
 
----
-
-## ▶ Grid + Hotspot Kombinasyonu
+### Grid + hotspot kombinasyonu
 
 <RunnableBlock
   sql={`-- Grid yoğunluk haritasından yüksek-yoğunluklu hücreler → KMeans
@@ -77,11 +78,12 @@ FROM kaza_noktalari k
 JOIN dense_cells c ON ST_Within(k.geom, c.cell_geom)
 LIMIT 20;`}
   label="Yoğun hücreler içindeki noktalar"
+  description="İlk CTE yoğun hücreleri belirler: 5 veya daha fazla kaza içeren grid hücrelerini seçer. İkinci adım bu yoğun hücrelerdeki bireysel kaza noktalarını listeler. Bu yöntem DBSCAN'ın gürültü işlemi yapmadan önceden belirlenmiş yoğunluk eşiğine göre odak alanları tanımlar."
 />
 
 ---
 
-## 🧪 Dene — Senaryoya Göre Seç
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Senaryo: 10 dağıtım deposu için bölge optimizasyonu
@@ -103,18 +105,13 @@ FROM (
 GROUP BY kume_id
 ORDER BY merkeze_km;`}
   label="10 depo bölgesi optimizasyonu"
+  description="Kaza nokta dağılımını 10 depo hizmet bölgesine böler. ST_Distance ile her küme merkezi İstanbul merkezine (28.979, 41.015) olan uzaklık kilometre cinsinden hesaplanır ve sonuç uzaklığa göre sıralanır. Merkeze en yakın bölgeler genellikle en yüksek hizmet talebini temsil eder. geom sütunu küme merkezlerini haritada gösterir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **"Her şey için DBSCAN" yanılgısı:** DBSCAN parametreler hassas, büyük veri setinde yavaş. Şube bölgelendirme için KMeans daha hızlı ve tahmin edilebilir.
-2. **Grid + mekansal JOIN performansı:** Büyük grid (küçük hücreler) + büyük nokta tablosu → yavaş. GIST indeks ve partition kombinasyonu gerekebilir.
-3. **Kümeleme ≠ karar:** Kümeleme keşifsel analiz aracı. Sonuçlar girdilere (k, eps, grid boyutu) çok duyarlı — domain bilgisiyle doğrula.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 3.1 tamamlandı! Sırada **Modül 3.2 — Ağ Analizi**: pgRouting ile en kısa yol, servis alanı ve güzergah optimizasyonu.
+1. **"Her şey için DBSCAN" yanılgısı:** DBSCAN parametrelere duyarlı ve büyük veri setlerinde yavaştır. Şube bölgelendirme gibi belirli sayıda grup gereken senaryolarda KMeans daha hızlı ve öngörülebilir sonuç verir.
+2. **Grid + mekansal JOIN performansı:** Küçük hücreli büyük grid ile büyük nokta tablosu birleştirildiğinde performans düşer. GiST indeks ve partition birlikte kullanılmalıdır.
+3. **Kümeleme ≠ karar:** Kümeleme keşifsel analiz aracıdır. Sonuçlar girdi parametrelerine (k, eps, grid boyutu) çok duyarlıdır; alan bilgisiyle doğrulanmadan karar vermek için kullanılmamalıdır.

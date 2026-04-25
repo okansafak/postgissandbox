@@ -1,24 +1,26 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Servis alanı (izokon) kavramını açıklayabileceksin
-- Ağ mesafesiyle ulaşılabilir düğümleri bulabileceksin
-- `ST_Buffer` ile yaklaşık izokon çizebileceksin
+- Servis alanı (izokon) kavramını açıklamak
+- Ağ mesafesiyle ulaşılabilir düğümleri bulmak
+- `ST_Buffer` ile yaklaşık izokon oluşturmak
 
 ---
 
-## 📖 Kavram: Servis Alanı (İzokon)
+## Servis Alanı (İzokon)
 
-"Bir itfaiye istasyonundan 2 km içinde hangi alanlar var?"
+"Bir itfaiye istasyonundan 2 km içinde hangi alanlar var?" sorusu servis alanı analizinin temel sorusudur.
 
 **İki yaklaşım:**
-1. **Ağ mesafesi:** Yol üzerinden 2 km — gerçekçi ama hesap yoğun
-2. **Kuş uçuşu buffer:** Merkez noktasından 2 km radius — hızlı yaklaşım
+1. **Ağ mesafesi:** Yol üzerinden 2 km — gerçekçi ancak hesap yoğun
+2. **Kuş uçuşu buffer:** Merkez noktasından 2 km yarıçaplı alan — hızlı yaklaşım
 
-pgRouting'de `pgr_drivingDistance` ağ mesafesiyle servis alanı üretir. PGlite'ta bunu recursive CTE simülasyonuyla göstereceğiz.
+pgRouting'de `pgr_drivingDistance` ağ mesafesiyle servis alanı üretir. PGlite'ta bu işlev recursive CTE simülasyonuyla gösterilir.
 
 ---
 
-## ▶ Canlı Örnek — Ağ Mesafesiyle Ulaşılabilir Düğümler
+## Uygulama Örneği
+
+### 5 km servis alanı düğümleri
 
 <RunnableBlock
   sql={`-- Taksim'den 5 km mesafede ulaşılabilir düğümler
@@ -47,11 +49,10 @@ FROM erisim e
 JOIN yol_dugumler d ON d.id = e.dugum
 ORDER BY e.en_kisa;`}
   label="5 km servis alanı düğümleri"
+  description="Taksim'den (dugum=1) başlayan recursive CTE 5000 metre sınırı içindeki tüm ulaşılabilir düğümleri genişletir. MIN(mesafe_m) GROUP BY ile her düğüme en kısa mesafe hesaplanır; aynı düğüme farklı yollarla ulaşılmış olsa bile en kısa mesafe korunur. geom sütunu düğüm noktalarını haritada gösterir."
 />
 
----
-
-## ▶ Buffer ile Görsel Servis Alanı
+### Servis alanı convex hull
 
 <RunnableBlock
   sql={`-- Ulaşılabilir düğümlerin convex hull = yaklaşık servis alanı
@@ -72,16 +73,14 @@ erisim_noktalar AS (
   SELECT d.geom FROM erisim e JOIN yol_dugumler d ON d.id = e.dugum
 )
 SELECT
-  -- Convex hull: erişilen noktaların dış çerçevesi
   ST_ConvexHull(ST_Collect(geom)) AS servis_alani_geom,
   COUNT(*) AS erisilen_dugum
 FROM erisim_noktalar;`}
   label="Servis alanı convex hull"
+  description="Ulaşılabilir tüm düğüm noktaları ST_Collect ile bir koleksiyona toplanır. ST_ConvexHull bu noktaları çevreleyen en küçük dışbükey poligonu oluşturur. Bu poligon yaklaşık servis alanını temsil eder. Gerçek servis alanı yol geometrisine göre daha düzensiz bir şekle sahiptir; alpha-shape algoritması daha doğru sınır verir."
 />
 
----
-
-## ▶ ST_Buffer ile İzokon Karşılaştırması
+### Kuş uçuşu buffer izokon
 
 <RunnableBlock
   sql={`-- Kuş uçuşu vs ağ mesafesi karşılaştırması
@@ -93,13 +92,12 @@ SELECT
   )::geometry AS buffer_geom,
   'kuş uçuşu 3km' AS yontem;`}
   label="Kuş uçuşu buffer izokon"
+  description="ST_Buffer geography üzerinde çalışarak gerçek dairesel alan oluşturur; 3000 metre yarıçaplı alan Taksim merkezli olarak hesaplanır. ::geometry cast'i sonucu harita görünümüne uygun formata çevirir. Ağ mesafesi genellikle bu buffer'dan daha küçük alan kapsar; nehir, demiryolu ve çıkmaz sokaklar ağ erişimini kısıtlar."
 />
-
-> Ağ mesafesi genellikle buffer'dan daha küçük alan kapsar — özellikle nehir, demiryolu ve çıkmaz sokaklar nedeniyle.
 
 ---
 
-## 🧪 Dene — Farklı Başlangıç
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Levent'ten (düğüm 4) erişilebilir yerler
@@ -117,18 +115,13 @@ SELECT d.ad, ROUND(MIN(s.mesafe_m)::numeric) AS en_kisa_m
 FROM servis s JOIN yol_dugumler d ON d.id = s.dugum
 GROUP BY d.ad ORDER BY en_kisa_m;`}
   label="Levent 4 km servis alanı"
+  description="Levent'ten (dugum=4) 4000 metre sınırıyla aynı analiz tekrarlanır. TEM Bağlantı kenarı tek yönlü (Levent → Maslak) olduğundan Maslak erişilebilir; ancak Maslak'tan Levent'e bu yoldan geçilemez. MIN ile aynı düğüme en kısa mesafe seçilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Büyük ağda recursive CTE sonsuz tekrar:** `mesafe_m <= limit` koşulu olmadan sonsuz döngü. Limit her zaman koy.
-2. **Aynı düğüme farklı yollar:** `MIN(mesafe_m)` ile en kısa mesafeyi al — aksi halde aynı düğüm birden fazla kez döner.
-3. **İzokon ≠ buffer:** Buffer dairesel — gerçek servis alanı yol yapısına bağlı. pgr_drivingDistance + alpha-shape daha doğru sonuç verir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **TSP (Gezgin Satıcı)** — çoklu durak ziyaretini optimize et.
+1. **Büyük ağda recursive CTE sonsuz tekrar:** `mesafe_m <= limit` koşulu olmadan sonsuz döngüye girilir; limit her zaman konmalıdır.
+2. **Aynı düğüme farklı yollar:** `MIN(mesafe_m)` ile en kısa mesafe seçilmelidir; aksi halde aynı düğüm birden fazla kez döner.
+3. **İzokon ≠ buffer:** Buffer daireseldir; gerçek servis alanı yol yapısına bağlı biçimsiz bir alan kapsar. `pgr_drivingDistance` + alpha-shape daha doğru sonuç verir.

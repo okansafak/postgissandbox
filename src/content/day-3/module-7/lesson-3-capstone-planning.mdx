@@ -1,22 +1,33 @@
-## 🏗️ Capstone Part 1: İstanbul Unified Mobility Platform
+## Capstone Bölüm 1: Proje Planlama ve Veri Modeli
 
-**Hedef:** Gerçek dünya projesini plan et - 16 milyon kişiye hizmet veren mobility platform.
-
----
-
-## 🎯 Proje Tanımı
-
-İstanbul Belediyesi'nin ihtiyaç duyduğu:
-- **Transit:** 500 tramvay istasyonu, 1000+ otobüs hattı
-- **Emergency:** 500+ itfaiye, 400+ ambulans
-- **Logistics:** 50,000+ aktif araç (kargo, yemek, vb)
+**Hedef:** Çok kaynaklı bir şehir platformunun veri modelini ve kapasite gereksinimlerini tasarlamak.
 
 ---
 
-## ▶ Veri Modeli
+## Öğrenim Hedefleri
+
+- Unified geographic_features tablosu ile çok alanlı veri modellemek
+- Platform kapasite gereksinimlerini hesaplamak
+- Uygulama fazlarını ve risk faktörlerini değerlendirmek
+
+---
+
+## Senaryo
+
+Büyük ölçekli bir şehir platformu üç farklı operasyonel alanı kapsamaktadır:
+
+- **Transit:** tramvay istasyonları ve otobüs hatları
+- **Acil durum:** itfaiye ve ambulans konumları
+- **Lojistik:** aktif araç ve depo lokasyonları
+
+---
+
+## Uygulama Örneği
+
+### Unified veri modeli
 
 <RunnableBlock
-  sql={`-- Unified geographic_features core table
+  sql={`-- Unified geographic_features çekirdek tablosu
 CREATE TABLE IF NOT EXISTS geographic_features (
   id BIGSERIAL PRIMARY KEY,
   name VARCHAR(255),
@@ -26,91 +37,76 @@ CREATE TABLE IF NOT EXISTS geographic_features (
   attributes JSONB
 );
 
--- Sample data: İstanbul'un temel noktaları
+-- Örnek veri: İstanbul'un temel noktaları
 INSERT INTO geographic_features (name, geom, feature_type, domain, attributes) VALUES
   ('Taksim', ST_SetSRID(ST_MakePoint(28.9850, 41.0368), 4326), 'landmark', 'transit', '{"station_type": "tram"}'),
   ('Kadıköy Hastanesi', ST_SetSRID(ST_MakePoint(29.0306, 40.9897), 4326), 'facility', 'emergency', '{"type": "hospital"}'),
   ('Pendik Lojistik Merkezi', ST_SetSRID(ST_MakePoint(29.2408, 40.8621), 4326), 'facility', 'logistics', '{"type": "warehouse"}')
-;
+ON CONFLICT DO NOTHING;
 
-SELECT COUNT(*) AS feature_count, domain FROM geographic_features GROUP BY domain;`}
-  label="Unified data model"
+SELECT domain, COUNT(*) AS ozellik_sayisi
+FROM geographic_features
+GROUP BY domain;`}
+  label="Unified veri modeli"
+  description="BIGSERIAL birincil anahtar milyonlarca kayıt için yeterli alan sağlar. JSONB attributes sütunu şema değişikliği gerektirmeden alan bazlı ek özellikler depolamak için kullanılır. domain sütunu transit/emergency/logistics verilerini tek tabloda birleştirir ve alan bazlı sorgulama kolaylığı sağlar. Bu yaklaşım ayrı tablolar yerine tek unified modeli tercih eder."
 />
 
----
-
-## ▶ Capacity Planning
+### Kapasite planlama
 
 <RunnableBlock
-  sql={`-- Capacity requirements
+  sql={`-- Platform boyut parametreleri
 SELECT 
-  'Platform Size' AS metric,
-  '16,000,000' AS population_served,
-  '2,300,000' AS addresses,
-  '39' AS districts,
-  '86.4 million' AS daily_events_estimate,
-  '1000' AS concurrent_users,
-  '99.99%' AS uptime_sla
-;
+  'Platform Büyüklüğü' AS metrik,
+  '16.000.000' AS hizmet_nufusu,
+  '2.300.000' AS adres_sayisi,
+  '39' AS ilce_sayisi,
+  '1000' AS esanzamanli_kullanici,
+  '99.99%' AS uptime_sla;
 
--- Storage estimate
+-- Depolama gereksinimleri
 SELECT 
-  'Storage Requirement' AS component,
-  '50 GB' AS addresses_storage,
-  '10 GB' AS transit_network,
-  '5 GB' AS events_30days,
-  '2 GB' AS indexes,
-  '67 GB' AS total_minimum
-;
+  'Depolama Bileşeni' AS bilesен,
+  '50 GB' AS adres_deposu,
+  '10 GB' AS transit_agi,
+  '5 GB' AS olaylar_30gun,
+  '2 GB' AS indeksler,
+  '67 GB' AS toplam_minimum;
 
--- Performance targets
+-- Performans hedefleri
 SELECT 
-  'Performance SLA' AS target,
-  '< 2 seconds' AS dashboard_load,
-  '< 500ms' AS drill_down,
-  '< 100ms' AS map_interaction,
-  '99.99%' AS uptime
-;`}
-  label="Platform capacity planning"
+  'Performans SLA' AS hedef,
+  '< 2 saniye' AS dashboard_yukleme,
+  '< 500 ms' AS detay_sorgu,
+  '< 100 ms' AS harita_etkilesim,
+  '99.99%' AS uptime;`}
+  label="Platform kapasite planlama"
+  description="Depolama tahminleri veri türlerine göre ayrıştırılır: adres geometrileri, transit ağ topolojisi, döngüsel olay günlükleri ve bu verilere ait GiST indeksleri. Performans SLA'ları kullanıcı deneyimi katmanlarına göre belirlenir: dashboard yüklemesi (2 s), detay sorgusu (500 ms), harita etkileşimi (100 ms). Toplam 67 GB minimum altyapı boyutu production sunucu seçimini yönlendirir."
 />
 
 ---
 
-## ▶ Implementation Timeline
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Project timeline
+  sql={`-- Uygulama zaman çizelgesi ve risk değerlendirmesi
 SELECT 
-  'Phase' AS phase,
-  '1-2 weeks' AS data_ingestion,
-  '3-4 weeks' AS etl_pipeline,
-  '5-6 weeks' AS analytics_layer,
-  '7-8 weeks' AS optimization_engine,
-  '9-10 weeks' AS integration,
-  '11-12 weeks' AS testing,
-  '13-14 weeks' AS cutover,
-  '15 weeks' AS total_duration
-;
+  'Faz' AS faz,
+  '1-2 hafta' AS veri_aktarimi,
+  '3-4 hafta' AS etl_boru_hatti,
+  '5-6 hafta' AS analitik_katmani,
+  '7-8 hafta' AS optimizasyon_motoru,
+  '9-10 hafta' AS entegrasyon,
+  '11-12 hafta' AS test,
+  '13-14 hafta' AS gecis,
+  '15 hafta' AS toplam_sure;
 
--- Risk assessment
+-- Risk faktörleri
 SELECT 
-  'Risk Factor' AS factor,
-  'Data Quality' AS risk_1,
-  'Performance at Scale' AS risk_2,
-  'Integration Complexity' AS risk_3,
-  'Migration Timeline' AS risk_4
-WHERE true;`}
-  label="Implementation timeline ve risk assessment"
+  'Risk Faktörü' AS etken,
+  'Veri Kalitesi' AS risk_1,
+  'Ölçekte Performans' AS risk_2,
+  'Entegrasyon Karmaşıklığı' AS risk_3,
+  'Geçiş Takvimi' AS risk_4;`}
+  label="Uygulama takvimi ve risk değerlendirmesi"
+  description="15 haftalık uygulama takvimi iki haftalık fazlar halinde yapılandırılmıştır: önce veri aktarımı, ardından ETL, analitik katmanı, optimizasyon, entegrasyon, test ve üretim geçişi. Risk faktörleri projenin başarısını tehdit edebilecek alanlardır; veri kalitesi ve ölçekte performans en kritik risklerdir. Bu çerçeve büyük ölçekli PostGIS projelerinin tipik uygulama mirasını yansıtmaktadır."
 />
-
----
-
-## ✨ Özet
-
-Capstone planning:
-- ✓ 16 milyon kişiye hizmet verme
-- ✓ 3 domain entegrasyonu (transit, emergency, logistics)
-- ✓ 99.99% uptime hedefi
-- ✓ 15 haftalık implementation
-
-**Sonraki ders:** ETL ve data integration

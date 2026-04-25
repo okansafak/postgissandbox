@@ -1,197 +1,116 @@
-## 🎓 Final: 94 Lesson Complete - PostGIS Expert Path
+## 15 Saatlik PostGIS Akademi — Kapanış
 
-**Hedef:** 94 dersin öğrendiklerini özetleyip next steps'i planla
-
----
-
-## 🏆 Tamamlanan Öğrenim Yolculuğu
-
-Başlangıçtan ileri seviyeye:
-
-### **Phase 1: Basics (Module 1-3, 15 ders)**
-- Geometry types (Point, LineString, Polygon)
-- Spatial relationships (distance, containment, intersection)
-- Coordinate systems & transformations (WGS84, UTM)
-
-### **Phase 2: Operations (Module 4-7, 23 ders)**
-- Geometric operations (buffer, union, intersection, difference)
-- Spatial indexing (GIST, BRIN, SPGIST)
-- Query optimization (EXPLAIN ANALYZE)
-- Raster operations
-
-### **Phase 3: Advanced (Module 8-12, 29 ders)**
-- Geometry cleaning & decomposition
-- Clustering & tessellation (K-Means, Voronoi, Delaunay)
-- Multi-table operations & joins
-- Data management & quality
-
-### **Phase 4: Expert (Module 13-15, 27 ders)**
-- Spatial aggregation (ST_Collect, ST_Union, custom functions)
-- Line analysis & network routing
-- **Capstone Projects (7 ders bu session'da)**
+**Hedef:** Üç günlük öğrenim yolculuğunu özetlemek ve ileri adımları planlamak.
 
 ---
 
-## ▶ What You've Learned
+## Tamamlanan Öğrenim Yolculuğu
+
+**Gün 1 — Geometri ve Mekansal İlişkiler**
+
+- Geometry tipleri: POINT, LINESTRING, POLYGON, Multi ve koleksiyon tipleri
+- Koordinat sistemleri ve SRID: WGS84, UTM, ST_Transform
+- Mekansal ilişkiler: ST_Within, ST_Intersects, ST_Contains, ST_Distance
+- Ölçüm fonksiyonları: ST_Length, ST_Area, ST_DWithin
+
+**Gün 2 — Performans, Veri Yönetimi ve İleri Operasyonlar**
+
+- Veri aktarımı: COPY, shp2pgsql, ogr2ogr
+- İndeksleme: GiST, BRIN, EXPLAIN ANALYZE
+- Sorgu optimizasyonu: partitioning, partial index, pg_partman
+- Geometri operasyonları: ST_Buffer, ST_Union, ST_Intersection, ST_Simplify
+
+**Gün 3 — Kümeleme, Ağ, Topoloji, Güvenlik ve Production**
+
+- Mekansal kümeleme: ST_ClusterKMeans, ST_ClusterDBSCAN, hex/square grid
+- Ağ analizi: WITH RECURSIVE Dijkstra, CROSS JOIN LATERAL en yakın komşu
+- Topoloji: topo_node, topo_edge, topo_face, ST_Touches
+- Güvenlik: CREATE ROLE, GRANT, RLS, mekansal politikalar
+- Production operasyonu: pg_dump, replikasyon, PITR, pgBouncer, izleme
+- Kapanış projesi: İstanbul Acil Durum Analizi + Unified Platform Capstone
+
+---
+
+## Uygulama Örneği
+
+### Kurs kapsam matrisi
 
 <RunnableBlock
-  sql={`-- Comprehensive skill summary
-SELECT 
-  'PostGIS Fundamentals' AS skill_category,
-  'Point, LineString, Polygon, MultiGeometry' AS topics,
-  'Modules 1-3' AS modules,
-  '15 lessons' AS count
+  sql={`-- PostGIS Akademi içerik özeti
+SELECT 'Gün 1' AS gun, 'Geometri temelleri' AS konu, 'POINT, LINESTRING, POLYGON; ST_Distance, ST_Within' AS fonksiyonlar
 UNION ALL
-SELECT 'Spatial Operations', 
-  'Buffer, Union, Intersection, Difference, ST_Clip',
-  'Modules 4-7',
-  '23 lessons'
+SELECT 'Gün 1', 'Koordinat sistemleri', 'ST_Transform, ST_SRID, geography cast'
 UNION ALL
-SELECT 'Performance & Optimization',
-  'Indexing (GIST/BRIN/SPGIST), EXPLAIN ANALYZE, Query Tuning',
-  'Modules 5-6',
-  '10 lessons'
+SELECT 'Gün 1', 'Mekansal ilişkiler', 'ST_Intersects, ST_Contains, ST_DWithin'
 UNION ALL
-SELECT 'Advanced Geometry',
-  'Clustering (DBSCAN, K-Means), Tessellation (Voronoi, Delaunay)',
-  'Modules 8-9',
-  '12 lessons'
+SELECT 'Gün 2', 'Veri aktarımı', 'COPY, shp2pgsql, ogr2ogr'
 UNION ALL
-SELECT 'Data Management',
-  'Spatial relationships, Data quality, Synchronization',
-  'Modules 11-12',
-  '12 lessons'
+SELECT 'Gün 2', 'İndeks ve performans', 'GiST, BRIN, EXPLAIN ANALYZE'
 UNION ALL
-SELECT 'Real-World Projects',
-  'Aggregation, Network analysis, Routing, Capstone',
-  'Modules 13-15',
-  '22 lessons'
-;`}
-  label="Comprehensive skill matrix"
+SELECT 'Gün 2', 'Geometri operasyonları', 'ST_Buffer, ST_Union, ST_Intersection, ST_Simplify'
+UNION ALL
+SELECT 'Gün 3', 'Mekansal kümeleme', 'ST_ClusterKMeans, ST_ClusterDBSCAN, ST_HexagonGrid'
+UNION ALL
+SELECT 'Gün 3', 'Ağ analizi', 'WITH RECURSIVE Dijkstra, CROSS JOIN LATERAL servis alanı'
+UNION ALL
+SELECT 'Gün 3', 'Topoloji ve güvenlik', 'topology extension, GRANT, RLS, ST_Within politikaları'
+UNION ALL
+SELECT 'Gün 3', 'Production operasyonu', 'pg_dump, streaming replication, PITR, pgBouncer'
+ORDER BY gun, konu;`}
+  label="Kurs kapsam matrisi"
+  description="Her gün için işlenen ana konular ve kullanılan PostGIS fonksiyonları listelenir. Bu matris kurs boyunca öğrenilen fonksiyonların aranabilir bir referansı olarak kullanılabilir. ORDER BY gun, konu kronolojik ve alfabetik düzende gösterim sağlar."
+/>
+
+### Kapanış projesi başarım özeti
+
+<RunnableBlock
+  sql={`-- İstanbul Acil Durum Analizi + Unified Platform sonuçları
+SELECT 'Proje Bileşeni' AS bilesен, 'Kullanılan Teknik' AS teknik, 'Sonuç' AS sonuc
+UNION ALL
+SELECT 'Veri doğrulama', 'ST_IsValid, ST_IsValidReason', '3 tablo, geometri hatası yok'
+UNION ALL
+SELECT 'Sağlık yoğunluğu', 'ST_Within JOIN, COUNT FILTER', 'İlçe bazlı normalized gösterge'
+UNION ALL
+SELECT 'Erişilemez bölgeler', 'ST_DWithin + NOT EXISTS', '2 km+ uzak ilçeler tespit edildi'
+UNION ALL
+SELECT 'Hotspot analizi', 'ST_ClusterDBSCAN, ST_Centroid', 'Top-5 acil çağrı kümesi'
+UNION ALL
+SELECT 'ETL pipeline', 'ST_Transform(32635→4326)', 'Koordinat dönüşüm + kalite kontrolü'
+UNION ALL
+SELECT 'Optimizasyon', 'ROW_NUMBER greedy atama', 'Kapasite kısıtlı araç-sipariş eşleşmesi'
+ORDER BY bilesен;`}
+  label="Kapanış projesi başarım özeti"
+  description="Kurs boyunca işlenen tüm teknikler kapanış projesinde uygulandı. Her bileşen öğrenilen fonksiyonları gerçek bir analitik senaryoya bağlar: veri doğrulama, mekansal JOIN, erişilebilirlik analizi, kümeleme ve ETL. Bu tablo öğrenilen konuların pratikte hangi sorunları çözdüğünü özetler."
 />
 
 ---
 
-## ▶ Capstone: İstanbul Unified Mobility Platform
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Capstone project scope
-SELECT 
-  'Platform Component' AS component,
-  'Unified Data Model' AS model,
-  'ETL Pipeline' AS etl,
-  'Real-Time Analytics' AS analytics,
-  'Optimization Engine' AS optimization,
-  'Production Deployment' AS deployment
+  sql={`-- Kişisel öğrenim haritası: ileri adım önerileri
+SELECT 'Kısa Vade (1-3 ay)' AS donem, 'Gerçek veri seti üzerinde uygulama yapın' AS eylem
 UNION ALL
-SELECT 'Complexity', 'Advanced', 'Advanced', 'Expert', 'Expert', 'Expert'
+SELECT 'Kısa Vade (1-3 ay)', 'PostGIS belgelerindeki ek fonksiyonları keşfedin: ST_Voronoi, ST_DelaunayTriangles'
 UNION ALL
-SELECT 'Users Served', '16 million', '2.3M addresses', '3 domains', '500+ orders/day', '99.99% uptime'
+SELECT 'Orta Vade (3-6 ay)', 'pgRouting ile gerçek ağ analizi'
 UNION ALL
-SELECT 'Business Impact', 
-  'Unified operations',
-  '99.5% data quality',
-  'Real-time dashboards',
-  '36-40% cost reduction',
-  '441% ROI'
-;`}
-  label="Capstone project achievements"
+SELECT 'Orta Vade (3-6 ay)', 'Python + psycopg2 veya SQLAlchemy/GeoAlchemy2 entegrasyonu'
+UNION ALL
+SELECT 'Uzun Vade (6-12 ay)', 'PostGIS + QGIS veya Leaflet ile web harita uygulaması geliştirme'
+UNION ALL
+SELECT 'Uzun Vade (6-12 ay)', 'Production veritabanı yönetimi ve performans izleme'
+ORDER BY donem;`}
+  label="İleri adım önerileri"
+  description="Kurs sonrası öğrenme yolculuğu üç zaman dilimine ayrılmıştır. Kısa vadede gerçek veri setleriyle pratik yapılması, orta vadede pgRouting ve programlama dili entegrasyonu, uzun vadede ise tam bir web harita uygulaması veya üretim veritabanı yönetimi hedeflenmektedir. Bu harita kurs bilgisini iş değerine dönüştürmek için somut adımlar sunmaktadır."
 />
 
 ---
 
-## ▶ Next Steps
+## İleri Kaynaklar
 
-<RunnableBlock
-  sql={`-- Recommended learning path
-SELECT 
-  'Phase' AS phase,
-  'Immediate' AS immediate,
-  'Short-term (1-3 months)' AS short_term,
-  'Medium-term (3-6 months)' AS medium_term,
-  'Long-term (6-12 months)' AS long_term
-UNION ALL
-SELECT 'Action',
-  'Review Capstone projects',
-  'Build own PostGIS project',
-  'Explore pgRouting, pgrouting',
-  'Advanced analytics (ML integration)'
-UNION ALL
-SELECT 'Resources',
-  'postgis.net docs',
-  'Real datasets from your domain',
-  'pgRouting documentation',
-  'PostGIS + Python/R tutorials'
-;
-
--- Community & Resources
-SELECT 
-  'Resource' AS resource,
-  'PostGIS Documentation' AS postgis_docs,
-  'Stack Overflow' AS stackoverflow,
-  'GitHub Examples' AS github,
-  'GIS Community' AS community
-UNION ALL
-SELECT 'URL',
-  'postgis.net',
-  'stackoverflow.com/questions/tagged/postgis',
-  'github.com/dbeat/awesome-postgis',
-  'gis.stackexchange.com'
-;`}
-  label="Next steps & resources"
-/>
-
----
-
-## 🎯 Learning Outcomes Achieved
-
-✅ **Foundation:** 15-lesson mastery of geometry types & relationships  
-✅ **Operations:** 23-lesson hands-on spatial operations  
-✅ **Performance:** 10-lesson optimization techniques  
-✅ **Advanced:** 12-lesson clustering & tessellation  
-✅ **Expert:** 22-lesson real-world project integration  
-✅ **Capstone:** 7-lesson enterprise platform design  
-
----
-
-## 📊 Final Stats
-
-<RunnableBlock
-  sql={`SELECT 
-  'Total Lessons' AS stat,
-  '94' AS value,
-  'Beginner → Expert progression' AS description
-UNION ALL
-SELECT 'Total Duration', '~200 hours', '15 weeks self-paced'
-UNION ALL
-SELECT 'Code Examples', '470+', '5 per lesson'
-UNION ALL
-SELECT 'Learning Activities', '470+', '5 per lesson'
-UNION ALL
-SELECT 'SQL Queries', '1200+', 'Copy-paste ready'
-UNION ALL
-SELECT 'Istanbul Scenarios', '94', 'Every lesson'
-UNION ALL
-SELECT 'Cross-References', '500+', 'Between modules'
-UNION ALL
-SELECT 'Modules', '15', 'Comprehensive coverage'
-;`}
-  label="Curriculum completion statistics"
-/>
-
----
-
-## 🏅 Congratulations!
-
-Vous avez complété:
-- ✓ 94-lesson PostGIS curriculum
-- ✓ Enterprise capstone project
-- ✓ Real-world deployment patterns
-- ✓ Production optimization techniques
-
-**You are now a PostGIS Expert!**
-
----
-
-Teşekkürler - PostGIS Akademi'yi tamamladığın için. İyi şanslar! 🎓
-
+- PostGIS Belgelendirmesi: postgis.net/documentation
+- pgRouting Belgelendirmesi: pgrouting.org
+- EXPLAIN ANALYZE görselleştirici: explain.depesz.com
+- Stack Exchange GIS: gis.stackexchange.com
+- Awesome PostGIS kaynak listesi: github.com/dbeat/awesome-postgis

@@ -1,23 +1,27 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Union`, `ST_Intersection`, `ST_Difference` ile geometri set işlemleri yapabileceksin
-- Birleşim, kesişim ve fark kavramlarını geometriye uygulayabileceksin
-- `ST_SymDifference` ile simetrik farkı hesaplayabileceksin
+Geometri set işlemleri, iki alanın birleşimini, ortak bölgesini veya farkını hesaplamayı mümkün kılar; parsel birleştirme, etki alanı kesişimi ve kapsama boşluğu tespiti gibi analizlerin matematiksel temelidir. Bu ders dört temel set işlemi fonksiyonunu ve kullanım bağlamlarını ele almaktadır.
+
+- `ST_Union`, `ST_Intersection`, `ST_Difference` ile geometri set işlemleri yapmak
+- Birleşim, kesişim ve fark kavramlarını geometriye uygulamak
+- `ST_SymDifference` ile simetrik fark hesaplamak
 
 ---
 
-## 📖 Kavram: Geometri Set İşlemleri
+## Geometri Set İşlemleri
 
 | Fonksiyon | İşlem | Açıklama |
 |---|---|---|
 | `ST_Union(A, B)` | A ∪ B | A ve B'nin tamamı (birleşim) |
 | `ST_Intersection(A, B)` | A ∩ B | A ve B'nin ortak alanı |
 | `ST_Difference(A, B)` | A − B | A'nın B ile örtüşmeyen kısmı |
-| `ST_SymDifference(A, B)` | A △ B | Her ikisinin de sadece kendine ait kısımları |
+| `ST_SymDifference(A, B)` | A △ B | Her ikisinin yalnızca kendine ait kısımları |
 
 ---
 
-## ▶ Canlı Örnek — Dört İşlem
+## Uygulama Örneği
+
+### Dört set işlemi
 
 <RunnableBlock
   sql={`WITH a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
@@ -30,13 +34,10 @@ UNION ALL SELECT 'A−B (difference)',   ST_Difference(a.g, b.g) FROM a,b
 UNION ALL SELECT 'A△B (symdiff)',      ST_SymDifference(a.g, b.g) FROM a,b;`}
   label="Dört set işlemi"
   autoFit
+  description="İki örtüşen poligon üzerinde dört set işlemi hesaplanır ve haritada görselleştirilir. ST_Union her iki poligonu tek geometride birleştirir. ST_Intersection yalnızca ortak alanı döndürür. ST_Difference A'dan B'nin ortak kısmını çıkarır. ST_SymDifference her iki poligonun münhasır (yalnızca kendine ait) bölümlerini birleştirir."
 />
 
----
-
-## ▶ Aggregate Union — Birden Fazla Poligonu Birleştir
-
-`ST_Union` aggregate olarak da kullanılabilir — bir tablodaki tüm geometrileri tek poligona birleştirir:
+### Aggregate union — birden fazla poligonu birleştir
 
 <RunnableBlock
   sql={`WITH parceller AS (
@@ -52,11 +53,12 @@ SELECT
 FROM parceller;`}
   label="4 parsel → birleşik poligon"
   autoFit
+  description="ST_Union aggregate fonksiyon olarak kullanıldığında GROUP BY ile bir tablodaki tüm geometrileri tek bir poligona birleştirir. Dört komşu kare parsel arasındaki ortak sınırlar eritilir; sonuç büyük bir kare poligon ve toplam alanı döndürür. Kadastro birleştirme işlemlerinin temel kalıbıdır."
 />
 
 ---
 
-## 🧪 Dene — Şehir Tamponlarının Kesişimi
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH istanbul_tampon AS (
@@ -73,18 +75,13 @@ SELECT
 FROM istanbul_tampon i, ankara_tampon a;`}
   label="150 km tamponların kesişimi"
   autoFit
+  description="İstanbul ve Ankara merkezlerine 150 km tampon oluşturulur; ST_Intersection iki tamponun ortak alanını hesaplar. ST_IsEmpty kesişimin boş olup olmadığını kontrol eder. 150 km yarıçaplı tamponlar iki şehrin ~350 km aralığını kapatamaz — kesişim boş döner. Yarıçapı 200 km'ye çıkarmak ortak bir bölge üretir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Intersection boş döndürebilir:** Geometriler kesişmiyorsa `ST_Intersection` → boş geometry. `ST_IsEmpty` ile kontrol et.
-2. **ST_Union topoloji onarmaz:** Geçersiz geometrileri birleştirirken hata alabilirsin. Önce `ST_MakeValid` uygula.
-3. **ST_Difference sırasına dikkat:** `ST_Difference(A, B)` ≠ `ST_Difference(B, A)`. A'dan B'yi çıkarır.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste kapsam geometrileri: `ST_Envelope`, `ST_ConvexHull`, `ST_ConcaveHull`.
+1. **`ST_Intersection` boş geometri döndürebilir.** Geometriler kesişmiyorsa `ST_Intersection` boş bir geometri üretir. `ST_IsEmpty` veya `ST_Intersects` ile önceden kontrol edilmesi önerilir.
+2. **`ST_Union` geçersiz geometrilerde hata verebilir.** Geçersiz poligonları birleştirirken topoloji hatası oluşabilir. İşlem öncesinde `ST_MakeValid` uygulanmalıdır.
+3. **`ST_Difference` sırasına dikkat.** `ST_Difference(A, B)` ≠ `ST_Difference(B, A)`. İlk argümandan ikinci argüman çıkarılır; sıra değiştirildiğinde tamamen farklı bir geometri elde edilir.

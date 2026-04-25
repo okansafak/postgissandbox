@@ -1,14 +1,17 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `PARTITION BY LIST` sözdizimini yazabileceksin
-- Kategorik sütunlara (ülke, şehir, tür) göre bölümleme yapabileceksin
-- Default partition ile beklenmedik değerleri yönetebileceksin
+Range partitioning sürekli değer aralıkları için uygundur; ancak ülke kodu, şehir adı veya kategori gibi ayrık değerlerin yönetimi için List Partitioning daha doğal bir modelleme sağlar. Bu ders, kategorik sütunlara göre bölümleme yöntemini ele almaktadır.
+
+- `PARTITION BY LIST` sözdizimini yazmak
+- Kategorik sütunlara göre bölümleme yapmak
+- Default partition ile beklenmedik değerleri yönetmek
 
 ---
 
-## 📖 Kavram: List Partitioning
+## List Partitioning
 
 **Range partitioning:** Sürekli değer aralığı (tarih, sayı)
+
 **List partitioning:** Ayrık kategoriler (ülke kodu, şehir, tür)
 
 ```sql
@@ -25,13 +28,16 @@ CREATE TABLE mekanlar_tr PARTITION OF mekanlar_ulke
 CREATE TABLE mekanlar_gr PARTITION OF mekanlar_ulke
   FOR VALUES IN ('GR');
 
+-- Tanımsız değerler için zorunlu
 CREATE TABLE mekanlar_other PARTITION OF mekanlar_ulke
   DEFAULT;
 ```
 
 ---
 
-## ▶ Canlı Örnek — Şehir Bazlı Partition
+## Uygulama Örneği
+
+### List partition kurulumu
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS pois_sehir (
@@ -63,36 +69,25 @@ INSERT INTO pois_sehir (sehir, tur, geom) VALUES
 
 SELECT tableoid::regclass AS partition, sehir, COUNT(*) FROM pois_sehir GROUP BY 1, 2;`}
   label="List partition kurulumu"
+  description="Şehir adına göre list partition yapısı kurulur; tanımsız şehirler için pois_diger DEFAULT bölümü eklenir. 'bursa' değeri için özel bölüm tanımlanmadığından bu kayıt pois_diger bölümüne düşer. tableoid::regclass her kaydın hangi fiziksel tabloda depolandığını gösterir — bu pruning'in doğru bölümü seçtiğini doğrulamak için kullanılır."
 />
 
----
-
-## ▶ List Partition Pruning
+### List partition pruning
 
 <RunnableBlock
-  sql={`-- Sadece istanbul partition'ı taranır
+  sql={`-- Sadece istanbul bölümü taranır
 EXPLAIN
 SELECT * FROM pois_sehir
 WHERE sehir = 'istanbul'
   AND tur = 'restoran';`}
   label="List partition pruning"
+  description="WHERE sehir = 'istanbul' koşuluyla yapılan sorguda planlayıcı yalnızca pois_istanbul bölümünü tarar; diğer bölümler (pois_ankara, pois_izmir, pois_diger) planda yer almaz. tur = 'restoran' koşulu partition key olmadığından pruning yapmaz; yalnızca istanbul bölümünde filtre olarak uygulanır."
 />
 
----
-
-## ▶ Çok Değerli List Partition
+### Bölüm üzerine indeks ve plan
 
 <RunnableBlock
-  sql={`-- Birden fazla değeri tek partition'a topla
-CREATE TABLE IF NOT EXISTS pois_ege
-  PARTITION OF pois_sehir FOR VALUES IN ('izmir', 'bodrum', 'marmaris');
-
--- Ama izmir zaten başka partition'da — bu PGlite'ta hata verebilir
--- Temizle ve yeniden dene:
--- DROP TABLE IF EXISTS pois_izmir;
--- DROP TABLE IF EXISTS pois_ege;
-
--- Partition üzerine GIST indeks
+  sql={`-- Partition üzerine GiST indeks
 CREATE INDEX IF NOT EXISTS idx_pois_ist_geom
   ON pois_istanbul USING gist(geom);
 
@@ -100,11 +95,12 @@ EXPLAIN ANALYZE
 SELECT * FROM pois_sehir
 WHERE sehir = 'istanbul';`}
   label="Partition üzerine indeks ve plan"
+  description="pois_istanbul bölümüne GiST indeksi eklendikten sonra İstanbul sorgusunun planı incelenir. Pruning İstanbul bölümünü seçer; ardından GiST indeksi mekansal sorgularda devreye girer. Her bölümün kendi bağımsız indeksi olduğundan bölüme özgü indeks stratejileri uygulanabilir."
 />
 
 ---
 
-## 🧪 Dene — Default Partition'a Düşen Kayıtlar
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- 'bursa' default'a düştü
@@ -115,18 +111,13 @@ GROUP BY 1;
 -- Default'taki kayıtlar
 SELECT * FROM pois_diger;`}
   label="Default partition içeriği"
+  description="Şehir başına kayıt sayısı ve her kaydın hangi bölümde bulunduğu listelenir. 'bursa' için özel bölüm tanımlanmadığından bu kayıt pois_diger (DEFAULT) bölümüne düşer. SELECT * FROM pois_diger bu kaydı gösterir. Yeni şehirler eklendikçe DEFAULT bölümü büyüyebilir; büyüyen kategoriler için yeni bölüm oluşturulup kayıtlar taşınabilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Default partition var mı?** Yoksa tanımsız değer `INSERT` hatası verir. Her zaman `DEFAULT` partition oluştur.
-2. **List partition çok parçalanırsa:** 100 ülke için 100 partition — planner overhead'i artar. 10-20'den fazla partition için hash partitioning veya range düşün.
-3. **Partition key güncelleme (UPDATE):** `UPDATE SET sehir = 'ankara' WHERE sehir = 'istanbul'` — satır eski partition'dan silinir, yenisine eklenir. PostgreSQL 10 öncesinde bu desteklenmiyordu.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **Partition Pruning** — planlayıcının hangi partition'ları atladığını EXPLAIN ile doğrula ve dinamik parametre davranışını anla.
+1. **Default partition yoksa tanımsız değer hata verir.** Partition listesinde bulunmayan bir değer için `INSERT` hatası oluşur. Her list partition tablosuna mutlaka `DEFAULT` bölümü eklenmelidir.
+2. **Çok fazla bölüm planlayıcı overhead'ini artırır.** 100 ülke için 100 bölüm tanımlamak planlayıcının tüm bölümleri değerlendirmesi için ek maliyet getirir. 10–20'den fazla bölüm için hash partitioning veya farklı bir strateji düşünülmelidir.
+3. **Partition key güncellemesi mümkün ancak maliyetlidir.** `UPDATE SET sehir = 'ankara' WHERE sehir = 'istanbul'` satırı eski bölümden siler ve yeni bölüme ekler; bu işlem iki fiziksel I/O olayı gerektirir.

@@ -1,32 +1,36 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Buffer` ile etki alanı / tampon bölge oluşturabileceksin
-- Metre cinsinden tampon için doğru yöntemi seçebileceksin
-- Tampon sonucunu mekansal analizde filtre olarak kullanabileceksin
+Tampon bölge analizi, konum tabanlı etki alanı hesaplamanın temel aracıdır; hastaneden N kilometre uzaklıkta yaşayan nüfustan hava koridoruna kadar pek çok uygulamada kullanılır. Bu ders, `ST_Buffer`'ın metre cinsinden doğru tampon üretmesini sağlayan yöntemleri ele almaktadır.
+
+- `ST_Buffer` ile belirli mesafede tampon bölge oluşturmak
+- Metre cinsinden tampon için doğru yöntemi seçmek
+- Tampon sonucunu mekansal filtre olarak kullanmak
 
 ---
 
-## 📖 Kavram: Tampon Bölge
+## ST_Buffer: Tampon Bölge
 
-`ST_Buffer(geom, distance)` bir geometrinin çevresinde `distance` kadar genişletilmiş bir **POLYGON** döndürür.
+`ST_Buffer(geom, distance)` bir geometrinin çevresinde `distance` kadar genişletilmiş bir **POLYGON** döndürür. Mesafe birimi SRID'e bağlıdır.
 
 ```sql
--- ⚠ YANLIŞ: 0.01 derece (~1.1 km) — tutarsız
+-- YANLIŞ: 0.01 derece (~1.1 km) — enlem değiştikçe tutarsız
 ST_Buffer(geom_4326, 0.01)
 
--- ✅ DOĞRU: geography → metre, geri 4326'ya dönüştür
+-- DOĞRU: geography → metre, geri 4326'ya dönüştür
 ST_Transform(
   ST_Buffer(ST_Transform(geom, 32636), 1000),
   4326
 )
 
--- ✅ DOĞRU: geography cast (en kolay)
+-- DOĞRU: geography cast (en kısa yol)
 ST_Buffer(geom::geography, 1000)::geometry
 ```
 
 ---
 
-## ▶ Canlı Örnek — İstanbul'a 50 km Tampon
+## Uygulama Örneği
+
+### İstanbul'a 50 km tampon
 
 <RunnableBlock
   sql={`SELECT
@@ -37,11 +41,10 @@ ST_Buffer(geom::geography, 1000)::geometry
   '50 km tampon' AS label;`}
   label="İstanbul 50 km tampon"
   autoFit
+  description="İstanbul merkez koordinatı ::geography cast ile elipsoid'e alınır ve ST_Buffer 50.000 metre (50 km) yarıçapında bir daire üretir. Sonuç ::geometry ile geri dönüştürülür çünkü harita bileşeni geometry tipinde veri bekler. label sütunu harita görselinde etiket olarak görünür."
 />
 
----
-
-## ▶ Yol Tamponu
+### Yol güzergahı tamponu
 
 <RunnableBlock
   sql={`SELECT
@@ -55,11 +58,10 @@ ST_Buffer(geom::geography, 1000)::geometry
   '20 km yol koridoru' AS label;`}
   label="Yol güzergahı tamponu"
   autoFit
+  description="İki nokta arasındaki güzergahı temsil eden bir LINESTRING geometrisine 20.000 metre (20 km) tampon uygulanır. Çizgi tamponu yol boyunca uzanan bir koridor poligonu üretir. Bu kalıp, güzergah çevresindeki etki alanını modellemek için kullanılır."
 />
 
----
-
-## ▶ Tampon + Filtre
+### Tampon + mekansal filtre
 
 <RunnableBlock
   sql={`WITH istanbul_tamponu AS (
@@ -83,13 +85,12 @@ FROM istanbul_tamponu t, sehirler s
 ORDER BY km;`}
   label="100 km tampon içindeki şehirler"
   autoFit
+  description="İstanbul merkezine 100 km tampon oluşturulur ve şehirlerin bu tampon içinde kalıp kalmadığı ST_Contains ile test edilir. ST_Distance gerçek mesafeyi km cinsinden hesaplar; ST_Contains boolean tampon testi yapar. Sonuçlar mesafeye göre sıralanarak her şehrin eşik içinde olup olmadığı doğrulanır."
 />
 
 ---
 
-## 🧪 Egzersiz
-
-Ankara'dan 200 km tampon çiz, sonra bu alan içindeki şehirleri filtrele:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH tampon AS (
@@ -115,18 +116,13 @@ WHERE ST_Contains(t.geom, s.geom)
 ORDER BY km;`}
   label="Ankara 200 km tampon analizi"
   autoFit
+  description="Ankara merkezine 200 km tampon oluşturulur; WHERE ST_Contains yalnızca tampon içindeki şehirleri filtreler. Sonuç hem tablo hem harita olarak incelenebilir: harita sekmesinde şehir noktaları ve Ankara'ya olan mesafeleri görüntülenir. Bu kalıp servis alanı analizinin temel yapısıdır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Buffer 4326'da derece kullanır:** `ST_Buffer(geom_4326, 1000)` → 1000 **derece** (~111,000 km!) tampon. `::geography` veya UTM kullan.
-2. **geography cast geri geometry'ye:** `ST_Buffer(geom::geography, 1000)` → `geography` döner. Geometri işlemleriyle kullanmak için `::geometry` ile geri çevir.
-3. **Çözünürlük:** `ST_Buffer`'ın 3. parametresi `num_seg_quarter_circle` — varsayılan 8. Daha düzgün daire için `ST_Buffer(geom, dist, 32)` kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste geometrileri birleştiren ve kesen set işlemleri: `ST_Union`, `ST_Intersection`, `ST_Difference`.
+1. **`ST_Buffer` EPSG:4326'da derece kullanır.** `ST_Buffer(geom_4326, 1000)` → 1000 **derece** (~111.000 km) tampon üretir. `::geography` veya UTM dönüşümü zorunludur.
+2. **`geography` tampon `geometry` döndürmez.** `ST_Buffer(geom::geography, 1000)` → `geography` tipinde sonuç verir. Diğer geometri fonksiyonlarıyla kullanmak için `::geometry` ile geri dönüştürmek gerekir.
+3. **Tampon çözünürlüğü ayarlanabilir.** `ST_Buffer`'ın üçüncü parametresi `num_seg_quarter_circle`; varsayılan 8 segmenttir. Daha düzgün bir daire için `ST_Buffer(geom, dist, 32)` kullanılabilir.

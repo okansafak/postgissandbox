@@ -1,27 +1,29 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Simplify` ile geometri boyutunu küçültebileceksin
-- `ST_SimplifyPreserveTopology` ile topoloji bozulmasını önleyebileceksin
-- Web haritası için uygun sadeleştirme toleransını belirleyebileceksin
+Yüksek çözünürlüklü sınır geometrileri binlerce noktadan oluşabilir. Bu detay küçük ölçekli web haritalarında gereksizdir ve büyük veri aktarımına yol açar. Bu ders, Douglas-Peucker algoritmasına dayanan geometri sadeleştirme fonksiyonlarını ve topoloji koruma seçeneklerini ele almaktadır.
+
+- `ST_Simplify` ile geometri boyutunu küçültmek
+- `ST_SimplifyPreserveTopology` ile topoloji bozulmasını önlemek
+- Web haritası için uygun sadeleştirme toleransını belirlemek
 
 ---
 
-## 📖 Kavram: Neden Sadeleştirme?
+## Geometri Sadeleştirme
 
-Yüksek çözünürlüklü il/ülke sınırları binlerce noktadan oluşur. Web'de küçük ölçekte gösterildiğinde bu detay gereksizdir — ve ağır veri aktarımına yol açar.
-
-**Douglas-Peucker algoritması:** Belirli bir tolerans içindeki noktaları eler.
+Douglas-Peucker algoritması belirli bir tolerans içindeki ara noktaları eler; geometri daha az nokta ile temsil edilir.
 
 | Fonksiyon | Topoloji | Kullanım |
 |---|---|---|
 | `ST_Simplify(geom, tol)` | Korumaz | Hızlı, basit render |
 | `ST_SimplifyPreserveTopology(geom, tol)` | Korur | Komşu poligonlar, sınır paylaşımı |
 
-**Tolerans birimi = SRID birimi** — 4326'da derece, UTM'de metre.
+**Tolerans birimi = SRID birimi:** EPSG:4326'da derece, UTM'de metre.
 
 ---
 
-## ▶ Canlı Örnek — Tolerans Karşılaştırması
+## Uygulama Örneği
+
+### Tolerans karşılaştırması
 
 <RunnableBlock
   sql={`WITH karmasik AS (
@@ -40,11 +42,10 @@ SELECT
 FROM karmasik;`}
   label="Sadeleştirme karşılaştırması"
   autoFit
+  description="12 noktalı bir LINESTRING üzerinde farklı tolerans değerleriyle sadeleştirme karşılaştırması yapılır. ST_NPoints her versiyondaki nokta sayısını verir; tolerans arttıkça nokta sayısı düşer. Harita sekmesi tolerans=0.01 ile sadeleştirilmiş çizgiyi gösterir. Küçük tolerans (0.005) daha fazla nokta korurken büyük tolerans (0.1) geometriyi agresif biçimde sadeleştirir."
 />
 
----
-
-## ▶ Topoloji Bozulması Örneği
+### Topoloji bozulması
 
 <RunnableBlock
   sql={`WITH poli AS (
@@ -61,11 +62,12 @@ SELECT
   ST_NPoints(ST_SimplifyPreserveTopology(geom,0.1)) AS spt_nokta
 FROM poli;`}
   label="ST_Simplify vs PreserveTopology"
+  description="Ağırlıklı tolerans değeriyle ST_Simplify geçersiz bir poligon üretebilir (ST_IsValid → false). ST_SimplifyPreserveTopology ise her zaman geçerli bir geometri garantilemek için toleransı gerekirse dahili olarak küçültür; bu durum bazen daha az nokta azalmasıyla sonuçlanır. Sonuçlar iki fonksiyon arasındaki güvenlik farkını sayısal olarak ortaya koyar."
 />
 
 ---
 
-## 🧪 Egzersiz — Rota Sadeleştirme
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH rota AS (
@@ -83,18 +85,13 @@ SELECT
 FROM rota;`}
   label="Rota sadeleştirme"
   autoFit
+  description="12 noktalı bir rota çizgisi ST_SimplifyPreserveTopology ile sadeleştirilir. ST_Length ::geography ile orijinal uzunluk km cinsinden hesaplanır. Sadeleştirme sonrası nokta sayısı düşerken çizginin genel şekli korunur. geom sütunu harita sekmesinde sadeleştirilmiş rotayı gösterir; orijinalle karşılaştırma için tolerans değeri değiştirilebilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **4326 tolerans = derece:** `ST_Simplify(geom_4326, 100)` → 100 derece = neredeyse tüm noktaları siler. UTM kullanıyorsan metre. 4326 için ~0.001 (≈111m), 0.01 (≈1.1km).
-2. **ST_Simplify poligonu geçersizleştirebilir:** Sonucu `ST_IsValid` ile kontrol et ve gerekirse `ST_MakeValid` uygula.
-3. **Rendering için `ST_SimplifyPreserveTopology` yeter:** Sadece web render için bile topoloji korumalı versiyonu tercih et — maliyeti küçük, güvenliği büyük.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste büyük poligonları verimli sorgulamak için: **`ST_Subdivide`**.
+1. **EPSG:4326 toleransı dereceyle çalışır.** `ST_Simplify(geom_4326, 100)` → 100 derece tolerans, neredeyse tüm noktaları siler. EPSG:4326 için ~0.001 (≈111 m) ile ~0.01 (≈1.1 km) aralığı pratik değerlerdir.
+2. **`ST_Simplify` geçersiz poligon üretebilir.** Sonuç `ST_IsValid` ile kontrol edilmeli; gerekirse `ST_MakeValid` uygulanmalıdır.
+3. **Render için de `ST_SimplifyPreserveTopology` tercih edilmelidir.** Yalnızca web render amacıyla bile topoloji korumalı versiyon kullanılmalıdır; performans farkı küçük, güvenlik kazanımı büyüktür.

@@ -1,23 +1,25 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Dijkstra algoritmasının mantığını açıklayabileceksin
-- SQL recursive CTE ile en kısa yolu hesaplayabileceksin
-- `yol_agi` tablosu üzerinde A → B güzergahı bulabileceksin
-
----
-
-## 📖 Kavram: Dijkstra Algoritması
-
-1. Başlangıç düğümüne mesafe = 0, diğerlerine ∞
-2. En düşük maliyetli düğümü seç
-3. Komşularına güncellenen mesafeyi yaz (geçiş daha ucuzsa)
-4. Hedef düğüme ulaşana dek tekrar et
-
-**SQL ile:** Recursive CTE (WITH RECURSIVE) Dijkstra'yı yaklaşık olarak simüle edebilir — küçük ağlarda yeterli.
+- Dijkstra algoritmasının işleyişini açıklamak
+- SQL recursive CTE ile en kısa yolu hesaplamak
+- `yol_agi` tablosu üzerinde A → B güzergahı bulmak
 
 ---
 
-## ▶ Canlı Örnek — Taksim'den Maslak'a
+## Dijkstra Algoritması
+
+1. Başlangıç düğümüne mesafe = 0, diğerlerine ∞ atanır
+2. En düşük maliyetli düğüm seçilir
+3. Komşularına güncellenmiş mesafe yazılır (geçiş daha ucuzsa)
+4. Hedef düğüme ulaşılana kadar tekrarlanır
+
+**SQL ile:** Recursive CTE (WITH RECURSIVE) Dijkstra'yı yaklaşık olarak simüle eder; küçük ağlarda yeterlidir.
+
+---
+
+## Uygulama Örneği
+
+### Taksim'den Maslak'a
 
 <RunnableBlock
   sql={`-- Yol ağı tablosunun mevcut olduğunu varsayıyoruz (lesson-1'den)
@@ -48,11 +50,10 @@ WHERE dugum = 5  -- Maslak
 ORDER BY toplam_maliyet
 LIMIT 3;`}
   label="Dijkstra: Taksim → Maslak"
+  description="Recursive CTE Taksim'den (dugum=1) başlar ve her adımda komşu düğümlere genişler. yol dizisi ziyaret edilen düğümleri tutar; NOT ... = ANY(d.yol) döngüleri önler. array_length < 6 limiti sonsuz tekrarı durdurur. WHERE dugum = 5 yalnızca Maslak'a ulaşan yolları filtreler; ORDER BY toplam_maliyet en kısayı öne alır."
 />
 
----
-
-## ▶ Yol Geometrisini Çiz
+### En kısa yol geometrisi
 
 <RunnableBlock
   sql={`-- En kısa yolu haritada göster
@@ -87,11 +88,12 @@ yol_segmentler AS (
 )
 SELECT ST_Collect(geom) AS rota_geom FROM yol_segmentler;`}
   label="En kısa yol geometrisi"
+  description="En kısa güzergah düğüm ID dizisinden geometrik segmentlere dönüştürülür. generate_series ardışık düğüm çiftlerini (n1, n2) oluşturur. Her çifti karşılayan yol_agi satırı JOIN ile eşleştirilir. ST_Collect tüm segmentleri tek bir GeometryCollection'a toplar ve haritada çizgi olarak görünür."
 />
 
 ---
 
-## 🧪 Dene — Farklı Hedef
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Beşiktaş'tan Maslak'a (düğüm 2 → 5)
@@ -115,18 +117,13 @@ WHERE dugum = 5
 ORDER BY maliyet
 LIMIT 3;`}
   label="Beşiktaş → Maslak güzergahları"
+  description="Başlangıç düğümü 2 (Beşiktaş) olarak değiştirilmiş aynı algoritma çalışır. İlk üç alternatif güzergah km cinsinden listelenir. Beşiktaş → Barbaros Bul → Levent → Maslak ve Beşiktaş → Taksim → Şişli → Levent → Maslak gibi alternatif rotaların toplam maliyeti karşılaştırılabilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Recursive CTE Dijkstra = simülasyon:** Büyük ağlarda (10K+ kenar) bu yaklaşım yavaş ve tam doğru değil. Gerçek projede pgRouting veya uygulama katmanı (OSRM, Valhalla) kullan.
-2. **Döngü kontrolü:** `NOT ... = ANY(d.yol)` döngü önler ama `array_length < 6` limiti koymazsan sonsuz döngü olabilir.
-3. **Tek yönlü yol:** `tek_yon = TRUE` olan kenarda geri yön geçişi engellendi. Yön kontrolünü tam uygulamak için `reverse_cost = -1` şemasına bak.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **Servis alanı (izokon)** — bir noktadan N dakika/km içinde ulaşılabilir bölge.
+1. **Recursive CTE Dijkstra = simülasyon:** Büyük ağlarda (10K+ kenar) bu yaklaşım yavaş ve tam doğru değildir. Gerçek projelerde pgRouting veya uygulama katmanı (OSRM, Valhalla) kullanılmalıdır.
+2. **Döngü kontrolü:** `NOT ... = ANY(d.yol)` döngüleri önler; ancak `array_length < 6` limiti konmazsa sonsuz tekrara girilir.
+3. **Tek yönlü yol:** `tek_yon = TRUE` olan kenarda geri yön geçişi engellenir. Tam yön kontrolü için `reverse_cost = -1` şeması incelenmelidir.

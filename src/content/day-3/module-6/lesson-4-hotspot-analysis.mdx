@@ -1,20 +1,20 @@
-## 🏆 Görev 4: Hotspot Analizi
+## Görev 4: Hotspot Analizi
 
-**Hedef:** Son 1 yıldaki acil çağrıları DBSCAN ile kümele, yoğun 5 noktayı haritada göster.
-
----
-
-## 🎯 Ne öğreneceksin?
-
-- Gerçek bir analitik pipeline'ı baştan sona uygulayabileceksin
-- Kümeleme + ilçe analizi + görselleştirmeyi birleştirebileceksin
-- Tüm kursun kazanımlarını tek senaryoda kullanabileceksin
+**Hedef:** Son 1 yıldaki acil çağrılar DBSCAN ile kümelenerek en yoğun 5 hotspot haritada tespit edilir.
 
 ---
 
-## ⚙ Ön Hazırlık — Temel veri setini kur
+## Öğrenim Hedefleri
 
-> Önceki görevleri çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
+- Gerçek bir analitik pipeline'ı baştan sona uygulamak
+- Kümeleme, ilçe analizi ve görselleştirmeyi birleştirmek
+- Kursun tüm kazanımlarını tek senaryoda kullanmak
+
+---
+
+## Ön Hazırlık
+
+Önceki görevleri çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS istanbul_ilceler (
@@ -45,15 +45,39 @@ INSERT INTO saglik_kuruluslari (ad,tur,ilce,geom) VALUES
   ('Bağcılar Eğitim','hastane','Bağcılar',ST_SetSRID(ST_MakePoint(28.840,41.040),4326))
 ON CONFLICT DO NOTHING;
 
+CREATE TABLE IF NOT EXISTS toplanma_alanlari (
+  id SERIAL PRIMARY KEY,
+  ad TEXT,
+  kapasite INT,
+  geom GEOMETRY(POINT, 4326)
+);
+INSERT INTO toplanma_alanlari (ad, kapasite, geom) VALUES
+  ('Kadıköy Meydan Toplanma', 3000, ST_SetSRID(ST_MakePoint(29.028, 40.990), 4326)),
+  ('Kadıköy Park Toplanma',   1500, ST_SetSRID(ST_MakePoint(29.048, 40.995), 4326)),
+  ('Üsküdar Meydanı',        2500, ST_SetSRID(ST_MakePoint(29.018, 41.022), 4326)),
+  ('Beşiktaş Parkı',         2000, ST_SetSRID(ST_MakePoint(29.005, 41.048), 4326)),
+  ('Şişli Meydan',           1800, ST_SetSRID(ST_MakePoint(28.990, 41.070), 4326)),
+  ('Fatih Toplanma Alanı',   2200, ST_SetSRID(ST_MakePoint(28.945, 41.012), 4326)),
+  ('Beyoğlu Toplanma',       1200, ST_SetSRID(ST_MakePoint(28.978, 41.044), 4326)),
+  ('Bağcılar Meydan',        3500, ST_SetSRID(ST_MakePoint(28.832, 41.042), 4326)),
+  ('Pendik Toplanma',        4000, ST_SetSRID(ST_MakePoint(29.245, 40.912), 4326)),
+  ('Maltepe Sahil',          2800, ST_SetSRID(ST_MakePoint(29.152, 40.935), 4326)),
+  ('Ataşehir Toplanma',      2000, ST_SetSRID(ST_MakePoint(29.125, 41.002), 4326))
+ON CONFLICT DO NOTHING;
+
 SELECT 'Hazır' AS durum,
   (SELECT COUNT(*) FROM istanbul_ilceler) AS ilce,
-  (SELECT COUNT(*) FROM saglik_kuruluslari) AS saglik;`}
+  (SELECT COUNT(*) FROM saglik_kuruluslari) AS saglik,
+  (SELECT COUNT(*) FROM toplanma_alanlari) AS toplanma;`}
   label="Temel veri setini hazırla (önceki görevleri atladıysan)"
+  description="Kapanış projesinin tüm tabloları tek blokta kurulur. ON CONFLICT DO NOTHING mevcut verileri korur. 10 ilçe, 8 sağlık kuruluşu ve 11 toplanma alanı sayımı görünmelidir."
 />
 
 ---
 
-## ▶ Acil Çağrı Verisi Oluştur
+## Uygulama Örneği
+
+### Acil çağrı verisi oluşturma
 
 <RunnableBlock
   sql={`-- Acil çağrı simülasyonu: İstanbul'da 300 çağrı
@@ -93,11 +117,10 @@ ANALYZE acil_cagrilar;
 SELECT tur, COUNT(*) AS cagri_sayisi
 FROM acil_cagrilar GROUP BY tur ORDER BY cagri_sayisi DESC;`}
   label="Acil çağrı verisi oluştur"
+  description="300 acil çağrı 4 yoğunluk bölgesi (Kadıköy, Üsküdar, Fatih, Bağcılar) ve rastgele dağılmış noktalardan oluşturulur. CASE (i % 5) döngüsel desen ile nokta koordinatları belirlenir. GiST indeks ve ANALYZE DBSCAN sorgusunun performansını artırır. Tür dağılımı yangın/kaza/sağlık olarak görünmelidir."
 />
 
----
-
-## ▶ DBSCAN Hotspot Tespiti
+### Top-5 hotspot kümesi
 
 <RunnableBlock
   sql={`-- DBSCAN: 500m içinde en az 8 çağrı = hotspot kümesi
@@ -122,11 +145,10 @@ GROUP BY cid
 ORDER BY cagri_sayisi DESC
 LIMIT 5;`}
   label="Top-5 hotspot kümesi"
+  description="ST_ClusterDBSCAN 500 metre yarıçapında en az 8 çağrı barındıran bölgeleri küme olarak tanımlar. ST_Transform(geom, 3857) metre cinsinden doğru mesafe hesabı sağlar. WHERE cid IS NOT NULL gürültü noktaları dışlar. COUNT FILTER her kümedeki olay türü dağılımını gösterir. merkez_geom haritada hotspot merkezlerini işaretler."
 />
 
----
-
-## ▶ Hotspot + İlçe Birleştir
+### Hotspot ilçe ve sağlık analizi
 
 <RunnableBlock
   sql={`-- Her hotspot hangi ilçede?
@@ -158,11 +180,12 @@ LEFT JOIN istanbul_ilceler i ON ST_Within(h.merkez, i.geom)
 ORDER BY h.cagri DESC
 LIMIT 5;`}
   label="Hotspot ilçe ve sağlık analizi"
+  description="CTE hotspot merkezlerini hesaplar. LEFT JOIN ST_Within ile her merkezi ilgili ilçeye bağlar. Korelasyonlu alt sorgu her hotspot'a en yakın sağlık kuruluşunu bulur. en_yakin_saglik_km hotspot ile en yakın sağlık kuruluşu arasındaki mesafeyi verir. Uzak mesafeli hotspot bölgeleri yeni sağlık altyapısı için öncelikli konumlardır."
 />
 
 ---
 
-## ▶ Final: Tüm Analizi Birleştir
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Kapsamlı özet rapor: ilçe bazlı sağlık, toplanma ve hotspot
@@ -174,10 +197,10 @@ SELECT
   COALESCE(SUM(DISTINCT t.kapasite), 0) AS toplanma_kapasitesi,
   COUNT(DISTINCT c.id) AS acil_cagri_sayisi,
   CASE
-    WHEN COUNT(DISTINCT t.id) = 0 THEN '🔴 Kritik'
-    WHEN COUNT(DISTINCT s.id) = 0 THEN '🟠 Riskli'
-    WHEN COUNT(DISTINCT s.id) < 2 THEN '🟡 Dikkat'
-    ELSE '🟢 Yeterli'
+    WHEN COUNT(DISTINCT t.id) = 0 THEN 'Kritik'
+    WHEN COUNT(DISTINCT s.id) = 0 THEN 'Riskli'
+    WHEN COUNT(DISTINCT s.id) < 2 THEN 'Dikkat'
+    ELSE 'Yeterli'
   END AS risk_seviyesi
 FROM istanbul_ilceler i
 LEFT JOIN saglik_kuruluslari s ON ST_Within(s.geom, i.geom)
@@ -192,13 +215,12 @@ ORDER BY
        ELSE 3 END,
   i.nufus DESC;`}
   label="İlçe bazlı kapsamlı acil durum raporu"
+  description="Dört tabloyu bir araya getiren final sorgu: sağlık kuruluşu sayısı (ST_Within JOIN), 3 km içindeki toplanma alanları (ST_DWithin JOIN), toplanma kapasitesi (SUM DISTINCT), acil çağrı sayısı (ST_Within JOIN). CASE risk_seviyesi risk öncelik sırasını belirler. ORDER BY CASE en kritik ilçeleri (toplanma alanı yok) öne alır; aynı risk seviyesinde nüfus yoğunluğu ikincil sıralama kriteri olur."
 />
 
 ---
 
-## 🎓 Tebrikler!
-
-15 saatlik PostGIS Akademi'yi tamamladın. Öğrendiklerin:
+## 15 Saatlik PostGIS Akademi Tamamlandı
 
 **Gün 1:** Geometry tipleri, SRID, mekansal ilişkiler, ölçüm fonksiyonları
 
@@ -208,9 +230,8 @@ ORDER BY
 
 ---
 
-## 🔗 İleri Kaynaklar
+## İleri Kaynaklar
 
-- [PostGIS Belgelendirmesi](https://postgis.net/documentation/)
-- [pgRouting Belgelendirmesi](https://pgrouting.org/)
-- [Awesome PostGIS](https://github.com/dbeat/awesome-postgis)
-- `EXPLAIN ANALYZE` görselleştirici: explain.depesz.com
+- PostGIS Belgelendirmesi: postgis.net/documentation
+- pgRouting Belgelendirmesi: pgrouting.org
+- EXPLAIN ANALYZE görselleştirici: explain.depesz.com

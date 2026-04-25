@@ -1,20 +1,20 @@
 ## ogr2ogr / shp2pgsql — Kavramsal Genel Bakış
 
-**Hedef:** Komut satırı CBS araçlarının hangi sorunları çözdüğünü ve PGlite alternatifleri neler olduğunu öğren.
+Komut satırı CBS araçları, büyük ölçekli veri yüklemede ve format dönüşümünde endüstri standardıdır. Bu ders, bu araçların hangi sorunları çözdüğünü, nasıl kullanıldığını ve PGlite sandbox ortamında hangi alternatiflerin geçerli olduğunu ele almaktadır.
 
 ---
 
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ogr2ogr`'ın desteklediği formatları sıralayabileceksin
-- `shp2pgsql` ile shapefile yükleme pipeline'ını açıklayabileceksin
-- PGlite'ta neden çalışmadığını ve alternatiflerini söyleyebileceksin
+- `ogr2ogr`'ın desteklediği formatları tanımak
+- `shp2pgsql` ile shapefile yükleme pipeline'ını açıklamak
+- PGlite'ta bu araçların neden çalışmadığını ve SQL alternatiflerini bilmek
 
 ---
 
 ## ogr2ogr Nedir?
 
-`ogr2ogr`, GDAL kütüphanesinin bir parçasıdır ve **150+ coğrafi veri formatı** arasında dönüşüm yapar.
+`ogr2ogr`, GDAL kütüphanesinin bir parçasıdır ve **150'den fazla coğrafi veri formatı** arasında dönüşüm gerçekleştirir.
 
 ```bash
 # Shapefile → PostgreSQL
@@ -42,7 +42,7 @@ ogr2ogr -f "GPKG" cikti.gpkg \
 
 ## shp2pgsql Nedir?
 
-`shp2pgsql`, PostGIS ile birlikte gelen bir araçtır. Shapefile'ı SQL INSERT ifadelerine dönüştürür.
+`shp2pgsql`, PostGIS ile birlikte gelen bir araçtır. Shapefile'ı SQL INSERT ifadelerine dönüştürür ve doğrudan bir PostgreSQL veritabanına yükleyebilir.
 
 ```bash
 # SQL dosyası oluştur
@@ -73,7 +73,7 @@ raster2pgsql -s 4326 -I -C dem.tif public.dem | psql -d gisdb
 
 ## PGlite'ta Neden Çalışmaz?
 
-Bu araçlar **işletim sistemi süreçleridir** — tarayıcı sandbox'ı dışarıdır. PGlite bir WASM PostgreSQL olduğu için:
+Bu araçlar işletim sistemi süreçleridir ve tarayıcı sandbox'ı dışında çalışır. PGlite bir WASM PostgreSQL olduğundan:
 
 1. Dış süreç çağrısı yapılamaz
 2. Dosya sistemi erişimi yoktur
@@ -81,11 +81,10 @@ Bu araçlar **işletim sistemi süreçleridir** — tarayıcı sandbox'ı dışa
 
 ---
 
-## ▶ PGlite Alternatifleri
+## PGlite Alternatifleri
 
 <RunnableBlock
-  sql={`-- Alternatif 1: GeoJSON'u SQL ile yükle (Bu kursta yaptığımız)
--- GeoJSON koordinatları ST_GeomFromGeoJSON ile parse edilir
+  sql={`-- Alternatif 1: GeoJSON'u SQL ile yükle
 CREATE TABLE IF NOT EXISTS ornek_noktalar (
   id   SERIAL PRIMARY KEY,
   ad   TEXT,
@@ -104,6 +103,7 @@ FROM generate_series(1, 5) i;
 SELECT id, ad, ST_AsText(geom) AS konum
 FROM ornek_noktalar;`}
   label="GeoJSON/SQL ile veri yükleme"
+  description="generate_series(1, 5) beş satır üretir; her satır için random() fonksiyonu İstanbul çevresinde rastgele koordinat oluşturur. Bu kalıp ogr2ogr'ın yaptığını — dış kaynak yerine SQL ile veri üretmeyi — sandbox içinde simüle eder. Gerçek projede bu INSERT yerine ST_GeomFromGeoJSON veya CSV dönüşümü kullanılır."
 />
 
 <RunnableBlock
@@ -128,23 +128,18 @@ SELECT
   ST_AsText(ST_SetSRID(ST_MakePoint(lon, lat), 4326)) AS wkt
 FROM csv_simulasyon;`}
   label="CSV koordinat → geometri dönüşümü"
+  description="Ayrı lon/lat sütunlarından ST_MakePoint ile geometry üretilir. Bu yöntem ogr2ogr'ın CSV+koordinat yükleme davranışını SQL ile karşılar: koordinat sütunları okunur, geometry nesnesi oluşturulur, SRID atanır. Gerçek üretim ortamında COPY komutu bu INSERT ifadelerinin yerine geçer ve milyonlarca satırı dakikalar içinde yükler."
 />
 
 ---
 
-## 📌 Karşılaştırma
+## Araç Karşılaştırması
 
 | Araç | Platform | Kaynak format | Hedef |
 |---|---|---|---|
 | `ogr2ogr` | Komut satırı | 150+ format | 150+ format |
 | `shp2pgsql` | Komut satırı | Shapefile | PostgreSQL |
-| `raster2pgsql` | Komut satırı | GeoTIFF, vb. | PostgreSQL |
+| `raster2pgsql` | Komut satırı | GeoTIFF vb. | PostgreSQL |
 | SQL + ST_* | Her ortam | CSV, JSON, WKT | PostgreSQL |
 
-Gerçek projelerde `ogr2ogr` ile yükle, PGlite'ta SQL ile simüle et.
-
----
-
-## 🔗 Sıradaki Modül
-
-Modül 2.2: **Geometri İşlemleri (Advanced)** — ST_Simplify, ST_Subdivide ve lineer referanslama.
+Gerçek projelerde `ogr2ogr` ile yükleme yapılır; bu sandbox'ta SQL alternatifleri aynı mantığı göstermektedir.

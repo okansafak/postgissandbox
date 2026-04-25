@@ -1,57 +1,51 @@
-## Tablespace Kavramı
+## Öğrenim Hedefleri
 
-**Hedef:** Tablespace'in PostgreSQL depolama mimarisindeki yerini ve pg_tablespace kataloğunu kavra.
+Veritabanı performansını disk düzeyinde yönetmek için tablespace kavramını anlamak şarttır. Bu derste PostgreSQL'in veri dosyalarını fiziksel depolamada nasıl organize ettiği ve bu yapının üretim ortamlarında nasıl kullanıldığı ele alınmaktadır.
 
----
-
-## 🎯 Ne öğreneceksin?
-
-- Tablespace'in ne olduğunu ve hangi sorunu çözdüğünü açıklayabileceksin
-- `pg_tablespace` catalog tablosunu sorgulayabileceksin
-- `pg_default` ve `pg_global` arasındaki farkı söyleyebileceksin
+- Tablespace'in hangi sorunu çözdüğünü işlevsel olarak açıklayabilmek
+- `pg_tablespace` katalog tablosunu sorgulamak
+- `pg_default` ile `pg_global` arasındaki farkı kavramak
 
 ---
 
-## Tablespace nedir?
+## Tablespace Nedir?
 
-Tablespace, PostgreSQL'in veri dosyalarını (tablo ve indeks) sakladığı **disk konumudur**.
+Tablespace, PostgreSQL'in veri dosyalarını (tablo ve indeks blokları) sakladığı disk konumunu tanımlar. Varsayılan tablespace `pg_default`'tur ve PGDATA dizininin altındaki `base/` klasörüne karşılık gelir.
 
 ```
-/var/lib/postgresql/data/   ← varsayılan: pg_default tablespace
+/var/lib/postgresql/data/
     base/
-        16384/              ← her database için bir klasör
-            17000           ← her tablo için bir dosya
+        16384/          ← her database için ayrı klasör
+            17000       ← her tablo için ayrı dosya
 ```
 
-Farklı bir tablespace tanımlarsanız PostgreSQL o tablonun dosyalarını farklı bir dizine (ve dolayısıyla farklı bir diske) yazar.
+Farklı bir tablespace tanımlandığında PostgreSQL, ilgili tablonun veri dosyalarını o tablespace'in gösterdiği dizine yazar. Bu mekanizmanın üretim ortamlarındaki başlıca kullanım senaryoları şunlardır:
 
-**Kullanım senaryoları:**
-- Büyük tablolar → yüksek kapasiteli HDD
-- Sık erişilen indeksler → hızlı SSD
+- Büyük, nadiren erişilen tablolar → yüksek kapasiteli HDD
+- Yoğun kullanılan indeksler → düşük gecikmeli NVMe SSD
 - Geçici nesneler → RAM diski (tmpfs)
 
 ---
 
-## ▶ Mevcut tablespace'leri listele
+## Uygulama Örneği
+
+### Mevcut tablespace'leri listele
 
 <RunnableBlock
-  sql={`-- pg_tablespace: tüm tablespace'ler
-SELECT
-  spcname AS tablespace_adi,
-  pg_catalog.pg_get_userbyid(spcowner) AS sahip,
-  pg_catalog.pg_tablespace_location(oid) AS konum
+  sql={`SELECT
+  spcname                                          AS tablespace_adi,
+  pg_catalog.pg_get_userbyid(spcowner)             AS sahip,
+  pg_catalog.pg_tablespace_location(oid)           AS konum
 FROM pg_catalog.pg_tablespace
 ORDER BY spcname;`}
   label="Tablespace listesi"
+  description="pg_catalog.pg_tablespace sistem kataloğu, cluster'daki tüm tablespace'leri ve sahiplerini tutar. pg_tablespace_location() her tablespace'in dosya sistemi yolunu döndürür; PGlite ortamında konum boş görünebilir."
 />
 
----
-
-## ▶ Hangi tablo hangi tablespace'de?
+### Tabloların tablespace dağılımı
 
 <RunnableBlock
-  sql={`-- Tabloların tablespace bilgisi (NULL = pg_default)
-SELECT
+  sql={`SELECT
   schemaname,
   tablename,
   tablespace
@@ -59,36 +53,29 @@ FROM pg_tables
 WHERE schemaname = 'public'
 ORDER BY tablespace NULLS FIRST, tablename;`}
   label="Tablo tablespace dağılımı"
+  description="pg_tables.tablespace sütunu, tablonun ait olduğu tablespace'i gösterir. NULL değeri tablonun veritabanının varsayılan tablespace'ini (genellikle pg_default) kullandığı anlamına gelir."
 />
 
----
-
-## ▶ Veritabanının varsayılan tablespace'i
+### Veritabanının varsayılan tablespace'i
 
 <RunnableBlock
-  sql={`-- Bu database'in default tablespace'i
-SELECT
-  datname AS database,
-  spcname AS default_tablespace
+  sql={`SELECT
+  datname  AS database,
+  spcname  AS default_tablespace
 FROM pg_database d
 JOIN pg_tablespace t ON d.dattablespace = t.oid
 WHERE datname = current_database();`}
   label="Database tablespace"
+  description="pg_database ve pg_tablespace kataloglarını JOIN'leyerek aktif veritabanının varsayılan tablespace'i belirlenir. Bu değer, CREATE TABLE sırasında TABLESPACE belirtilmediğinde kullanılır."
 />
 
 ---
 
-## 📌 pg_default vs pg_global
+## pg_default ve pg_global Karşılaştırması
 
-| Tablespace | İçerik | Konum |
+| Tablespace | İçerik | Fiziksel Konum |
 |---|---|---|
-| `pg_default` | Normal tablolar ve indeksler | `$PGDATA/base/` |
+| `pg_default` | Kullanıcı tabloları ve indeksler | `$PGDATA/base/` |
 | `pg_global` | Paylaşılan sistem katalogları (`pg_database`, `pg_authid`…) | `$PGDATA/global/` |
 
-> **PGlite notu:** Tarayıcıda çalıştığımız için gerçek disk yolu yoktur. pg_tablespace sorguları çalışır ancak özel tablespace oluşturamazsınız (OS seviyesi dizin erişimi gerekir).
-
----
-
-## 🔗 Sıradaki Ders
-
-Ders 3: **MVCC ve Transaction** — PostgreSQL'in eşzamanlılığı nasıl yönettiğini öğren.
+> **PGlite notu:** Tarayıcı ortamında gerçek bir disk yolu yoktur. Tablespace sorguları başarıyla çalışır; ancak özel tablespace oluşturmak için işletim sistemi düzeyinde dizin erişimi gerektiğinden bu ortamda mümkün değildir.

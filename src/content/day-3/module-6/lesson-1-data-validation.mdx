@@ -1,6 +1,6 @@
-## 🏆 Kapanış Projesi — İstanbul Acil Durum Analizi
+## Kapanış Projesi — İstanbul Acil Durum Analizi
 
-**Senaryo:** İstanbul'da acil durum müdahale kapasitesini analiz edeceksin.
+**Senaryo:** İstanbul'da acil durum müdahale kapasitesinin mekansal analizi gerçekleştirilecektir.
 
 Veri setleri:
 - 10 ilçe poligonu (basitleştirilmiş bbox)
@@ -9,15 +9,15 @@ Veri setleri:
 
 ---
 
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Çok tablolu bir proje veri setini kurup doğrulayabileceksin
-- `ST_IsValid` + `ST_IsValidReason` ile geometri sorunlarını tespit edebileceksin
-- Tüm tabloların SRID tutarlılığını kontrol edebileceksin
+- Çok tablolu bir proje veri setini kurup doğrulamak
+- `ST_IsValid` + `ST_IsValidReason` ile geometri sorunlarını tespit etmek
+- Tüm tabloların SRID tutarlılığını kontrol etmek
 
 ---
 
-## 📋 Görev 1: Veri Doğrulama
+## Görev 1: Veri Doğrulama
 
 - Tüm geometrilerin geçerli olduğunu kontrol et
 - Bozuk olanları `ST_MakeValid` ile onar
@@ -25,7 +25,9 @@ Veri setleri:
 
 ---
 
-## ▶ Veri Seti Kur
+## Uygulama Örneği
+
+### Proje veri seti kurulumu
 
 <RunnableBlock
   sql={`-- İstanbul ilçe sınırları (basitleştirilmiş bbox'lar)
@@ -92,11 +94,10 @@ SELECT 'Veri yüklendi' AS durum,
   (SELECT COUNT(*) FROM saglik_kuruluslari) AS saglik,
   (SELECT COUNT(*) FROM toplanma_alanlari) AS toplanma;`}
   label="Proje veri seti kurulumu"
+  description="Üç tablo oluşturulur: istanbul_ilceler (10 ilçe poligonu), saglik_kuruluslari (8 sağlık kuruluşu noktası), toplanma_alanlari (6 AFAD toplanma noktası). ON CONFLICT DO NOTHING birden fazla çalıştırmada veri tekrarını önler. Son SELECT üç tablonun doğru satır sayısıyla dolduğunu doğrular."
 />
 
----
-
-## ▶ Geometri Doğrulama
+### Geometri doğrulama raporu
 
 <RunnableBlock
   sql={`-- Tüm tablolarda geçersiz geometri tara
@@ -117,11 +118,10 @@ WHERE NOT EXISTS (
   SELECT 1 FROM saglik_kuruluslari WHERE NOT ST_IsValid(geom)
 );`}
   label="Geometri doğrulama raporu"
+  description="UNION ALL üç tablonun geçersiz geometrilerini tek sorguda toplar. ST_IsValidReason geçersizlik nedenini açıklar: 'Self-intersection', 'Too few points' gibi hatalar gösterir. WHERE NOT EXISTS bloğu tüm geometriler geçerliyse 'Tüm geometriler geçerli!' mesajı döndürür. Geçersiz geometriler ST_MakeValid ile onarılabilir."
 />
 
----
-
-## ▶ SRID Kontrolü
+### SRID doğrulama
 
 <RunnableBlock
   sql={`-- Tüm tabloların SRID'leri
@@ -131,16 +131,11 @@ SELECT 'saglik_kuruluslari', ST_SRID(geom), COUNT(*) FROM saglik_kuruluslari GRO
 UNION ALL
 SELECT 'toplanma_alanlari', ST_SRID(geom), COUNT(*) FROM toplanma_alanlari GROUP BY 2;`}
   label="SRID doğrulama"
+  description="Tüm tabloların SRID değerleri GROUP BY ile sayılır. Her tabloda yalnızca SRID = 4326 görünmeli; farklı SRID değerleri mekansal JOIN ve mesafe hesaplamalarında hata verir. Karma SRID durumunda ST_Transform ile dönüşüm yapılmalıdır."
 />
 
 ---
 
-## ⚠ Proje Notu
+## Proje Notu
 
-Bu proje PGlite'ta çalışır — veriler `generate_series` değil, gerçekçi koordinatlarla oluşturuldu. Sonraki derslerde bu veri setini analiz edeceğiz.
-
----
-
-## 🔗 Sıradaki Görev
-
-Görev 2: **İlçe bazlı sağlık yoğunluğu** — her ilçedeki hastane sayısı ve nüfus başına oran.
+Bu proje PGlite ortamında çalışır. Veriler gerçekçi İstanbul koordinatlarıyla oluşturulmuştur. Sonraki derslerde bu veri seti üzerinde kapsamlı analizler uygulanacaktır.

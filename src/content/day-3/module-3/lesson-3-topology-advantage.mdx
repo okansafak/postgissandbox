@@ -1,12 +1,12 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Topolojik güncellemenin tüm komşuları nasıl otomatik etkilediğini gösterebileceksin
-- Topoloji tabanlı komşuluk sorgularını yazabileceksin
-- Basit geometri vs topoloji için doğru karar verebileceksin
+- Topolojik güncellemenin komşu geometrileri nasıl otomatik etkilediğini gözlemlemek
+- Paylaşılan kenar sorgularını yazmak
+- Basit geometri ve topoloji arasında doğru seçim kararı vermek
 
 ---
 
-## 📖 Kavram: Otomatik Güncelleme
+## Otomatik Güncelleme
 
 ```
 Basit geometri:
@@ -16,48 +16,88 @@ Topoloji:
   Kenar güncellendi → Parsel A ve Parsel B aynı kenara referans verir → Otomatik düzeltme
 ```
 
-Bu, kadastro ve idari sınır sistemlerinde kritik. TKGM (Tapu Kadastro Genel Müdürlüğü) topolojik veri modeli kullanır.
+Kadastro ve idari sınır sistemlerinde bu fark kritiktir. TKGM (Tapu Kadastro Genel Müdürlüğü) topolojik veri modeli kullanır.
 
 ---
 
-## ▶ Canlı Örnek — Topoloji Komşuluk Sorgusu
+## Uygulama Örneği
+
+### Komşu parsel tespiti
 
 <RunnableBlock
-  sql={`-- Topoloji üzerinden komşu parsel tespiti
--- (kadastro_topo kuruluysa)
+  sql={`-- parseller_basit yoksa oluştur
+CREATE TABLE IF NOT EXISTS parseller_basit (
+  id   INT PRIMARY KEY,
+  ad   TEXT,
+  geom GEOMETRY(POLYGON, 4326)
+);
+INSERT INTO parseller_basit (id, ad, geom) VALUES
+  (1, 'Parsel A', ST_GeomFromText('POLYGON((29.00 41.00,29.02 41.00,29.02 41.02,29.00 41.02,29.00 41.00))',4326)),
+  (2, 'Parsel B', ST_GeomFromText('POLYGON((29.02 41.00,29.04 41.00,29.04 41.02,29.02 41.02,29.02 41.00))',4326)),
+  (3, 'Parsel C', ST_GeomFromText('POLYGON((29.00 41.02,29.02 41.02,29.02 41.04,29.00 41.04,29.00 41.02))',4326))
+ON CONFLICT (id) DO NOTHING;
+
+-- ST_Touches ile komşu parsel tespiti (topoloji komşuluk sorgusu)
 SELECT
   a.ad AS parsel,
-  b.ad AS komsu
-FROM kadastro a
-JOIN kadastro b ON a.id != b.id
-WHERE ST_Touches(a.tgeom::geometry, b.tgeom::geometry)
+  b.ad AS komsu,
+  ROUND(ST_Length(ST_Intersection(a.geom, b.geom)::geography)::numeric) AS ortak_sinir_m
+FROM parseller_basit a
+JOIN parseller_basit b ON a.id < b.id
+WHERE ST_Touches(a.geom, b.geom)
 ORDER BY a.ad, b.ad;`}
-  label="Topoloji komşuluk sorgusu"
+  label="Komşu parsel tespiti"
+  description="ST_Touches temas eden (örtüşmeyen) parsel çiftlerini tespit eder. ST_Intersection(a.geom, b.geom) ortak sınır geometrisini hesaplar; ST_Length(::geography) bu sınırın uzunluğunu metre cinsinden verir. Kadastro analizinde ortak sınır uzunluğu çakışma tespiti ve alan doğrulama için kullanılır."
 />
 
----
-
-## ▶ Paylaşılan Kenar Doğrula
+### Paylaşılan kenarlar
 
 <RunnableBlock
-  sql={`-- Paylaşılan kenarları doğrula
--- left_face ve right_face farklıysa paylaşımlı kenar
+  sql={`-- topo_edge tablosu yoksa oluştur ve doldur (ders-2 çalıştırılmadıysa)
+CREATE TABLE IF NOT EXISTS topo_face (
+  face_id SERIAL PRIMARY KEY,
+  ad      TEXT,
+  geom    GEOMETRY(POLYGON, 4326)
+);
+INSERT INTO topo_face (ad, geom) SELECT ad, geom FROM parseller_basit
+WHERE NOT EXISTS (SELECT 1 FROM topo_face LIMIT 1);
+
+CREATE TABLE IF NOT EXISTS topo_edge (
+  edge_id    SERIAL PRIMARY KEY,
+  left_face  INT DEFAULT -1,
+  right_face INT DEFAULT -1,
+  geom       GEOMETRY(LINESTRING, 4326)
+);
+INSERT INTO topo_edge (left_face, right_face, geom)
+SELECT
+  a.face_id,
+  b.face_id,
+  ST_Intersection(a.geom, b.geom)::geometry(LINESTRING, 4326)
+FROM topo_face a
+JOIN topo_face b ON a.face_id < b.face_id
+  AND ST_Touches(a.geom, b.geom)
+  AND ST_GeometryType(ST_Intersection(a.geom, b.geom)) IN ('ST_LineString','ST_MultiLineString')
+WHERE NOT EXISTS (SELECT 1 FROM topo_edge LIMIT 1);
+
+-- left_face ve right_face farklıysa paylaşımlı kenar (shared edge)
 SELECT
   e.edge_id,
-  e.left_face AS sol_yuz,
-  e.right_face AS sag_yuz,
+  e.left_face  AS sol_yuz_id,
+  e.right_face AS sag_yuz_id,
+  ROUND(ST_Length(e.geom::geography)::numeric) AS uzunluk_m,
   ST_AsText(e.geom) AS kenar_wkt
-FROM kadastro_topo.edge_data e
-WHERE e.left_face != 0 AND e.right_face != 0;`}
+FROM topo_edge e
+WHERE e.left_face != -1 AND e.right_face != -1
+ORDER BY e.edge_id;`}
   label="Paylaşılan kenarlar"
+  description="Önceki ders çalıştırılmamışsa topo_face ve topo_edge tabloları WHERE NOT EXISTS koruması ile yeniden oluşturulur. WHERE e.left_face != -1 AND e.right_face != -1 yalnızca iki yüz arasında paylaşılan kenarları seçer; serbest kenarlarda (dış sınır) bu değerler -1 olur. Her paylaşımlı kenar uzunluğu ve WKT ile listelenir."
 />
 
----
-
-## ▶ Basit Geometri ile Karşılaştır
+### Basit geometride ortak sınır uzunluğu
 
 <RunnableBlock
   sql={`-- Basit geometride aynı sınır iki farklı WKT ile ifade edilmiş
+-- ST_Intersection ile ortak uzunluk hesabı yapılabilir ama "aynı nesne" garantisi yok
 SELECT
   a.ad AS parsel1,
   b.ad AS parsel2,
@@ -67,11 +107,12 @@ SELECT
 FROM parseller_basit a, parseller_basit b
 WHERE a.id < b.id AND ST_Touches(a.geom, b.geom);`}
   label="Basit geometride ortak sınır uzunluğu"
+  description="Spaghetti modelde ST_Intersection her sorguda hesaplama yapar; bu paylaşımlı kenarın gerçekten tek bir nesne olduğu anlamına gelmez. İki parsel bağımsız koordinat setine sahiptir. Koordinat kayması veya ondalık yuvarlama farklılığı ST_Intersection'ın sıfır uzunlukta sonuç vermesine neden olabilir; topoloji modelinde bu risk yoktur."
 />
 
 ---
 
-## 🧪 Dene — Geometri Doğrulama
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Topoloji doğrulama: geçersiz geometri var mı?
@@ -88,30 +129,25 @@ WHERE NOT EXISTS (
   SELECT 1 FROM parseller_basit WHERE NOT ST_IsValid(geom)
 );`}
   label="Geometri doğrulama raporu"
+  description="ST_IsValid OGC standartlarına göre geometri geçerliliğini kontrol eder. ST_IsValidReason geçersiz geometriler için neden açıklaması döndürür: 'Self-intersection', 'Ring Self-intersection' gibi hatalar gösterir. WHERE NOT EXISTS ile tüm geometrilerin geçerli olduğunu doğrulayan özet mesaj oluşturulur."
 />
 
 ---
 
-## 📖 Karar: Ne Zaman Topoloji?
+## Karar: Ne Zaman Topoloji?
 
 | Durum | Topoloji gerekli mi? |
 |---|---|
-| < 1000 parsel, statik veri | ❌ ST_Touches yeterli |
-| 100K+ parsel, sık güncelleme | ✅ Topoloji zorunlu |
-| Yol ağı analizi | ✅ veya pgRouting şeması |
-| Web harita görüntüleme | ❌ Basit geometry daha hızlı |
-| Kadastro / resmi sınır | ✅ Standart gereği |
+| 1000'den az parsel, statik veri | ST_Touches yeterli |
+| 100K+ parsel, sık güncelleme | Topoloji zorunlu |
+| Yol ağı analizi | Topoloji veya pgRouting şeması |
+| Web harita görüntüleme | Basit geometry daha hızlı |
+| Kadastro / resmi sınır | Standart gereği zorunlu |
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Topoloji bakımı:** `RemoveFromTopology`, `MoveIsoNode` gibi fonksiyonları öğrenmek gerekir. Basit UPDATE çalışmaz.
-2. **Sorgu karmaşıklığı:** `tgeom::geometry` cast her sorguda ek join maliyeti ekler.
-3. **PostGIS Topology API kararlılığı:** Major versiyon değişimlerinde API değişebilir — sürüm sabitliliğini kontrol et.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 3.3 tamamlandı! Sırada **Modül 3.4 — Güvenlik**: rol, yetki, RLS ve mekansal erişim kontrolü.
+1. **Topoloji bakımı:** Gerçek PostGIS Topology'de `RemoveFromTopology`, `MoveIsoNode` gibi fonksiyonları öğrenmek gerekir; doğrudan UPDATE çalışmaz.
+2. **Sorgu karmaşıklığı:** Her sorguda `tgeom::geometry` cast ek JOIN maliyeti ekler.
+3. **PostGIS Topology API:** Major versiyon değişimlerinde API değişebilir; sürüm sabitliği kontrol edilmelidir.

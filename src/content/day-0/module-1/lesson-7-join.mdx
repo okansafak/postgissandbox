@@ -1,0 +1,128 @@
+## JOIN ile Tablolar Arası İlişki
+
+**Hedef:** İki ayrı tablodaki verileri ortak bir anahtar üzerinden birleştirmek.
+
+---
+
+## Öğrenim Hedefleri
+
+- Primary key ve foreign key kavramlarını açıklamak
+- `INNER JOIN` ile eşleşen satırları birleştirmek
+- `LEFT JOIN` ile eşleşmeyen satırları da dahil etmek
+
+---
+
+## Neden JOIN Kullanılır?
+
+İyi tasarlanmış veritabanlarında veri tekrarını önlemek için bilgi birden fazla tabloya bölünür. Örneğin şehirlerin bölgesi ayrı bir `bolgeler` tablosunda tutulabilir; her şehir bölge kimliğine başvurur. JOIN bu iki tabloyu birleştirir.
+
+**Primary key** — bir tablodaki her satırı eşsiz biçimde tanımlayan sütun.
+**Foreign key** — başka bir tablonun primary key'ine başvuran sütun.
+
+---
+
+## Ön Hazırlık
+
+<RunnableBlock
+  sql={`-- Bölge tablosu oluştur
+CREATE TABLE IF NOT EXISTS bolgeler (
+  id     SERIAL PRIMARY KEY,
+  ad     TEXT UNIQUE,
+  kisalt TEXT,
+  bolum  TEXT   -- 'Batı' veya 'Doğu'
+);
+
+INSERT INTO bolgeler (ad, kisalt, bolum) VALUES
+  ('Marmara',             'MAR', 'Batı'),
+  ('Ege',                 'EGE', 'Batı'),
+  ('Akdeniz',             'AKD', 'Batı'),
+  ('İç Anadolu',          'ICA', 'Doğu'),
+  ('Karadeniz',           'KAR', 'Doğu'),
+  ('Güneydoğu Anadolu',   'GDA', 'Doğu'),
+  ('Doğu Anadolu',        'DOA', 'Doğu')
+ON CONFLICT DO NOTHING;
+
+-- Şehir tablosuna bolge_id sütunu ekle
+ALTER TABLE sehirler ADD COLUMN IF NOT EXISTS bolge_id INTEGER;
+
+-- Bölge ID'lerini güncelle
+UPDATE sehirler s
+SET bolge_id = b.id
+FROM bolgeler b
+WHERE s.bolge = b.ad;
+
+SELECT s.ad, s.bolge, s.bolge_id FROM sehirler ORDER BY s.ad;`}
+  label="Bölge tablosunu oluştur ve şehirleri ilişkilendir"
+  description="UNIQUE kısıtı bölge adının tekrar etmesini engeller. ALTER TABLE ... ADD COLUMN IF NOT EXISTS var olmayan bir sütun ekler; sütun zaten varsa hata vermez. UPDATE ... FROM farklı tablodaki değere göre güncelleme yapar — PostgreSQL'e özgü bu sözdizimi, standart SQL'deki SET sütun = (alt sorgu) yerine daha verimlidir."
+/>
+
+---
+
+## Uygulama Örneği
+
+### INNER JOIN
+
+<RunnableBlock
+  sql={`-- INNER JOIN: her iki tabloda da eşleşen satırlar
+SELECT
+  s.ad        AS sehir,
+  s.nufus,
+  b.ad        AS bolge,
+  b.bolum     AS cografya_bolumu
+FROM sehirler s
+INNER JOIN bolgeler b ON s.bolge_id = b.id
+ORDER BY s.nufus DESC;`}
+  label="INNER JOIN örneği"
+  description="INNER JOIN yalnızca ON koşulunu sağlayan satırları döndürür; her iki tabloda da eşleşme yoksa satır sonuç kümesine girmez. s ve b tablo alias'larıdır; uzun tablo adları yerine kısa harfler kullanılır. ON s.bolge_id = b.id birleştirme koşulunu belirtir. İki tabloda aynı adlı sütunlar varsa tablo.sütun biçiminde nitelendirme zorunludur."
+/>
+
+### LEFT JOIN
+
+<RunnableBlock
+  sql={`-- LEFT JOIN: sol tablodaki tüm satırlar dahil
+SELECT
+  b.ad        AS bolge,
+  b.bolum,
+  COUNT(s.id) AS sehir_sayisi
+FROM bolgeler b
+LEFT JOIN sehirler s ON b.id = s.bolge_id
+GROUP BY b.id, b.ad, b.bolum
+ORDER BY sehir_sayisi DESC;`}
+  label="LEFT JOIN örneği"
+  description="LEFT JOIN sol tablodaki (FROM'daki) tüm satırları döndürür; sağ tabloda eşleşme yoksa o sütunlar NULL olarak gelir. Bu örnekte veri setimizde yer almayan Doğu Anadolu bölgesi de listede görünür ama sehir_sayisi 0 olur. COUNT(s.id) NULL olan satırları saymaz; bu nedenle eşleşmeyen bölgeler için 0 döner."
+/>
+
+### Üç sütundan bilgi birleştirme
+
+<RunnableBlock
+  sql={`-- Şehir adı, nüfus ve bölge bilgisini JOIN ile al
+SELECT
+  s.ad                                      AS sehir,
+  ROUND(s.nufus / 1000000.0, 2)             AS nufus_milyon,
+  b.ad                                      AS bolge,
+  b.bolum                                   AS bolum,
+  ROUND(s.nufus / s.alan_km2, 1)            AS nufus_yogunlugu
+FROM sehirler s
+JOIN bolgeler b ON s.bolge_id = b.id
+ORDER BY nufus_milyon DESC;`}
+  label="Birleşik sorgu"
+  description="JOIN, INNER JOIN ile eşanlamlıdır — INNER yazmak isteğe bağlıdır. Tek sorguda iki tablodaki bilgiler birleştirilirken her iki tablodaki hesaplamalar da yapılabilir. Bu yaklaşım PostGIS'te çok yaygındır: geometri sütunu bir tabloda, özellik bilgileri başka bir tabloda tutulur ve JOIN ile birleştirilir."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Batı bölgelerindeki şehirlerin toplam nüfusu
+SELECT
+  b.bolum,
+  COUNT(s.id)   AS sehir_sayisi,
+  SUM(s.nufus)  AS toplam_nufus
+FROM bolgeler b
+LEFT JOIN sehirler s ON b.id = s.bolge_id
+GROUP BY b.bolum
+ORDER BY toplam_nufus DESC;`}
+  label="Bölüm bazlı nüfus özeti"
+  description="JOIN ve GROUP BY birlikte kullanılabilir. FROM bolgeler b başlangıç noktasıdır; LEFT JOIN tüm bölgeleri dahil eder. GROUP BY b.bolum 'Batı' ve 'Doğu' olmak üzere iki grup oluşturur. SUM(s.nufus) her grubun toplam nüfusunu hesaplar; LEFT JOIN sayesinde şehri olmayan bölgeler de gösterilir."
+/>

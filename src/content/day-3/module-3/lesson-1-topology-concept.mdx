@@ -1,28 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- PostGIS Topology ile basit geometri arasındaki farkı açıklayabileceksin
-- Paylaşımlı kenar (shared edge) kavramının neden önemli olduğunu anlayabileceksin
-- Topoloji kullanım senaryolarını örnekleyebileceksin
+- PostGIS Topology ile basit geometri arasındaki farkı açıklamak
+- Paylaşımlı kenar (shared edge) kavramının önemini anlamak
+- Topoloji kullanım senaryolarını örneklemek
 
 ---
 
-## 📖 Kavram: Neden Topoloji?
+## Neden Topoloji?
 
 **Basit geometri (spaghetti model):**
 ```
 İl A poligonu: kendi kenarlarını tanımlar
 İl B poligonu: kendi kenarlarını tanımlar
 ```
-→ Ortak sınır iki kez saklanır. İl A sınırı güncellense, İl B güncellenmez → boşluk/örtüşme hatası.
+Ortak sınır iki kez saklanır. İl A sınırı güncellendiğinde İl B güncellenmez; boşluk veya örtüşme hatası oluşur.
 
 **Topoloji:**
 - Ortak sınır **bir kez** saklanır (shared edge)
 - Her poligon kenar listesine referans verir
-- Güncelleme: tek kenarda → tüm komşu poligonlar otomatik güncellenir
+- Güncelleme tek kenarda yapılır; tüm komşu poligonlar otomatik güncellenir
 
 ---
 
-## 📖 Kullanım Senaryoları
+## Kullanım Senaryoları
 
 | Senaryo | Sorun | Çözüm |
 |---|---|---|
@@ -33,7 +33,9 @@
 
 ---
 
-## ▶ Canlı Örnek — Çakışma Problemi (Basit Geometri)
+## Uygulama Örneği
+
+### Komşu parsel ortak sınır
 
 <RunnableBlock
   sql={`-- Komşu iki parsel — ortak kenar iki kez tanımlanmış
@@ -55,11 +57,10 @@ SELECT
 FROM parseller_basit a, parseller_basit b
 WHERE a.id < b.id AND ST_Touches(a.geom, b.geom);`}
   label="Komşu parsel ortak sınır"
+  description="İki komşu parsel oluşturulur; ortak kenar her parselin geometrisinde ayrı ayrı tanımlanmıştır. ST_Touches ortak sınırları tespit eder; ST_Intersection bu ortak sınırın geometrisini döndürür. Spaghetti modelde bu sınır iki kez saklandığından biri güncellendiğinde diğeri otomatik güncellenmez."
 />
 
----
-
-## ▶ Topoloji Soruları
+### Komşuluk ilişkisi
 
 <RunnableBlock
   sql={`-- Topoloji soruları basit geometriyle da yanıtlanabilir
@@ -73,11 +74,10 @@ JOIN parseller_basit b ON ST_Touches(a.geom, b.geom)
 WHERE a.id != b.id
 GROUP BY a.id, a.ad;`}
   label="Komşuluk ilişkisi"
+  description="ST_Touches yalnızca sınır temasını (not overlap) tespit eder. array_agg her parselin komşularını listeler. Basit geometriyle komşuluk sorgusu çalışır; ancak güncelleme tutarsızlığı riski devam eder çünkü ortak sınır gerçekten paylaşılmıyor, yalnızca aynı koordinatlar tekrar ediliyor."
 />
 
----
-
-## ▶ postgis_topology Extension
+### Topology extension kontrolü
 
 <RunnableBlock
   sql={`-- postgis_topology PGlite'ta mevcut mu?
@@ -85,13 +85,12 @@ SELECT name, default_version
 FROM pg_available_extensions
 WHERE name LIKE '%topolog%';`}
   label="Topology extension kontrolü"
+  description="pg_available_extensions sisteme kurulmuş ve kullanıma hazır extension'ları listeler. postgis_topology PostGIS 3.6.2 ile birlikte gelir; PGlite WASM bundle'ında mevcut olup olmadığı bu sorgu ile doğrulanır. Extension görünüyorsa sonraki derste topology API kullanılabilir."
 />
-
-> PGlite'ta `postgis_topology` mevcut olabilir (PGlite PostGIS 3.6.2 içerir). Extension yüklüyse sonraki dersde kullanacağız.
 
 ---
 
-## 🧪 Dene — Örtüşme Tespiti
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- İki poligon arası örtüşme var mı?
@@ -110,18 +109,13 @@ FROM parseller_basit a
 JOIN parseller_basit b ON a.id < b.id
 WHERE ST_Touches(a.geom, b.geom) AND NOT ST_Overlaps(a.geom, b.geom);`}
   label="Örtüşme ve komşuluk tespiti"
+  description="İki sorgu birlikte veri kalitesi denetimi yapar. ST_Overlaps tam örtüşmeyi tespit eder; sonuç dönerse geometriler çakışıyor demektir. İkinci sorgu ST_Touches AND NOT ST_Overlaps koşuluyla mükemmel komşuluğu doğrular. Sonuçta yalnızca ikinci sorgu kayıt döndürmeli; birinci sorgu boş olmalıdır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Spaghetti model büyük projede sorun:** Az sayıda parsel için basit geometri yeterli. 100K+ parsel → topoloji veya en azından constraint (ST_IsValid + check) zorunlu.
-2. **postgis_topology hafif ağırlıklı değil:** Kurulum, topoloji bakımı ve sorgu yazımı karmaşık. Basit komşuluk için `ST_Touches` yeterli.
-3. **PGlite topoloji desteği:** PostGIS 3.6.2 `postgis_topology` içerir ama PGlite WASM bundle'ında dahil olmayabilir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: `CreateTopology` ve `AddTopoGeometryColumn` ile topoloji kurulumu.
+1. **Spaghetti model büyük projede sorun:** Az sayıda parsel için basit geometri yeterlidir. 100K'dan fazla parsel ve sık güncelleme senaryolarında topoloji veya en azından constraint (ST_IsValid + check) zorunludur.
+2. **postgis_topology hafif ağırlıklı değil:** Kurulum, topoloji bakımı ve sorgu yazımı karmaşıktır. Basit komşuluk için `ST_Touches` yeterlidir.
+3. **PGlite topoloji desteği:** PostGIS 3.6.2 `postgis_topology` içerir; ancak PGlite WASM bundle'ında dahil olmayabilir.

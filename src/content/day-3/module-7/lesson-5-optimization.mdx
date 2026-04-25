@@ -1,22 +1,23 @@
-## ⚡ Capstone Part 3: Real-Time Optimization Engine
+## Capstone Bölüm 3: Rota Optimizasyonu ve Talep Tahmini
 
-**Hedef:** Delivery routing, demand forecasting, anomaly detection
-
----
-
-## 🎯 Optimization Challenges
-
-- 500+ orders/day
-- 100+ delivery vehicles
-- Multiple constraints (time windows, capacity, HOS)
-- Real-time optimization < 600ms
+**Hedef:** Araç-sipariş atama, hareketli ortalama ile talep tahmini ve anomali tespiti uygulamak.
 
 ---
 
-## ▶ Delivery Route Optimization
+## Öğrenim Hedefleri
+
+- Greedy insertion ile araç-sipariş atama algoritması uygulamak
+- Hareketli ortalama ile saatlik talep tahmini üretmek
+- Baseline karşılaştırması ile anomali tespiti yapmak
+
+---
+
+## Uygulama Örneği
+
+### Araç-sipariş atama (greedy insertion)
 
 <RunnableBlock
-  sql={`-- Order-to-vehicle assignment (greedy insertion)
+  sql={`-- Araç ve sipariş tabloları
 CREATE TABLE IF NOT EXISTS orders (
   id INT PRIMARY KEY,
   location GEOMETRY(POINT, 4326),
@@ -32,7 +33,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   current_load_kg INT
 );
 
--- Sample: Assign 10 orders to 3 vehicles
+-- Örnek veriler
 INSERT INTO orders VALUES
   (1, ST_MakePoint(28.97, 41.00), '09:00', '12:00', 5),
   (2, ST_MakePoint(28.98, 41.01), '10:00', '14:00', 3),
@@ -44,35 +45,39 @@ INSERT INTO vehicles VALUES
   (2, ST_MakePoint(28.99, 41.03), 50, 15)
 ON CONFLICT DO NOTHING;
 
--- Assignment result
+-- Her sipariş için kapasite uygunluğu olan en yakın araç
 WITH feasible AS (
   SELECT 
-    o.id AS order_id,
-    v.id AS vehicle_id,
-    ST_Distance(v.current_location::geography, o.location::geography)::int4 AS distance_m
+    o.id AS siparis_id,
+    v.id AS arac_id,
+    ST_Distance(v.current_location::geography, o.location::geography)::int4 AS mesafe_m
   FROM orders o, vehicles v
   WHERE v.current_load_kg + o.weight_kg <= v.capacity_kg
+),
+sirali AS (
+  SELECT 
+    siparis_id,
+    arac_id,
+    mesafe_m,
+    ROW_NUMBER() OVER (PARTITION BY siparis_id ORDER BY mesafe_m) AS siralama
+  FROM feasible
 )
-SELECT 
-  order_id,
-  vehicle_id,
-  distance_m,
-  ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY distance_m) AS rank
-FROM feasible
-WHERE ROW_NUMBER() OVER (PARTITION BY order_id ORDER BY distance_m) <= 1;`}
-  label="Route optimization (greedy insertion)"
+SELECT siparis_id, arac_id, mesafe_m
+FROM sirali
+WHERE siralama = 1
+ORDER BY siparis_id;`}
+  label="Araç-sipariş atama (greedy)"
+  description="Greedy insertion her siparişi kapasite kısıtını karşılayan en yakın araca atar. WHERE v.current_load_kg + o.weight_kg <= v.capacity_kg kapasite filtresi uygunsuz araçları dışlar. ROW_NUMBER() OVER (PARTITION BY siparis_id ORDER BY mesafe_m) her sipariş için araçları mesafeye göre sıralar. WHERE siralama = 1 yalnızca en yakın aracı seçer; bu yaklaşım pencere fonksiyonunu CTE'ye taşıyarak WHERE filtresini geçerli kılar."
 />
 
----
-
-## ▶ Demand Forecasting
+### Saatlik talep tahmini
 
 <RunnableBlock
-  sql={`-- 7-day demand forecast
+  sql={`-- Günlük teslimat geçmişi
 CREATE TABLE IF NOT EXISTS daily_deliveries (
-  date DATE,
-  hour INT,
-  delivery_count INT
+  tarih DATE,
+  saat INT,
+  teslimat_sayisi INT
 );
 
 INSERT INTO daily_deliveries VALUES
@@ -84,78 +89,55 @@ INSERT INTO daily_deliveries VALUES
   ('2024-01-02', 10, 70)
 ON CONFLICT DO NOTHING;
 
--- Forecast next 7 days (simple moving average)
-WITH daily_avg AS (
+-- Hareketli ortalama ile 7 günlük tahmin
+WITH saatlik_ort AS (
   SELECT 
-    hour,
-    AVG(delivery_count)::int4 AS avg_deliveries,
-    STDDEV(delivery_count)::numeric(6,2) AS std_dev
+    saat,
+    AVG(teslimat_sayisi)::int4 AS ort_teslimat,
+    STDDEV(teslimat_sayisi)::numeric(6,2) AS std_sapma
   FROM daily_deliveries
-  GROUP BY hour
+  GROUP BY saat
 )
 SELECT 
-  hour,
-  avg_deliveries AS forecast_count,
-  ROUND((avg_deliveries * 1.15)::numeric)::int4 AS with_15pct_buffer,
-  CEILING(avg_deliveries::numeric / 5)::int4 AS vehicles_needed
-FROM daily_avg
-ORDER BY hour;`}
-  label="Demand forecasting (7 days)"
+  saat,
+  ort_teslimat AS tahmin,
+  ROUND((ort_teslimat * 1.15)::numeric)::int4 AS pct15_tampon_ile,
+  CEILING(ort_teslimat::numeric / 5)::int4 AS gereken_arac
+FROM saatlik_ort
+ORDER BY saat;`}
+  label="Saatlik talep tahmini"
+  description="AVG ve STDDEV saatlik geçmiş verileri istatistiksel olarak özetler. pct15_tampon_ile = tahmin * 1.15 talep patlamalarına karşı %15 tampon ekler; bu değer operasyonel güvenlik marjını temsil eder. CEILING(ort_teslimat / 5) her saat için gereken minimum araç sayısını hesaplar (araç başına 5 teslimat kapasitesi varsayımıyla). Tahmin doğruluğu artıkça std_sapma değeri küçülür."
 />
 
 ---
 
-## ▶ Anomaly Detection
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Real-time anomaly detection (LOF-like)
-WITH hourly_stats AS (
+  sql={`-- Anlık anomali tespiti (baseline karşılaştırması)
+WITH saatlik_istatistik AS (
   SELECT 
-    EXTRACT(HOUR FROM CURRENT_TIMESTAMP)::int4 AS hour,
-    COUNT(*) AS current_count,
-    (SELECT AVG(delivery_count) FROM daily_deliveries 
-     WHERE EXTRACT(HOUR FROM date) = EXTRACT(HOUR FROM CURRENT_TIMESTAMP)) AS expected_count
+    EXTRACT(HOUR FROM CURRENT_TIMESTAMP)::int4 AS saat,
+    COUNT(*) AS anlık_sayi,
+    (SELECT AVG(teslimat_sayisi)::int4
+     FROM daily_deliveries 
+     WHERE saat = EXTRACT(HOUR FROM CURRENT_TIMESTAMP)::int4
+    ) AS beklenen_sayi
+  FROM daily_deliveries
+  WHERE tarih = CURRENT_DATE
+  GROUP BY saat
 )
 SELECT 
-  hour,
-  current_count,
-  expected_count::int4,
+  saat,
+  anlık_sayi,
+  beklenen_sayi,
   CASE 
-    WHEN expected_count IS NULL THEN 'NO_BASELINE'
-    WHEN current_count > expected_count * 1.5 THEN '🔴 ANOMALY_HIGH'
-    WHEN current_count < expected_count * 0.5 THEN '🔴 ANOMALY_LOW'
-    ELSE '🟢 NORMAL'
-  END AS status
-FROM hourly_stats;`}
-  label="Real-time anomaly detection"
+    WHEN beklenen_sayi IS NULL     THEN 'BASELINE YOK'
+    WHEN anlık_sayi > beklenen_sayi * 1.5 THEN 'ANOMALI - YUKSEK'
+    WHEN anlık_sayi < beklenen_sayi * 0.5 THEN 'ANOMALI - DUSUK'
+    ELSE 'NORMAL'
+  END AS durum
+FROM saatlik_istatistik;`}
+  label="Anlık anomali tespiti"
+  description="Anomali tespiti mevcut saatin değerini geçmiş aynı saatin ortalamasıyla karşılaştırır. Beklenen değerin 1.5 katını aşan sayı yüksek anomali, 0.5 katının altına düşen ise düşük anomali olarak sınıflandırılır. Bu eşikler ±%50 sapmaya karşılık gelir; gerçek uygulamada z-skoru veya IQR tabanlı adaptif eşikler tercih edilir. beklened_sayi IS NULL baseline verisi olmayan saatler için uyarı verir."
 />
-
----
-
-## ▶ Performance Summary
-
-<RunnableBlock
-  sql={`-- Optimization results
-SELECT 
-  'Optimization Metric' AS metric,
-  '36-40%' AS cost_reduction,
-  '< 600ms' AS optimization_time,
-  '500+' AS orders_per_day,
-  '100+' AS vehicles_managed,
-  '95%+' AS constraint_satisfaction
-;`}
-  label="Optimization performance"
-/>
-
----
-
-## ✨ Özet
-
-Real-time optimization:
-- ✓ Greedy insertion routing (< 600ms)
-- ✓ 7-day demand forecasting
-- ✓ Anomaly detection (LOF)
-- ✓ 36-40% cost reduction
-- ✓ Multi-constraint satisfaction
-
-**Sonraki ders:** Production deployment & ROI

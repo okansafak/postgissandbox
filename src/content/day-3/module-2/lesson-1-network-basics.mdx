@@ -1,14 +1,14 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Ağ analizi için düğüm-kenar modelini açıklayabileceksin
-- pgRouting'in PGlite'ta sınırlı desteğini anlayabileceksin
-- Basit bir yol ağı tablosu oluşturabileceksin
+- Ağ analizi için düğüm-kenar modelini açıklamak
+- pgRouting'in PGlite'ta sınırlı desteğini kavramak
+- Basit bir yol ağı tablosu oluşturmak
 
 ---
 
-## 📖 Kavram: Graf Teorisi ve Yol Ağı
+## Graf Teorisi ve Yol Ağı
 
-Ağ analizi: Düğümler (kavşaklar) + Kenarlar (yollar) + Ağırlıklar (mesafe/süre) ile optimum güzergah bulma.
+Ağ analizi; düğümler (kavşaklar), kenarlar (yollar) ve ağırlıklar (mesafe/süre) kullanarak optimum güzergah bulmaya dayanır.
 
 | Kavram | Yol ağında karşılığı |
 |---|---|
@@ -18,11 +18,11 @@ Ağ analizi: Düğümler (kavşaklar) + Kenarlar (yollar) + Ağırlıklar (mesaf
 | **Yönlü graf** | Tek yönlü sokak |
 | **Yönsüz graf** | İki yönlü yol |
 
-**pgRouting:** PostgreSQL + PostGIS üzerine kurulu ağ analizi extension'ı. PGlite'ta resmi destek **yok** — bu modülde kavramsal anlatım + örnek veri üzerinde simülasyon yapacağız.
+**pgRouting:** PostgreSQL + PostGIS üzerine kurulu ağ analizi extension'ıdır. PGlite'ta resmi desteği bulunmadığından bu modülde kavramsal anlatım ve örnek veri üzerinde simülasyon uygulanır.
 
 ---
 
-## 📖 Yol Ağı Tablo Şeması
+## Yol Ağı Tablo Şeması
 
 pgRouting standart şeması:
 ```sql
@@ -38,7 +38,9 @@ CREATE TABLE yollar (
 
 ---
 
-## ▶ Canlı Örnek — Basit Yol Ağı Oluştur
+## Uygulama Örneği
+
+### Yol ağı tablosu
 
 <RunnableBlock
   sql={`-- Basitleştirilmiş İstanbul Avrupa yakası yol ağı (sentetik)
@@ -65,11 +67,10 @@ CREATE INDEX IF NOT EXISTS idx_yol_agi_geom ON yol_agi USING gist(geom);
 
 SELECT id, source, target, yol_adi, ROUND(uzunluk_m::numeric) AS m, tek_yon FROM yol_agi;`}
   label="Yol ağı tablosu"
+  description="5 düğümlü (Taksim, Beşiktaş, Şişli, Levent, Maslak) ve 6 kenarlı sentetik yol ağı oluşturulur. source/target sütunları pgRouting standart şemasını izler. tek_yon = TRUE olan kenar (TEM Bağlantı) yalnızca Levent → Maslak yönünde geçişe izin verir. GiST indeks mekansal sorgular için eklenir."
 />
 
----
-
-## ▶ Düğüm Koordinatları
+### Düğüm noktaları ve ağ özeti
 
 <RunnableBlock
   sql={`-- Düğüm noktaları — başlangıç/bitiş koordinatları
@@ -94,11 +95,12 @@ SELECT
   ROUND(SUM(uzunluk_m)::numeric/1000, 1) AS toplam_km
 FROM yol_agi;`}
   label="Düğüm noktaları ve ağ özeti"
+  description="Haritada görünecek düğüm noktaları POINT geometrisiyle yol_dugumler tablosuna eklenir. ON CONFLICT DO NOTHING birden fazla çalıştırmada çakışmayı önler. Ağ özeti benzersiz düğüm sayısını, kenar sayısını ve toplam yol uzunluğunu km cinsinden özetler."
 />
 
 ---
 
-## 🧪 Dene — Bağlantılı Komşular
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Her düğümün komşuları
@@ -113,18 +115,13 @@ JOIN yol_dugumler k ON (
 GROUP BY d.id, d.ad
 ORDER BY d.ad;`}
   label="Komşu düğüm listesi"
+  description="Her düğümün komşularını listeler. JOIN yol_agi ON source = d.id OR target = d.id her iki yöndeki bağlantıları yakalar. CASE ifadesi karşı düğümü belirler. array_agg komşu isimlerini alfabetik sıraya dizer. Bağlantı sayısı az olan düğümler ağ giriş/çıkış noktalarını (dead-end) gösterir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **pgRouting PGlite'ta yok:** `pgr_dijkstra` gibi fonksiyonlar çalışmaz. Sonraki derslerde recursive CTE ile Dijkstra simülasyonu yapacağız.
-2. **source/target INT olmalı:** pgRouting standart şeması integer node ID bekler.
-3. **Tek yönlü kenarlar:** `reverse_cost = -1` olunca pgRouting bu yönde geçiş yapmaz. Simülasyonda `tek_yon = TRUE` ile kontrol edeceğiz.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **pgr_createTopology benzeri** — ham yol geometrisinden ağ topolojisi oluşturma.
+1. **pgRouting PGlite'ta yok:** `pgr_dijkstra` gibi fonksiyonlar çalışmaz. Sonraki derslerde recursive CTE ile Dijkstra simülasyonu uygulanır.
+2. **source/target INT olmalı:** pgRouting standart şeması integer düğüm ID bekler; TEXT veya UUID kullanılamaz.
+3. **Tek yönlü kenarlar:** `reverse_cost = -1` olduğunda pgRouting bu yönde geçiş yapmaz. Simülasyonda `tek_yon = TRUE` sütunuyla kontrol sağlanır.

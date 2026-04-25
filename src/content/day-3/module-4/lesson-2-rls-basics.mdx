@@ -1,15 +1,15 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Row Level Security (RLS) kavramını açıklayabileceksin
-- `CREATE POLICY` ile satır filtresi yazabileceksin
-- `current_user` ve `current_setting` ile dinamik politika oluşturabileceksin
+- Row Level Security (RLS) kavramını açıklamak
+- `CREATE POLICY` ile satır filtresi yazmak
+- `current_user` ve `current_setting` ile dinamik politika oluşturmak
 
 ---
 
-## 📖 Kavram: Row Level Security
+## Row Level Security
 
-Normal yetki: Tüm tablo okunabilir veya hiçbiri.
-**RLS:** Her kullanıcı sadece kendi satırlarını görür.
+Normal yetki modeli tablo düzeyinde çalışır: tüm tablo okunabilir veya hiçbiri.
+**RLS:** Her kullanıcı yalnızca kendi satırlarını görür.
 
 ```sql
 -- 1. RLS etkinleştir
@@ -20,11 +20,13 @@ CREATE POLICY p ON t FOR SELECT
   USING (sahip = current_user);
 ```
 
-Politika olmayan tabloda RLS aktifse → hiçbir satır dönmez (deny-by-default).
+Politika tanımlı olmayan bir tabloda RLS aktifse hiçbir satır döner (deny-by-default).
 
 ---
 
-## ▶ Canlı Örnek — Kullanıcı Bazlı Politika
+## Uygulama Örneği
+
+### RLS politika kurulumu
 
 <RunnableBlock
   sql={`-- Kullanıcı sahipliği olan tablo
@@ -51,11 +53,10 @@ CREATE POLICY kullanici_politika ON kullanici_verileri
 -- Superuser politika dışında — tümünü görür
 SELECT * FROM kullanici_verileri;`}
   label="RLS politika kurulumu"
+  description="kullanici_verileri tablosuna 3 satır eklenir; ikisi 'ahmet', biri 'mehmet' sahibi. ENABLE ROW LEVEL SECURITY politikayı devreye alır. CREATE POLICY USING(kullanici = current_user) her SELECT sorgusuna otomatik WHERE filtresi ekler. Superuser BYPASSRLS ile politikayı atlar ve tüm satırları görür; bu nedenle test için normal kullanıcıya geçilmesi gerekir."
 />
 
----
-
-## ▶ current_setting ile Dinamik Politika
+### Session değişkeni ile RLS
 
 <RunnableBlock
   sql={`-- Session parametresiyle dinamik filtre
@@ -85,17 +86,19 @@ CREATE POLICY il_politika ON bolge_verileri
 SET app.il_kodu = '34';
 SELECT * FROM bolge_verileri;`}
   label="Session değişkeni ile RLS"
+  description="current_setting('app.il_kodu', TRUE) oturum değişkenini okur; TRUE parametresi değişken tanımlı değilse NULL döndürür (hata vermez). SET app.il_kodu = '34' oturuma özel parametre ayarlar; politika bu değere göre satırları filtreler. OR IS NULL koşulu parametresiz oturumlarda tüm satırları gösterir."
 />
 
 ---
 
-## 🧪 Dene — Farklı İl Kodu
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Ankara için filtrele
 SET app.il_kodu = '06';
 SELECT il_kod, ad FROM bolge_verileri;`}
   label="Ankara il filtresi"
+  description="app.il_kodu = '06' ile Ankara il kodu ayarlanır. Politika bu oturumda yalnızca il_kod = '06' olan satırları döndürür. Farklı kullanıcılar farklı oturum parametreleriyle farklı il verilerine erişebilir; bu yaklaşım çok kiracılı (multi-tenant) uygulamalarda yaygın kullanılır."
 />
 
 <RunnableBlock
@@ -103,18 +106,13 @@ SELECT il_kod, ad FROM bolge_verileri;`}
 SET app.il_kodu = '';
 SELECT il_kod, ad FROM bolge_verileri;`}
   label="Filtre kaldır"
+  description="Boş string atanması current_setting('app.il_kodu', TRUE) değerini boş string yapar. Politikadaki il_kod = '' koşulu hiçbir il kodu ile eşleşmez; OR IS NULL da sağlanmaz. Bu senaryoda tüm satırlar gizlenir. Gerçek 'tümünü gör' davranışı için SET app.il_kodu = NULL; veya RESET app.il_kodu; kullanılmalıdır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Superuser RLS'yi atlar:** `BYPASSRLS` yetkisine sahip kullanıcılar politikayı görmez. Test için normal kullanıcıya geç.
-2. **`current_setting` ikinci parametre:** `current_setting('app.x', TRUE)` — TRUE = ayar yoksa NULL döner, hata vermez. FALSE ise hata verir.
-3. **Performance:** RLS politikası her sorguya WHERE eklenir. Politika sütununda indeks olmazsa yavaşlar. `il_kod` üzerine B-tree index ekle.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste mekansal RLS: **ST_Within ile il bazlı erişim kontrolü**.
+1. **Superuser RLS'yi atlar:** `BYPASSRLS` yetkisine sahip kullanıcılar politikayı görmez. Test için normal kullanıcıya geçilmelidir.
+2. **`current_setting` ikinci parametre:** `current_setting('app.x', TRUE)` — TRUE ile ayar yoksa NULL döner; FALSE ile hata üretir. TRUE her zaman tercih edilmelidir.
+3. **Performans:** RLS politikası her sorguya WHERE ekler. Politika sütununda indeks olmazsa performans düşer; `il_kod` üzerine B-tree indeks eklenmelidir.

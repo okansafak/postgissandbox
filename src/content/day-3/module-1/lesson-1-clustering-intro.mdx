@@ -1,14 +1,14 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Mekansal kümeleme kavramını açıklayabileceksin
-- KMeans, DBSCAN ve H3 yöntemlerini karşılaştırabileceksin
-- Hangi durumda hangi yöntemi seçeceğine karar verebileceksin
+- Mekansal kümeleme kavramını açıklamak
+- KMeans, DBSCAN ve H3 yöntemlerini karşılaştırmak
+- Hangi durumda hangi yöntemin tercih edileceğine karar vermek
 
 ---
 
-## 📖 Kavram: Mekansal Kümeleme Nedir?
+## Mekansal Kümeleme Nedir?
 
-Kümeleme: Birbirine yakın nesneleri otomatik olarak gruplama — önceden etiket olmadan.
+Kümeleme, birbirine yakın nesneleri önceden etiket olmadan otomatik olarak gruplama işlemidir.
 
 **Kullanım alanları:**
 - Şube lokasyonu optimizasyonu
@@ -18,7 +18,7 @@ Kümeleme: Birbirine yakın nesneleri otomatik olarak gruplama — önceden etik
 
 ---
 
-## 📖 Üç Ana Yaklaşım
+## Üç Ana Yaklaşım
 
 | Yöntem | Küme sayısı | Gürültü toleransı | En iyi kullanım |
 |---|---|---|---|
@@ -28,7 +28,9 @@ Kümeleme: Birbirine yakın nesneleri otomatik olarak gruplama — önceden etik
 
 ---
 
-## ▶ Canlı Örnek — Test Verisi
+## Uygulama Örneği
+
+### Test verisi oluşturma
 
 <RunnableBlock
   sql={`-- Kümeleme için test verisi: İstanbul çevresinde 500 nokta
@@ -62,11 +64,10 @@ ANALYZE kaza_noktalari;
 
 SELECT COUNT(*) AS toplam_kayit FROM kaza_noktalari;`}
   label="Kümeleme test verisi"
+  description="Üç gerçek yoğunluk bölgesi (Boğaziçi, TEM Bağcılar, E-5 Maltepe) ve rastgele dağılmış gürültü noktalarından oluşan 500 kayıtlık test seti oluşturulur. ON CONFLICT DO NOTHING birden fazla çalıştırmada tekrar ekleme yapmaz. GiST indeks mekansal kümeleme sorgularını hızlandırır; ANALYZE istatistikleri günceller."
 />
 
----
-
-## ▶ Yöntem Karşılaştırma Tablosu
+### KMeans küme dağılımı
 
 <RunnableBlock
   sql={`-- KMeans: 5 küme, her noktaya küme numarası ata
@@ -78,11 +79,12 @@ FROM kaza_noktalari
 ORDER BY kmeans_id
 LIMIT 10;`}
   label="KMeans küme dağılımı (ilk 10)"
+  description="ST_ClusterKMeans(geom, 5) bir window function olarak çalışır ve her satıra 0–4 arası küme numarası atar. OVER () tüm tabloyu tek pencere olarak işler. COUNT(*) OVER (PARTITION BY ...) her kümenin toplam boyutunu hesaplar. Sonuç her noktanın hangi kümeye atandığını gösterir."
 />
 
 ---
 
-## 🧪 Dene — Küme Merkezleri
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Her KMeans kümesinin merkezi
@@ -99,18 +101,13 @@ FROM (
 GROUP BY kume_id
 ORDER BY nokta_sayisi DESC;`}
   label="KMeans küme merkezleri"
+  description="ST_Collect küme içindeki tüm nokta geometrilerini bir MultiPoint'e toplar. ST_Centroid bu koleksiyonun ağırlık merkezini hesaplar. ST_AsText WKT formatına çevirir. Sonuç her kümenin merkez koordinatlarını ve içindeki nokta sayısını listeler; bu noktalar şube yer seçimi için aday konumlar olarak kullanılabilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **KMeans küre sayısını önceden bilmek gerekir:** Kaç küme olduğunu bilmiyorsan DBSCAN daha iyi seçim.
-2. **KMeans geometri ağırlığı izler:** Tüm noktalar eşit ağırlıklı — outlier etkisi azaltılamaz.
-3. **DBSCAN parametreler kritik:** `eps` (mesafe) ve `min_points` yanlış ayarlanınca tüm noktalar tek küme veya gürültü olabilir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste KMeans detaylı: **ST_ClusterKMeans** ile şube optimizasyonu.
+1. **KMeans küme sayısını önceden bilmek gerekir:** Kaç küme olduğu bilinmiyorsa DBSCAN daha uygun bir seçimdir.
+2. **KMeans geometri ağırlığı izler:** Tüm noktalar eşit ağırlıklıdır; aykırı değerlerin etkisi azaltılamaz.
+3. **DBSCAN parametreler kritik:** `eps` (mesafe) ve `min_points` yanlış ayarlandığında tüm noktalar tek küme veya gürültü olarak sınıflandırılabilir.

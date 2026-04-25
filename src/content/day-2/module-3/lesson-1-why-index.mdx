@@ -1,23 +1,25 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- B-Tree indeksin neden poligonlarla çalışmadığını açıklayabileceksin
-- GIST indeksinin temel mantığını özetleyebileceksin
-- İndekssiz mekansal sorgunun maliyetini görebileceksin
+Mekansal verinin boyutu arttıkça indekssiz sorgular kabul edilemez süreler almaya başlar. Klasik B-Tree indeksleri iki boyutlu mekansal ilişkileri destekleyemez; bu boşluğu GiST doldurur. Bu ders, mekansal indeksin temel mantığını ve pratik etkisini göstermektedir.
+
+- B-Tree indeksin poligonlarla neden çalışmadığını açıklamak
+- GiST indeksinin temel mantığını anlamak
+- İndekssiz mekansal sorgunun maliyetini gözlemlemek
 
 ---
 
-## 📖 Kavram: B-Tree Neden Yetmez?
+## B-Tree Neden Yetmez?
 
-Klasik B-Tree indeks **sıralı** verileri destekler: sayılar, metinler, tarihler. "28.979 < X < 32.854" gibi aralık sorguları çalışır.
+Klasik B-Tree indeks **sıralı** verileri destekler: sayılar, metinler, tarihler. "28.979 < X < 32.854" gibi aralık sorguları için uygundur.
 
-Ama "Bu poligon o poligonla kesişiyor mu?" sorusu **iki boyutlu** — başlangıç/bitiş değeri yoktur. B-Tree bu soru için sequential scan'dan daha iyi yapamaz.
+"Bu poligon o poligonla kesişiyor mu?" sorusu ise **iki boyutludur** — başlangıç/bitiş değeri yoktur. B-Tree bu soru için tam tablo taramasından daha iyi bir performans sunamaz.
 
-### GIST (Generalized Search Tree)
+### GiST (Generalized Search Tree)
 
-R-Tree tabanlı mekansal indeks. Her geometri için **bounding box (MBR)** saklar. Sorguda:
+R-Tree tabanlı mekansal indeks. Her geometri için **bounding box (MBR)** saklar. Sorgu iki aşamada çözülür:
 
-1. **Hızlı faz:** bbox'lar kesişiyor mu? (indeks kullanır)
-2. **Kesin faz:** Gerçek geometri testi (indeks sonrası)
+1. **Hızlı faz (indeks):** Bounding box'lar kesişiyor mu?
+2. **Kesin faz (heap):** Gerçek geometri testi
 
 ```
 İndekssiz: Tüm tabloyu tara → N geometri testi
@@ -26,7 +28,9 @@ R-Tree tabanlı mekansal indeks. Her geometri için **bounding box (MBR)** sakla
 
 ---
 
-## ▶ Canlı Örnek — İndekssiz Sorgu Maliyeti
+## Uygulama Örneği
+
+### İndekssiz sorgu planı
 
 <RunnableBlock
   sql={`-- Test tablosu: 1000 nokta
@@ -51,11 +55,10 @@ WHERE ST_DWithin(
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
   100000);`}
   label="İndekssiz sorgu planı"
+  description="Türkiye koordinat aralığında 1000 rastgele nokta oluşturulur ve GiST indeksi olmadan sorgu planı EXPLAIN ile incelenir. Beklenen çıktı 'Seq Scan' içerir — tablo sıralı olarak taranır. Rows sütunundaki tahmini satır sayısı ve cost değeri, indeks eklendikten sonraki planla karşılaştırılacaktır."
 />
 
----
-
-## ▶ İndeks Ekle ve Karşılaştır
+### GiST indeksi ekle ve karşılaştır
 
 <RunnableBlock
   sql={`-- GIST indeks oluştur
@@ -71,12 +74,13 @@ WHERE ST_DWithin(
   geom::geography,
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
   100000);`}
-  label="GIST sonrası sorgu planı"
+  label="GiST sonrası sorgu planı"
+  description="GiST indeksi oluşturulduktan ve ANALYZE ile istatistikler güncellendikten sonra aynı sorgunun planı incelenir. 'Bitmap Index Scan' veya 'Index Scan' satırı indeksin devreye girdiğini gösterir. cost değerinin düştüğü ve rows tahmininin daha küçük olduğu gözlemlenir. ANALYZE olmadan planlayıcı eski istatistiklerle çalışır ve indeksi seçmeyebilir."
 />
 
 ---
 
-## 🧪 Dene — Kaç Nokta Kapsıyor?
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`SELECT COUNT(*)
@@ -87,18 +91,13 @@ WHERE ST_DWithin(
   200000  -- 200 km
 );`}
   label="200 km içindeki nokta sayısı"
+  description="GiST indeksli tabloda İstanbul'a 200 km içindeki noktaları sayan sorgu çalıştırılır. İndeks, önce bounding box eleme ile aday satırları hızla belirler; ardından ST_DWithin kesin testi uygular. Sonuç sayısı tablodaki nokta dağılımına bağlı olarak değişir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **İndeks otomatik kullanılmaz her zaman:** Çok küçük tablolarda planner sequential scan tercih edebilir — bu doğrudur, indeks overhead'i büyük tablolarda karlı.
-2. **ANALYZE unutulursa:** `CREATE INDEX` sonrası `ANALYZE` çalıştırılmazsa planner eski istatistikleri kullanır.
-3. **geography sütun için ayrı indeks:** `geom GEOMETRY(POINT,4326)` sütuna `GIST(geom)` indeks, `geom::geography` sorgusunda da kullanılır — cast indeksi devre dışı bırakmaz.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste GIST indeksi oluşturma detayları ve `CREATE INDEX` sözdizimi.
+1. **İndeks küçük tablolarda otomatik kullanılmaz.** Planlayıcı çok küçük tablolarda tam tablo taramasını tercih edebilir; bu doğru bir karardır. İndeks yalnızca büyük tablolarda kayda değer performans kazanımı sağlar.
+2. **`ANALYZE` unutulursa plan bozulabilir.** `CREATE INDEX` sonrasında `ANALYZE` çalıştırılmazsa planlayıcı eski istatistiklere dayanır ve indeksi kullanmayabilir.
+3. **`geography` cast indeksi devre dışı bırakmaz.** `geom GEOMETRY(POINT, 4326)` sütununa oluşturulan `GIST(geom)` indeksi, `geom::geography` biçimindeki sorgularda da kullanılır.

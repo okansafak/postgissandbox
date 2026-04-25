@@ -1,38 +1,42 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `WHERE ST_Distance(...) < x` neden indeks kullanmadığını açıklayabileceksin
-- `ST_DWithin` ile neden her zaman değiştirmen gerektiğini söyleyebileceksin
-- Mesafe filtresinde `geography` ve `geometry` davranış farkını anlayabileceksin
+Mesafe filtresi yazmanın iki yolu vardır; biri GiST indeksini kullanır, diğeri kullanmaz. Bu fark büyük tablolarda sorgu süresini saniyeden milisaniyeye düşürebilir. Bu ders, mekansal sorgunun en yaygın performans antipattern'ini ve çözümünü ele almaktadır.
+
+- `WHERE ST_Distance(...) < x` neden indeks kullanmadığını açıklamak
+- `ST_DWithin` ile her zaman değiştirme gerekçesi
+- Mesafe filtresinde `geography` ve `geometry` davranış farkı
 
 ---
 
-## 📖 Kavram: Antipattern
+## Antipattern: ST_Distance < N
 
 ```sql
--- ❌ YANLIŞ — indeks bypass eder, her satırı hesaplar
+-- YANLIŞ — indeksi bypass eder, her satırı hesaplar
 WHERE ST_Distance(geom::geography, ref_point::geography) < 100000
 
--- ✅ DOĞRU — GIST indeksi kullanır
+-- DOĞRU — GiST indeksini kullanır
 WHERE ST_DWithin(geom::geography, ref_point::geography, 100000)
 ```
 
-**Neden?** `ST_Distance < x` bir fonksiyon sonucunu karşılaştırır — PostgreSQL bunu index sargable (sargable) görmez ve full scan yapar. `ST_DWithin` ise özel bir operatör ailesidir, GIST operatör sınıfı tarafından index scan'a çevrilir.
+**Neden?** `ST_Distance < x` bir fonksiyon sonucunu karşılaştırır — PostgreSQL bunu "sargable" (indeks uyumlu) görmez ve tam tablo taraması yapar. `ST_DWithin` ise GiST operatör sınıfı tarafından desteklenen özel bir operatör ailesidir ve indeks taramasına çevrilir.
 
 ---
 
-## 📖 Geography vs Geometry Mesafe
+## Geography vs Geometry Mesafe
 
 | | `geometry` | `geography` |
 |---|---|---|
 | Mesafe birimi | Koordinat birimi (derece) | Metre |
-| `ST_DWithin(a, b, 100000)` | 100000 derece (dev alan!) | 100 km |
-| Doğruluk | Düzlemsel | Elipsoidal (gerçek dünya) |
+| `ST_DWithin(a, b, 100000)` | 100.000 derece (tüm dünya!) | 100 km |
+| Doğruluk | Düzlemsel | Elipsoid (gerçek dünya) |
 
-**Kural:** Metre cinsinden mesafe → `::geography` cast kullan.
+**Kural:** Metre cinsinden mesafe filtresi için `::geography` cast kullanılmalıdır.
 
 ---
 
-## ▶ Canlı Örnek — Antipattern Planı
+## Uygulama Örneği
+
+### ST_Distance antipattern planı
 
 <RunnableBlock
   sql={`-- Hazırlık: indeksli tablo
@@ -49,7 +53,7 @@ ON CONFLICT DO NOTHING;
 CREATE INDEX IF NOT EXISTS idx_mesafe_geom ON mesafe_test USING gist(geom);
 ANALYZE mesafe_test;
 
--- ❌ Antipattern — planı gör
+-- YANLIŞ — planı gör
 EXPLAIN ANALYZE
 SELECT COUNT(*) FROM mesafe_test
 WHERE ST_Distance(
@@ -57,14 +61,13 @@ WHERE ST_Distance(
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography
 ) < 200000;`}
   label="ST_Distance antipattern planı"
+  description="3000 noktalı indeksli tabloda ST_Distance < 200000 koşuluyla sorgu EXPLAIN ANALYZE ile incelenir. GiST indeksi mevcut olmasına karşın 'Seq Scan' görünür — planlayıcı fonksiyon sonucu üzerindeki karşılaştırmayı indeks uyumlu bulamaz. 'actual time' ve 'rows' değerleri tüm tablonun tarandığını doğrular."
 />
 
----
-
-## ▶ ST_DWithin ile Karşılaştır
+### ST_DWithin — doğru yol
 
 <RunnableBlock
-  sql={`-- ✅ Doğru yol — indeks kullanır
+  sql={`-- DOĞRU — GiST indeksi kullanır
 EXPLAIN ANALYZE
 SELECT COUNT(*) FROM mesafe_test
 WHERE ST_DWithin(
@@ -73,14 +76,13 @@ WHERE ST_DWithin(
   200000
 );`}
   label="ST_DWithin — indeks kullanan plan"
+  description="Aynı sorgu ST_DWithin ile yazıldığında EXPLAIN planı 'Index Scan' veya 'Bitmap Index Scan' gösterir. 'actual time' değeri antipattern sürümünden belirgin biçimde düşük olmalıdır. Bu karşılaştırma iki sorgu arasındaki pratik performans farkını somut sayılarla ortaya koyar."
 />
 
----
-
-## ▶ En Yakın N Nokta (KNN)
+### KNN — en yakın N nokta
 
 <RunnableBlock
-  sql={`-- KNN: <-> operatörü GIST indeksi ile çalışır
+  sql={`-- KNN: <-> operatörü GiST indeksi ile çalışır
 SELECT
   id,
   ROUND(ST_Distance(
@@ -91,17 +93,15 @@ FROM mesafe_test
 ORDER BY geom <-> ST_SetSRID(ST_MakePoint(28.979,41.015),4326)
 LIMIT 5;`}
   label="KNN — en yakın 5 nokta"
+  description="En yakın N nokta sorgusunda ORDER BY ST_Distance(...) tam tablo taraması yapar. Bunun yerine ORDER BY geom <-> ref GiST indeksini devreye sokar ve sadece en yakın adayları sıralar. ST_Distance SELECT'te doğrulama için kullanılır ancak sıralama için kullanılmaz. <-> operatörü bbox merkezine göre yaklaşık mesafe üretir; kesin mesafe ST_Distance ile doğrulanır."
 />
-
-> `<->` operatörü (KNN-GIST) sıralama için indeks kullanır. `ORDER BY ST_Distance(...)` kullanma — tam tarama yapar.
 
 ---
 
-## 🧪 Dene — Geometry'de Mesafe Hatası
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- geometry ile ST_DWithin: 1 birim = 1 derece (~111 km ekvatorda)
--- Bu sorgu aynı mı çalışır?
 SELECT COUNT(*) FROM mesafe_test
 WHERE ST_DWithin(
   geom,  -- geography cast YOK
@@ -109,18 +109,13 @@ WHERE ST_DWithin(
   2.0    -- 2 derece ≈ 222 km (ama Türkiye enleminde ~160 km)
 );`}
   label="Geometry ST_DWithin — derece cinsinden"
+  description="::geography cast olmadan ST_DWithin derece biriminde çalışır: 2.0 derece Türkiye enleminde yaklaşık 160-222 km'ye karşılık gelir. Aynı değer ::geography ile 2 metreye karşılık gelirdi. Bu sorgu, koordinat sistemi ve birim uyumsuzluğunun sessizce yanlış sonuç ürettiğini gösterir; hata mesajı verilmez."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`ST_Distance` + `ORDER BY` + `LIMIT`:** Eğer `LIMIT` varsa PostgreSQL bazen index scan'a geçebilir — ama garanti değil. `<->` operatörü güvenli.
-2. **`ST_DWithin` geometry vs geography:** `geometry` versiyon derece, `geography` versiyon metre. Karışık kullanım yanlış sonuç verir.
-3. **Büyük `ST_DWithin` alanı:** 2000 km yarıçapı → neredeyse tüm tablo döner. Bu durumda seq scan normal — yanlış plan değil.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **WHERE yan tümcesinde fonksiyon kullanımı** — neden `WHERE ST_X(geom) > 28` yavaşlatır?
+1. **`ST_Distance + ORDER BY + LIMIT` kombinasyonunda indeks seçilebilir.** `LIMIT` varsa planlayıcı bazen index scan'a geçebilir; ancak bu garanti değildir. KNN sorguları için `<->` operatörü her zaman tercih edilmelidir.
+2. **`ST_DWithin(geometry, geometry, N)` derece kullanır.** `::geography` cast'ı olmadan N değeri metre değil derece olarak yorumlanır; istemeden büyük alanlar sorgulanabilir.
+3. **Çok büyük `ST_DWithin` alanı.** 2000 km yarıçaplı bir sorgu neredeyse tüm tabloyu döndürür; bu durumda Seq Scan normal ve doğru bir seçimdir.

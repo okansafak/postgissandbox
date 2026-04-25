@@ -1,35 +1,39 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Distance` ile iki nokta arasındaki mesafeyi doğru hesaplayabileceksin
-- Birim sorununu (derece vs metre) çözebileceksin
-- `geography` ve `ST_Transform` yollarını karşılaştırabileceksin
+Mesafe hesabı mekansal analizin en temel işlemlerinden biridir; ancak koordinat sistemine bağlı birim sorununu doğru çözmeden güvenilir sonuçlar elde edilemez. Bu ders, `ST_Distance`'ın üç farklı kullanım biçimini ve her birinin ne zaman tercih edileceğini ele almaktadır.
+
+- `ST_Distance` ile minimum geometrik mesafeyi hesaplamak
+- Birim sorununu (derece / metre) doğru çözmek
+- `geography`, `ST_Transform` ve `ST_DistanceSphere` yollarını karşılaştırmak
 
 ---
 
-## 📖 Kavram: ST_Distance
+## ST_Distance: Birim Kuralı
 
-`ST_Distance(A, B)` iki geometri arasındaki **minimum mesafeyi** döndürür.
+`ST_Distance(A, B)` iki geometri arasındaki minimum mesafeyi döndürür. Döndürdüğü birimi SRID belirler:
 
-Döndürdüğü birim SRID'e bağlıdır:
-- `geometry` EPSG:4326 → **derece** (anlamsız uzun mesafelerde)
+- `geometry` EPSG:4326 → **derece** (uzun mesafelerde anlamsız)
 - `geometry` EPSG:32635 (UTM) → **metre**
-- `geography` → **metre** (elipsoid, doğru)
+- `geography` → **metre** (elipsoid üzerinde doğru)
+
+Üç güvenilir yol:
 
 ```sql
--- 3 doğru yol:
--- 1) geography cast
+-- 1) geography cast — en pratik
 ST_Distance(a::geography, b::geography)
 
 -- 2) ST_Transform → UTM
 ST_Distance(ST_Transform(a, 32636), ST_Transform(b, 32636))
 
--- 3) ST_DistanceSphere (hızlı ama daha az hassas)
+-- 3) ST_DistanceSphere — hızlı, küre varsayımıyla yaklaşık
 ST_DistanceSphere(a, b)
 ```
 
 ---
 
-## ▶ Canlı Örnek — Şehirlerarası Mesafe Tablosu
+## Uygulama Örneği
+
+### Şehirlerarası mesafe matrisi
 
 <RunnableBlock
   sql={`WITH sehirler AS (
@@ -47,13 +51,10 @@ FROM sehirler a, sehirler b
 WHERE a.ad < b.ad
 ORDER BY km;`}
   label="Şehirlerarası mesafe matrisi"
+  description="CROSS JOIN (FROM a, b) tüm şehir çiftlerini üretir; WHERE a.ad < b.ad her çifti tek kez listeler. ST_Distance ::geography ile elipsoid üzerinde metre cinsinden mesafe hesaplar; 1000'e bölüm km'ye çevirir. Sonuçlar mesafeye göre sıralanır."
 />
 
----
-
-## ▶ Nokta–Çizgi Mesafesi
-
-`ST_Distance` sadece nokta-nokta değil, her geometri çifti için çalışır:
+### Noktadan çizgiye dik mesafe
 
 <RunnableBlock
   sql={`WITH nokta AS (
@@ -68,37 +69,31 @@ SELECT
   ROUND(ST_Distance(n.geom::geography, y.geom::geography)::numeric / 1000, 1) AS yola_mesafe_km
 FROM nokta n, yol y;`}
   label="Noktadan yola dik mesafe"
+  description="ST_Distance yalnızca nokta-nokta değil, her geometri tipi kombinasyonu için çalışır. Nokta-LINESTRING durumunda en kısa mesafeyi yani noktadan çizgiye dik uzaklığı döndürür. Bir noktanın en yakın yola mesafesini bulmak için kullanılan temel kalıptır."
 />
 
 ---
 
-## 🧪 Dene
-
-`ST_DistanceSphere` ile `geography` karşılaştır — fark ne kadar?
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH a AS (SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS g),
      b AS (SELECT ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326) AS g)
 SELECT
   ROUND(ST_Distance(a.g::geography, b.g::geography)::numeric)    AS geography_m,
-  ROUND(ST_DistanceSphere(a.g, b.g)::numeric)                     AS sphere_m,
+  ROUND(ST_DistanceSphere(a.g, b.g)::numeric)                    AS sphere_m,
   ROUND(ST_Distance(
     ST_Transform(a.g, 32636),
-    ST_Transform(b.g, 32636))::numeric)                           AS utm36n_m
+    ST_Transform(b.g, 32636))::numeric)                          AS utm36n_m
 FROM a, b;`}
   label="3 yöntem karşılaştırması"
+  description="Aynı iki nokta için üç farklı yöntemle mesafe hesaplanır. geography elipsoid üzerinde en doğru sonucu verir. ST_DistanceSphere küre varsayımıyla yaklaşık %0.3 hata içerir. UTM 36N dönüşümü düzlemsel hesap yapar; bölgesel analizde geography'ye yakın sonuç üretir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **4326 geometry → derece:** `ST_Distance(geom4326, geom4326)` derece döndürür. `/ 111000` ile metreye çevirebilirsin ama bu kaba bir yaklaşım — `::geography` kullan.
-2. **ST_DistanceSphere küre varsayar:** Dünya küre değil elipsoid, bu yüzden ~%0.3 hata var. Mühendislik için `geography` kullan.
-3. **Büyük tablolarda ST_Distance WHERE koşulu:** `WHERE ST_Distance(...) < 1000` → sequential scan. `WHERE ST_DWithin(...)` → GIST indeks. Önce filtrele, sonra hesapla.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste alan ve uzunluk ölçümleri: `ST_Area`, `ST_Perimeter`, `ST_Length`.
+1. **EPSG:4326 geometry → derece.** `ST_Distance(geom4326, geom4326)` derece döndürür. Kaba dönüşüm için / 111000 uygulanabilir; güvenilir sonuç için `::geography` kullanılmalıdır.
+2. **ST_DistanceSphere küre varsayar.** Dünya elipsoid olduğundan ~%0.3 sistematik hata içerir. Mühendislik hesapları için `geography` tercih edilmelidir.
+3. **WHERE koşulunda ST_Distance yavaşlatır.** `WHERE ST_Distance(...) < 1000` sequential scan yapar. Mesafe filtresi için `WHERE ST_DWithin(...)` kullanılmalı; ST_Distance hesabı yalnızca SELECT'te yer almalıdır.

@@ -1,17 +1,14 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- GeoServer ve QGIS için güvenli read-only kullanıcı oluşturabileceksin
-- Şema bazlı yetki modelini yazabileceksin
-- Üretim ortamı güvenlik şablonunu açıklayabileceksin
+- GeoServer ve QGIS için güvenli read-only kullanıcı oluşturmak
+- Şema bazlı yetki modelini yapılandırmak
+- Üretim ortamı güvenlik şablonunu açıklamak
 
 ---
 
-## 📖 Kavram: Read-Only Üretim Kullanıcısı
+## Read-Only Üretim Kullanıcısı
 
-CBS uygulamaları (GeoServer, QGIS, Grafana) genellikle:
-- Sadece SELECT yetkisi gerektirir
-- Yanlış yapılandırmada INSERT/UPDATE yapabilir → güvenlik açığı
-- Veri değişikliğine izin verilmemeli
+CBS uygulamaları (GeoServer, QGIS, Grafana) genellikle yalnızca SELECT yetkisi gerektirir. Yanlış yapılandırmada INSERT/UPDATE yapılabilmesi veri bütünlüğü açısından ciddi risk oluşturur.
 
 **En az yetki şablonu:**
 ```sql
@@ -28,7 +25,9 @@ GRANT geoserver_ro TO geoserver;
 
 ---
 
-## ▶ Canlı Örnek — Read-Only Şablon
+## Uygulama Örneği
+
+### Read-only yetki şablonu
 
 <RunnableBlock
   sql={`-- Read-only grup rolü
@@ -50,11 +49,10 @@ FROM information_schema.role_table_grants
 WHERE grantee = 'ro_kullanici'
 ORDER BY table_name;`}
   label="Read-only yetki şablonu"
+  description="ro_kullanici NOLOGIN grup rolü üretimde GeoServer veya QGIS gibi uygulamaların kullanıcılarının üye olacağı şablondur. GRANT USAGE ON SCHEMA schema içindeki nesnelere erişim kapısını açar. Her tablo için ayrı SELECT yetkisi least privilege prensibini uygular. information_schema.role_table_grants verilen yetkilerin doğru kaydedildiğini doğrular."
 />
 
----
-
-## ▶ Fonksiyon Çalıştırma Yetkisi
+### Fonksiyon yetkileri
 
 <RunnableBlock
   sql={`-- Stored function için EXECUTE yetkisi
@@ -74,11 +72,10 @@ WHERE grantee = 'ro_kullanici'
   AND routine_schema = 'public'
 LIMIT 10;`}
   label="Fonksiyon yetkileri"
+  description="Tablo SELECT yetkisi PostGIS fonksiyonlarını kapsamaz; ST_AsGeoJSON ve ST_Distance gibi sık kullanılan fonksiyonlar için ayrıca EXECUTE yetkisi verilmesi gerekir. GRANT EXECUTE ON ALL FUNCTIONS daha kapsayıcı ama daha az kısıtlayıcıdır. information_schema.role_routine_grants verilen fonksiyon yetkilerini listeler."
 />
 
----
-
-## ▶ Güvenlik Denetim Sorgusu
+### Güvenlik denetim raporu
 
 <RunnableBlock
   sql={`-- Hangi tablolara kim ne yetkiyle erişebilir?
@@ -94,11 +91,12 @@ WHERE table_schema = 'public'
 GROUP BY grantee, table_schema, table_name
 ORDER BY grantee, table_name;`}
   label="Güvenlik denetim raporu"
+  description="information_schema.role_table_grants tüm nesne düzeyindeki yetkileri listeler. string_agg birden fazla yetkiyi tek satırda birleştirir. Sistem rolleri (postgres, PUBLIC, pg_%) ve pg_monitor filtrelenerek yalnızca uygulama rolleri gösterilir. Bu sorgu periyodik güvenlik denetimi için kullanılır."
 />
 
 ---
 
-## 🧪 Dene — Yetki Matrisi
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Tüm özel rollerin yetki matrisi
@@ -114,18 +112,13 @@ WHERE r.rolname NOT LIKE 'pg_%'
 GROUP BY r.rolname, r.rolcanlogin
 ORDER BY r.rolname;`}
   label="Rol üyelik matrisi"
+  description="pg_auth_members rol üyeliklerini tutar. LEFT JOIN ile her rolün üye olduğu grup roller listelenir. string_agg birden fazla üyeliği virgülle birleştirir. rolcanlogin login kullanıcıları (TRUE) grup rollerinden (FALSE) ayırır. Bu matris rol hiyerarşisini ve yetki miras zincirini görselleştirir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`ALTER DEFAULT PRIVILEGES`:** Mevcut tablolara `GRANT SELECT ON ALL TABLES` uygular ama sonradan eklenen tablolar için `ALTER DEFAULT PRIVILEGES` zorunlu.
-2. **pg_hba.conf PGlite'ta yok:** Gerçek sistemde bağlantı güvenliği `pg_hba.conf` ile yönetilir. PGlite'ta bu katman yok.
-3. **Şifre politikası:** `pg_password_check` extension ile güçlü şifre zorlama yapılabilir. Varsayılan PostgreSQL şifre kontrolü yapmaz.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 3.4 tamamlandı! Sırada **Modül 3.5 — Production Operasyonu**: pg_dump, replikasyon, PITR ve izleme.
+1. **`ALTER DEFAULT PRIVILEGES`:** Mevcut tablolara `GRANT SELECT ON ALL TABLES` uygulanır; sonradan eklenen tablolar için `ALTER DEFAULT PRIVILEGES` zorunludur.
+2. **pg_hba.conf PGlite'ta yok:** Gerçek sistemde bağlantı güvenliği `pg_hba.conf` ile yönetilir. PGlite'ta bu katman mevcut değildir.
+3. **Şifre politikası:** `pg_password_check` extension ile güçlü şifre zorlama yapılabilir. Varsayılan PostgreSQL şifre karmaşıklığı kontrolü yapmaz.

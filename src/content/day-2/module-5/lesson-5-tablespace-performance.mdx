@@ -1,20 +1,20 @@
 ## Tablespace Performans Stratejisi
 
-**Hedef:** SSD/HDD tablespace ayrımının performansa etkisini anla ve indeksleri ayrı tablespace'e taşı.
+Varsayılan olarak tüm tablolar ve indeksler aynı depolama ortamında saklanır. Farklı tablespace'ler tanımlayarak sıcak/soğuk veri ayrımı yapılabilir ve yüksek I/O gerektiren mekansal indeksler daha hızlı diske taşınabilir.
 
 ---
 
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- SSD/HDD tablespace ayrımının performansa etkisini açıklayabileceksin
-- Bir indeksi ayrı tablespace'e taşıyabileceksin
-- `pg_tablespace` ve `pg_class` ile yerleşim bilgisini sorgulayabileceksin
+- SSD/HDD tablespace ayrımının performansa etkisini açıklamak
+- Bir indeksi ayrı tablespace'e taşımak
+- `pg_tablespace` ve `pg_class` ile yerleşim bilgisini sorgulamak
 
 ---
 
 ## Tablespace Performans Stratejisi
 
-Varsayılan olarak tüm tablolar ve indeksler aynı diskte saklanır. Ayrı tablespace tanımlamak şunlara olanak sağlar:
+Ayrı tablespace tanımlamak şu düzenlemelere olanak sağlar:
 
 ```
 /mnt/ssd/pg_indexes/   ← Hızlı SSD: GiST indeksleri buraya
@@ -22,28 +22,11 @@ Varsayılan olarak tüm tablolar ve indeksler aynı diskte saklanır. Ayrı tabl
 /dev/shm/pg_temp/      ← RAM diski: geçici sıralama için
 ```
 
-**PostGIS özelinde:** Büyük bir ilçe poligonu tablosunun GiST indeksi SSD'de, geometri verisinin kendisi HDD'de olursa mekansal sorgular belirgin şekilde hızlanır.
+**PostGIS'e özgü:** Büyük il sınırı tablosunun GiST indeksi SSD'de, geometri verisinin kendisi HDD'de tutulursa mekansal sorgular belirgin biçimde hızlanır.
 
 ---
 
-## ▶ Mevcut tablespace'leri incele
-
-<RunnableBlock
-  sql={`-- Tüm tablespace'ler ve boyutları
-SELECT
-  spcname AS tablespace_adi,
-  pg_catalog.pg_get_userbyid(spcowner) AS sahip,
-  pg_size_pretty(
-    pg_catalog.pg_tablespace_size(oid)
-  ) AS boyut
-FROM pg_catalog.pg_tablespace
-ORDER BY spcname;`}
-  label="Tablespace boyutları"
-/>
-
----
-
-## ▶ Tablespace oluşturma (kavramsal)
+## Tablespace Oluşturma (Kavramsal)
 
 ```sql
 -- Gerçek ortamda (PGlite'ta çalışmaz — OS dizini gerekir):
@@ -61,7 +44,7 @@ CREATE TABLESPACE hdd_ts
 
 ---
 
-## ▶ Belirli tablespace'de tablo/indeks oluştur
+## Tablespace'de Tablo ve İndeks Oluşturma
 
 ```sql
 -- Tablo HDD'de, indeks SSD'de
@@ -79,7 +62,7 @@ CREATE INDEX idx_gps_geom
 
 ---
 
-## ▶ Mevcut nesnenin tablespace'ini değiştir
+## Mevcut Nesnenin Tablespace'ini Değiştirme
 
 ```sql
 -- Tabloyu taşı
@@ -91,7 +74,25 @@ ALTER INDEX idx_gps_geom SET TABLESPACE hdd_ts;
 
 ---
 
-## ▶ Hangi tablo hangi tablespace'de? (PGlite'ta çalışır)
+## Uygulama Örneği
+
+### Mevcut tablespace'leri incele
+
+<RunnableBlock
+  sql={`-- Tüm tablespace'ler ve boyutları
+SELECT
+  spcname AS tablespace_adi,
+  pg_catalog.pg_get_userbyid(spcowner) AS sahip,
+  pg_size_pretty(
+    pg_catalog.pg_tablespace_size(oid)
+  ) AS boyut
+FROM pg_catalog.pg_tablespace
+ORDER BY spcname;`}
+  label="Tablespace boyutları"
+  description="pg_catalog.pg_tablespace sistem kataloğu tüm tablespace tanımlarını listeler. pg_default varsayılan ve pg_global sistem katalogları için kullanılan iki dahili tablespace'dir. pg_tablespace_size her tablespace'in toplam disk kullanımını byte cinsinden döndürür; pg_size_pretty okunabilir biçime çevirir."
+/>
+
+### Tablo/indeks tablespace dağılımı
 
 <RunnableBlock
   sql={`-- Tablo ve indeks tablespace dağılımı
@@ -112,11 +113,12 @@ WHERE n.nspname = 'public'
 ORDER BY pg_relation_size(c.oid) DESC
 LIMIT 20;`}
   label="Tablo/indeks tablespace dağılımı"
+  description="pg_class her veritabanı nesnesini (tablo, indeks, partition) içerir. reltablespace sütunu nesnenin tablespace OID'ini tutar; NULL ise pg_default kullanılır. COALESCE(t.spcname, 'pg_default') NULL değeri okunabilir isimle değiştirir. relkind ayrımı tablo (r), indeks (i) ve partition (p) tiplerini ayırt eder. Sonuç boyuta göre sıralanır."
 />
 
 ---
 
-## ▶ Bölümlü tablo partition'larını farklı tablespace'lere dağıt
+## Bölümlü Tablo Partition'larını Farklı Tablespace'lere Dağıtma
 
 ```sql
 -- Sıcak veri (son ay) SSD'de, soğuk veri HDD'de
@@ -133,7 +135,7 @@ CREATE TABLE gps_2024_01
 
 ---
 
-## 📌 Tablespace Seçim Rehberi
+## Tablespace Seçim Rehberi
 
 | Nesne | Önerilen |
 |---|---|
@@ -142,9 +144,3 @@ CREATE TABLE gps_2024_01
 | Geçici sıralama (`temp_tablespaces`) | RAM diski |
 | Sistem katalogları | pg_global (değiştirme) |
 | OLTP tabloları | SSD |
-
----
-
-## 🔗 Sıradaki Modül
-
-Modül 3.1: **Kümeleme ve Yoğunluk Analizi** — ST_ClusterKMeans ve ST_ClusterDBSCAN.

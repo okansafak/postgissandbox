@@ -1,14 +1,14 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- PostgreSQL rol ve yetki modelini açıklayabileceksin
-- `CREATE ROLE`, `GRANT`, `REVOKE` sözdizimini yazabileceksin
-- Least privilege (en az yetki) prensibini uygulayabileceksin
+- PostgreSQL rol ve yetki modelini açıklamak
+- `CREATE ROLE`, `GRANT`, `REVOKE` sözdizimini uygulamak
+- Least privilege (en az yetki) prensibini hayata geçirmek
 
 ---
 
-## 📖 Kavram: Rol ve Yetki
+## Rol ve Yetki
 
-PostgreSQL güvenliği üç katmanda:
+PostgreSQL güvenliği üç katmanda uygulanır:
 
 1. **Bağlantı:** `pg_hba.conf` — kimler bağlanabilir?
 2. **Veritabanı:** `GRANT CONNECT ON DATABASE`
@@ -21,7 +21,9 @@ PostgreSQL güvenliği üç katmanda:
 
 ---
 
-## ▶ Canlı Örnek — Rol Oluştur ve Yetkilendir
+## Uygulama Örneği
+
+### Rol oluşturma ve yetkilendirme
 
 <RunnableBlock
   sql={`-- Grup rol: sadece okuma
@@ -44,11 +46,10 @@ FROM information_schema.role_table_grants
 WHERE table_name = 'noktalar_perf'
   AND grantee NOT IN ('postgres','PUBLIC');`}
   label="Rol oluştur ve yetkilendir"
+  description="harita_okuyucu NOLOGIN grup rolü doğrudan bağlanamaz; zeynep kullanıcısı bu rolü miras alır. GRANT USAGE ON SCHEMA schema altındaki nesnelere erişim izni verir (bu olmadan tablo yetkisi çalışmaz). information_schema.role_table_grants verilen yetkileri listeler; postgres ve PUBLIC sisteme ait olduğundan filtrelenir."
 />
 
----
-
-## ▶ Yazma Yetkisi
+### Veri editörü rolü
 
 <RunnableBlock
   sql={`-- Veri girişi için ayrı rol
@@ -64,11 +65,10 @@ FROM information_schema.role_table_grants
 WHERE table_name = 'noktalar_perf'
   AND grantee IN ('harita_okuyucu', 'veri_editoru');`}
   label="Veri editörü rolü"
+  description="veri_editoru SELECT, INSERT ve UPDATE yetkisi alır; DELETE kasıtlı olarak verilmez. Least privilege prensibi gereği her rol yalnızca ihtiyaç duyduğu yetkiyi alır. Karşılaştırmalı SELECT harita_okuyucu ve veri_editoru rollerinin yetki farklarını tek sorguda gösterir."
 />
 
----
-
-## ▶ Yetki Geri Al
+### Yetki geri alma
 
 <RunnableBlock
   sql={`-- Yetkiyi geri al
@@ -86,11 +86,12 @@ FROM information_schema.role_table_grants
 WHERE table_name = 'noktalar_perf'
   AND grantee IN ('harita_okuyucu', 'veri_editoru');`}
   label="Yetki geri alma"
+  description="REVOKE INSERT veri_editoru'nun INSERT yetkisini kaldırır; SELECT ve UPDATE yetkisi kalır. DROP ROLE öncesinde role ait tüm yetkiler REVOKE edilmelidir; aksi halde hata verir. Sonuç sorgusu INSERT yetkisinin kaldırıldığını doğrular."
 />
 
 ---
 
-## 🧪 Dene — Sistem Tablosundan Rol Listesi
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Tüm roller
@@ -103,18 +104,13 @@ FROM pg_roles
 WHERE rolname NOT LIKE 'pg_%'
 ORDER BY rolname;`}
   label="Veritabanı rolleri"
+  description="pg_roles sistem kataloğu tüm veritabanı rollerini listeler. rolcanlogin kullanıcı rollerini (TRUE) grup rollerinden (FALSE) ayırt eder. rolsuper ve rolcreatedb ileri düzey yetkileri gösterir. pg_% ile başlayan sistem roller filtrelenerek yalnızca kullanıcı tanımlı roller listelenir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`PUBLIC` rolü:** Tüm kullanıcılar PUBLIC üyesidir. `GRANT SELECT ON ... TO PUBLIC` → herkes okuyabilir. İzinsiz tablolarda `REVOKE ALL FROM PUBLIC` yap.
-2. **Schema yetkisi:** Tablo yetkisi versek bile `USAGE ON SCHEMA` yoksa erişim olmaz.
-3. **PGlite'ta rol sistemi:** PGlite single-user — rol komutları syntax'a uyar ama etki etmez. Üretim sisteminde önemli.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste satır bazlı güvenlik: **Row Level Security (RLS)**.
+1. **`PUBLIC` rolü:** Tüm kullanıcılar PUBLIC üyesidir. `GRANT SELECT ON ... TO PUBLIC` herkese okuma yetkisi verir. İzinsiz tablolarda `REVOKE ALL FROM PUBLIC` çalıştırılmalıdır.
+2. **Schema yetkisi:** Tablo yetkisi verilse bile `USAGE ON SCHEMA` yoksa erişim gerçekleşmez.
+3. **PGlite'ta rol sistemi:** PGlite single-user çalışır; rol komutları sözdizimsel olarak doğrudur ancak etki etmez. Üretim sisteminde kritik öneme sahiptir.

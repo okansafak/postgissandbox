@@ -1,93 +1,71 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_MakePoint(lon, lat)` ile nokta geometrisi oluşturabileceksin
-- `ST_SetSRID` ile koordinat sistemini (SRID 4326 = WGS84) belirtebileceksin
-- Sorgu sonucunu haritada görebileceksin
-- Koordinat sırasının **önemini** (lon önce, lat sonra) anlayacaksın
+Bir koordinat çiftini haritada görünür bir noktaya dönüştürmek, mekansal analizin en temel adımıdır. Bu ders, `ST_MakePoint` ve `ST_SetSRID` fonksiyonlarını ve koordinat sırasının neden kritik önem taşıdığını ele almaktadır.
+
+- `ST_MakePoint(lon, lat)` ile nokta geometrisi oluşturmak
+- `ST_SetSRID` ile koordinat referans sistemini belirtmek
+- Sorgu sonucunu Harita sekmesinde görselleştirmek
 
 ---
 
-## 📖 Kavram: Nokta Oluşturmak
+## ST_MakePoint ve SRID
 
-`ST_MakePoint(x, y)` fonksiyonu iki sayı alır ve bir `geometry` döndürür. Ama **hangi koordinat sistemi?** PostGIS bunu bilmek zorunda.
-
-Bunun için `ST_SetSRID(geometri, srid)` kullanılır.
+`ST_MakePoint(x, y)` iki sayısal değer alır ve bir `geometry` döndürür; ancak bu geometri henüz hangi koordinat sistemine ait olduğunu bilmez. `ST_SetSRID(geometri, srid)` bu eksikliği giderir:
 
 ```sql
 ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)
 ```
 
-- `28.979` → boylam (longitude / x)
-- `41.015` → enlem (latitude / y)
-- `4326` → EPSG:4326 = WGS84 koordinat sistemi (GPS'in kullandığı sistem)
+- `28.979` → boylam (longitude / x ekseni)
+- `41.015` → enlem (latitude / y ekseni)
+- `4326` → EPSG:4326 = WGS84 (GPS sisteminin kullandığı küresel referans)
 
-> **Kritik kural:** `ST_MakePoint(boylam, enlem)` — önce **boylam (x)**, sonra **enlem (y)**.
-> Çoğu kişi bunu tersine yazar. Google Maps `(lat, lon)` gösterir ama PostGIS `(lon, lat)` bekler!
+> **Kritik kural:** `ST_MakePoint(boylam, enlem)` — x ekseni (boylam) her zaman önce gelir. Google Maps `(enlem, boylam)` sırasıyla gösterir; PostGIS ise `(boylam, enlem)` bekler. Bu ters sıra en yaygın hata kaynaklarından biridir.
 
 ---
 
-## ▶ Canlı Örnek — İstanbul'u Haritada Göster
+## Uygulama Örneği
 
-Aşağıdaki butona bas. Sorgu çalıştırılacak, **Harita** sekmesinde İstanbul'a zoom yapacaksın:
+### İstanbul'u haritada göster
 
 <RunnableBlock
   sql={`SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom;`}
   label="İstanbul'u haritada gör"
   autoFit
+  description="ST_MakePoint(28.979, 41.015) İstanbul'un boylam ve enlemi ile bir POINT geometrisi üretir. ST_SetSRID bu geometriye EPSG:4326 (WGS84) koordinat referans sistemini atar. Sorgu çalışınca Harita sekmesi coğrafi koordinatları tanıyarak noktayı otomatik render eder."
 />
 
-Harita sekmesine geç ve mavi noktayı bul!
-
----
-
-## 🧪 Dene — Birden Fazla Şehir
-
-Birden fazla satırda birden fazla şehri haritada göster:
+### Birden fazla şehri haritada göster
 
 <RunnableBlock
   sql={`SELECT 'İstanbul' AS sehir, ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom
 UNION ALL
-SELECT 'Ankara'   AS sehir, ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326) AS geom
+SELECT 'Ankara',   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)
 UNION ALL
-SELECT 'İzmir'    AS sehir, ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326) AS geom;`}
+SELECT 'İzmir',    ST_SetSRID(ST_MakePoint(27.143, 38.423), 4326);`}
   label="3 şehri haritada gör"
   autoFit
+  description="UNION ALL üç bağımsız SELECT'i tek bir sonuç kümesinde birleştirir. Her satır farklı bir şehrin koordinatını taşıyan geometry sütunu içerdiğinden harita üç noktayı birden render eder. Tablo sekmesinde şehir adı ve geometri sütunları yan yana görünür."
 />
-
-**Tablo** sekmesine geçince `sehir` ve `geom` sütunlarını göreceksin.
 
 ---
 
-## 🧪 Egzersiz
+## Alıştırma
 
-**Kendi şehrinin koordinatını bul ve haritada göster.**
-
-1. Google Maps'ta şehrine sağ tıkla → koordinatları kopyala
-2. Koordinatlar `(enlem, boylam)` sırasında gösterilir — PostGIS için **tersine çevir**
-3. Aşağıdaki sorguyu düzenle:
+Bir şehrin koordinatlarını Google Maps'tan alarak aşağıdaki sorguya uygulayın. Google Maps `(enlem, boylam)` sırasıyla gösterir; PostGIS'te sırayı tersine çevirin.
 
 <RunnableBlock
-  sql={`-- İpucu: ST_MakePoint(BOYLAM, ENLEM) — önce boylam!
-SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom;
--- Koordinatları kendi şehrinin koordinatlarıyla değiştir`}
+  sql={`-- ST_MakePoint(BOYLAM, ENLEM) — önce boylam (x)!
+SELECT ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS geom;`}
   label="Kendi şehrini göster"
   autoFit
+  description="Koordinatları değiştirirken önce boylamın (doğu-batı), sonra enlemin (kuzey-güney) geldiğine dikkat edin. Doğru girildiğinde Harita sekmesi noktayı beklenen konumda gösterir."
 />
 
-> ✅ Doğru cevap: haritada bir nokta beliriyor ve geometry sütunu dolu.
-
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **Koordinat sırası:** `ST_MakePoint(lon, lat)` — boylam (x) önce, enlem (y) sonra. Tersine yazarsan nokta yanlış yerde çıkar.
-2. **SRID belirtmemek:** `ST_MakePoint(28.9, 41.0)` çalışır ama SRID'siz geometri. Haritaya aktarırken hata alırsın. Her zaman `ST_SetSRID` kullan.
-3. **Sayı formatı:** PostGIS ondalık ayırıcı olarak nokta (`.`) kullanır, virgül değil.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 1.2'de tüm geometri tiplerini (POINT, LINESTRING, POLYGON ve MULTI* varyantları) oluşturmayı öğreneceğiz.
-
-Modül 1.3'te **SRID** ve **projeksiyon** kavramlarına derinlemesine gireceğiz — "4326 neden?" sorusunu yanıtlayacağız.
+1. **Koordinat sırası:** `ST_MakePoint(lon, lat)` — boylam önce, enlem sonra. Tersine girildiğinde nokta okyanusta veya yanlış kıtada belirir.
+2. **SRID belirtmemek:** `ST_MakePoint(28.9, 41.0)` tek başına geçerli bir geometri üretir ancak koordinat sistemi tanımlanmamıştır. Haritaya aktarımda dönüşüm hatası alınır.
+3. **Ondalık ayırıcı:** PostGIS ondalık ayırıcı olarak nokta (`.`) kullanır, virgül değil.

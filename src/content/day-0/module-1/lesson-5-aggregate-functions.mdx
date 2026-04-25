@@ -1,0 +1,99 @@
+## Toplama Fonksiyonları: COUNT, SUM, AVG
+
+**Hedef:** Çok sayıda satırı tek bir özet değere indirgeyen `COUNT`, `SUM`, `AVG`, `MIN`, `MAX` fonksiyonlarını kullanmak.
+
+---
+
+## Öğrenim Hedefleri
+
+- `COUNT`, `SUM`, `AVG`, `MIN`, `MAX` fonksiyonlarını kullanmak
+- `NULL` değerlerin toplama fonksiyonlarına etkisini açıklamak
+- `ROUND` ile sonuç hassasiyetini ayarlamak
+
+---
+
+## Ön Hazırlık
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS sehirler (
+  id SERIAL PRIMARY KEY, ad TEXT, bolge TEXT, nufus INTEGER, alan_km2 NUMERIC
+);
+INSERT INTO sehirler (ad, bolge, nufus, alan_km2) VALUES
+  ('İstanbul','Marmara',15840900,5343),('Ankara','İç Anadolu',5782285,2516),
+  ('İzmir','Ege',4479525,3577),('Bursa','Marmara',3194720,10882),
+  ('Antalya','Akdeniz',2696249,20177),('Adana','Akdeniz',2258997,13844),
+  ('Konya','İç Anadolu',2279474,38873),('Gaziantep','Güneydoğu Anadolu',2154051,7642),
+  ('Mersin','Akdeniz',1922758,15853),('Trabzon','Karadeniz',839468,4685)
+ON CONFLICT DO NOTHING;
+SELECT COUNT(*) AS sehir_sayisi FROM sehirler;`}
+  label="Veri setini hazırla"
+  description="Tablo ve veriler yoksa oluşturur; varsa değiştirmeden devam eder."
+/>
+
+---
+
+## Uygulama Örneği
+
+### Temel toplama fonksiyonları
+
+<RunnableBlock
+  sql={`-- Tüm şehirlerin genel istatistikleri
+SELECT
+  COUNT(*)                          AS toplam_sehir,
+  SUM(nufus)                        AS toplam_nufus,
+  ROUND(AVG(nufus))                 AS ortalama_nufus,
+  MIN(nufus)                        AS en_az_nufus,
+  MAX(nufus)                        AS en_fazla_nufus,
+  ROUND(AVG(alan_km2), 0)           AS ort_alan_km2
+FROM sehirler;`}
+  label="Genel istatistikler"
+  description="COUNT(*) NULL dahil tüm satırları sayar; COUNT(sütun) ise yalnızca NULL olmayan değerleri sayar. SUM tüm değerleri toplar. AVG ortalama değeri döndürür. MIN ve MAX sırasıyla en küçük ve en büyük değeri bulur. ROUND(değer, basamak) ile ondalık hassasiyet belirlenir; ikinci parametre 0 olduğunda tam sayıya yuvarlar."
+/>
+
+### WHERE ile filtrelenmiş istatistik
+
+<RunnableBlock
+  sql={`-- Sadece Akdeniz bölgesi şehirlerinin istatistikleri
+SELECT
+  COUNT(*)            AS akdeniz_sehir_sayisi,
+  SUM(nufus)          AS akdeniz_toplam_nufus,
+  ROUND(AVG(nufus))   AS akdeniz_ort_nufus,
+  MAX(nufus)          AS en_kalabalik
+FROM sehirler
+WHERE bolge = 'Akdeniz';`}
+  label="Bölge bazlı istatistik"
+  description="WHERE ile filtre uygulandıktan sonra toplama fonksiyonları yalnızca kalan satırlar üzerinde çalışır. Bu yaklaşım belirli bir koşulu karşılayan grubun özetini çıkarmak için kullanılır. Birden fazla bölgenin istatistiğini aynı anda görmek için GROUP BY (sonraki ders) kullanılır."
+/>
+
+### NULL davranışı
+
+<RunnableBlock
+  sql={`-- NULL değerlerin aggregate üzerindeki etkisini test et
+DROP TABLE IF EXISTS test_null;
+CREATE TABLE test_null (deger INTEGER);
+INSERT INTO test_null VALUES (10), (20), (NULL), (30), (NULL);
+
+SELECT
+  COUNT(*)       AS tum_satirlar,
+  COUNT(deger)   AS null_haric_sayisi,
+  SUM(deger)     AS toplam,
+  AVG(deger)     AS ortalama
+FROM test_null;`}
+  label="NULL davranışı"
+  description="COUNT(*) NULL içeren satırları da sayar (5). COUNT(sütun) ise yalnızca NULL olmayan değerleri sayar (3). SUM ve AVG fonksiyonları NULL değerleri yok sayar; SUM = 10+20+30 = 60, AVG = 60/3 = 20. Bu davranış beklenmedik sonuçlara yol açabilir: 5 satır olmasına rağmen ortalama 3 değerin ortalamasıdır."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Türkiye'nin toplam nüfus yoğunluğu
+SELECT
+  SUM(nufus)                              AS toplam_nufus,
+  SUM(alan_km2)                           AS toplam_alan_km2,
+  ROUND(SUM(nufus) / SUM(alan_km2), 1)   AS ulke_yogunlugu
+FROM sehirler;`}
+  label="Toplam nüfus yoğunluğu"
+  description="Toplam nüfus yoğunluğu = toplam nüfus / toplam alan formülüyle hesaplanır. SUM(nufus)/SUM(alan_km2) tüm şehirlerin nüfusunu ve alanını ayrı ayrı topladıktan sonra böler — bu, her şehrin yoğunluğunu hesaplayıp ortalamayı almaktan farklı bir sonuç verir. ROUND(..., 1) sonucu bir ondalık basamakta yuvarlar."
+/>

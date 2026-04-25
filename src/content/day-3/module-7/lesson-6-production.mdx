@@ -1,137 +1,104 @@
-## 🏭 Capstone Part 4: Production & Monitoring
+## Capstone Bölüm 4: Üretim Ortamı ve İş Metrikleri
 
-**Hedef:** Platform'u production'a dağıt, 99.99% uptime sağla
-
----
-
-## 🎯 Production Architecture
-
-- Kubernetes cluster (10 node, 128 core)
-- PostgreSQL primary-replica (HA)
-- pgBouncer (connection pooling)
-- Prometheus + Grafana (monitoring)
+**Hedef:** Yüksek erişilebilirlik mimarisini, bağlantı havuzlamayı ve iş sonuçlarını değerlendiren metrikleri incelemek.
 
 ---
 
-## ▶ Deployment Configuration
+## Öğrenim Hedefleri
+
+- Primary-replica-backup üç katmanlı HA mimarisini kavramak
+- pgBouncer transaction mode ile bağlantı yönetimini anlamak
+- İzleme ve uyarı stratejisini yapılandırmak
+- Teknik yatırımı iş etkisiyle ilişkilendirmek
+
+---
+
+## Üretim Mimarisi
+
+| Bileşen | Yapılandırma |
+|---|---|
+| Veritabanı | PostgreSQL 15 + PostGIS 3.3 |
+| Replikasyon | Primary + Replica + Yedek Replica |
+| Bağlantı havuzu | pgBouncer (transaction mode) |
+| İzleme | Prometheus + Grafana |
+| Failover süresi | 30 saniye altı |
+
+---
+
+## Uygulama Örneği
+
+### Replikasyon düğüm yapısı
 
 <RunnableBlock
-  sql={`-- Production infrastructure specs
+  sql={`-- Replikasyon düğüm yapısı
 SELECT 
-  'Infrastructure' AS component,
-  'Kubernetes' AS orchestration,
-  '10 nodes' AS cluster_size,
-  '128 cores total' AS computing_power,
-  '256 GB RAM' AS memory,
-  'PostgreSQL 15 + PostGIS 3.3' AS database
-;
-
--- SLA Targets
-SELECT 
-  'SLA Target' AS target,
-  '99.99%' AS uptime,
-  '< 45 minutes' AS yearly_downtime,
-  '< 30 seconds' AS failover_time,
-  '< 500ms' AS p95_latency,
-  '< 1 hour' AS RPO
-;`}
-  label="Production architecture"
-/>
-
----
-
-## ▶ Database Replication
-
-<RunnableBlock
-  sql={`-- Streaming replication status
-SELECT 
-  'Primary' AS role,
-  '16 cores' AS cpu,
+  'Primary' AS rol,
+  '16 core' AS cpu,
   '256 GB' AS ram,
-  'Istanbul-DC1' AS location,
-  'Active' AS status
+  'Istanbul-DC1' AS konum,
+  'Aktif' AS durum
 UNION ALL
-SELECT 'Replica', '12 cores', '128 GB', 'Istanbul-DC2', 'Standby'
+SELECT 'Replica', '12 core', '128 GB', 'Istanbul-DC2', 'Standby'
 UNION ALL
-SELECT 'Backup Replica', '8 cores', '64 GB', 'Backup-DC', 'Reserve'
-;
+SELECT 'Yedek Replica', '8 core', '64 GB', 'Yedek-DC', 'Reserve';
 
--- Connection pool configuration
+-- Bağlantı havuzu yapılandırması
 SELECT 
-  'pgBouncer' AS pooler,
-  'Transaction mode' AS pool_mode,
-  1000 AS max_clients,
-  50 AS default_pool_size,
-  '95%+' AS hit_ratio_target,
-  '99% CPU overhead reduction' AS benefit
-;`}
-  label="Database HA & connection pooling"
+  'pgBouncer' AS havuzlayici,
+  'Transaction mode' AS havuz_modu,
+  1000 AS max_istemci,
+  50 AS varsayilan_havuz_boyutu,
+  '%97+ hit oranı' AS hedef,
+  'CPU yükü %99 azalma' AS kazanim;`}
+  label="Veritabanı HA ve bağlantı havuzlama"
+  description="Üç katmanlı replikasyon yapısı coğrafi yedeklilik sağlar: primary aktif yazma düğümü, replica okuma offloading ve otomatik failover hedefi, yedek replica ise felaket kurtarma için ayrı veri merkezinde bulunur. Transaction mode pgBouncer her SQL bloğundan sonra bağlantıyı havuza iade eder; bu mod PostGIS uzun işlemleri için dikkatli değerlendirilmelidir. %97 hit oranı her 100 istekten 97'sinin yeni TCP bağlantısı açmadan karşılandığı anlamına gelir."
 />
 
----
-
-## ▶ Monitoring & Alerting
+### İzleme ve uyarı yapılandırması
 
 <RunnableBlock
-  sql={`-- Key monitoring metrics
-SELECT 
-  'Metric' AS metric,
-  'Replication Lag' AS metric_1,
-  'Query Latency p95' AS metric_2,
-  'Disk Usage' AS metric_3,
-  'CPU Usage' AS metric_4,
-  'Pool Hit Ratio' AS metric_5
+  sql={`-- Temel izleme metrikleri ve eşik değerleri
+SELECT 'Metrik' AS metrik, 'Mevcut' AS mevcut, 'Eşik' AS esik, 'Durum' AS durum
 UNION ALL
-SELECT 'Current', '45 MB', '280 ms', '65%', '48%', '97%'
+SELECT 'Replikasyon gecikmesi (MB)', '45', '< 100', 'OK'
 UNION ALL
-SELECT 'Threshold', '< 100 MB', '< 500 ms', '< 85%', '< 80%', '> 95%'
+SELECT 'Sorgu gecikmesi p95 (ms)', '280', '< 500', 'OK'
 UNION ALL
-SELECT 'Status', '✓ OK', '✓ OK', '✓ OK', '✓ OK', '✓ OK'
-;
+SELECT 'Disk kullanımı (%)', '65', '< 85', 'OK'
+UNION ALL
+SELECT 'CPU kullanımı (%)', '48', '< 80', 'OK'
+UNION ALL
+SELECT 'Havuz hit oranı (%)', '97', '> 95', 'OK';
 
--- Alert routing
-SELECT 
-  'Severity' AS level,
-  'Critical' AS critical_alert,
-  'Warning' AS warning_alert,
-  'Info' AS info_alert
+-- Uyarı yönlendirme
+SELECT 'Seviye' AS seviye, 'Hedef' AS hedef, 'Yanıt Süresi' AS yanit
 UNION ALL
-SELECT 'Destination', 'SMS + PagerDuty', 'Slack', 'Log Only'
+SELECT 'Kritik', 'SMS + PagerDuty', '5 dakika altı'
 UNION ALL
-SELECT 'Response Time', '< 5 min', '< 15 min', 'Daily Review'
-;`}
-  label="Monitoring & alerting setup"
+SELECT 'Uyarı', 'Slack', '15 dakika altı'
+UNION ALL
+SELECT 'Bilgi', 'Yalnızca günlük', 'Günlük inceleme';`}
+  label="İzleme ve uyarı yapılandırması"
+  description="Her metrik için mevcut değer ve eşik değeri karşılaştırılır; eşik aşımında uyarı kanalı tetiklenir. Replikasyon gecikmesi 100 MB'ı aştığında replica primary'den çok geride kalmış olup failover durumunda veri kaybı riski artar. Uyarı seviyeleri olayın ciddiyetine göre kanallanır: kritik olaylar gece de müdahale gerektiren SMS + PagerDuty'ye, uyarılar iş saatinde izlenen Slack'e yönlendirilir."
 />
 
 ---
 
-## ▶ Business Metrics
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Platform success metrics
-SELECT 
-  'Business Metric' AS metric,
-  '8 minutes' AS ambulans_response_time,
-  '₺32' AS avg_delivery_cost,
-  '65%' AS transit_crowding,
-  '12 million' AS app_users,
-  '99.99%' AS platform_uptime,
-  '441%' AS roi
+  sql={`-- Platform iş metrikleri özeti
+SELECT 'İş Metriği' AS metrik, 'Değer' AS deger, 'Hedef / Önceki' AS referans
 UNION ALL
-SELECT 'Target/Previous', '< 8 min (was 15)', '₺32 (was ₺50)', '< 70% (was 85%)', '12M (75% pop)', '99.99% (was 99.9%)', '> 100% (payback 2.2 mo)'
-;`}
-  label="Business success metrics"
+SELECT 'Ambulans yanıt süresi', '8 dakika', '< 8 dk (önceki: 15 dk)'
+UNION ALL
+SELECT 'Ortalama teslimat maliyeti', '32 TL', '32 TL (önceki: 50 TL)'
+UNION ALL
+SELECT 'Platform uptime', '%99.99', '%99.99 (önceki: %99.9)'
+UNION ALL
+SELECT 'Yatırım getirisi (ROI)', '%441', '> %100 hedefi'
+UNION ALL
+SELECT 'Geri ödeme süresi', '2.2 ay', 'Hedef: < 6 ay';`}
+  label="İş başarı metrikleri"
+  description="Teknik yatırımın iş sonuçlarına dönüşümünü gösteren metrikler: ambulans yanıt süresi operasyonel iyileşmeyi, teslimat maliyeti lojistik optimizasyon kazanımını, uptime altyapı güvenilirliğini temsil eder. ROI = (net kazanç / yatırım maliyeti) * 100 formülüyle hesaplanır; %441 oran yatırımın 5.4 katına döndüğünü ifade eder. 2.2 aylık geri ödeme süresi yüksek öncelikli proje onayı için yönetim sunum materyalinde kullanılır."
 />
-
----
-
-## ✨ Özet
-
-Production deployment:
-- ✓ HA setup (primary-replica, < 30sn failover)
-- ✓ Connection pooling (97% hit ratio)
-- ✓ Comprehensive monitoring
-- ✓ 99.99% uptime SLA
-- ✓ 441% ROI achieved
-
-**Sonraki ders:** Final summary

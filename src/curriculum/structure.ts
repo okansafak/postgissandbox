@@ -18,7 +18,7 @@ export interface Exercise {
 
 export interface Lesson {
   id: string;
-  day: 1 | 2 | 3;
+  day: 0 | 1 | 2 | 3;
   module: number;
   order: number;
   title: string;
@@ -34,13 +34,14 @@ export interface Lesson {
 }
 
 export interface ModuleMeta {
-  day: 1 | 2 | 3;
+  day: 0 | 1 | 2 | 3;
   module: number;
   title: string;
   durationMinutes: number;
 }
 
 export const MODULE_META: ModuleMeta[] = [
+  { day: 0, module: 1, title: "SQL ve PostgreSQL'e Giriş", durationMinutes: 92 },
   { day: 1, module: 0, title: 'PostgreSQL Temelleri ve Mimari', durationMinutes: 45 },
   { day: 1, module: 1, title: 'Kuruluma ve Platforma Giriş', durationMinutes: 30 },
   { day: 1, module: 2, title: 'Geometri Temelleri', durationMinutes: 60 },
@@ -62,6 +63,7 @@ export const MODULE_META: ModuleMeta[] = [
 ];
 
 const DAY_MODULE_SEQUENCE: Record<number, number[]> = {
+  0: [1],
   1: [1, 0, 2, 3, 4, 5],
   2: [1, 2, 3, 4, 5],
   3: [1, 2, 3, 4, 5, 6, 7],
@@ -93,8 +95,91 @@ export function getLessonRoute(day: number, module: number, lessonSlug: string):
   return `/lesson/day-${day}/module-${displayModule}/${lessonSlug}`;
 }
 
-/** Modül 1.2 — PostgreSQL Temelleri ve Mimari */
+/** Bölüm 0 — SQL ve PostgreSQL'e Giriş */
 export const CURRICULUM: Lesson[] = [
+  {
+    id: 'day-0-module-1-lesson-1', day: 0, module: 1, order: 1,
+    title: "Veritabanı nedir? SELECT ile veri çekme",
+    slug: 'lesson-1', level: 'L1', estimatedMinutes: 10,
+    prerequisites: [],
+    objectives: ['Tablo, satır, sütun kavramlarını açıklayabilir', 'SELECT * ile tüm veriyi çekebilir', 'Belirli sütunları seçebilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-1-what-is-sql.mdx',
+    exercises: [], tags: ['sql', 'select', 'tablo', 'başlangıç'],
+  },
+  {
+    id: 'day-0-module-1-lesson-2', day: 0, module: 1, order: 2,
+    title: 'PostgreSQL veri tipleri',
+    slug: 'lesson-2', level: 'L1', estimatedMinutes: 20,
+    prerequisites: ['day-0-module-1-lesson-1'],
+    objectives: ['Tam sayı tiplerinin farkını açıklayabilir', 'NUMERIC ile REAL arasındaki hassasiyet farkını bilir', 'TIMESTAMPTZ kullanımını açıklayabilir', 'JSONB, dizi, enum ve range tiplerini tanır', 'Tablo tasarımında doğru tip seçimi yapabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-2-data-types.mdx',
+    exercises: [], tags: ['data-types', 'numeric', 'text', 'timestamp', 'boolean', 'jsonb', 'uuid', 'array', 'enum', 'range', 'inet'],
+  },
+  {
+    id: 'day-0-module-1-lesson-3', day: 0, module: 1, order: 3,
+    title: 'Sütun seçme, hesaplama ve alias',
+    slug: 'lesson-3', level: 'L1', estimatedMinutes: 8,
+    prerequisites: ['day-0-module-1-lesson-2'],
+    objectives: ['Belirli sütunları seçip yeniden adlandırabilir', 'SELECT içinde aritmetik hesaplama yapabilir', 'AS ile alias kullanabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-2-select-columns.mdx',
+    exercises: [], tags: ['select', 'alias', 'hesaplama'],
+  },
+  {
+    id: 'day-0-module-1-lesson-4', day: 0, module: 1, order: 4,
+    title: 'WHERE ile filtreleme',
+    slug: 'lesson-4', level: 'L1', estimatedMinutes: 12,
+    prerequisites: ['day-0-module-1-lesson-3'],
+    objectives: ['WHERE ile satırları filtreleyebilir', 'AND, OR, NOT mantıksal operatörlerini kullanabilir', 'LIKE, IN, BETWEEN, IS NULL ile karmaşık filtreler yazabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-3-where-filtering.mdx',
+    exercises: [], tags: ['where', 'filtreleme', 'like', 'in', 'between'],
+  },
+  {
+    id: 'day-0-module-1-lesson-5', day: 0, module: 1, order: 5,
+    title: 'ORDER BY, LIMIT ve DISTINCT',
+    slug: 'lesson-5', level: 'L1', estimatedMinutes: 8,
+    prerequisites: ['day-0-module-1-lesson-4'],
+    objectives: ['ORDER BY ile sonuçları sıralayabilir', 'LIMIT ve OFFSET ile sayfalama yapabilir', 'DISTINCT ile tekrarlayan değerleri tekilleştirebilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-4-order-limit-distinct.mdx',
+    exercises: [], tags: ['order-by', 'limit', 'distinct', 'sıralama'],
+  },
+  {
+    id: 'day-0-module-1-lesson-6', day: 0, module: 1, order: 6,
+    title: 'Toplama fonksiyonları: COUNT, SUM, AVG',
+    slug: 'lesson-6', level: 'L1', estimatedMinutes: 10,
+    prerequisites: ['day-0-module-1-lesson-5'],
+    objectives: ['COUNT, SUM, AVG, MIN, MAX fonksiyonlarını kullanabilir', 'NULL değerlerin aggregate üzerindeki etkisini açıklayabilir', 'ROUND ile sayısal hassasiyet ayarlayabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-5-aggregate-functions.mdx',
+    exercises: [], tags: ['count', 'sum', 'avg', 'aggregate', 'toplama'],
+  },
+  {
+    id: 'day-0-module-1-lesson-7', day: 0, module: 1, order: 7,
+    title: 'GROUP BY ve HAVING',
+    slug: 'lesson-7', level: 'L1', estimatedMinutes: 12,
+    prerequisites: ['day-0-module-1-lesson-6'],
+    objectives: ['GROUP BY ile gruplama yapabilir', 'HAVING ile grup filtrelemesi yapabilir', 'WHERE ile HAVING arasındaki farkı açıklayabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-6-group-by.mdx',
+    exercises: [], tags: ['group-by', 'having', 'gruplama'],
+  },
+  {
+    id: 'day-0-module-1-lesson-8', day: 0, module: 1, order: 8,
+    title: 'JOIN ile tablolar arası ilişki',
+    slug: 'lesson-8', level: 'L1', estimatedMinutes: 15,
+    prerequisites: ['day-0-module-1-lesson-7'],
+    objectives: ['INNER JOIN ile iki tabloyu birleştirebilir', 'LEFT JOIN ile eşleşmeyen satırları da dahil edebilir', 'Primary key ve foreign key kavramlarını açıklayabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-7-join.mdx',
+    exercises: [], tags: ['join', 'inner-join', 'left-join', 'ilişki'],
+  },
+  {
+    id: 'day-0-module-1-lesson-9', day: 0, module: 1, order: 9,
+    title: 'INSERT, UPDATE, DELETE ve CREATE TABLE',
+    slug: 'lesson-9', level: 'L1', estimatedMinutes: 12,
+    prerequisites: ['day-0-module-1-lesson-8'],
+    objectives: ['INSERT ile yeni satır ekleyebilir', 'UPDATE ile mevcut satırı güncelleyebilir', 'DELETE ile satır silebilir', 'CREATE TABLE ile yeni tablo oluşturabilir'],
+    mdxPath: '/src/content/day-0/module-1/lesson-8-insert-update-delete.mdx',
+    exercises: [], tags: ['insert', 'update', 'delete', 'create-table', 'ddl', 'dml'],
+  },
+
+/** Modül 1.2 — PostgreSQL Temelleri ve Mimari */
   {
     id: 'day-1-module-0-lesson-1', day: 1, module: 0, order: 1,
     title: 'Cluster, Database, Schema yapısı',
@@ -1251,7 +1336,7 @@ export function getPrevLesson(current: Lesson): Lesson | null {
 
 /** Curriculum ağacı: gün → modül → dersler */
 export interface CurriculumNode {
-  day: 1 | 2 | 3;
+  day: 0 | 1 | 2 | 3;
   module: number;
   moduleTitle: string;
   durationMinutes: number;

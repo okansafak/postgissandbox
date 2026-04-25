@@ -1,16 +1,16 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `pg_stat_user_indexes` ile hangi indekslerin kullanıldığını sorgulayabileceksin
-- Kullanılmayan indeksleri tespit edip kaldırabileceksin
-- `pg_indexes` ve `pg_stat_user_tables` ile tablo+indeks sağlığını izleyebileceksin
+İndeks oluşturmak yalnızca ilk adımdır; zamanla hangi indekslerin gerçekten kullanıldığını ve hangilerinin yalnızca disk alanı tükettiğini izlemek gerekir. PostgreSQL'in sistem katalogları bu bilgiyi sağlar. Bu ders, indeks kullanımını izleme yöntemlerini ele almaktadır.
+
+- `pg_stat_user_indexes` ile hangi indekslerin kullanıldığını sorgulamak
+- Kullanılmayan indeksleri tespit etmek
+- `pg_indexes` ve `pg_stat_user_tables` ile tablo ve indeks sağlığını izlemek
 
 ---
 
-## 📖 Kavram: İndeks Kullanım İzleme
+## İndeks Kullanım İzleme
 
-İndeks oluşturdun — ama sorgu planner gerçekten kullanıyor mu? PostgreSQL bunu takip eder:
-
-| Sistem Tablosu | Bilgi |
+| Sistem Kataloğu | Sağladığı Bilgi |
 |---|---|
 | `pg_stat_user_indexes` | Kaç kez tarandı, kaç satır okundu |
 | `pg_indexes` | İndeks tanımı |
@@ -19,7 +19,9 @@
 
 ---
 
-## ▶ Canlı Örnek — İndeks Kullanım Raporu
+## Uygulama Örneği
+
+### İndeks kullanım raporu
 
 <RunnableBlock
   sql={`SELECT
@@ -34,11 +36,10 @@ JOIN pg_stat_user_indexes s
 WHERE i.tablename IN ('noktalar_perf','mekanlar_part','gps_izler')
 ORDER BY s.idx_scan DESC;`}
   label="İndeks kullanım raporu"
+  description="pg_indexes ve pg_stat_user_indexes JOIN ile birleştirilerek her indeks için tanım, kullanım sayısı, okunan satır sayısı ve disk boyutu tek sorguda elde edilir. idx_scan yüksek olan indeksler aktif olarak kullanılmaktadır; idx_scan = 0 olanlar henüz kullanılmamış veya kullanılmayan indekslerdir. ORDER BY idx_scan DESC en çok kullanılan indeksleri üste getirir."
 />
 
----
-
-## ▶ Sequential Scan Oranı
+### Tablo tarama istatistikleri
 
 <RunnableBlock
   sql={`SELECT
@@ -53,11 +54,10 @@ FROM pg_stat_user_tables
 WHERE relname IN ('noktalar_perf','mekanlar_part','gps_izler')
 ORDER BY seq_scan DESC;`}
   label="Tablo tarama istatistikleri"
+  description="pg_stat_user_tables her tablo için sequential scan ve index scan sayılarını tutar. CASE ifadesi indeks kullanım oranını yüzde olarak hesaplar: yüksek oranlar indekslerin etkin kullanıldığını gösterir. n_live_tup tablodaki canlı (silinmemiş) satır tahminini verir. Yüksek seq_scan ve düşük idx_oran_pct değerleri indeks eksikliğine ya da sorguların indeksi bypass ettiğine işaret eder."
 />
 
----
-
-## ▶ Kullanılmayan İndeksleri Bul
+### Hiç kullanılmamış indeksler
 
 <RunnableBlock
   sql={`-- idx_scan = 0: hiç kullanılmamış indeksler
@@ -71,11 +71,12 @@ WHERE idx_scan = 0
   AND tablename NOT LIKE 'pg_%'
 ORDER BY pg_relation_size(indexrelid) DESC;`}
   label="Hiç kullanılmamış indeksler"
+  description="idx_scan = 0 koşulu hiç kullanılmamış indeksleri listeler. pg_%  ile başlayan sistem tabloları filtrelendiğinden yalnızca kullanıcı tabloları görünür. ORDER BY boyut DESC en fazla disk alanı tüketen kullanılmayan indeksleri üste getirir; bu indeksler kaldırılarak disk alanı ve yazma performansı iyileştirilebilir."
 />
 
 ---
 
-## 🧪 Dene — Birkaç Sorgu Çalıştır ve Tekrar İzle
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Birkaç sorgu çalıştır
@@ -85,18 +86,13 @@ SELECT COUNT(*) FROM noktalar_perf WHERE ST_DWithin(geom::geography, ST_SetSRID(
 -- Şimdi istatistiklere tekrar bak
 SELECT indexname, idx_scan FROM pg_stat_user_indexes WHERE tablename='noktalar_perf';`}
   label="Sorgu sonrası istatistik"
+  description="İki ST_DWithin sorgusu çalıştırıldıktan sonra pg_stat_user_indexes tekrar sorgulanır. Her sorgu indeks taramasını artırır; idx_scan değerinin 0'dan yüksek bir değere çıktığı görülür. Bu adım, istatistiklerin canlı olarak güncellendiğini ve izleme sorgularının gerçek kullanımı yansıttığını doğrular."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **idx_scan kümülatif:** Sunucu yeniden başlatılınca veya `pg_stat_reset()` çağrılınca sıfırlanır. PGlite'ta sayfa yenilemesinde sıfırlanabilir.
-2. **Yeni indeks başlangıçta 0:** İndeks yeni oluşturuldu ise henüz kullanılmamış olabilir. Birkaç sorgu çalıştır, sonra kontrol et.
-3. **idx_scan 0 ≠ hemen sil:** Bazı indeksler nadiren çalışan raporlar için kritiktir. Silmeden önce kullanım zamanını değerlendir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modülün son dersi: **`ANALYZE` — neden zorunlu?** Sorgu planlayıcısının neden güncel istatistiklere ihtiyacı var?
+1. **`idx_scan` kümülatiftir ve sıfırlanabilir.** Sunucu yeniden başlatıldığında veya `pg_stat_reset()` çağrıldığında sayaç sıfırlanır. PGlite'ta sayfa yenilemesinde de sıfırlanabilir.
+2. **Yeni indeks başlangıçta `idx_scan = 0` gösterir.** Bu normal bir durumdur; ilk birkaç sorgudan sonra sayaç artmaya başlar.
+3. **`idx_scan = 0` hemen silme gerekçesi değildir.** Bazı indeksler nadiren çalışan raporlar veya acil durum sorguları için kritik önem taşır. Silmeden önce indeksin amacı değerlendirilmelidir.

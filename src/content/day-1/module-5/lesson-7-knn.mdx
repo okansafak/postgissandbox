@@ -1,26 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `<->` KNN operatörü ile en yakın N komşuyu verimli bulabileceksin
-- `ORDER BY ... <-> ... LIMIT N` kalıbını kullanabileceksin
-- `ST_DWithin` + `<->` kombinasyonuyla arama alanını kısıtlayabileceksin
+"En yakın N nokta" sorgusu — sağlık hizmetlerine erişimden acil servis yönlendirmesine kadar geniş bir uygulama yelpazesinde ortaya çıkar. Bu ders, GiST indeksini ORDER BY'da kullanan `<->` operatörünün nasıl çalıştığını ve LATERAL JOIN ile her satır için en yakın komşunun nasıl bulunduğunu ele almaktadır.
+
+- `<->` KNN operatörü ile en yakın N komşuyu verimli bulmak
+- `ORDER BY ... <-> ... LIMIT N` kalıbını uygulamak
+- LATERAL JOIN ile her satır için en yakın komşuyu hesaplamak
 
 ---
 
-## 📖 Kavram: KNN (K-Nearest Neighbor)
+## KNN: K-Nearest Neighbor
 
-`<->` operatörü iki geometri arasındaki **bbox merkezlerine göre yaklaşık mesafeyi** hesaplar — ama asıl özelliği **GIST indeksini ORDER BY'da kullanabilmesidir**.
+`<->` operatörü iki geometrinin **bbox merkezlerine göre yaklaşık mesafeyi** hesaplar. Asıl önemi, büyük tablolarda sıralı arama için GiST indeksini devreye sokabilmesidir.
 
 ```sql
--- En yakın 5 nokta — GIST indeks ile çok hızlı
+-- En yakın 5 nokta — GiST indeks ile hızlı
 SELECT id, ST_Distance(a.geom::geography, ref.geom::geography)
 FROM noktalar a, referans ref
 ORDER BY a.geom <-> ref.geom
 LIMIT 5;
 ```
 
-### ST_DWithin ile Birleştir
+### `ST_DWithin` ile birleştirme
 
-Büyük tablolarda önce `ST_DWithin` ile coğrafi kutu çiz, sonra KNN sırala:
+Çok büyük tablolarda önce `ST_DWithin` ile coğrafi bir pencere açılır, ardından KNN sıralaması yapılır:
 
 ```sql
 WHERE ST_DWithin(a.geom::geography, ref.geom::geography, 100000)  -- 100 km içinde
@@ -30,7 +32,9 @@ LIMIT 5
 
 ---
 
-## ▶ Canlı Örnek — Ankara'ya En Yakın 3 Şehir
+## Uygulama Örneği
+
+### Ankara'ya en yakın 3 şehir (KNN)
 
 <RunnableBlock
   sql={`WITH referans AS (
@@ -54,13 +58,10 @@ ORDER BY s.geom <-> r.geom
 LIMIT 3;`}
   label="Ankara'ya en yakın 3 şehir (KNN)"
   autoFit
+  description="ORDER BY s.geom <-> r.geom tüm şehirleri referans noktasına (Ankara) olan bbox mesafesine göre sıralar; LIMIT 3 yalnızca en yakın üçünü döndürür. ST_Distance doğrulama amacıyla gerçek elipsoid mesafesini km cinsinden hesaplar. Gerçek tablolarda GiST indeksi bu sıralamayı tam tablo taraması olmadan gerçekleştirir."
 />
 
----
-
-## ▶ Her Nokta İçin En Yakın Komşu
-
-Lateral JOIN ile her şehire en yakın komşuyu bul:
+### Her şehrin en yakın komşusu (LATERAL JOIN)
 
 <RunnableBlock
   sql={`WITH sehirler AS (
@@ -83,23 +84,22 @@ LATERAL (
   LIMIT 1
 ) knn;`}
   label="Her şehrin en yakın komşusu"
+  description="LATERAL alt sorgu dış sorgunun her satırı (a) için bağımsız olarak çalışır: o satırın geometrisine en yakın diğer şehri bulur. WHERE b.ad <> a.ad şehrin kendisiyle eşleşmesini önler. Bu kalıp — dış döngü + LATERAL KNN — her nokta için en yakın komşuyu paralel biçimde hesaplamanın standart yöntemidir."
 />
 
 ---
 
-## 🎯 Gün 1 Mini-Projesi
-
-Sultanahmet'e en yakın 5 şehri bul ve haritada göster:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH sultanahmet AS (
   SELECT ST_SetSRID(ST_MakePoint(28.976, 41.006), 4326) AS geom
 ),
-sehirler AS (
+semtler AS (
   SELECT 'Kadıköy'    AS ad, ST_SetSRID(ST_MakePoint(29.023, 40.990), 4326) AS geom
   UNION ALL SELECT 'Beşiktaş', ST_SetSRID(ST_MakePoint(29.002, 41.042), 4326)
   UNION ALL SELECT 'Üsküdar',  ST_SetSRID(ST_MakePoint(29.015, 41.023), 4326)
-  UNION ALL SELECT 'Bakırköy',ST_SetSRID(ST_MakePoint(28.870, 40.982), 4326)
+  UNION ALL SELECT 'Bakırköy', ST_SetSRID(ST_MakePoint(28.870, 40.982), 4326)
   UNION ALL SELECT 'Şişli',    ST_SetSRID(ST_MakePoint(28.988, 41.060), 4326)
   UNION ALL SELECT 'Fatih',    ST_SetSRID(ST_MakePoint(28.940, 41.013), 4326)
   UNION ALL SELECT 'Eyüp',     ST_SetSRID(ST_MakePoint(28.934, 41.048), 4326)
@@ -108,23 +108,18 @@ SELECT
   s.ad,
   ROUND(ST_Distance(s.geom::geography, r.geom::geography)::numeric / 1000, 1) AS km,
   s.geom
-FROM sehirler s, sultanahmet r
+FROM semtler s, sultanahmet r
 ORDER BY s.geom <-> r.geom
 LIMIT 5;`}
   label="Sultanahmet'e en yakın 5 semt"
   autoFit
+  description="Sultanahmet referans noktasına en yakın 5 İstanbul semtini KNN ile bulan tam bir analiz. ORDER BY <-> sıralama yapar; LIMIT 5 en yakın beşini seçer. ST_Distance gerçek elipsoid mesafesini km cinsinden hesaplar. geom sütunu harita sekmesinde sonuç noktalarını görselleştirir. Bu sorgu yapısı coğrafi yakınlık analizi için şablondur."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`<->` bbox mesafesi:** Tam geometri mesafesi değil — küçük geometrilerde fark ihmal edilebilir, büyük poligonlarda farklılık olabilir. Kesin sıralama için `ST_Distance` ile doğrula.
-2. **İndekssiz tabloda KNN:** `<->` operatörü GIST indekssiz tablolarda `ST_Distance` kadar yavaş çalışır. `CREATE INDEX USING gist(geom)` şart.
-3. **LATERAL JOIN olmadan N-N:** Her satır için en yakın komşu bulmak istiyorsan `LATERAL` kullan — aksi hâlde cross join yaratırsın.
-
----
-
-## 🔗 Sıradaki Ders
-
-**Gün 1 tamamlandı!** Gün 2'de veri yükleme, gelişmiş geometri işlemleri ve indeks/performans konularına geçiyoruz.
+1. **`<->` kesin geometri mesafesi değildir.** Bbox merkezleri arasındaki yaklaşık mesafeyi kullanır. Küçük nokta geometrilerinde fark ihmal edilebilir; büyük poligonlarda sapma olabilir. Kesin sıralama için `ST_Distance` ile doğrulama yapılmalıdır.
+2. **GiST indekssiz tabloda KNN avantajı yoktur.** `<->` operatörü `CREATE INDEX USING gist(geom)` olmayan tablolarda `ST_Distance` kadar yavaş çalışır. İndeks oluşturulduğunda kazanım dramatik olabilir.
+3. **N-N eşleştirme için LATERAL zorunludur.** Her satır için en yakın komşuyu bulmak istenen durumlarda `LATERAL` olmadan yazılan sorgu CROSS JOIN üretir ve doğru sonuç vermez.

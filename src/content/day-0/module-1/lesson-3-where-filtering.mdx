@@ -1,0 +1,95 @@
+## WHERE ile Filtreleme
+
+**Hedef:** `WHERE` koşuluyla sonuç kümesini daraltmak; karşılaştırma ve mantıksal operatörleri kullanmak.
+
+---
+
+## Öğrenim Hedefleri
+
+- Temel karşılaştırma operatörleri (`=`, `!=`, `>`, `<`, `>=`, `<=`) ile filtre yazmak
+- `AND`, `OR`, `NOT` ile koşulları birleştirmek
+- `LIKE`, `IN`, `BETWEEN`, `IS NULL` ile özel filtreler kullanmak
+
+---
+
+## Ön Hazırlık
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS sehirler (
+  id SERIAL PRIMARY KEY, ad TEXT, bolge TEXT, nufus INTEGER, alan_km2 NUMERIC
+);
+INSERT INTO sehirler (ad, bolge, nufus, alan_km2) VALUES
+  ('İstanbul','Marmara',15840900,5343),('Ankara','İç Anadolu',5782285,2516),
+  ('İzmir','Ege',4479525,3577),('Bursa','Marmara',3194720,10882),
+  ('Antalya','Akdeniz',2696249,20177),('Adana','Akdeniz',2258997,13844),
+  ('Konya','İç Anadolu',2279474,38873),('Gaziantep','Güneydoğu Anadolu',2154051,7642),
+  ('Mersin','Akdeniz',1922758,15853),('Trabzon','Karadeniz',839468,4685)
+ON CONFLICT DO NOTHING;
+SELECT COUNT(*) AS sehir_sayisi FROM sehirler;`}
+  label="Veri setini hazırla"
+  description="Tablo ve veriler yoksa oluşturur; varsa değiştirmeden devam eder."
+/>
+
+---
+
+## Uygulama Örneği
+
+### Temel karşılaştırma operatörleri
+
+<RunnableBlock
+  sql={`-- Nüfusu 3 milyondan fazla olan şehirler
+SELECT ad, bolge, nufus
+FROM sehirler
+WHERE nufus > 3000000
+ORDER BY nufus DESC;`}
+  label="Nüfusa göre filtrele"
+  description="WHERE koşulu FROM'dan sonra gelir ve her satır için ayrı ayrı değerlendirilir. > büyüktür operatörü; benzer şekilde < (küçüktür), >= (büyük eşit), <= (küçük eşit), = (eşit), != veya <> (eşit değil) kullanılabilir. Koşulu sağlamayan satırlar sonuç kümesine dahil edilmez."
+/>
+
+### AND ve OR ile birden fazla koşul
+
+<RunnableBlock
+  sql={`-- Akdeniz bölgesinde VE nüfusu 2 milyonun üstünde şehirler
+SELECT ad, bolge, nufus
+FROM sehirler
+WHERE bolge = 'Akdeniz'
+  AND nufus > 2000000;`}
+  label="AND ile iki koşul"
+  description="AND her iki koşulun da sağlanmasını gerektirir. OR ise koşullardan en az birinin sağlanmasını gerektirir. Metin karşılaştırmasında tek tırnak kullanılır: 'Akdeniz'. Çift tırnak sütun ve tablo adları içindir; metin değerleri için kullanılmaz."
+/>
+
+### LIKE ile metin arama
+
+<RunnableBlock
+  sql={`-- Adı 'A' harfiyle başlayan şehirler
+SELECT ad, bolge FROM sehirler
+WHERE ad LIKE 'A%';`}
+  label="LIKE ile metin arama"
+  description="LIKE metin kalıbı eşleştirmesi yapar. % sıfır veya daha fazla herhangi bir karakteri temsil eder. _ (alt çizgi) tam olarak bir karakteri temsil eder. 'A%' → A ile başlayan; '%a' → a ile biten; '%an%' → içinde an geçen demektir. ILIKE büyük/küçük harf duyarsız eşleştirme yapar."
+/>
+
+### IN ve BETWEEN
+
+<RunnableBlock
+  sql={`-- Belirli bölgelerdeki şehirler
+SELECT ad, bolge, nufus
+FROM sehirler
+WHERE bolge IN ('Marmara', 'Ege', 'Akdeniz')
+ORDER BY bolge, nufus DESC;`}
+  label="IN ile liste filtresi"
+  description="IN liste içindeki değerlerden herhangi biriyle eşleşen satırları seçer; uzun OR zinciri yazmaya gerek kalmaz. NOT IN listede olmayan değerleri seçer. BETWEEN x AND y ise x ile y arasındaki değerleri (her iki uç dahil) seçer; sayılar ve tarihler için kullanılabilir."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Nüfusu 2-5 milyon arasında olan şehirler
+SELECT ad, bolge, nufus
+FROM sehirler
+WHERE nufus BETWEEN 2000000 AND 5000000
+ORDER BY nufus DESC;`}
+  label="BETWEEN ile aralık filtresi"
+  description="BETWEEN alt_sınır AND üst_sınır her iki sınır değeri dahil olmak üzere aralıktaki satırları seçer. Sayısal değerlerde, tarih/zaman değerlerinde ve metin değerlerinde (alfabetik sıra) kullanılabilir. NOT BETWEEN aralık dışındaki satırları seçer."
+/>

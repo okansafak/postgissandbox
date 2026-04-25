@@ -1,35 +1,37 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Türkiye'de kullanılan başlıca EPSG kodlarını listeleyebileceksin
-- Hangi bölge için hangi UTM diliminin seçileceğini belirleyebileceksin
-- ITRF96 Türkiye datumunu (EPSG:5254-5259) tanıyabileceksin
+Türkiye'nin coğrafi konumu birden fazla UTM dilimini kapsar; bu durum proje kapsamına göre koordinat sistemi seçimini kaçınılmaz kılar. Bu ders Türkiye'de kullanılan başlıca koordinat sistemlerini ve bölgesel dilim seçim kriterlerini ele almaktadır.
+
+- Türkiye'de kullanılan başlıca EPSG kodlarını sıralayabilmek
+- Hangi bölge için hangi UTM diliminin tercih edileceğini belirleyebilmek
+- ITRF96 / TUREF ulusal datumunu tanımak
 
 ---
 
-## 📖 Kavram: Türkiye'nin Koordinat Sistemi Dünyası
+## Türkiye'nin Koordinat Sistemi Ortamı
 
-Türkiye yayın yayın coğrafyasıyla **üç farklı UTM dilimini** kapsar. Proje kapsamına göre doğru dilim seçilmelidir.
+Türkiye, doğu-batı doğrultusunda yaklaşık 18 derecelik açısal genişliğiyle **üç farklı UTM dilimini** kapsar. Tek bir proje tüm ülkeyi kapsıyorsa `geography` (EPSG:4326) kullanmak daha pratiktir; bölgesel hassasiyet gerektiren projelerde ise doğru UTM dilimi seçilmelidir.
 
-### UTM (Universal Transverse Mercator)
+### UTM Dilimleri
 
-Dünyayı 6°'lik meridyen dilimleri halinde böler. Her dilim kendi merkezi meridyeninden itibaren metre cinsinden koordinat verir.
+UTM sistemi dünyayı 6°'lik meridyen dilimlerine böler; her dilim kendi merkez meridyenine göre metre cinsinden koordinat verir.
 
-| EPSG | Ad | Merkez Meridyen | Türkiye Kapsamı |
+| EPSG | Ad | Merkez Meridyen | Kapsadığı Bölge |
 |---|---|---|---|
 | **32635** | WGS84 / UTM Zone 35N | 27°E | Batı: İstanbul, İzmir, Bursa |
 | **32636** | WGS84 / UTM Zone 36N | 33°E | Orta: Ankara, Konya, Samsun |
 | **32637** | WGS84 / UTM Zone 37N | 39°E | Doğu: Erzurum, Van, Diyarbakır |
 
-### Web ve GPS
+### Genel Amaçlı Sistemler
 
 | EPSG | Ad | Kullanım |
 |---|---|---|
-| **4326** | WGS84 (coğrafi) | GPS, GeoJSON, API |
-| **3857** | Web Mercator | Google Maps, OSM tile |
+| **4326** | WGS84 (coğrafi) | GPS, GeoJSON, API depolama |
+| **3857** | Web Mercator | Google Maps, OSM tile haritaları |
 
-### ITRF96 / TUREF
+### ITRF96 / TUREF — Türkiye Ulusal Datumu
 
-Türkiye'nin resmi ulusal datumu. Yüksek hassasiyetli kadastro ve mühendislik projelerinde kullanılır.
+Yüksek hassasiyetli kadastro ve mühendislik projelerinde resmi olarak kullanılan Türkiye datumudur.
 
 | EPSG | Dilim |
 |---|---|
@@ -42,7 +44,9 @@ Türkiye'nin resmi ulusal datumu. Yüksek hassasiyetli kadastro ve mühendislik 
 
 ---
 
-## ▶ Canlı Örnek — Hangi UTM Diliminde?
+## Uygulama Örneği
+
+### Şehrin UTM dilimini hesapla
 
 <RunnableBlock
   sql={`WITH sehirler AS (
@@ -55,43 +59,33 @@ Türkiye'nin resmi ulusal datumu. Yüksek hassasiyetli kadastro ve mühendislik 
 SELECT
   sehir,
   lon,
-  -- UTM dilimi formülü: FLOOR((lon + 180) / 6) + 1
-  FLOOR((lon + 180) / 6) + 1 AS utm_dilim,
-  32600 + (FLOOR((lon + 180) / 6) + 1)::int AS epsg_kodu
+  FLOOR((lon + 180) / 6) + 1                       AS utm_dilim,
+  32600 + (FLOOR((lon + 180) / 6) + 1)::int        AS epsg_kodu
 FROM sehirler
 ORDER BY lon;`}
   label="Şehir → UTM dilim hesabı"
+  description="FLOOR((lon + 180) / 6) + 1 formülü herhangi bir boylam koordinatından UTM dilim numarasını hesaplar. 32600'e ekleyerek Kuzey yarımküre için EPSG kodunu üretir. Bu hesap herhangi bir noktanın doğal UTM dilimini programatik olarak belirlemenin standart yoludur."
 />
 
----
-
-## ▶ Aynı Nokta, 3 UTM Diliminde
+### Aynı nokta, üç dilimde
 
 <RunnableBlock
   sql={`WITH ankara AS (
   SELECT ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326) AS geom
 )
 SELECT
-  -- UTM 35N (batı dilimi)
   ROUND(ST_X(ST_Transform(geom, 32635))::numeric) AS utm35_x,
   ROUND(ST_Y(ST_Transform(geom, 32635))::numeric) AS utm35_y,
-  -- UTM 36N (doğal dilimi)
   ROUND(ST_X(ST_Transform(geom, 32636))::numeric) AS utm36_x,
   ROUND(ST_Y(ST_Transform(geom, 32636))::numeric) AS utm36_y,
-  -- UTM 37N (doğu dilimi)
   ROUND(ST_X(ST_Transform(geom, 32637))::numeric) AS utm37_x,
   ROUND(ST_Y(ST_Transform(geom, 32637))::numeric) AS utm37_y
 FROM ankara;`}
   label="Ankara — 3 UTM diliminde koordinatlar"
+  description="Ankara'nın koordinatları aynı anda üç farklı UTM dilimine dönüştürülür. Doğal dilimi olan UTM 36N'de X değeri yaklaşık 500.000 metreye yakın olmalıdır — bu UTM'nin false easting (merkez meridyen ofset) özelliğidir. Diğer dilimlerde X değerleri bu referanstan uzaklaşır."
 />
 
-> UTM 36N'de X ≈ 500000 metre görmelisin — bu UTM merkez meridyen özelliği (false easting).
-
----
-
-## 🧪 Dene
-
-İstanbul için UTM 35N koordinatlarını hesapla ve şehir merkezine 5 km tampon çiz:
+### İstanbul: UTM tampon
 
 <RunnableBlock
   sql={`WITH istanbul_utm AS (
@@ -103,23 +97,17 @@ FROM ankara;`}
 SELECT
   ROUND(ST_X(geom)::numeric) AS x_m,
   ROUND(ST_Y(geom)::numeric) AS y_m,
-  -- 5 km tampon → geri 4326'ya dönüştür
   ST_Transform(ST_Buffer(geom, 5000), 4326) AS tampon_geom
 FROM istanbul_utm;`}
   label="İstanbul 5 km tampon (UTM)"
   autoFit
+  description="UTM sisteminde ST_Buffer metre cinsinden çalışır: 5000 parametre 5 km tampon üretir. Tampon UTM koordinatlarında hesaplandıktan sonra ST_Transform ile 4326'ya geri çevrilerek haritada görselleştirilebilir hale getirilir. WGS84 üzerinde doğrudan ST_Buffer uygulamak derece cinsinden çalışır ve yuvarlak değil eliptik bir tampon üretir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **UTM dilim sınırında nokta:** Şehir iki dilim arasında kalıyorsa proje kapsamındaki çoğunluk için doğal dilimi seç. Türkiye çapında analizde `geography` (4326) kullan.
-2. **3857 hassas hesap için uygun değil:** Web Mercator kutuplara yaklaştıkça ~%0.3'e kadar alan hatası birikir. Yüzde bazında analizde UTM kullan.
-3. **ITRF96 ile WGS84 farkı:** Pratik kullanımda ITRF96 ve WGS84 ~1 cm farklıdır — çoğu uygulamada ihmal edilebilir. Kadastro seviyesinde ölçüm için EPSG:5254-5259 kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son derste tüm bu bilgileri bir araya getirip **hangi projeksiyonu ne zaman seçeceğini** öğreneceğiz.
+1. **Dilim sınırında kalan noktalar:** Şehir iki dilim arasına düşüyorsa analizin ağırlıklı coğrafi bölgesine uygun dilim seçilmelidir. Türkiye geneli analizlerde `geography` (4326) tercih edilir.
+2. **EPSG:3857 hassas ölçüm için uygun değildir.** Web Mercator kutuplara yaklaştıkça yaklaşık %0.3 oranında alan hatası biriktirir; yüzdesel analiz için UTM kullanılmalıdır.
+3. **ITRF96 ile WGS84 farkı.** Pratik kullanımda iki datum arasındaki fark yaklaşık 1 cm'dir; çoğu uygulamada ihmal edilebilir. Kadastro hassasiyeti gerektiren projelerde EPSG:5254–5259 kullanılmalıdır.

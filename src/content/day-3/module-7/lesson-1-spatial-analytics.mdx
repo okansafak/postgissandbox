@@ -1,19 +1,21 @@
-## 📊 Mekansal Analitik: Gerçek Zamanlı KPI Dashboard
+## Mekansal Analitik: Erişilebilirlik KPI Hesaplama
 
-**Hedef:** ST_HexagonGrid ile İstanbul adreslerinin eczane erişilebilirliğini analiz et.
-
----
-
-## 🎯 Ne öğreneceksin?
-
-- `ST_HexagonGrid` ile hexagonal grid oluşturabileceksin
-- Hiyerarşik aggregation (nokta → hücre → ilçe) yapabileceksin
-- Mekansal otokorelasyon istatistikleri hesaplayabileceksin
-- Real-time KPI dashboard verisi hazırlayabileceksin
+**Hedef:** `ST_HexagonGrid` ile İstanbul eczane erişilebilirliğini analiz etmek ve ilçe bazlı yoğunluk istatistiklerini üretmek.
 
 ---
 
-## ▶ Hexagonal Grid Oluştur
+## Öğrenim Hedefleri
+
+- `ST_HexagonGrid` ile hexagonal grid oluşturmak
+- Hiyerarşik aggregation (nokta → hücre → ilçe) yapmak
+- Mekansal yoğunluk istatistikleri ve z-skoru hesaplamak
+- Erişilebilirlik skorunu haritada görselleştirmek
+
+---
+
+## Uygulama Örneği
+
+### Hexagonal grid oluşturma
 
 <RunnableBlock
   sql={`-- ST_HexagonGrid ile İstanbul üzerine hex grid (0.01 derece ≈ 1km)
@@ -27,11 +29,10 @@ SELECT
 FROM bbox, ST_HexagonGrid(0.01, bbox.geom) h
 LIMIT 20;`}
   label="Hex grid oluştur (ilk 20 hücre)"
+  description="ST_HexagonGrid(boyut, bbox) verilen sınır kutusu üzerinde eşit büyüklükte altıgen hücre ağı üretir. 0.01 derece aralık ≈ 1 km²'ye karşılık gelir. ST_Area(::geography) her hücrenin gerçek yüzey alanını metrekare cinsinden döndürür. ROW_NUMBER() OVER () hücrelere sıralı kimlik atar."
 />
 
----
-
-## ▶ Eczane Erişilebilirliğini Hesapla
+### Eczane erişilebilirlik analizi
 
 <RunnableBlock
   sql={`-- Örnek eczane ve adres noktaları oluştur
@@ -61,9 +62,9 @@ SELECT
   ROW_NUMBER() OVER () AS hucre_id,
   MIN(ST_Distance(g.merkez::geography, e.geom::geography))::int4 AS en_yakin_eczane_m,
   CASE
-    WHEN MIN(ST_Distance(g.merkez::geography, e.geom::geography)) < 500  THEN '✓ İyi (< 500m)'
-    WHEN MIN(ST_Distance(g.merkez::geography, e.geom::geography)) < 1000 THEN '~ Orta (< 1km)'
-    ELSE '✗ Uzak (> 1km)'
+    WHEN MIN(ST_Distance(g.merkez::geography, e.geom::geography)) < 500  THEN 'Iyi (500m alti)'
+    WHEN MIN(ST_Distance(g.merkez::geography, e.geom::geography)) < 1000 THEN 'Orta (1km alti)'
+    ELSE 'Uzak (1km uzeri)'
   END AS erisim_durumu
 FROM grid g
 CROSS JOIN eczanes e
@@ -71,11 +72,10 @@ GROUP BY g.geom
 ORDER BY en_yakin_eczane_m
 LIMIT 15;`}
   label="Eczane erişilebilirlik analizi"
+  description="CROSS JOIN her hücreyi tüm eczanelerle eşleştirir; MIN(ST_Distance) en yakın eczane mesafesini seçer. ::geography cast'i metre cinsinden doğru küresel mesafe sağlar. CASE ifadesi eşik değerlerine (500 m / 1 km) göre erişim kategorisi atar. en_yakin_eczane_m ASC sıralaması en kötü erişime sahip hücreleri öne getirir."
 />
 
----
-
-## ▶ İlçe Bazlı Yoğunluk Analizi
+### İlçe bazlı yoğunluk istatistikleri
 
 <RunnableBlock
   sql={`-- İlçe bazlı eczane yoğunluğu ve istatistikleri
@@ -104,17 +104,18 @@ SELECT
   eczane_per_100k,
   AVG(eczane_per_100k) OVER () AS ort_yogunluk,
   CASE
-    WHEN eczane_per_100k > AVG(eczane_per_100k) OVER () THEN '↑ Yüksek'
-    ELSE '↓ Düşük'
+    WHEN eczane_per_100k > AVG(eczane_per_100k) OVER () THEN 'Yüksek'
+    ELSE 'Düşük'
   END AS yogunluk_sinifi
 FROM eczane_per_ilce
 ORDER BY eczane_per_100k DESC;`}
   label="İlçe bazlı yoğunluk istatistikleri"
+  description="ST_Within ile her eczane ilgili ilçeye mekansal JOIN ile bağlanır. eczane_per_100k = eczane_sayisi / nufus * 100000 formülü nüfus farklılıklarına rağmen ilçeler arası adil karşılaştırma sağlar. AVG OVER () pencere fonksiyonu genel ortalamanın her satırda görünmesini sağlar. yogunluk_sinifi ortalamanın altındaki ilçeleri acil müdahale için işaretler."
 />
 
 ---
 
-## ▶ Mekansal Otokorelasyon (Moran's I benzeri)
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Moran's I yaklaşımı: yoğunluk değerlerinin komşu ilçelerle korelasyonu
@@ -146,16 +147,5 @@ SELECT
 FROM district_density d, stats s
 ORDER BY d.yogunluk DESC;`}
   label="Mekansal yoğunluk otokorelasyonu"
+  description="Moran's I istatistiği mekansal otokorelasyonun ölçüsüdür; burada z-skor tabanlı bir yaklaşımla uygulanmaktadır. z_skoru = (değer - ortalama) / standart_sapma formülüyle hesaplanır. Pozitif z skoru ortalamanın üzerinde yoğunluğa, negatif z skoru ise altında yoğunluğa işaret eder. NULLIF(std_sapma, 0) sıfıra bölme hatasını önler."
 />
-
----
-
-## ✨ Özet
-
-Mekansal analitik ile:
-- ✓ `ST_HexagonGrid` ile 1km²'lik hücrelerde KPI hesaplama
-- ✓ Her hücre için en yakın eczane erişim mesafesi
-- ✓ İlçe bazlı normalleştirilmiş yoğunluk (per 100k nüfus)
-- ✓ Z-skor tabanlı clustering deseni tespiti
-
-**Sonraki ders:** Deployment & Monitoring — production ortamında bu analytics'leri çalıştırma

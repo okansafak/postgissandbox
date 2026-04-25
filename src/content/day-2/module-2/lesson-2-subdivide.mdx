@@ -1,24 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Subdivide` ile büyük poligonu küçük parçalara bölebileceksin
-- Büyük geometrilerin GIST indeks verimliliğini neden düşürdüğünü açıklayabileceksin
-- `max_vertices` parametresini doğru ayarlayabileceksin
+GiST indeksi her geometri için bir bounding box saklar. Büyük ve karmaşık poligonlar çok büyük bounding box üretir; bu da indeksin seçiciliğini düşürür ve sorgulama verimliliğini azaltır. `ST_Subdivide`, büyük geometrileri indeks dostu küçük parçalara bölerek bu sorunu giderir.
 
----
-
-## 📖 Kavram: Büyük Poligon Sorunu
-
-GIST indeksi her geometri için bir **bounding box** saklar. Büyük bir ülke poligonu (ör. Türkiye — binlerce nokta) tüm Türkiye'yi kapsayan dev bir bounding box üretir. Bu bbox Türkiye'yi kesen **her sorguya** yanıt verir — çoğu gereksiz.
-
-**Çözüm:** `ST_Subdivide(geom, max_vertices)` — büyük poligonu 256 noktalı küçük parçalara böler. Her parçanın daha küçük bbox'ı → daha seçici indeks.
-
-```
-1 büyük poligon (10000 nokta) → 40+ küçük parça (her biri ≤256 nokta)
-```
+- `ST_Subdivide` ile büyük poligonu küçük parçalara bölmek
+- Büyük geometrilerin GiST indeks verimliliğine etkisini açıklamak
+- `max_vertices` parametresini doğru ayarlamak
 
 ---
 
-## ▶ Canlı Örnek — Subdivide
+## Büyük Poligon Sorunu
+
+GiST indeksi her geometri için bir **bounding box** saklar. Büyük bir ülke poligonu — binlerce noktayla — tüm ülkeyi kapsayan devasa bir bounding box üretir. Bu bounding box, söz konusu ülkeyi kesen **her sorguya** potansiyel aday olarak katılır; sorgular çok daha fazla geometriyi kesin test aşamasında değerlendirmek zorunda kalır.
+
+**Çözüm:** `ST_Subdivide(geom, max_vertices)` büyük poligonu daha küçük parçalara böler; her parçanın daha küçük bounding box'ı daha seçici indeks davranışı sağlar.
+
+```
+1 büyük poligon (10.000 nokta) → 40+ küçük parça (her biri ≤ 256 nokta)
+```
+
+---
+
+## Uygulama Örneği
+
+### Subdivide parça sayısı
 
 <RunnableBlock
   sql={`WITH buyuk_poli AS (
@@ -38,11 +42,10 @@ LATERAL (
 ) sub
 GROUP BY geom;`}
   label="Subdivide parça sayısı"
+  description="ST_Buffer ile yuvarlak köşeler eklenerek karmaşık bir poligon simüle edilir. LATERAL ST_Subdivide(geom, 64) her satır için ayrı ayrı çalışır ve 64 noktadan büyük her poligon parçasını daha küçük parçalara böler. COUNT(*) kaç parçanın üretildiğini sayar. Bu karşılaştırma, buffer sonrası artan nokta sayısının subdivide ile nasıl yönetildiğini gösterir."
 />
 
----
-
-## ▶ Subdivide ile Tablo Oluştur
+### Subdivide ile tablo oluşturma
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS buyuk_alan (
@@ -72,11 +75,12 @@ SELECT
   MAX(ST_NPoints(geom)) AS max_nokta_per_parca
 FROM buyuk_alan_sub;`}
   label="Subdivide tablosu oluştur"
+  description="Orijinal büyük poligon buyuk_alan tablosuna yazılır; ardından ST_Subdivide(geom, 128) ile her parçanın en fazla 128 noktası olacak şekilde bölünmüş kopya buyuk_alan_sub tablosuna kaydedilir. Sonuç sütunları orijinal nokta sayısını, üretilen parça sayısını ve en kalabalık parçadaki nokta sayısını gösterir. Üretim ortamında buyuk_alan_sub üzerinde GiST indeksi oluşturulur."
 />
 
 ---
 
-## 🧪 Dene — Neden 256?
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH poli AS (
@@ -93,18 +97,13 @@ LATERAL (VALUES (32),(64),(128),(256)) AS t(max_v),
 LATERAL ST_Subdivide(geom, max_v) AS sub
 GROUP BY max_v ORDER BY max_v;`}
   label="max_vertices etkisi"
+  description="50 km yarıçaplı bir tampon poligon üzerinde dört farklı max_vertices değeri (32, 64, 128, 256) test edilir. VALUES ile üretilen parametre listesi her değer için ayrı LATERAL ST_Subdivide çağrısı yapar. Sonuç: max_vertices azaldıkça parça sayısı artar. 32 → en çok parça (en küçük bbox, en seçici indeks), 256 → en az parça (daha büyük bbox). Pratikte 64–256 aralığı önerilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Subdivide set döndürür:** `SELECT ST_Subdivide(geom, 128) FROM tablo` → her satır için birden fazla satır üretir. `LATERAL` veya `CREATE TABLE AS` kullan.
-2. **Orijinal tabloyu değiştirme:** Subdivide tablosu ayrı oluşturulur. Orijinal tablo ihtiyaç duyulanabilir (ör. etiket için).
-3. **max_vertices < 8 hatası:** Minimum değer 8. Çok küçük parçalar büyük overhead yaratır — 64-256 arası pratik.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste çizgiler üzerinde konumlandırma: **lineer referanslama**.
+1. **`ST_Subdivide` set döndürür.** `SELECT ST_Subdivide(geom, 128) FROM tablo` her kaynak satır için birden fazla sonuç satırı üretir. `LATERAL` veya `CREATE TABLE AS` kullanılmalıdır.
+2. **Orijinal tablo gerekli kalabilir.** Subdivide tablosu indeks performansı için kullanılır; ancak etiket veya tablo bütünlüğü gerektiren işlemler için orijinal tablo ayrı tutulmalıdır.
+3. **`max_vertices` minimum değeri 8'dir.** Çok küçük değerler aşırı parça üretir ve overhead'i artırır. 64–256 arası pratik aralıktır.

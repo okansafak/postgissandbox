@@ -1,18 +1,20 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `&&` bounding box operatörünün ne yaptığını açıklayabileceksin
-- `ST_Intersects` ile `&&` arasındaki iki aşamalı filtrelemeyi anlayabileceksin
-- `~`, `@`, `~=` operatörlerini tanıyabileceksin
+`ST_Intersects` ve benzeri fonksiyonların GiST indeksini nasıl kullandığını anlamak, mekansal sorgu optimizasyonunun temelini oluşturur. Bu ders, iki aşamalı filtreleme mekanizmasını ve bounding box operatörlerini ele almaktadır.
+
+- `&&` bounding box operatörünün işlevini açıklamak
+- `ST_Intersects` ile `&&` arasındaki iki aşamalı filtrelemeyi anlamak
+- `~`, `@`, `~=` operatörlerini tanımak
 
 ---
 
-## 📖 Kavram: İki Aşamalı Filtreleme
+## İki Aşamalı Filtreleme
 
 PostGIS mekansal sorguları iki aşamada çözer:
 
-**Aşama 1 — Kaba filtre (index scan):** `&&` operatörü — bounding box'lar kesişiyor mu?
+**Aşama 1 — Kaba filtre (indeks tarama):** `&&` operatörü — bounding box'lar kesişiyor mu?
 
-**Aşama 2 — Kesin filtre (heap scan):** `ST_Intersects` gibi fonksiyon — gerçek geometri testi.
+**Aşama 2 — Kesin filtre (heap tarama):** `ST_Intersects` gibi fonksiyon — gerçek geometri testi.
 
 ```sql
 -- ST_Intersects içinde zaten && kullanılır — otomatik
@@ -20,7 +22,7 @@ WHERE ST_Intersects(a.geom, b.geom)
 -- → 1. bbox && → aday listesi → 2. ST_Intersects kesin test
 ```
 
-Bunu elle de yapabilirsin:
+Manuel olarak da yazılabilir:
 
 ```sql
 WHERE a.geom && b.geom           -- hızlı kaba filtre
@@ -29,7 +31,7 @@ WHERE a.geom && b.geom           -- hızlı kaba filtre
 
 ---
 
-## 📖 Bbox Operatörleri
+## Bounding Box Operatörleri
 
 | Operatör | Anlamı |
 |---|---|
@@ -41,7 +43,9 @@ WHERE a.geom && b.geom           -- hızlı kaba filtre
 
 ---
 
-## ▶ Canlı Örnek — && vs ST_Intersects
+## Uygulama Örneği
+
+### `&&` ile `ST_Intersects` farkı
 
 <RunnableBlock
   sql={`WITH alan AS (
@@ -59,13 +63,10 @@ SELECT
 FROM noktalar n, alan a
 ORDER BY n.i;`}
   label="&& vs ST_Intersects farkı"
+  description="10 nokta ve bir poligon üzerinde hem && hem ST_Intersects test edilir. && bbox kesişimini test eder: poligonun dış sınırına yakın bazı noktalar bbox içinde görünebilir ancak poligon dışında kalabilir. ST_Intersects kesin geometri testini yapar ve yalnızca gerçekten poligon içindeki veya sınırında olan noktaları true döndürür. bbox_kesiyor true ama gercek_kesisim false olan satırlar yanlış pozitif örnekleridir."
 />
 
-> `&&` bbox kesişimini test eder — bazı noktalar bbox içinde olmasına rağmen poligon dışında olabilir. `ST_Intersects` kesin testi yapar.
-
----
-
-## ▶ ST_MakeEnvelope ile Kutu Sorgusu
+### ST_MakeEnvelope ile kutu sorgusu
 
 <RunnableBlock
   sql={`-- Belirli bir kutunun içindeki noktaları hızlıca bul
@@ -73,11 +74,12 @@ SELECT COUNT(*) AS istanbul_bolgesi
 FROM noktalar_perf
 WHERE geom && ST_MakeEnvelope(28.5, 40.8, 29.5, 41.5, 4326);`}
   label="Envelope bbox sorgusu"
+  description="ST_MakeEnvelope(minx, miny, maxx, maxy, srid) dört koordinatla dikdörtgen bir bounding box oluşturur. && operatörü GiST indeksi aracılığıyla hızlı bbox testi yapar. Bu sorgu tam geometri testi gerektirmeyen durumlarda — ör. ön eleme, dashboard sayacı — ideal performans sağlar."
 />
 
 ---
 
-## 🧪 Dene — Manuel İki Aşamalı Filtre
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Önce bbox, sonra kesin test
@@ -91,18 +93,13 @@ WHERE np.geom && ST_Buffer(
     ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography,
     100000);`}
   label="Manuel iki aşamalı filtre"
+  description="İki aşamalı filtreleme manuel olarak yazılır: && ile 1 derece bbox içinde noktalar GiST indeksiyle hızlıca seçilir (kaba filtre); ardından ST_DWithin 100 km kesin testi uygulanır. Bu yaklaşım normalde ST_DWithin tarafından otomatik olarak yapılan işlemi açık hale getirir ve iki aşama arasındaki farkı anlatır."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`&&` yanlış pozitif üretir:** Bbox kesişimi gerçek geometri kesişimini garanti etmez. Sadece kaba filtre — her zaman kesin test ekle.
-2. **`&&` GIST kullanır, `ST_Intersects` kullanır ama `ST_Distance <` kullanmaz:** `WHERE ST_Distance(a,b) < x` indeksi bypass eder. `ST_DWithin` kullan.
-3. **Farklı SRID'li `&&`:** `geom_4326 && geom_3857` sonucu anlamsız. SRID eşleştir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste: **partial index ve functional index** — koşullu ve cast'lı sütunları hızlandır.
+1. **`&&` yanlış pozitif üretir.** Bounding box kesişimi gerçek geometri kesişimini garanti etmez; kesin test her zaman eklenmeli ya da `ST_Intersects` gibi bir fonksiyon kullanılmalıdır.
+2. **`ST_Distance < N` indeksi atlar.** `WHERE ST_Distance(a, b) < x` GiST indeksinden yararlanamaz. Bunun yerine `WHERE ST_DWithin(a, b, x)` kullanılmalıdır.
+3. **Farklı SRID'li `&&` anlamsız sonuç üretir.** `geom_4326 && geom_3857` bounding box'ları farklı koordinat sistemlerinde karşılaştırır ve sonuç anlamsızdır. SRID eşleştirilmelidir.

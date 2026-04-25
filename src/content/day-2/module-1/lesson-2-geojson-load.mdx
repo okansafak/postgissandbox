@@ -1,24 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_GeomFromGeoJSON` ile GeoJSON metnini geometry'ye çevirebileceksin
-- GeoJSON özelliklerini tablo sütunlarına eşleyebileceksin
-- `json_array_elements` ile GeoJSON FeatureCollection'ı satırlara açabileceksin
+GeoJSON, web tabanlı harita uygulamalarında yaygın olarak kullanılan standart bir coğrafi veri formatıdır. PostGIS, GeoJSON metnini doğrudan geometry'ye dönüştürebilir; bu özellik, harici veri kaynaklarından veri yüklemede pratik bir alternatif sunar.
+
+- `ST_GeomFromGeoJSON` ile GeoJSON metnini geometry'ye dönüştürmek
+- GeoJSON özelliklerini tablo sütunlarına eşlemek
+- `json_array_elements` ile GeoJSON FeatureCollection'ı satırlara açmak
 
 ---
 
-## 📖 Kavram: GeoJSON Yükleme
+## GeoJSON Yükleme
 
-GeoJSON web'in harita formatı. PostGIS doğrudan parse eder:
+GeoJSON, web harita ekosisteminin standart formatıdır. PostGIS `ST_GeomFromGeoJSON` fonksiyonu bu formatı doğrudan ayrıştırır:
 
 ```sql
 ST_GeomFromGeoJSON('{"type":"Point","coordinates":[28.979,41.015]}')
 ```
 
-Gerçek senaryoda: GeoJSON `properties` nesnesinden attribute sütunları çıkarılır.
+Gerçek senaryolarda GeoJSON `properties` nesnesinden attribute sütunları çıkarılır ve geometry ile birlikte tabloya yazılır.
 
 ---
 
-## ▶ Canlı Örnek — Tek Feature
+## Uygulama Örneği
+
+### Tek Feature dönüşümü
 
 <RunnableBlock
   sql={`SELECT
@@ -32,13 +36,10 @@ Gerçek senaryoda: GeoJSON `properties` nesnesinden attribute sütunları çıka
     ST_GeomFromGeoJSON('{"type":"Point","coordinates":[28.979,41.015]}')
   ) AS srid_otomatik;`}
   label="GeoJSON → geometry"
+  description="ST_GeomFromGeoJSON GeoJSON metin ifadesini PostGIS geometry nesnesine dönüştürür. GeoJSON spesifikasyonu WGS84 koordinatlarını zorunlu kıldığından ST_GeomFromGeoJSON SRID=4326'yı otomatik atar — srid_otomatik sütunu bunu doğrular. ST_AsText sonucu insan tarafından okunabilir WKT formatında gösterir."
 />
 
-> `ST_GeomFromGeoJSON` SRID=4326 otomatik set eder (GeoJSON spesifikasyonu gereği).
-
----
-
-## ▶ FeatureCollection Yükle
+### FeatureCollection yükleme
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS geojson_noktalar (
@@ -58,30 +59,30 @@ WITH fc AS (
 )
 INSERT INTO geojson_noktalar (ad, tur, geom)
 SELECT
-  feat->>'ad'                                                       AS ad,
+  feat->'properties'->>'ad'                                         AS ad,
   feat->'properties'->>'tur'                                        AS tur,
-  ST_SetSRID(ST_GeomFromGeoJSON(feat->>'geometry'), 4326)            AS geom
+  ST_SetSRID(ST_GeomFromGeoJSON(feat->>'geometry'), 4326)           AS geom
 FROM fc,
      json_array_elements(fc->'features') AS feat(feat)
 ON CONFLICT DO NOTHING;
 
 SELECT id, ad, tur, ST_AsText(geom) AS wkt FROM geojson_noktalar;`}
   label="FeatureCollection → tablo"
+  description="json_array_elements FeatureCollection içindeki features dizisini tek tek satırlara açar. Her satır için ->'properties' JSON nesnesi, ->>'properties'->>'ad' ise metin değer döndürür. feat->>'geometry' geometri bloğunu metin olarak alır ve ST_GeomFromGeoJSON dönüştürür. ON CONFLICT DO NOTHING aynı sorgunun tekrar çalıştırılmasında çakışmaları önler."
 />
 
----
-
-## ▶ Haritada Gör
+### GeoJSON noktalarını haritada görüntüle
 
 <RunnableBlock
   sql={`SELECT geom, ad AS label FROM geojson_noktalar;`}
   label="GeoJSON noktaları haritada"
   autoFit
+  description="Tabloya yüklenen üç tarihi mekan harita üzerinde görselleştirilir. geom sütunu harita bileşeninin geometry'yi algılaması için zorunludur; ad AS label her noktanın etiketini belirler."
 />
 
 ---
 
-## 🧪 Dene — Polygon GeoJSON
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`SELECT
@@ -92,18 +93,13 @@ SELECT id, ad, tur, ST_AsText(geom) AS wkt FROM geojson_noktalar;`}
     '{"type":"Polygon","coordinates":[[[28.9,41.0],[29.1,41.0],[29.1,41.1],[28.9,41.1],[28.9,41.0]]]}')
   ::geography)::numeric / 1000000, 1) AS alan_km2;`}
   label="GeoJSON Polygon yükle"
+  description="GeoJSON formatındaki bir Polygon geometrisi ST_GeomFromGeoJSON ile dönüştürülür ve WKT biçiminde gösterilir. ST_Area ::geography cast ile elipsoid üzerinde m² cinsinden alan hesaplar; 1.000.000'a bölüm km²'ye çevirir. Bu örnek ST_GeomFromGeoJSON'un nokta dışında Polygon gibi karmaşık geometrileri de desteklediğini gösterir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **GeoJSON `->` vs `->>`:** `feat->'geometry'` JSON nesnesi, `feat->>'geometry'` metin döner. `ST_GeomFromGeoJSON` metin bekler — `->>'geometry'` kullan.
-2. **İç içe properties:** `properties` nesnesi `{"ad":"..."}` şeklindeyse `feat->'properties'->>'ad'` kullan.
-3. **Çoklu geometry tipleri:** FeatureCollection'da karışık geometri tipleri olabilir. `GEOMETRY` (tip kısıtlamasız) kolonu kullan veya tipi kontrol et.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste temiz veri yüklemede altın standart: **staging tablosu deseni**.
+1. **`->`  ile `->>`  farkı.** `feat->'geometry'` JSON nesnesi döndürür; `feat->>'geometry'` metin döndürür. `ST_GeomFromGeoJSON` metin beklediğinden `->>` operatörü kullanılmalıdır.
+2. **İç içe `properties`.** Özellik değerlerine erişmek için `feat->'properties'->>'ad'` ifadesi gereklidir; `feat->>'ad'` feature kök düzeyinde arar ve NULL döndürür.
+3. **Karışık geometry tipleri.** FeatureCollection'da Point, LineString ve Polygon bir arada bulunabilir. Bu durumda `GEOMETRY(POINT, 4326)` yerine kısıtsız `GEOMETRY` kolonu kullanılmalı ya da geometri tipi önceden filtrelenmelidir.

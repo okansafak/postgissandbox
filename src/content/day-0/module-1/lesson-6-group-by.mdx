@@ -1,0 +1,101 @@
+## GROUP BY ve HAVING
+
+**Hedef:** Satırları gruplara ayırarak her grup için özet istatistik üretmek; grup düzeyinde filtre yazmak.
+
+---
+
+## Öğrenim Hedefleri
+
+- `GROUP BY` ile satırları gruplara ayırmak
+- Her grup için `COUNT`, `SUM`, `AVG` gibi fonksiyon uygulamak
+- `HAVING` ile grupları filtrelemek; `WHERE` ile `HAVING` farkını açıklamak
+
+---
+
+## Ön Hazırlık
+
+<RunnableBlock
+  sql={`CREATE TABLE IF NOT EXISTS sehirler (
+  id SERIAL PRIMARY KEY, ad TEXT, bolge TEXT, nufus INTEGER, alan_km2 NUMERIC
+);
+INSERT INTO sehirler (ad, bolge, nufus, alan_km2) VALUES
+  ('İstanbul','Marmara',15840900,5343),('Ankara','İç Anadolu',5782285,2516),
+  ('İzmir','Ege',4479525,3577),('Bursa','Marmara',3194720,10882),
+  ('Antalya','Akdeniz',2696249,20177),('Adana','Akdeniz',2258997,13844),
+  ('Konya','İç Anadolu',2279474,38873),('Gaziantep','Güneydoğu Anadolu',2154051,7642),
+  ('Mersin','Akdeniz',1922758,15853),('Trabzon','Karadeniz',839468,4685)
+ON CONFLICT DO NOTHING;
+SELECT COUNT(*) AS sehir_sayisi FROM sehirler;`}
+  label="Veri setini hazırla"
+  description="Tablo ve veriler yoksa oluşturur; varsa değiştirmeden devam eder."
+/>
+
+---
+
+## Uygulama Örneği
+
+### Bölge bazlı gruplama
+
+<RunnableBlock
+  sql={`-- Her bölgedeki şehir sayısı ve toplam nüfus
+SELECT
+  bolge,
+  COUNT(*)          AS sehir_sayisi,
+  SUM(nufus)        AS bolge_nufusu,
+  ROUND(AVG(nufus)) AS ort_nufus
+FROM sehirler
+GROUP BY bolge
+ORDER BY bolge_nufusu DESC;`}
+  label="Bölge bazlı özet"
+  description="GROUP BY belirtilen sütuna göre satırları küme halinde gruplar. Her grup için toplama fonksiyonları ayrı ayrı hesaplanır. SELECT listesinde GROUP BY'da bulunmayan sütunlar doğrudan yazılamaz; yalnızca gruplama sütunları ve toplama fonksiyonları kullanılabilir. ORDER BY'da hesaplanmış alias kullanılabilir."
+/>
+
+### HAVING ile grup filtreleme
+
+<RunnableBlock
+  sql={`-- Birden fazla şehri olan bölgeler
+SELECT
+  bolge,
+  COUNT(*) AS sehir_sayisi
+FROM sehirler
+GROUP BY bolge
+HAVING COUNT(*) > 1
+ORDER BY sehir_sayisi DESC;`}
+  label="HAVING ile grup filtresi"
+  description="HAVING GROUP BY sonrasında grupları filtreler; WHERE ise satırları GROUP BY'dan önce filtreler. Bu kritik fark şu anlama gelir: WHERE tek satır koşullarına, HAVING ise gruba ait toplama değerine (COUNT, SUM, AVG…) göre filtre uygular. HAVING koşulunda alias yerine toplama ifadesinin kendisi yazılmalıdır."
+/>
+
+### WHERE ve HAVING birlikte
+
+<RunnableBlock
+  sql={`-- Batı Türkiye bölgeleri içinde nüfusu 5 milyonu aşan bölgeler
+SELECT
+  bolge,
+  COUNT(*)    AS sehir_sayisi,
+  SUM(nufus)  AS toplam_nufus
+FROM sehirler
+WHERE bolge IN ('Marmara', 'Ege', 'Akdeniz', 'İç Anadolu')
+GROUP BY bolge
+HAVING SUM(nufus) > 5000000
+ORDER BY toplam_nufus DESC;`}
+  label="WHERE + GROUP BY + HAVING"
+  description="SQL çalışma sırası: FROM → WHERE (satır filtresi) → GROUP BY (gruplama) → HAVING (grup filtresi) → SELECT → ORDER BY. WHERE önce Batı bölgelerini seçer, GROUP BY bunları bölgeye göre gruplar, HAVING toplam nüfusu 5 milyonun altında olanları eler. Bu sırayı anlamak doğru filtre yerleştirmek için kritiktir."
+/>
+
+---
+
+## Pratik Uygulama
+
+<RunnableBlock
+  sql={`-- Her bölgenin ortalama ve maksimum nüfus yoğunluğu
+SELECT
+  bolge,
+  COUNT(*)                              AS sehir_sayisi,
+  ROUND(AVG(nufus / alan_km2), 1)      AS ort_yogunluk,
+  ROUND(MAX(nufus / alan_km2), 1)      AS max_yogunluk
+FROM sehirler
+GROUP BY bolge
+ORDER BY ort_yogunluk DESC;`}
+  label="Bölge bazlı yoğunluk analizi"
+  description="Hesaplama ifadeleri (nufus / alan_km2) toplama fonksiyonlarının içinde kullanılabilir. AVG(nufus / alan_km2) her şehrin yoğunluğunu hesaplayıp ortalamasını alır — bu, SUM(nufus)/SUM(alan_km2)'den farklı bir sonuç verir (ağırlıksız ortalama vs. ağırlıklı ortalama). PostGIS'te bu tür bölge bazlı hesaplamalar çok yaygındır."
+/>

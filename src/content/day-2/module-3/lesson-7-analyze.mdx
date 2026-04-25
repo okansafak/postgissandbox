@@ -1,16 +1,18 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ANALYZE` komutunun ne yaptığını ve neden zorunlu olduğunu açıklayabileceksin
-- Sorgu planlayıcısının istatistikleri nasıl kullandığını anlayabileceksin
-- `pg_stats` ile sütun istatistiklerini inceleyebileceksin
+Sorgu planlayıcısının doğru kararlar alabilmesi için güncel istatistiklere ihtiyacı vardır. Büyük toplu yüklemeler veya güncellemeler sonrasında istatistikler eskiyebilir ve planlayıcı yetersiz planlar üretmeye başlayabilir. Bu ders, `ANALYZE` komutunun rolünü ve ne zaman çalıştırılması gerektiğini açıklamaktadır.
+
+- `ANALYZE` komutunun ne yaptığını ve neden gerekli olduğunu açıklamak
+- Sorgu planlayıcısının istatistikleri nasıl kullandığını anlamak
+- `pg_stats` ile sütun istatistiklerini incelemek
 
 ---
 
-## 📖 Kavram: Planlayıcı ve İstatistikler
+## Planlayıcı ve İstatistikler
 
-PostgreSQL sorgu planlayıcısı her sorguda şunu sorar: "Sequential scan mi, index scan mı, hash join mı — hangisi daha ucuz?"
+PostgreSQL sorgu planlayıcısı her sorguda şunu sorar: "Sequential scan mı, index scan mı, hash join mı — hangisi daha ucuz?"
 
-Bu kararı vermek için **satır sayısı tahminine** ihtiyacı vardır. Bu tahminler `pg_statistic` sisteminde saklanır ve yalnızca `ANALYZE` ile güncellenir.
+Bu kararı verebilmek için **satır sayısı tahminlerine** ihtiyaç duyar. Bu tahminler `pg_statistic` sisteminde saklanır ve yalnızca `ANALYZE` komutuyla güncellenir.
 
 ```sql
 ANALYZE;                    -- Tüm tablolar
@@ -18,11 +20,13 @@ ANALYZE tablo_adi;          -- Tek tablo
 VACUUM ANALYZE tablo_adi;   -- Ölü satırları temizle + istatistik güncelle
 ```
 
-**autovacuum** normalde bunu otomatik yapar — ama büyük toplu yükleme sonrası **manuel** çalıştırmak gerekir.
+`autovacuum` bu işlemi normalde otomatik olarak gerçekleştirir; ancak büyük toplu yüklemeler veya güncellemeler sonrasında **manuel** çalıştırmak gerekir.
 
 ---
 
-## ▶ Canlı Örnek — Analiz Öncesi vs Sonrası
+## Uygulama Örneği
+
+### ANALYZE öncesi plan tahmini
 
 <RunnableBlock
   sql={`-- Yeni tablo — henüz ANALYZE yok
@@ -42,11 +46,10 @@ EXPLAIN SELECT COUNT(*) FROM test_analyze
 WHERE ST_DWithin(geom::geography,
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 200000);`}
   label="ANALYZE öncesi plan tahmini"
+  description="500 noktalı yeni bir tablo ve GiST indeksi oluşturulur; ancak ANALYZE çalıştırılmaz. EXPLAIN çıktısındaki 'rows' tahmini gerçek değerden önemli ölçüde sapabilir — planlayıcı eski veya varsayılan istatistiklerle çalışır. Bu durum yanlış plan seçimine ve yavaş sorgulara yol açabilir."
 />
 
----
-
-## ▶ ANALYZE Çalıştır ve Karşılaştır
+### ANALYZE sonrası plan tahmini
 
 <RunnableBlock
   sql={`ANALYZE test_analyze;
@@ -56,11 +59,10 @@ EXPLAIN SELECT COUNT(*) FROM test_analyze
 WHERE ST_DWithin(geom::geography,
   ST_SetSRID(ST_MakePoint(28.979,41.015),4326)::geography, 200000);`}
   label="ANALYZE sonrası plan tahmini"
+  description="ANALYZE çalıştırıldıktan sonra aynı sorgunun planı incelenir. 'rows' tahmini gerçek satır sayısına daha yakın olmalıdır. Planlayıcı artık güncel istatistiklere dayanarak sequential scan yerine index scan tercih edebilir. İki EXPLAIN çıktısındaki 'rows' ve 'cost' değerlerini karşılaştırmak ANALYZE'ın etkisini somutlaştırır."
 />
 
----
-
-## ▶ pg_stats — Sütun İstatistikleri
+### pg_stats ile sütun istatistikleri
 
 <RunnableBlock
   sql={`SELECT
@@ -74,11 +76,12 @@ WHERE tablename = 'test_analyze'
   AND attname = 'id'
 LIMIT 5;`}
   label="pg_stats istatistik görüntüle"
+  description="pg_stats ANALYZE sonrası hesaplanan sütun istatistiklerini gösterir. null_frac NULL değer oranını, n_distinct farklı değer sayısını (negatif değer tablo boyutuna oranı ifade eder), most_common_vals en sık görülen değerleri içerir. Bu bilgiler planlayıcının satır sayısı tahminini nasıl yaptığını anlamayı sağlar."
 />
 
 ---
 
-## 🧪 Dene — Büyük Yükleme Sonrası
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- 500 satır daha ekle
@@ -92,18 +95,13 @@ SELECT reltuples::bigint AS planlayici_tahmini,
 FROM pg_class WHERE relname = 'test_analyze';
 -- Fark var mı? ANALYZE çalıştırılmadan planlayıcı eski sayıyı bilir`}
   label="Yükleme sonrası istatistik farkı"
+  description="500 ek satır eklendikten sonra pg_class.reltuples planlayıcının tablo büyüklüğüne ilişkin tahmini içerir. COUNT(*) ise gerçek satır sayısını verir. ANALYZE çalıştırılmadan reltuples eski değeri (500) gösterirken gerçek sayı 1000'dir. Bu fark planlayıcının çok düşük maliyet tahmini yaparak yanlış plan seçmesine neden olabilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ANALYZE sadece okur, kilitlemez:** `ANALYZE` tablo okurken bile concurrent DML çalışabilir. Güvenle çalıştır.
-2. **CREATE INDEX ANALYZE gerektirmez:** İndeks oluşturulduğunda otomatik küçük bir istatistik güncellemesi yapılır ama tam `ANALYZE` yerini tutmaz.
-3. **default_statistics_target:** Varsayılan 100. Çok geniş dağılımlı sütunlar için `ALTER TABLE t ALTER COLUMN geom SET STATISTICS 500` ile artır.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 2.3 tamamlandı! Sırada **Modül 2.4 — EXPLAIN ANALYZE**: sorgu planını oku, yavaş sorguları tespit et ve düzelt.
+1. **`ANALYZE` tabloyu kilitlemez.** `ANALYZE` yalnızca tablo okur; çalışırken eşzamanlı DML işlemlerine izin verir. Üretim ortamında güvenle çalıştırılabilir.
+2. **`CREATE INDEX` tam `ANALYZE` yerine geçmez.** İndeks oluşturulduğunda küçük bir istatistik güncellemesi yapılır; ancak sorgu planlayıcısı için tam `ANALYZE` çalıştırmak gerekir.
+3. **`default_statistics_target` ayarlanabilir.** Varsayılan değer 100'dür. Çok geniş dağılımlı sütunlar için `ALTER TABLE t ALTER COLUMN geom SET STATISTICS 500` ile daha ayrıntılı istatistik toplanabilir.

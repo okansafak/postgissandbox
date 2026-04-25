@@ -1,26 +1,28 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Hexagonal grid ile yoğunluk haritası oluşturabileceksin
-- `ST_SquareGrid` ve `ST_HexagonGrid` fonksiyonlarını kullanabileceksin
-- Grid hücresi başına nokta sayısını hesaplayabileceksin
+- Hexagonal grid ile yoğunluk haritası oluşturmak
+- `ST_SquareGrid` ve `ST_HexagonGrid` fonksiyonlarını uygulamak
+- Grid hücresi başına nokta yoğunluğunu hesaplamak
 
 ---
 
-## 📖 Kavram: Grid Tabanlı Yoğunluk
+## Grid Tabanlı Yoğunluk
 
-H3 (Uber'in hexagonal grid sistemi) PGlite'ta mevcut değil — ama PostGIS'in kendi grid fonksiyonları var:
+H3 (Uber'in hexagonal grid sistemi) PGlite ortamında mevcut değildir; ancak PostGIS'in kendi grid fonksiyonları aynı amaca hizmet eder:
 
 | Fonksiyon | Açıklama |
 |---|---|
-| `ST_SquareGrid(size, bounds)` | Kare grid üret |
-| `ST_HexagonGrid(size, bounds)` | Altıgen grid üret |
+| `ST_SquareGrid(size, bounds)` | Kare grid üretir |
+| `ST_HexagonGrid(size, bounds)` | Altıgen grid üretir |
 | `ST_PixelAsPolygons` | Raster tabanlı grid |
 
-Bu fonksiyonlar bir alan üzerine eşit büyüklükte hücreler üretir. Her hücreye düşen nokta sayısı → yoğunluk.
+Bu fonksiyonlar belirli bir alan üzerine eşit büyüklükte hücreler üretir. Her hücreye düşen nokta sayısı yoğunluk değerini verir.
 
 ---
 
-## ▶ Canlı Örnek — Kare Grid Yoğunluk
+## Uygulama Örneği
+
+### Kare grid yoğunluk haritası
 
 <RunnableBlock
   sql={`-- İstanbul bbox üzerine 0.05 derece (~5 km) kare grid
@@ -42,11 +44,10 @@ HAVING COUNT(k.id) > 0
 ORDER BY kaza_sayisi DESC
 LIMIT 20;`}
   label="Kare grid yoğunluk haritası"
+  description="ST_MakeEnvelope İstanbul çevresini sınırlayan dikdörtgen oluşturur. ST_SquareGrid(0.05, bbox) bu alan üzerine ~5 km kenar uzunluklu kare hücreler üretir. ST_Within her kazanın hangi hücrede olduğunu belirler. HAVING COUNT(k.id) > 0 boş hücreleri filtreler. Sonuç en kalabalık 20 hücreyi poligon geometrisiyle haritada gösterir."
 />
 
----
-
-## ▶ Altıgen Grid
+### Altıgen grid yoğunluk
 
 <RunnableBlock
   sql={`-- Altıgen grid — H3'e benzer görünüm
@@ -73,11 +74,10 @@ GROUP BY h.geom
 HAVING COUNT(k.id) > 0
 ORDER BY kaza_sayisi DESC;`}
   label="Altıgen grid yoğunluk"
+  description="ST_HexagonGrid kare yerine altıgen hücreler üretir; altıgenler komşu hücrelere eşit uzaklık sağlar ve görsel olarak H3 sistemine benzer. CASE ifadesi kaza sayısına göre her hücreyi 'yüksek/orta/düşük' olarak kategorize eder. geom sütunu haritada renkli poligonlar olarak görünür."
 />
 
----
-
-## ▶ Yoğunluk Sütununu Hesapla
+### km² başına yoğunluk
 
 <RunnableBlock
   sql={`-- Alanı bilinen grid hücreleri için km² başına yoğunluk
@@ -101,11 +101,12 @@ HAVING COUNT(k.id) > 0
 ORDER BY kaza_per_km2 DESC
 LIMIT 10;`}
   label="km² başına kaza yoğunluğu"
+  description="ST_Area(geom::geography) her hücrenin gerçek alanını metre kare cinsinden hesaplar; bölü 1.000.000 ile km²'ye çevrilir. NULLIF(g.alan_km2, 0) sıfıra bölme hatasını önler. kaza_per_km2 farklı boyuttaki hücreleri karşılaştırmayı sağlayan normalize edilmiş yoğunluk değeridir. En yüksek yoğunluklu 10 hücre öncelikli müdahale alanlarıdır."
 />
 
 ---
 
-## 🧪 Dene — Grid Boyutunu Değiştir
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Daha ince grid: 0.02 derece (~2 km) — daha hassas
@@ -118,18 +119,13 @@ JOIN kaza_noktalari k ON ST_Within(k.geom, g.geom)
 GROUP BY g.geom
 HAVING COUNT(k.id) > 3;`}
   label="İnce grid hotspot hücreler"
+  description="0.02 derece (~2 km) kenar uzunluğu daha ince çözünürlüklü analiz sağlar. JOIN kaza_noktalari ON ST_Within boş hücreleri zaten dışarıda bırakır; HAVING > 3 ek filtre ile yalnızca 3'ten fazla kaza içeren yoğun hücreler sayılır. Grid boyutunu küçültmek hassasiyeti artırır ancak JOIN maliyetini de yükseltir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **`ST_SquareGrid` / `ST_HexagonGrid` PostGIS 3.1+ gerektirir:** PGlite PostGIS sürümüne bağlı — çalışmazsa `generate_series` ile elle grid oluştur.
-2. **Grid hücresi çok küçükse:** Binlerce hücre, binlerce JOIN — performans düşer. Grid boyutunu veri yoğunluğuna göre ayarla.
-3. **Sınır kenarında kesik hücreler:** `ST_Intersection(g.geom, bbox)` ile kesilen hücreleri kıs — kenar etkileri azalır.
-
----
-
-## 🔗 Sıradaki Ders
-
-Son ders: **KMeans vs DBSCAN vs Grid** — karar tablosu ve hangi yöntemi seçersin?
+1. **`ST_SquareGrid` / `ST_HexagonGrid` PostGIS 3.1+ gerektirir:** Eski sürümlerde bu fonksiyonlar bulunmaz. Desteklenmiyorsa `generate_series` ile elle grid oluşturulabilir.
+2. **Grid hücresi çok küçükse:** Binlerce hücre ve binlerce JOIN işlemi performansı düşürür. Grid boyutu veri yoğunluğuyla orantılı seçilmelidir.
+3. **Sınır kenarında kesik hücreler:** `ST_Intersection(g.geom, bbox)` ile sınır kenarındaki kısmi hücreler kırpılır ve kenar etkisi azaltılır.

@@ -1,50 +1,50 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Touches`, `ST_Crosses`, `ST_Overlaps` arasındaki ince farkları açıklayabileceksin
-- Hangi topolojik durumda hangi fonksiyonun `true` döndürdüğünü belirleyebileceksin
-- DE-9IM matrisini kavramsal düzeyde anlayabileceksin
+`ST_Intersects` genel kesişim testi için yeterli olduğunda, bazı analizler geometrik ilişkiyi daha ince bir düzeyde ayırt etmeyi gerektirir. Bu ders, komşuluk, geçiş ve kısmi örtüşme ilişkilerini modelleyen üç topolojik fonksiyonu karşılaştırmaktadır.
 
----
-
-## 📖 Kavram: Üç İnce Ayrım
-
-### ST_Touches(A, B) — "Sadece Kenardan Dokunuyor"
-- Sınırları ortak nokta paylaşıyor
-- **İç kısımları örtüşmüyor**
-- Örnek: Yan yana iki il poligonu
-
-### ST_Crosses(A, B) — "Kesişerek Geçiyor"
-- Geometrilerin iç kısımları kesişiyor
-- Ama birini tamamen içermiyor
-- Tipik: Yolun nehri kesmesi (LineString × LineString veya LineString × Polygon)
-
-### ST_Overlaps(A, B) — "Kısmen Örtüşüyor"
-- Aynı boyuttaki geometriler kısmen örtüşüyor
-- Birini tamamen içermiyor
-- Tipik: İki poligonun kısmen üst üste gelmesi
+- `ST_Touches`, `ST_Crosses`, `ST_Overlaps` arasındaki ince ayrımları açıklayabilmek
+- Hangi topolojik durumda hangi fonksiyonun `true` döndürdüğünü belirleyebilmek
+- DE-9IM matrisini kavramsal düzeyde yorumlayabilmek
 
 ---
 
-## ▶ Canlı Örnek — Üç Durum
+## Üç İnce Topolojik Ayrım
+
+### ST_Touches — Sadece Kenardan Dokunma
+
+Sınırlar ortak nokta paylaşır; ancak iç kısımlar örtüşmez. Tipik örnek: yan yana iki il poligonu. Birbirinin kenarına temas eder, içlerinde ortak alan yoktur.
+
+### ST_Crosses — Kesişerek Geçme
+
+Geometrilerin iç kısımları kesişir; ancak birini tamamen içermez. Tipik örnekler: bir yolun nehri kesmesi (LINESTRING × LINESTRING) veya bir çizginin poligonu geçmesi (LINESTRING × POLYGON).
+
+### ST_Overlaps — Kısmi Örtüşme
+
+Aynı boyuttaki iki geometri kısmen üst üste gelir; birini tamamen içermez. Tipik örnek: iki kadastro parselinin yanlış sınır nedeniyle kısmen çakışması.
+
+---
+
+## Uygulama Örneği
+
+### Üç durumun karşılaştırması
 
 <RunnableBlock
   sql={`WITH poly_a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
-     poly_b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((4 0,8 0,8 4,4 4,4 0))'), 4326) AS g),  -- sadece kenar
-     poly_c AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS g),  -- örtüşüyor
-     line_d AS (SELECT ST_SetSRID(ST_GeomFromText('LINESTRING(-1 2, 5 2)'),           4326) AS g)   -- geçiyor
-SELECT 'A touches B (sadece kenar)' AS test, ST_Touches(poly_a.g, poly_b.g) AS sonuc FROM poly_a, poly_b
+     poly_b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((4 0,8 0,8 4,4 4,4 0))'), 4326) AS g),
+     poly_c AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS g),
+     line_d AS (SELECT ST_SetSRID(ST_GeomFromText('LINESTRING(-1 2, 5 2)'),           4326) AS g)
+SELECT 'A touches B (sadece kenar)'   AS test, ST_Touches(poly_a.g, poly_b.g) AS sonuc FROM poly_a, poly_b
 UNION ALL
-SELECT 'A overlaps C (kısmen örtüş)',  ST_Overlaps(poly_a.g, poly_c.g) FROM poly_a, poly_c
+SELECT 'A overlaps C (kısmi örtüşme)', ST_Overlaps(poly_a.g, poly_c.g) FROM poly_a, poly_c
 UNION ALL
-SELECT 'line crosses A (içinden geç)', ST_Crosses(line_d.g, poly_a.g)  FROM poly_a, line_d
+SELECT 'line crosses A (içten geçiş)', ST_Crosses(line_d.g, poly_a.g)  FROM poly_a, line_d
 UNION ALL
 SELECT 'A intersects C (genel test)',  ST_Intersects(poly_a.g, poly_c.g) FROM poly_a, poly_c;`}
   label="Touches, Overlaps, Crosses karşılaştırması"
+  description="Dört test üç farklı ilişki türünü örnekler: kenar teması (touches), kısmi örtüşme (overlaps), çizginin içten geçmesi (crosses). Son satır ST_Intersects'in genel oluşunu gösterir — örtüşen poligon için de true döner. Bu karşılaştırma dört fonksiyonun kapsam farklarını somutlaştırır."
 />
 
----
-
-## ▶ Komşu İller — ST_Touches
+### Komşu il testi
 
 <RunnableBlock
   sql={`WITH iller AS (
@@ -63,15 +63,15 @@ FROM iller a, iller b
 WHERE a.il < b.il;`}
   label="Komşu il testi"
   autoFit
+  description="Üç ilin sınır geometrileri CROSS JOIN ile her çift bir kez test edilir (WHERE a.il < b.il tekrarı önler). ST_Touches yalnızca ortak kenar paylaşan komşu illeri true olarak işaretler; iç örtüşme yoksa bu komşuluk ilişkisidir. Gerçek il sınırı datasıyla aynı sorgu komşuluk grafiği oluşturur."
 />
 
 ---
 
-## 🧪 Dene
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- DE-9IM matrisini görmek için ST_Relate kullan
-WITH a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
+  sql={`WITH a AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((0 0,4 0,4 4,0 4,0 0))'), 4326) AS g),
      b AS (SELECT ST_SetSRID(ST_GeomFromText('POLYGON((2 2,6 2,6 6,2 6,2 2))'), 4326) AS g)
 SELECT
   ST_Relate(a.g, b.g)    AS de9im_matrisi,
@@ -80,18 +80,13 @@ SELECT
   ST_Contains(a.g, b.g)  AS contains
 FROM a, b;`}
   label="DE-9IM matrisi"
+  description="ST_Relate, iki geometri arasındaki tüm topolojik ilişkiyi 9 karakterlik DE-9IM matrisi olarak döndürür. Her karakter iç-iç, iç-sınır, iç-dış vb. boyutsal kesişimleri temsil eder. ST_Touches, ST_Overlaps ve ST_Contains bu matrisi yorumlayan kısayollar olarak düşünülebilir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Overlaps aynı boyut gerektirir:** `ST_Overlaps(polygon, linestring)` → her zaman `false`. Farklı boyutlar için `ST_Crosses` kullan.
-2. **ST_Touches iç örtüşmede false:** İki poligonun hem ortak kenarı hem iç örtüşmesi varsa `ST_Touches` → `false`, `ST_Overlaps` → `true`.
-3. **Pratik kullanım:** Üretimde bu üçü az kullanılır. Çoğu sorgu `ST_Intersects` veya `ST_Contains` ile çözülür.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki ders en pratik mekansal filtre: **`ST_DWithin` — N metre içindeki geometriler**.
+1. **ST_Overlaps aynı boyut gerektirir.** `ST_Overlaps(polygon, linestring)` her zaman `false` döndürür. Farklı boyutlu geometrilerin örtüşmesini test etmek için `ST_Crosses` kullanılmalıdır.
+2. **ST_Touches iç örtüşmede false döner.** Ortak kenar ve iç örtüşme aynı anda varsa `ST_Touches` → `false`, `ST_Overlaps` → `true`.
+3. **Üretim sorgularında nadir kullanım.** Çoğu üretim sorgusu `ST_Intersects` veya `ST_Contains` ile çözülür. Bu üç fonksiyon özellikle topoloji doğrulama ve veri kalite kontrol senaryolarında değer kazanır.

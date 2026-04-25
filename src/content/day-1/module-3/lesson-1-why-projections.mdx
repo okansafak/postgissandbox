@@ -1,96 +1,82 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- Dünya'nın neden düz bir haritaya tam olarak aktarılamadığını açıklayabileceksin
-- Projeksiyon hatalarının SQL sorgularını nasıl etkilediğini görebileceksin
-- SRID kavramının neden var olduğunu anlayabileceksin
+Koordinat sistemleri ve projeksiyon seçimi, mekansal analizde en sık göz ardı edilen ancak en kritik teknik karardır. Yanlış projeksiyon kullanan bir sorgu hata mesajı vermez; yalnızca anlamsız sonuçlar üretir. Bu ders bu riski somutlaştırmaktadır.
+
+- Dünya yüzeyinin düz bir haritaya aktarılmasının neden bozulma içerdiğini açıklayabilmek
+- Projeksiyon hatalarının SQL sorgularını nasıl etkilediğini gözlemlemek
+- SRID kavramının varlık nedenini anlamak
 
 ---
 
-## 📖 Kavram: Portakal Kabuğu Problemi
+## Portakal Kabuğu Problemi
 
-Dünya bir küre. Harita düz bir kağıt. Kürenin yüzeyini düzleştirmek için bir şeyleri **germek**, **kesmek** veya **sıkıştırmak** gerekir — bu da her zaman bir bozulma demektir.
+Dünya küresel bir yüzeydir; harita ise düzlemsel bir ortamdır. Küre yüzeyini bozulmadan düzleştirmek matematiksel olarak imkânsızdır — her projeksiyon bir geometrik özelliği korurken diğerini feda eder.
 
-Bunu anlamak için bir portakal düşün: kabuğunu soyup düzleştirmeye çalıştığında ya kıyılar yırtılır ya ortası gerilir. Harita projeksiyonları da tam olarak bunu yapar.
-
-### Sonuç: Her Harita Bir Yalan Söyler
-
-| Projeksiyon | Koruduğu | Bozduğu | Nerede Kullanılır |
+| Projeksiyon | Koruduğu | Bozduğu | Kullanım Alanı |
 |---|---|---|---|
-| Mercator (EPSG:3857) | Şekil (yerel) | Alan | Web haritaları (Google, OSM) |
+| Mercator (EPSG:3857) | Yerel şekil | Alan | Web haritaları (Google, OSM) |
 | WGS84 (EPSG:4326) | Koordinat sistemi | Mesafe/alan hesabı | GPS, depolama |
-| UTM (EPSG:32635) | Alan + mesafe | Geniş bölge kapsamı | Mühendislik, Türkiye |
+| UTM (EPSG:32635–37) | Alan + mesafe | Geniş bölge kapsamı | Mühendislik, Türkiye |
 | Albers Equal Area | Alan | Şekil | İstatistik haritaları |
 
 ---
 
-## 📖 Kavram: Neden SQL'i Etkiler?
+## Projeksiyon Hatası SQL'de Nasıl Görünür?
 
 ```sql
--- ⚠ YANLIŞ — derece cinsinden mesafe, anlamsız!
+-- YANLIŞ — SRID'siz geometry; birim derece, sonuç anlamsız
 SELECT ST_Distance(
   ST_MakePoint(28.979, 41.015),
   ST_MakePoint(32.854, 39.930)
 );
--- Sonuç: 4.82 (DERECE! ~537 km ama bunu söylemez)
+-- Sonuç: 4.82  (derece cinsinden; yaklaşık 537 km'ye karşılık gelir ama bunu söylemez)
 
--- ✅ DOĞRU — metre cinsinden mesafe
+-- DOĞRU — geography cast; birim metre
 SELECT ST_Distance(
   ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
   ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography
 );
--- Sonuç: ~351000 (metre)
+-- Sonuç: 351000 (metre)
 ```
-
-Koordinat sistemi belirtmeden yapılan hesaplamalar **anlamsız sayılar** döndürür.
 
 ---
 
-## ▶ Canlı Örnek — Aynı Mesafe, İki Farklı Sonuç
+## Uygulama Örneği
+
+### Aynı mesafe, iki farklı sonuç
 
 <RunnableBlock
   sql={`SELECT
-  -- SRID'siz: derece cinsinden (anlamsız)
-  ST_Distance(
+  ROUND(ST_Distance(
     ST_MakePoint(28.979, 41.015),
     ST_MakePoint(32.854, 39.930)
-  ) AS mesafe_derece,
+  )::numeric, 4) AS mesafe_derece,
 
-  -- geography cast: metre cinsinden (doğru)
   ROUND(ST_Distance(
     ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326)::geography,
     ST_SetSRID(ST_MakePoint(32.854, 39.930), 4326)::geography
   )::numeric / 1000, 1) AS mesafe_km;`}
   label="İstanbul-Ankara: derece vs km"
+  description="İlk sütun SRID'siz geometry üzerinde çalışır ve derece cinsinden bir sayı döndürür. İkinci sütun ::geography cast'i ile küresel elipsoid hesabı yapar ve metre cinsinden doğru mesafeyi verir. Her iki sorgu da hata vermez; yalnızca biri anlamlı bir sonuç üretir."
 />
 
----
-
-## 🧪 Dene
-
-Türkiye'nin en batısı (26.0°E) ile en doğusu (44.8°E) arasındaki açısal mesafeyi hesapla. Sonra km cinsinden gerçek mesafeyi bul:
+### Türkiye'nin gerçek eni
 
 <RunnableBlock
   sql={`SELECT
-  -- Açısal fark
   44.8 - 26.0 AS acısal_fark_derece,
-  -- Gerçek mesafe (40°N enleminde)
   ROUND(ST_Distance(
     ST_SetSRID(ST_MakePoint(26.0, 40.0), 4326)::geography,
     ST_SetSRID(ST_MakePoint(44.8, 40.0), 4326)::geography
   )::numeric / 1000, 0) AS gercek_km;`}
   label="Türkiye eni"
+  description="Açısal fark hesabı (44.8 - 26.0 = 18.8 derece) ölçüm değil, koordinat farkıdır. ST_Distance ::geography ile 40°N enleminde iki nokta arasındaki gerçek yay uzunluğunu metre cinsinden hesaplar ve 1000'e bölerek km'ye çevirir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **SRID=-1 sessiz hata:** `ST_MakePoint` tek başına SRID=-1 döndürür. PostGIS hata vermez ama hesaplamalar yanlış olur.
-2. **Derece cinsinden "mesafe" anlamsız:** 1 derece enlem ~111 km, ama 1 derece boylam farklı enleme göre değişir (kutuplarda sıfıra iner).
-3. **Görüntü doğru ≠ hesap doğru:** Haritada güzel görünen bir geometri, yanlış SRID ile hatalı alan/mesafe hesabı verir.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste bu problemi çözen sistemi öğreneceğiz: **SRID, EPSG ve `spatial_ref_sys` tablosu**.
+1. **SRID=-1 sessiz hata üretir.** `ST_MakePoint` tek başına SRID=-1 döndürür. PostGIS hata vermez; ancak tüm hesaplamalar koordinat sistemsiz çalışır ve sonuçlar yanlıştır.
+2. **Derece cinsinden mesafe yanıltıcıdır.** 1 derece enlem ≈ 111 km, ancak 1 derece boylam enleme göre değişir ve kutuplarda sıfıra iner. Derece farkı asla km yerine kullanılamaz.
+3. **Haritada doğru görünen ≠ hesapta doğru.** Geometri görsel olarak yerinde görünse de yanlış SRID ile yapılan alan ve mesafe hesapları sistematik hata içerir.

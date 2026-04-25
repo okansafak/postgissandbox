@@ -1,73 +1,68 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- PGlite'ın ne olduğunu ve neden tarayıcıda çalıştığını açıklayabileceksin
-- PostgreSQL, PostGIS ve PGlite arasındaki farkı özetleyebileceksin
-- `version()` ve `postgis_full_version()` sorgularını yorumlayabileceksin
+PostGIS, PostgreSQL ve PGlite — bu üç teknoloji sıklıkla birbirinin yerine kullanılır; ancak farklı katmanları temsil eder. Bu ayrımı netleştirmek, ileride karşılaşılacak pek çok yapılandırma ve hata teşhis sorununu önler.
+
+- PGlite'ın neden tarayıcıda çalışabildiğini açıklayabilmek
+- PostgreSQL, PostGIS ve PGlite arasındaki katman ilişkisini özetleyebilmek
+- `version()` ve `postgis_full_version()` çıktılarını yorumlamak
 
 ---
 
-## 📖 Kavram: Üçlü Ayrım
+## Üç Katmanlı Yapı
 
 ### PostgreSQL
-Dünyanın en gelişmiş açık kaynaklı **ilişkisel veritabanı**. Metin, sayı, JSON, UUID gibi standart veri tiplerini saklar. Coğrafi veri konusunda yeteneksizdir.
+
+Dünyanın en gelişmiş açık kaynaklı ilişkisel veritabanı motorudur. Metin, sayı, JSON, UUID gibi standart veri tiplerini yönetir. Coğrafi veri işleme yetenekleri tek başına sınırlıdır.
 
 ### PostGIS
-PostgreSQL'e kurulu bir **eklenti (extension)**. 300+ `ST_*` fonksiyonu, `geometry` ve `geography` tipleri, mekansal indeksler (GIST) ekler. Yani PostGIS, PostgreSQL olmadan çalışmaz — ama PostgreSQL, PostGIS olmadan çalışır.
+
+PostgreSQL'e kurulan bir eklentidir (extension). 300'den fazla `ST_*` fonksiyonu, `geometry` ve `geography` tipleri ile mekansal indeksler (GiST) ekler. PostGIS, PostgreSQL olmadan çalışmaz; PostgreSQL ise PostGIS olmadan sorunsuz devam eder.
 
 ```
 PostgreSQL  ──(extension)──►  PostGIS
-   temel DB                  mekansal güç
+   temel motor               mekansal analiz katmanı
 ```
 
 ### PGlite
-ElectricSQL tarafından geliştirilen bir proje. PostgreSQL'i **WebAssembly (WASM)**'a derleyerek tarayıcıda çalıştırıyor. Bu platformda kullandığın veritabanı PGlite + PostGIS'tir.
 
-> **Önemli:** PGlite deneyseldir. Üretim ortamı için değil; öğrenme, prototipleme ve bu kurs için mükemmeldir.
+ElectricSQL tarafından geliştirilen bu proje, PostgreSQL'i **WebAssembly (WASM)** formatına derleyerek tarayıcıda çalıştırır. Bu platformda kullanılan veritabanı PGlite + PostGIS bileşimidir.
 
----
-
-## ▶ Canlı Örnek — Sürümleri Sorgula
-
-<RunnableBlock sql="SELECT version() AS postgresql_surumu;" label="PostgreSQL sürümünü gör" />
-
-<RunnableBlock sql="SELECT postgis_full_version() AS postgis_surumu;" label="PostGIS sürümünü gör" />
-
-Çıktıda şunları göreceksin:
-- `POSTGIS="3.6.2"` — PostGIS sürümü
-- `PGSQL="170"` — PostgreSQL 17 üzerinde çalışıyor
-- `GEOS`, `PROJ` — PostGIS'in kullandığı geometri kütüphaneleri
+> **Not:** PGlite öğrenme, prototipleme ve bu eğitim programı için uygundur. Üretim ortamı gereksinimleri için standart PostgreSQL sunucusu kullanılır.
 
 ---
 
-## 🧪 Dene
+## Uygulama Örneği
 
-`postgis_full_version()` çıktısındaki `GEOS` sürümünü not al. Aynı sorguyu bir hafta sonra çalıştırsan ne değişir? (Cevap: PGlite sürümünü güncellemediğin sürece hiçbir şey — veriler IndexedDB'de kalır.)
+### PostgreSQL sürümü
 
----
+<RunnableBlock
+  sql={`SELECT version() AS postgresql_surumu;`}
+  label="PostgreSQL sürümünü gör"
+  description="version() fonksiyonu PostgreSQL'in tam sürüm dizesini döndürür: ana sürüm numarası, derleme tarihi ve işletim sistemi mimarisi. Bu bilgi destek ve uyumluluk doğrulaması için kullanılır."
+/>
 
-## 🧪 Egzersiz
+### PostGIS sürümü
 
-Hem PostgreSQL hem PostGIS bilgisini tek bir sorguda yan yana göster:
+<RunnableBlock
+  sql={`SELECT postgis_full_version() AS postgis_surumu;`}
+  label="PostGIS sürümünü gör"
+  description="postgis_full_version() PostGIS sürümünü ve bağımlı kütüphanelerin (GEOS, PROJ, GDAL) sürümlerini içeren tam bir dize döndürür. GEOS geometri hesaplama, PROJ projeksiyon dönüşümü için kullanılır."
+/>
+
+### Tüm sürümler tek sorguda
 
 <RunnableBlock
   sql={`SELECT
-  current_database() AS veritabani,
-  version()           AS pg_surumu,
-  postgis_lib_version() AS postgis_lib;`}
+  current_database()      AS veritabani,
+  version()               AS pg_surumu,
+  postgis_lib_version()   AS postgis_lib;`}
   label="Tek sorguda tüm sürümler"
+  description="postgis_lib_version() yalnızca PostGIS'in kısa sürüm numarasını (örn. '3.6.2') döndürür; tam bağımlılık listesi olmadan hızlı doğrulama için kullanışlıdır. Üç fonksiyon yan yana ortam kimliğini özetler."
 />
 
-> `postgis_lib_version()` sadece kısa sürüm numarasını döndürür (örn. `3.6.2`).
-
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-- **PostGIS ≠ PostgreSQL:** "PostGIS sorgusu" diye bir şey yoktur. PostGIS sadece PostgreSQL'e fonksiyon ve tip ekler. Tüm sorgular geçerli SQL'dir.
-- **Extension aktif edilmeli:** `CREATE EXTENSION postgis;` bir kez çalıştırılmalıdır. Bu platformda otomatik yapılmıştır, endişelenme.
-
----
-
-## 🔗 Sıradaki Ders
-
-Bir sonraki derste **CBS (Coğrafi Bilgi Sistemi) nedir?** ve **vektör vs raster verinin** farkını öğreneceğiz.
+- **PostGIS, PostgreSQL'den ayrı bir yazılım değildir.** Her ikisi de aynı sorgulama altyapısını paylaşır; "PostGIS sorgusu" diye özel bir sözdizimi yoktur.
+- **Extension etkinleştirilmelidir.** `CREATE EXTENSION postgis;` komutunun bir kez çalıştırılmış olması gerekir. Bu platformda otomatik olarak yapılmaktadır.

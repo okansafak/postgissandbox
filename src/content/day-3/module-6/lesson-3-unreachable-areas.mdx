@@ -1,20 +1,20 @@
-## 🏆 Görev 3: Erişilemez Bölgeler
+## Görev 3: Erişilemez Bölgeler
 
-**Hedef:** Hangi ilçelerin merkezi en yakın toplanma alanına 2 km'den uzakta? Bu ilçeleri haritada kırmızıyla göster.
-
----
-
-## 🎯 Ne öğreneceksin?
-
-- `ST_DWithin` + `NOT EXISTS` ile erişim boşluğu tespit edebileceksin
-- İlçe centroid'i ile toplanma alanı mesafesini hesaplayabileceksin
-- Kritik bölgeleri haritada vurgulayabileceksin
+**Hedef:** Hangi ilçelerin merkezi en yakın toplanma alanına 2 km'den uzakta? Bu ilçelerin haritada tespit edilmesi.
 
 ---
 
-## ⚙ Ön Hazırlık — Veri setini kur
+## Öğrenim Hedefleri
 
-> Bu dersi ilk defa açıyorsan veya önceki görevleri çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
+- `ST_DWithin` + `NOT EXISTS` ile erişim boşluğu tespit etmek
+- İlçe centroid'i ile toplanma alanı mesafesini hesaplamak
+- Kritik bölgeleri haritada vurgulamak
+
+---
+
+## Ön Hazırlık
+
+Bu dersi ilk defa açıyorsan veya önceki görevleri çalıştırmadıysan aşağıdaki bloğu önce çalıştır.
 
 <RunnableBlock
   sql={`CREATE TABLE IF NOT EXISTS istanbul_ilceler (
@@ -47,11 +47,14 @@ SELECT 'Hazır' AS durum,
   (SELECT COUNT(*) FROM istanbul_ilceler) AS ilce,
   (SELECT COUNT(*) FROM toplanma_alanlari) AS toplanma;`}
   label="Veri setini hazırla (önceki görevleri atladıysan)"
+  description="istanbul_ilceler ve toplanma_alanlari tabloları yoksa burada kurulur. ON CONFLICT DO NOTHING mevcut verileri korur. 10 ilçe ve 6 toplanma alanı görünmelidir."
 />
 
 ---
 
-## ▶ Her İlçeye En Yakın Toplanma Alanı
+## Uygulama Örneği
+
+### İlçe → en yakın toplanma alanı
 
 <RunnableBlock
   sql={`-- İlçe merkezi → en yakın toplanma alanı mesafesi
@@ -72,11 +75,10 @@ CROSS JOIN LATERAL (
 ) t
 ORDER BY uzaklik_km DESC;`}
   label="İlçe → en yakın toplanma alanı"
+  description="CROSS JOIN LATERAL her ilçe için ayrı bir alt sorgu çalıştırır. İçerideki ORDER BY + LIMIT 1 en yakın toplanma alanını seçer. ST_Centroid(i.geom) ilçenin ağırlık merkezini, ::geography cast'i metre cinsinden doğru mesafe hesabını sağlar. Sonuç en uzak ilçeden en yakına sıralanır."
 />
 
----
-
-## ▶ 2 km Eşiğini Aşan İlçeler
+### 2 km+ uzaktaki ilçeler
 
 <RunnableBlock
   sql={`-- 2 km içinde toplanma alanı OLMAYAN ilçeler
@@ -97,11 +99,10 @@ HAVING MIN(ST_Distance(
 )) > 2000
 ORDER BY en_yakin_km DESC;`}
   label="2 km+ uzaktaki ilçeler"
+  description="CROSS JOIN tüm ilçe-toplanma çiftlerini oluşturur. MIN(ST_Distance) her ilçe için en yakın mesafeyi hesaplar. HAVING MIN > 2000 yalnızca 2000 metreden (2 km) uzak ilçeleri filtreler. merkez_geom haritada ilçe centroid noktaları olarak görünür. Bu ilçeler acil müdahale planında öncelikli hedef alanlardır."
 />
 
----
-
-## ▶ NOT EXISTS ile Verimli Sorgu
+### NOT EXISTS ile erişim boşluğu
 
 <RunnableBlock
   sql={`-- ST_DWithin + NOT EXISTS — indeks dostu
@@ -121,11 +122,10 @@ WHERE NOT EXISTS (
 )
 ORDER BY i.nufus DESC;`}
   label="NOT EXISTS ile erişim boşluğu"
+  description="ST_DWithin + NOT EXISTS önceki HAVING sorgusuna göre daha verimlidir; GIST indeksi kullanabilir. Alt sorgu 2000 metre içinde herhangi bir toplanma alanı bulunduğu anda sonuç döndürür; NOT EXISTS bu durumda dış sorgu satırını dahil etmez. ilce_geom haritada erişim boşluğu olan ilçe poligonlarını gösterir."
 />
 
----
-
-## ▶ Görselleştirme: Riskli İlçeler
+### İlçe erişim durum haritası
 
 <RunnableBlock
   sql={`-- Tüm ilçeler + erişim durumu (harita için)
@@ -143,11 +143,12 @@ SELECT
 FROM istanbul_ilceler i
 ORDER BY i.ilce;`}
   label="İlçe erişim durum haritası"
+  description="Her ilçe 'erisimli' veya 'riskli' olarak etiketlenir. EXISTS alt sorgusu 2 km içinde toplanma alanı olup olmadığını kontrol eder. geom sütunu ilçe poligonlarını haritada iki farklı renkte göstermek için kullanılır. Bu harita karar vericilerin yeni toplanma alanı konumlarını planlamasına rehberlik eder."
 />
 
 ---
 
-## 🧪 Dene — Kapasite Ağırlıklı Analiz
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`-- Toplam kapasiteye göre ilçe sıralaması
@@ -162,10 +163,5 @@ LEFT JOIN toplanma_alanlari t
 GROUP BY i.id, i.ilce, i.nufus
 ORDER BY kapasite_oran_pct ASC;`}
   label="Nüfus başına toplanma kapasitesi"
+  description="3 km içindeki toplanma alanlarının kapasiteleri SUM ile toplanır. kapasite_oran_pct = toplam_kapasite / nüfus * 100 her ilçede nüfusun yüzde kaçının sığınabileceğini gösterir. ORDER BY ASC en düşük kapasiteli ilçeleri öne alır. Nüfus yoğun ilçelerde düşük oran kritik acil durum açığına işaret eder."
 />
-
----
-
-## 🔗 Sıradaki Görev
-
-Son görev: **Hotspot Analizi** — acil çağrı yoğunluklarını DBSCAN ile tespit et.

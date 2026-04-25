@@ -1,29 +1,34 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Envelope` ile sınırlayıcı dikdörtgen oluşturabileceksin
-- `ST_ConvexHull` ile dış bükey kabuk hesaplayabileceksin
-- `ST_ConcaveHull` ile daha gerçekçi kapsam alanı bulabileceksin
+Nokta kümeleri veya karmaşık geometrileri kapsayan basit geometriler, küme analizi, görsel sınır çizme ve bounding-box sorguları gibi uygulamalarda sıkça kullanılır. Bu ders, farklı sıkılık düzeylerinde kapsam geometrisi üreten üç fonksiyonu karşılaştırmaktadır.
+
+- `ST_Envelope` ile axis-aligned sınırlayıcı dikdörtgen oluşturmak
+- `ST_ConvexHull` ile dış bükey kabuk hesaplamak
+- `ST_ConcaveHull` ile gerçekçi kapsam alanı üretmek
 
 ---
 
-## 📖 Kavram: Kapsam Geometrileri
+## Kapsam Geometrileri
 
 Bir nokta kümesini veya karmaşık geometriyi kapsayan daha basit geometriler:
 
 | Fonksiyon | Çıktı | Kullanım |
 |---|---|---|
 | `ST_Envelope(g)` | Dikdörtgen POLYGON | Hızlı bounding box, indeks sorguları |
-| `ST_ConvexHull(g)` | Dış bükey (convex) POLYGON | Cluster kapsamı, görsel kapsam |
+| `ST_ConvexHull(g)` | Dış bükey (convex) POLYGON | Küme kapsamı, görsel sınır |
 | `ST_ConcaveHull(g, target)` | İç bükey (concave) POLYGON | Gerçekçi alan tahmini |
 
 ### target parametresi (ConcaveHull)
-0.0 → maksimum concave (noktaların tam etrafı)  
-1.0 → convex hull ile aynı  
-0.9 → tavsiye edilen başlangıç değeri
+
+- `0.0` → maksimum içbükey (noktaların tam çevresini sarar)
+- `1.0` → ConvexHull ile eşdeğer
+- `0.9` → tavsiye edilen başlangıç değeri
 
 ---
 
-## ▶ Canlı Örnek — Üç Kapsam
+## Uygulama Örneği
+
+### Üç kapsam geometrisinin karşılaştırması
 
 <RunnableBlock
   sql={`WITH noktalar AS (
@@ -42,11 +47,10 @@ UNION ALL SELECT 'ConvexHull',  ST_ConvexHull(geom)          FROM noktalar
 UNION ALL SELECT 'ConcaveHull', ST_ConcaveHull(geom, 0.9)    FROM noktalar;`}
   label="Envelope, ConvexHull, ConcaveHull"
   autoFit
+  description="Altı Türkiye şehrini temsil eden noktalar için üç kapsam geometrisi hesaplanır. ST_Envelope her zaman yatay-dikey dikdörtgen üretir; en geniş kapsam budur. ST_ConvexHull tüm noktaları içeren en küçük dışbükey poligonu verir. ST_ConcaveHull(geom, 0.9) noktaların şekline daha yakın bir sınır çizerek gereksiz boş alanı azaltır. Harita sekmesi üç geometriyi üst üste gösterir."
 />
 
----
-
-## ▶ Alan Karşılaştırması
+### Alan karşılaştırması
 
 <RunnableBlock
   sql={`WITH noktalar AS (
@@ -64,13 +68,12 @@ SELECT
   ROUND(ST_Area(ST_ConcaveHull(geom,0.9)::geography)::numeric / 1000000, 0) AS concave_km2
 FROM noktalar;`}
   label="Alan karşılaştırması"
+  description="Aynı nokta kümesi için üç kapsam geometrisinin alanı km² cinsinden hesaplanır. Envelope her zaman en büyük alanı verir çünkü dik köşeli dikdörtgendir. ConvexHull Envelope'tan küçük; ConcaveHull ise en küçük alanı üretir. Bu fark, hangi kapsam geometrisinin etki alanı tahmininde ne kadar fazla alan hesapladığını gösterir."
 />
 
 ---
 
-## 🧪 Dene
-
-Kendi noktalarını ekle ve ConcaveHull target değerini değiştirerek farkı gör:
+## Pratik Uygulama
 
 <RunnableBlock
   sql={`WITH cluster AS (
@@ -83,22 +86,17 @@ Kendi noktalarını ekle ve ConcaveHull target değerini değiştirerek farkı g
     ST_SetSRID(ST_MakePoint(29.2, 41.2), 4326)
   ]) AS geom
 )
-SELECT ST_ConcaveHull(geom, 0.7) AS geom  -- 0.7 dene, sonra 0.95 ile karşılaştır
+SELECT ST_ConcaveHull(geom, 0.7) AS geom  -- 0.95 ile karşılaştır
 FROM cluster;`}
   label="ConcaveHull target değeri"
   autoFit
+  description="İstanbul çevresindeki altı nokta için target=0.7 değeriyle ConcaveHull hesaplanır. target değeri 0.7'den 0.95'e çıkarıldığında poligon daha az bükümlü (ConvexHull'a yakın) bir şekil alır; düşürüldüğünde noktaların şekline daha sıkı sarılır. Bu örnek target parametresinin kapsam geometrisinin sıkılığını nasıl kontrol ettiğini gösterir."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Envelope dikdörtgen:** Döndürdüğü poligon her zaman axis-aligned (dönmemiş) dikdörtgendir. Döndürülmüş minimum bounding box için `ST_OrientedEnvelope` kullan.
-2. **ST_ConcaveHull az noktada hata verebilir:** 3'ten az nokta için `ST_ConvexHull` kullan.
-3. **target=0.0 çok yavaş:** `ConcaveHull(geom, 0.0)` çok fazla vertex üretir. Pratikte 0.8-0.95 arası değer kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modülün son dersi: **`<->` KNN operatörü — en yakın N komşuyu verimli bul**.
+1. **`ST_Envelope` döndürülmüş dikdörtgen üretmez.** Çıktı her zaman axis-aligned (yatay-dikey) dikdörtgendir. Döndürülmüş minimum sınırlayıcı kutu için `ST_OrientedEnvelope` kullanılmalıdır.
+2. **`ST_ConcaveHull` az noktada başarısız olabilir.** 3'ten az nokta için `ST_ConvexHull` tercih edilmelidir.
+3. **`target=0.0` aşırı işlem yükü oluşturur.** `ConcaveHull(geom, 0.0)` çok sayıda köşe noktası üretir ve hesaplama süresini uzatır. Pratikte 0.8–0.95 aralığı tavsiye edilir.

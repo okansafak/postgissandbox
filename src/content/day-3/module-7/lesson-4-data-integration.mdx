@@ -1,23 +1,35 @@
-## 📥 Capstone Part 2: ETL & Data Integration
+## Capstone Bölüm 2: ETL ve Veri Entegrasyonu
 
-**Hedef:** 4 farklı kaynaktan veriyi integre et ve data quality sağla.
-
----
-
-## 🎯 ETL Pipeline
-
-Dört veri kaynağı:
-1. Address Registry (CSV - UTM 32635)
-2. Transit API (JSON - WGS84)
-3. Meter Database (PostgreSQL - WGS84)
-4. Waste System (Excel - geocoded)
+**Hedef:** Farklı kaynaklardan gelen adres ve konum verilerini dönüştürmek, doğrulamak ve artımlı yükleme stratejisiyle güncel tutmak.
 
 ---
 
-## ▶ Data Extraction
+## Öğrenim Hedefleri
+
+- Staging tablosu ve ETL pipeline mimarisi kurmak
+- UTM → WGS84 koordinat dönüşümü yapmak
+- Geometri ve veri kalitesi doğrulama sorguları yazmak
+- Change Data Capture (CDC) ile artımlı yükleme uygulamak
+
+---
+
+## ETL Boru Hattı
+
+Dört veri kaynağı entegre edilir:
+
+1. Adres kayıt sistemi (CSV — UTM 32635)
+2. Transit API (JSON — WGS84)
+3. Su sayacı veritabanı (PostgreSQL — WGS84)
+4. Atık sistemi (Excel — coğrafi kodlu)
+
+---
+
+## Uygulama Örneği
+
+### Veri çıkarma (Extraction)
 
 <RunnableBlock
-  sql={`-- Address Registry transformation
+  sql={`-- Adres kayıt sistemi staging tablosu
 CREATE TABLE IF NOT EXISTS addresses_staging (
   id BIGINT,
   street VARCHAR(255),
@@ -29,22 +41,21 @@ CREATE TABLE IF NOT EXISTS addresses_staging (
   created_at TIMESTAMP
 );
 
--- Sample extract
+-- Örnek kayıtlar (UTM 32635 koordinatları)
 INSERT INTO addresses_staging VALUES
   (1, 'İstiklal Cad', '100', 'Beyoğlu', '34433', 388000, 4543000, NOW()),
   (2, 'Bağdat Cad', '50', 'Kadıköy', '34740', 470000, 4527000, NOW())
 ON CONFLICT DO NOTHING;
 
-SELECT COUNT(*) AS extracted_addresses FROM addresses_staging;`}
-  label="Address data extraction"
+SELECT COUNT(*) AS aktarilan_adres FROM addresses_staging;`}
+  label="Adres veri çıkarma"
+  description="Staging tablosu kaynak sistemdeki ham veriyi aynen depolar; dönüşüm bu aşamada yapılmaz. x_utm ve y_utm sütunları EPSG:32635 (UTM Bölge 35N) koordinatlarını depolar; bu projeksiyon Türkiye'nin büyük kısmını kapsar. ON CONFLICT DO NOTHING tekrarlanan yüklemelerde veri çakışmasını önler."
 />
 
----
-
-## ▶ Data Transformation (Coordinate Conversion)
+### Koordinat dönüşümü (Transformation)
 
 <RunnableBlock
-  sql={`-- Transform UTM 32635 → WGS84 4326
+  sql={`-- UTM 32635 → WGS84 4326 dönüşümü
 WITH addresses_transformed AS (
   SELECT 
     id,
@@ -60,104 +71,82 @@ SELECT
   id,
   street,
   district,
-  ST_X(geom_wgs84) AS longitude,
-  ST_Y(geom_wgs84) AS latitude,
-  'EPSG:4326' AS crs
+  ROUND(ST_X(geom_wgs84)::numeric, 6) AS boylam,
+  ROUND(ST_Y(geom_wgs84)::numeric, 6) AS enlem,
+  'EPSG:4326' AS koordinat_sistemi
 FROM addresses_transformed
 LIMIT 5;`}
-  label="Coordinate transformation"
+  label="Koordinat dönüşümü"
+  description="ST_SetSRID(ST_MakePoint(x, y), 32635) ham UTM koordinatlarından kaynak SRID belirlenmiş bir POINT üretir. ST_Transform(..., 4326) bunu WGS84 coğrafi koordinatlarına dönüştürür. Bu dönüşüm kayıp verisi önlemek için doğru kaynak SRID'in bilinmesini gerektirir; yanlış SRID tüm noktaların coğrafi olarak hatalı konumlandırılmasına yol açar."
 />
 
----
-
-## ▶ Data Quality Validation
+### Veri kalitesi doğrulama
 
 <RunnableBlock
-  sql={`-- Quality checks
+  sql={`-- Kalite kontrol sorguları
 WITH validation AS (
   SELECT 
-    'NULL geometries' AS check_type,
-    COUNT(*) FILTER (WHERE geom IS NULL) AS failed_count,
-    COUNT(*) AS total_count
+    'NULL geometriler' AS kontrol_tipi,
+    COUNT(*) FILTER (WHERE x_utm IS NULL OR y_utm IS NULL) AS basarisiz,
+    COUNT(*) AS toplam
   FROM addresses_staging
   UNION ALL
-  SELECT 'Valid shapes',
-    COUNT(*) FILTER (WHERE NOT ST_IsValid(geom)) AS failed,
-    COUNT(*) FROM addresses_staging WHERE geom IS NOT NULL
+  SELECT 
+    'Kapsam dışı koordinatlar',
+    COUNT(*) FILTER (WHERE x_utm < 200000 OR x_utm > 800000) AS basarisiz,
+    COUNT(*) AS toplam
+  FROM addresses_staging
   UNION ALL
-  SELECT 'Duplicates',
-    0, COUNT(DISTINCT id) FROM addresses_staging
+  SELECT 
+    'Tekrarlanan kayıtlar',
+    COUNT(*) - COUNT(DISTINCT id) AS basarisiz,
+    COUNT(*) AS toplam
+  FROM addresses_staging
 )
 SELECT 
-  check_type,
-  failed_count,
-  ROUND((failed_count::float / total_count * 100)::numeric, 2) AS failure_rate,
+  kontrol_tipi,
+  basarisiz,
+  toplam,
+  ROUND((basarisiz::numeric / NULLIF(toplam, 0) * 100), 2) AS hata_orani_pct,
   CASE 
-    WHEN failed_count = 0 THEN '✓ PASS'
-    ELSE '✗ FAIL'
-  END AS status
+    WHEN basarisiz = 0 THEN 'GECTI'
+    ELSE 'BASARISIZ'
+  END AS sonuc
 FROM validation;`}
-  label="Data quality validation"
+  label="Veri kalitesi doğrulama"
+  description="Üç kalite kontrolü uygulanır: NULL koordinat varlığı, UTM Zone 35N sınırları dışında kalan değerler (bölge dışı koordinat), ve tekrarlanan kayıt kimliği. COUNT FILTER ile her kural ayrı ayrı sayılır. hata_orani_pct = basarisiz / toplam * 100 yüzde hata oranını gösterir. %99.5 kalite hedefi üretim ortamına geçiş kriteri olarak kullanılır."
 />
 
 ---
 
-## ▶ Incremental Load (CDC)
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Change Data Capture pattern
+  sql={`-- Change Data Capture (artımlı yükleme) deseni
 CREATE TABLE IF NOT EXISTS addresses_log (
   id BIGINT,
   operation VARCHAR(10),
   old_values JSONB,
   new_values JSONB,
-  timestamp TIMESTAMP
+  log_timestamp TIMESTAMP
 );
 
--- Sample CDC events
+-- Örnek CDC olayları
 INSERT INTO addresses_log VALUES
   (1, 'INSERT', NULL, '{"street":"İstiklal"}', NOW()),
   (2, 'UPDATE', '{"district":"Fatih"}', '{"district":"Beyoğlu"}', NOW() + INTERVAL '1 minute'),
   (3, 'DELETE', '{"id":3}', NULL, NOW() + INTERVAL '2 minutes')
 ON CONFLICT DO NOTHING;
 
--- Daily delta summary
+-- Günlük delta özeti
 SELECT 
   operation,
-  COUNT(*) AS count,
-  'Today''s changes' AS batch
+  COUNT(*) AS islem_sayisi,
+  'Bugünkü değişiklikler' AS toplu_yukleme
 FROM addresses_log
-WHERE timestamp >= CURRENT_DATE
-GROUP BY operation;`}
-  label="Incremental load (CDC)"
+WHERE log_timestamp >= CURRENT_DATE
+GROUP BY operation
+ORDER BY operation;`}
+  label="Artımlı yükleme (CDC)"
+  description="Change Data Capture deseni yalnızca değişen kayıtları işleyerek tam yükleme maliyetini ortadan kaldırır. INSERT/UPDATE/DELETE işlemleri old_values ve new_values JSONB sütunlarıyla günlüklenir; bu yapı hangi alanın nasıl değiştiğini izlemeye olanak tanır. log_timestamp >= CURRENT_DATE filtresi günlük delta raporlamasında kullanılır. Üretimde bu yapı PostgreSQL logical replication veya trigger tabanlı yaklaşımlarla beslenir."
 />
-
----
-
-## ▶ Integration Result
-
-<RunnableBlock
-  sql={`-- Unified data warehouse result
-SELECT 
-  'ETL Pipeline' AS component,
-  '2,300,000' AS addresses_loaded,
-  '500' AS transit_stations,
-  '4,500' AS eczanes,
-  '99.5%' AS data_quality,
-  '< 30 minutes' AS load_time
-;`}
-  label="ETL pipeline summary"
-/>
-
----
-
-## ✨ Özet
-
-ETL & Data Integration:
-- ✓ 4 kaynaktan veri çekme
-- ✓ Coordinate transformations
-- ✓ Data quality validation (99.5% pass rate)
-- ✓ Incremental load (CDC)
-- ✓ 30 dakikada 2.3M adres yükleme
-
-**Sonraki ders:** Analytics & optimization

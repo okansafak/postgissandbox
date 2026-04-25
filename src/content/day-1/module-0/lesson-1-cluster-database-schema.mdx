@@ -1,116 +1,108 @@
-## Cluster, Database, Schema Yapısı
+## Öğrenim Hedefleri
 
-**Hedef:** PostgreSQL'in üç katmanlı nesne hiyerarşisini (Cluster → Database → Schema) kavra ve arama yolunu yönet.
+PostgreSQL'in nesne hiyerarşisi — Cluster, Database ve Schema — veritabanı yönetiminin temel çerçevesini oluşturur. Bu dersin sonunda bu üç katmanı birbirinden kesin olarak ayırt edebilecek ve `search_path` mekanizmasını bilerek yönetebileceksiniz.
 
----
-
-## 🎯 Ne öğreneceksin?
-
-- Cluster, Database ve Schema kavramlarını birbirinden ayırt edebileceksin
-- `search_path` ile varsayılan schema'yı değiştirebileceksin
-- `\l`, `\dn`, `\dt` psql komutlarının SQL karşılıklarını yazabileceksin
+- Cluster, Database ve Schema kavramlarını işlevsel düzeyde tanımlayabilmek
+- `search_path` ile varsayılan şemayı değiştirmek
+- `\l`, `\dn`, `\dt` psql komutlarının SQL karşılıklarını yazmak
 
 ---
 
-## ▶ Hiyerarşiyi keşfet
+## PostgreSQL Nesne Hiyerarşisi
+
+PostgreSQL, nesneleri üç katmanlı bir yapıda düzenler: en üstte **Cluster** (tek bir sunucu süreci ve veri dizini), altında birden fazla **Database**, her database içinde ise birden fazla **Schema** yer alır. Tablolar, view'lar ve fonksiyonlar her zaman belirli bir şemaya aittir.
+
+Bu hiyerarşiyi anlamak önemlidir; çünkü farklı database'lerdeki nesneler aynı SQL oturumunda doğrudan erişilemez. Şemalar ise aynı database içinde ad alanı izolasyonu sağlar — aynı isimli iki tablo, farklı şemalarda sorunsuzca var olabilir.
+
+---
+
+## Uygulama Örneği
+
+### Mevcut bağlantı bilgisi
 
 <RunnableBlock
-  sql={`-- Mevcut database ve kullanıcıyı göster
-SELECT current_database(), current_user, version();`}
+  sql={`SELECT current_database(), current_user, version();`}
   label="Mevcut bağlantı bilgisi"
+  description="current_database() aktif veritabanının adını, current_user bağlı kullanıcıyı, version() ise PostgreSQL sürüm dizesini döndürür. Üçü birlikte çalışma ortamının kimliğini özetler."
 />
 
----
-
-## ▶ Schema'ları listele
+### Şemaları listele
 
 <RunnableBlock
-  sql={`-- \dn komutunun SQL karşılığı
-SELECT schema_name, schema_owner
+  sql={`SELECT schema_name, schema_owner
 FROM information_schema.schemata
 ORDER BY schema_name;`}
-  label="Schema listesi"
+  label="Şema listesi"
+  description="information_schema.schemata görünümü, mevcut database'deki tüm şemaları ve sahiplerini listeler. psql'deki \dn komutunun SQL karşılığıdır."
 />
 
----
-
-## ▶ search_path ile çalış
+### search_path ile çalış
 
 <RunnableBlock
-  sql={`-- search_path nedir?
-SHOW search_path;`}
+  sql={`SHOW search_path;`}
   label="Mevcut search_path"
+  description="SHOW search_path, PostgreSQL'in nitelenmemiş (şema belirtilmemiş) tablo adlarını hangi sırayla aradığını gösterir. Varsayılan genellikle '$user, public' şeklindedir."
 />
 
 <RunnableBlock
-  sql={`-- Yeni schema oluştur ve search_path'e ekle
-CREATE SCHEMA IF NOT EXISTS egitim;
+  sql={`CREATE SCHEMA IF NOT EXISTS egitim;
 SET search_path TO egitim, public;
 
--- Artık "egitim." prefix'i olmadan tablo oluşturulur
 CREATE TABLE IF NOT EXISTS test_tablo (id SERIAL, ad TEXT);
-INSERT INTO test_tablo (ad) VALUES ('önce egitim schema''ya gider');
+INSERT INTO test_tablo (ad) VALUES ('önce egitim şemasına gider');
 
 SELECT schemaname, tablename
 FROM pg_tables
 WHERE tablename = 'test_tablo';`}
-  label="Schema oluştur ve search_path ayarla"
+  label="Şema oluştur ve search_path ayarla"
+  description="CREATE SCHEMA yeni bir ad alanı oluşturur. SET search_path öncelik sırasını değiştirir; bundan sonra yaratılan nesneler ilk eşleşen şemaya (egitim) yerleşir. pg_tables sorgusu tablonun hangi şemada bulunduğunu doğrular."
 />
 
----
-
-## ▶ Tablo, view ve sequence envanteri
+### Tablo envanteri
 
 <RunnableBlock
-  sql={`-- \dt komutunun SQL karşılığı: public şemasındaki tüm tablolar
-SELECT tablename, tableowner
+  sql={`SELECT tablename, tableowner
 FROM pg_tables
 WHERE schemaname = 'public'
 ORDER BY tablename;`}
-  label="Public schema tabloları"
+  label="Public şema tabloları"
+  description="pg_tables sistem kataloğu, her tablonun adını, sahibini ve ait olduğu şemayı kaydeder. WHERE koşuluyla belirli bir şemayla sınırlandırılır; psql'deki \dt komutunun işlevsel karşılığıdır."
 />
 
 <RunnableBlock
-  sql={`-- Tüm nesneler: tablo, view, sequence — şema bilgisiyle
-SELECT table_schema, table_name, table_type
+  sql={`SELECT table_schema, table_name, table_type
 FROM information_schema.tables
 WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
 ORDER BY table_schema, table_name;`}
   label="Tüm kullanıcı nesneleri"
+  description="information_schema.tables, kullanıcı tarafından oluşturulan tüm tablo ve görünümleri listeler. Sistem katalog şemaları (pg_catalog, information_schema) WHERE koşuluyla dışlanır; böylece yalnızca kullanıcıya ait nesneler görünür."
 />
 
 ---
 
-## 🧪 Dene
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- search_path'i sıfırla, temizle
-SET search_path TO public;
+  sql={`SET search_path TO public;
 DROP TABLE IF EXISTS egitim.test_tablo;
 DROP SCHEMA IF EXISTS egitim;
 
--- public schema'daki postgis nesnelerini say
 SELECT count(*) AS postgis_nesne_sayisi
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
 WHERE n.nspname = 'public' AND p.proname LIKE 'st_%';`}
-  label="PostGIS fonksiyon sayısı"
+  label="Temizlik ve PostGIS fonksiyon sayısı"
+  description="search_path önce varsayılana döndürülür, ardından bu derste oluşturulan şema ve tablo silinir. Son SELECT, public şemasında 'st_' önekiyle başlayan fonksiyonları sayarak PostGIS kurulumunun varlığını doğrular."
 />
 
 ---
 
-## 📌 Özet
+## Özet
 
-| Katman | Ne içerir | Psql komutu |
+| Katman | Ne içerir | psql komutu |
 |---|---|---|
 | **Cluster** | Tüm database'ler | `\l` |
-| **Database** | Schema'lar | `\c dbname` |
+| **Database** | Şemalar | `\c dbname` |
 | **Schema** | Tablolar, view'lar, fonksiyonlar | `\dn`, `\dt` |
 
-`search_path` önemlidir: aynı isimli iki tablo farklı schema'da olabilir ve hangisinin seçileceğini path belirler.
-
----
-
-## 🔗 Sıradaki Ders
-
-Ders 2: **Tablespace** — verilerin diskte nerede saklandığını öğren.
+`search_path` kritik bir ayardır: aynı isimli iki tablo farklı şemalarda bulunabilir ve hangisinin seçileceğini bu parametre belirler.

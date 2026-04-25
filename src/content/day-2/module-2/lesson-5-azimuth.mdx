@@ -1,14 +1,16 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_Azimuth` ile iki nokta arasındaki yön açısını hesaplayabileceksin
-- Radyanı dereceye çevirebileceksin
-- Rota üzerindeki her segmentin yönünü tabloya aktarabileceksin
+Yön bilgisi, navigasyon, araç takip ve rota analizi gibi uygulamalarda konum bilgisini tamamlayan kritik bir parametredir. Bu ders, iki nokta arasındaki yön açısını Kuzey referanslı radyan ve derece cinsinden hesaplayan `ST_Azimuth` fonksiyonunu ele almaktadır.
+
+- `ST_Azimuth` ile iki nokta arasındaki yön açısını hesaplamak
+- Radyanı dereceye dönüştürmek
+- Rota üzerindeki her segmentin yönünü hesaplamak
 
 ---
 
-## 📖 Kavram: Azimut (Kerteriz)
+## Azimut (Kerteriz)
 
-**Azimut** — Kuzeyden saat yönünde ölçülen açı (radyan).
+Azimut, Kuzeyden saat yönünde ölçülen açıdır ve radyan cinsinden döndürülür.
 
 ```
 Kuzey = 0  (veya 2π)
@@ -22,11 +24,13 @@ ST_Azimuth(baslangic, bitis)  -- radyan döndürür
 DEGREES(ST_Azimuth(...))      -- dereceye çevir
 ```
 
-**Pusula yönü** = `DEGREES(ST_Azimuth(...)) % 360`
+**Pusula yönü:** `DEGREES(ST_Azimuth(...)) % 360`
 
 ---
 
-## ▶ Canlı Örnek — Şehirler Arası Yön
+## Uygulama Örneği
+
+### İstanbul'dan diğer şehirlerin yönü
 
 <RunnableBlock
   sql={`WITH sehirler AS (
@@ -55,11 +59,10 @@ SELECT
 FROM sehirler s, merkez m
 WHERE s.ad <> 'İstanbul';`}
   label="İstanbul'dan diğer şehirlerin yönü"
+  description="ST_Azimuth İstanbul'dan her şehre yön açısını radyan cinsinden hesaplar; DEGREES() dereceye çevirir. CASE ifadesi 45°'lik dilimlere göre sekiz pusula yönü (K, KD, D, GD, G, GB, B, KB) üretir. Ankara'nın güneydoğu, İzmir'in güneybatı, Trabzon'un doğu yönünde olması beklenen sonuçtur."
 />
 
----
-
-## ▶ Rota Segmentlerinin Yönü
+### Rota segment yönleri
 
 <RunnableBlock
   sql={`WITH rota AS (
@@ -83,14 +86,15 @@ SELECT
 FROM segmentler;`}
   label="Rota segment yönleri"
   autoFit
+  description="generate_series ile LINESTRING noktaları ardışık çiftlere bölünür: ST_PointN(geom, i) ve ST_PointN(geom, i+1) her segmentin başlangıç ve bitiş noktasını verir. Her segment için azimut ve mesafe hesaplanır; ST_MakeLine segment geometrisini oluşturur. Harita sekmesi her segmenti ayrı çizgi olarak gösterir. Bu kalıp araç hareket yönü analizi ve trafik sinyalleştirme uygulamalarında kullanılır."
 />
 
 ---
 
-## 🧪 Dene — Pusula Yönü Fonksiyonu
+## Pratik Uygulama
 
 <RunnableBlock
-  sql={`-- Azimut → pusula yönü yardımcı CTE
+  sql={`-- Azimut → pusula yönü
 WITH test AS (
   SELECT
     ST_SetSRID(ST_MakePoint(28.979, 41.015), 4326) AS a,
@@ -101,18 +105,13 @@ SELECT
   ROUND(ST_Distance(a::geography, b::geography)::numeric/1000, 0) AS mesafe_km
 FROM test;`}
   label="İstanbul → Ankara azimut"
+  description="İstanbul'dan Ankara'ya azimut ve mesafe yan yana hesaplanır. DEGREES(ST_Azimuth(a, b)) yönü derece cinsinden verir; ~130° değeri güneydoğu yönünü ifade eder. ST_Distance ::geography ile elipsoid üzerinde gerçek mesafeyi km cinsinden hesaplar. Bu basit sorgu, bir noktadan diğerine yön ve mesafeyi tek sorguda elde etmenin şablonudur."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_Azimuth radyan döndürür:** `DEGREES()` veya `ST_Azimuth(...) * 180 / PI()` ile dereceye çevir.
-2. **Aynı nokta için hata:** `ST_Azimuth(P, P)` → NULL döner. Başlangıç ≠ bitiş olmalı.
-3. **geography koordinat düzeni:** `ST_Azimuth` `geometry` tipinde çalışır. geography için önce cast et: `ST_Azimuth(a::geometry, b::geometry)`.
-
----
-
-## 🔗 Sıradaki Ders
-
-Modül 2.2 tamamlandı! Sırada **Modül 2.3 — Mekansal İndeksler**: GIST, SP-GIST, `&&` operatörü ve partial index.
+1. **`ST_Azimuth` radyan döndürür.** `DEGREES()` veya `ST_Azimuth(...) * 180 / PI()` ile dereceye dönüştürülmesi gerekir.
+2. **Aynı nokta azimut hesaplanamaz.** `ST_Azimuth(P, P)` → NULL döner. Başlangıç ve bitiş koordinatlarının farklı olması zorunludur.
+3. **`geography` tipinde doğrudan çalışmaz.** `ST_Azimuth` `geometry` tipinde çalışır. `geography` geometrisi için `::geometry` cast uygulanmalıdır.

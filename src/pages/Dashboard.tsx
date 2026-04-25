@@ -3,6 +3,7 @@ import { getCurriculumTree, getLessonById, getLessonRoute } from '@/curriculum/s
 import { useProgressStore } from '@/store/progressStore';
 
 const SECTION_TITLES: Record<number, string> = {
+  0: "SQL ve PostgreSQL'e Giriş",
   1: 'Spatial SQL Fundamentals',
   2: 'Sorgular, İndeks ve Performans',
   3: 'Production, Ağ Analizi ve Proje',
@@ -11,9 +12,13 @@ const SECTION_TITLES: Record<number, string> = {
 export default function Dashboard() {
   const tree = getCurriculumTree();
   const completedLessons = useProgressStore((s) => s.completedLessons);
+  const sqlIntroStart = getLessonById('day-0-module-1-lesson-1');
   const beginnerStart = getLessonById('day-1-module-1-lesson-1');
   const postgresFundamentalsStart = getLessonById('day-1-module-0-lesson-1');
 
+  const sqlIntroLink = sqlIntroStart
+    ? getLessonRoute(sqlIntroStart.day, sqlIntroStart.module, sqlIntroStart.slug)
+    : '/lesson/day-0/module-1/lesson-1';
   const beginnerStartLink = beginnerStart
     ? getLessonRoute(beginnerStart.day, beginnerStart.module, beginnerStart.slug)
     : '/lesson/day-1/module-1/lesson-1';
@@ -25,7 +30,7 @@ export default function Dashboard() {
   const totalCompleted = completedLessons.length;
   const totalPct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
 
-  const days = [1, 2, 3] as const;
+  const days = [0, 1, 2, 3] as const;
 
   return (
     <div className="h-full overflow-y-auto bg-surface">
@@ -61,29 +66,38 @@ export default function Dashboard() {
 
       <div className="px-8 py-6 border-b border-border">
         <h2 className="text-base font-semibold text-text mb-3">Nereden başlamak istersin?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
-            to={beginnerStartLink}
+            to={sqlIntroLink}
             className="p-4 rounded-xl border border-primary/40 bg-primary/10 hover:border-primary transition-colors"
           >
-            <div className="text-xs uppercase tracking-wider text-accent font-semibold mb-1">Yeni başlayanlar için önerilen</div>
+            <div className="text-xs uppercase tracking-wider text-accent font-semibold mb-1">SQL bilmiyorum — buradan başla</div>
+            <div className="text-sm font-semibold text-text">Bölüm 0 · Veritabanı nedir? SELECT ile veri çekme</div>
+            <div className="text-xs text-text-muted mt-1">Hiç SQL kullanmamış olanlar için temel giriş</div>
+          </Link>
+
+          <Link
+            to={beginnerStartLink}
+            className="p-4 rounded-xl border border-border bg-surface-2 hover:border-accent transition-colors"
+          >
+            <div className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">SQL biliyorum, PostGIS'e geçeyim</div>
             <div className="text-sm font-semibold text-text">Bölüm 1.1 · Hoş geldin: Bu platform nasıl çalışır?</div>
-            <div className="text-xs text-text-muted mt-1">Hiç bilmeyenler için en güvenli başlangıç rotası</div>
+            <div className="text-xs text-text-muted mt-1">Temel SQL bilgisi olanlar için önerilen başlangıç</div>
           </Link>
 
           <Link
             to={fundamentalsStartLink}
             className="p-4 rounded-xl border border-border bg-surface-2 hover:border-accent transition-colors"
           >
-            <div className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">Alternatif başlangıç</div>
+            <div className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-1">PostgreSQL mimarisini anlamak istiyorum</div>
             <div className="text-sm font-semibold text-text">Bölüm 1.2 · PostgreSQL Temelleri ve Mimari</div>
-            <div className="text-xs text-text-muted mt-1">Altyapı/mimari konularıyla başlamak isteyenler için</div>
+            <div className="text-xs text-text-muted mt-1">Altyapı ve iç mimari konularıyla başlamak isteyenler için</div>
           </Link>
         </div>
       </div>
 
       {/* Section cards */}
-      <div className="px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="px-8 py-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {days.map((day) => {
           const dayNodes = tree.filter((n) => n.day === day);
           const dayLessons = dayNodes.flatMap((n) => n.lessons);

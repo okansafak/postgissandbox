@@ -1,48 +1,48 @@
-## 🎯 Ne öğreneceksin?
+## Öğrenim Hedefleri
 
-- `ST_MakeLine` ile nokta dizisinden çizgi oluşturabileceksin
-- `ST_MakePolygon` ile kapalı çizgiden poligon yapabileceksin
-- `ST_Collect` ve `ST_Union` arasındaki farkı açıklayabileceksin
-- Noktaları ARRAY ile `ST_MakeLine`'a aktarabileceksin
+WKT metni ile geometri oluşturmak her durumda pratik değildir. Programatik bağlamlarda — satır satır veri işleme, dinamik koordinat hesaplama — yapıcı (constructor) fonksiyonlar daha güvenilir ve okunabilir bir yaklaşım sunar. Bu ders temel yapıcı fonksiyonları ve aralarındaki kritik farkları ele almaktadır.
+
+- `ST_MakeLine` ile nokta dizisinden çizgi oluşturmak
+- `ST_MakePolygon` ile kapalı çizgiden poligon üretmek
+- `ST_Collect` ile `ST_Union` arasındaki işlevsel farkı açıklayabilmek
 
 ---
 
-## 📖 Kavram: Yapıcı Fonksiyonlar
+## Yapıcı Fonksiyonlar
 
-PostGIS geometrileri ya WKT string'inden ya da **yapıcı fonksiyonlar** ile oluşturulur. Yapıcılar daha programatik ve esnek:
+PostGIS geometrileri ya WKT dizisinden ya da yapıcı fonksiyonlar aracılığıyla oluşturulur. Yapıcılar, koordinatları doğrudan parametre olarak alır ve daha esnek kullanım sağlar:
 
-| Fonksiyon | Aldığı Girdi | Çıktı |
+| Fonksiyon | Girdi | Çıktı |
 |---|---|---|
 | `ST_MakePoint(lon, lat)` | İki sayı | POINT |
 | `ST_MakeLine(pt, pt)` | İki nokta | LINESTRING |
 | `ST_MakeLine(ARRAY[pt, ...])` | Nokta dizisi | LINESTRING |
 | `ST_MakePolygon(ring)` | Kapalı LINESTRING | POLYGON |
-| `ST_MakePolygon(ring, holes)` | Dış halka + iç halkalar | POLYGON delik ile |
+| `ST_MakePolygon(ring, holes)` | Dış halka + iç halkalar | Delikli POLYGON |
 | `ST_Collect(geom, geom)` | İki geometri | GEOMETRYCOLLECTION |
 | `ST_Collect(ARRAY[geom, ...])` | Geometri dizisi | MULTI* veya GEOMETRYCOLLECTION |
 
 ---
 
-## ▶ Canlı Örnek — ST_MakeLine ile Rota
+## Uygulama Örneği
+
+### ST_MakeLine ile rota
 
 <RunnableBlock
   sql={`SELECT ST_SetSRID(
   ST_MakeLine(ARRAY[
-    ST_MakePoint(28.979, 41.015),  -- İstanbul
-    ST_MakePoint(30.717, 36.896),  -- Antalya
-    ST_MakePoint(27.143, 38.423)   -- İzmir
+    ST_MakePoint(28.979, 41.015),
+    ST_MakePoint(30.717, 36.896),
+    ST_MakePoint(27.143, 38.423)
   ]),
   4326
 ) AS rota;`}
   label="3 şehir arası rota"
   autoFit
+  description="ST_MakeLine bir dizi POINT'ten LINESTRING üretir. ARRAY[] sözdizimi birden fazla koordinatı sıralı olarak fonksiyona aktarır; bu, dinamik sıralamaya veya satır bazlı hesaplamaya ihtiyaç duyulduğunda WKT'ye göre daha esnektir. İstanbul → Antalya → İzmir güzergahı oluşturulur."
 />
 
----
-
-## ▶ Canlı Örnek — ST_MakePolygon ile Alan
-
-`ST_MakePolygon` bir **kapalı** `LINESTRING` alır. Çizgiyi önce `ST_MakeLine` ile oluştur, sonra dönüştür:
+### ST_MakePolygon ile alan
 
 <RunnableBlock
   sql={`SELECT ST_SetSRID(
@@ -52,40 +52,32 @@ PostGIS geometrileri ya WKT string'inden ya da **yapıcı fonksiyonlar** ile olu
       ST_MakePoint(29.10, 41.00),
       ST_MakePoint(29.10, 41.15),
       ST_MakePoint(28.90, 41.15),
-      ST_MakePoint(28.90, 41.00)  -- kapatma noktası
+      ST_MakePoint(28.90, 41.00)
     ])
   ),
   4326
 ) AS alan;`}
   label="Dikdörtgen poligon"
   autoFit
+  description="ST_MakePolygon, kapalı bir LINESTRING'i dış halka olarak alarak POLYGON üretir. İlk ve son nokta aynı olmalıdır; aksi hâlde 'ring is not closed' hatası alınır. ST_MakeLine önce bir LINESTRING oluşturur, ardından ST_MakePolygon bunu kapalı alana çevirir."
 />
 
----
-
-## ▶ Delikli Poligon (İç Halka)
-
-`ST_MakePolygon(dış_halka, ARRAY[iç_halka])` ile delikli poligon:
+### Delikli poligon
 
 <RunnableBlock
   sql={`SELECT ST_SetSRID(
   ST_MakePolygon(
-    -- Dış halka (büyük kare)
     ST_GeomFromText('LINESTRING(28.8 40.9, 29.2 40.9, 29.2 41.2, 28.8 41.2, 28.8 40.9)'),
-    -- İç halka (delik)
     ARRAY[ST_GeomFromText('LINESTRING(28.95 41.0, 29.05 41.0, 29.05 41.1, 28.95 41.1, 28.95 41.0)')]
   ),
   4326
 ) AS delikli_alan;`}
   label="Delikli poligon"
   autoFit
+  description="ST_MakePolygon'un ikinci parametresi iç halkaların (delik) ARRAY'ini alır. Dış halka büyük kareyi, iç halka onun ortasındaki dikdörtgen deliği tanımlar. Delikler alanın dışına taşmamalı ve dış halkayla kesişmemelidir."
 />
 
----
-
-## 🧪 Dene
-
-`ST_MakeLine` aggregate olarak da çalışır — satırları bir çizgiye toplar:
+### Aggregate ST_MakeLine
 
 <RunnableBlock
   sql={`WITH noktalar AS (
@@ -98,18 +90,13 @@ SELECT ST_SetSRID(ST_MakeLine(pt ORDER BY sira), 4326) AS rota
 FROM noktalar;`}
   label="Satırlardan çizgi oluştur"
   autoFit
+  description="ST_MakeLine aggregate modda çalışır: birden fazla satırdaki geometrileri tek bir LINESTRING'e sıralar. ORDER BY ifadesi noktaların birleşim sırasını belirler; bu sıra haritada görünen güzergahı doğrudan etkiler."
 />
 
 ---
 
-## ⚠ Tuzaklar
+## Yaygın Hatalar
 
-1. **ST_MakePolygon açık çizgi alamaz:** `ST_MakeLine` ile oluşturulan çizginin ilk ve son noktası **aynı** olmazsa `ERROR: polygon ring is not closed`.
-2. **ST_Collect ≠ ST_Union:** `ST_Collect` hızlıdır, geometrileri birleştirmez (çakışmalar kalır). `ST_Union` geometrik birleşim yapar — daha yavaş ama alan hesabı için doğru.
-3. **ARRAY sırasına dikkat:** `ST_MakeLine(ARRAY[...])` noktaları dizideki sırayla birleştirir. Sıra önemliyse `ORDER BY` kullan.
-
----
-
-## 🔗 Sıradaki Ders
-
-Sonraki derste geometri hakkında **metadata** çıkarmayı öğreneceğiz: kaç nokta var, SRID ne, boyut kaç?
+1. **ST_MakePolygon açık çizgi kabul etmez:** Giriş LINESTRING'inin ilk ve son noktası aynı olmazsa `ERROR: polygon ring is not closed` hatası oluşur.
+2. **ST_Collect ≠ ST_Union:** `ST_Collect` geometrileri hızla bir koleksiyona toplar; çakışan alanları birleştirmez. Gerçek geometrik birleşim ve doğru alan toplamı için `ST_Union` kullanılmalıdır — daha yavaştır.
+3. **ARRAY sırası önemlidir:** `ST_MakeLine(ARRAY[...])` noktaları dizideki sırayla birleştirir. Sıralama kritikse `ORDER BY` kullanılmalıdır.
