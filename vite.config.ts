@@ -15,20 +15,20 @@ export default defineConfig({
     {
       name: 'serve-sunum',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          const url = req.url ?? '';
-          if (!url.startsWith('/sunum')) return next();
-          const rel = url.slice('/sunum'.length).split('?')[0] || '/index.html';
-          const filePath = path.join(__dirname, 'sunum', rel);
+        const sunumDir = path.join(__dirname, 'sunum');
+        // use('/sunum', handler) → Connect, '/sunum' önekini keser; req.url = '/index.html'
+        server.middlewares.use('/sunum', (req, res, next) => {
+          const rel = (req.url ?? '/').split('?')[0].replace(/^\/+/, '') || 'index.html';
+          const filePath = path.join(sunumDir, rel);
           if (!existsSync(filePath)) return next();
-          const mime: Record<string, string> = {
+          const mimeMap: Record<string, string> = {
             '.html': 'text/html; charset=utf-8',
-            '.css': 'text/css; charset=utf-8',
-            '.js': 'application/javascript; charset=utf-8',
-            '.svg': 'image/svg+xml',
-            '.png': 'image/png',
+            '.css':  'text/css; charset=utf-8',
+            '.js':   'application/javascript; charset=utf-8',
+            '.svg':  'image/svg+xml',
+            '.png':  'image/png',
           };
-          res.setHeader('Content-Type', mime[extname(filePath)] ?? 'text/plain');
+          res.writeHead(200, { 'Content-Type': mimeMap[extname(filePath)] ?? 'text/plain' });
           res.end(readFileSync(filePath));
         });
       },
