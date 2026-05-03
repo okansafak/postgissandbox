@@ -1,41 +1,81 @@
 # PostGIS Akademi: Bölüm 1 - Spatial SQL Fundamentals
-**Konuşma Metni ve Sahne Notları**
+**2. Gün (6., 7. ve 8. Dersler)**
+**Kapsamlı Ders Planı ve Sahne Metni**
 
 ---
 
-### [Açılış Anekdotu - Sahneye Çıkış]
-"Orman yangınlarıyla mücadelede eski yaklaşımlar, sadece rüzgarın yönüne ve gözleme dayalı müdahale planlarından ibaretti. Raporlamalar, etkilenen hektar bazında sayısal özetlerle sınırlı kalıyordu. Günümüzde ise modern afet yönetim merkezleri, anlık veri analitiği kullanmaktadır. İnsansız hava araçlarından alınan sensör verileri, arazi eğimi, rüzgar koridorları ve coğrafi engeller gibi parametrelerle mekansal bir veritabanında entegre ediliyor. Veriler gösteriyor ki, bu parametrelerin uzamsal ilişkileri analiz edildiğinde yangının yayılım yönü saatler öncesinden hesaplanabilmektedir. Sayısal veri, mekansal bir zemine oturtulduğunda karar destek mekanizmalarını proaktif hale getirir. Elde edilen bilgiyi coğrafi zeka ile birleştiren bu analitik yapının çalışma prensiplerini incelemeye başlıyoruz."
+## [Ders 6] 10:00 - 10:50 | Mimari, Veri Tipleri ve Geometri
+
+### [10:00 - 10:15] Açılış Anekdotu ve Platform Seçimi
+**(Kritik Soru: İstemci tarafı çözümleri üretim ortamları için neden yetersiz kalır?)**
+
+**Teorik Anlatım:**
+"Orman yangınlarıyla mücadelede eski yaklaşımlar, sadece rüzgarın yönüne ve gözleme dayalı müdahale planlarından ibaretti. Günümüzde ise modern afet yönetim merkezleri, anlık veri analitiği kullanmaktadır. Sensör verileri, arazi eğimi ve rüzgar koridorları mekansal bir veritabanında entegre ediliyor. Veriler gösteriyor ki, bu parametrelerin uzamsal ilişkileri analiz edildiğinde yangının yayılım yönü saatler öncesinden hesaplanabilmektedir. Elde edilen bilgiyi coğrafi zeka ile birleştiren bu analitik yapının kalbine, PostGIS'e iniyoruz. Platform seçimi bu noktada kritiktir. İstemci tarafında çalışan hafif çözümler prototipler için uygun olsa da, üretim ortamlarında Docker gibi izole edilmiş sunucu mimarilerine ihtiyaç duyarız."
+
+**Canlı Uygulama / Görev (5 Dakika):**
+*   **Görev:** Mekansal Veritabanına Bağlan
+*   **Uygulama Adımları:** `SELECT postgis_version();` komutu ile eklentinin durumu kontrol edilir.
+
+### [10:20 - 10:35] Veri Mimarisi ve Tablespace
+**(Kritik Soru: MVCC mimarisi, eşzamanlılığı nasıl sağlar?)**
+
+**Teorik Anlatım:**
+"PostgreSQL, farklı veri türlerini ayrı fiziksel konumlara yönlendirmek için `Tablespace` yapısını kullanır. Örneğin, mekansal indeksleri hızlı depolama birimlerine taşıyarak gecikmeler azaltılabilir. MVCC mimarisi okuma ve yazma operasyonlarının birbirini engellemesini önleyerek veri bütünlüğünü sağlar."
+
+### [10:35 - 10:50] Geometri Tipleri ve ST_IsValid
+**(Kritik Soru: Makine ve insan tarafından okunabilen geometri formatları nelerdir?)**
+
+**Teorik Anlatım:**
+"Geometriler, metin formatı olarak WKT veya ikili format olan WKB ile depolanır. Ancak en kritik aşama, geometrilerin yapısal geçerliliğidir. Kendi üzerine katlanan çizgiler (invalid geometries) hatalı hesaplamalara yol açar. Operasyonel setlerde mutlaka `ST_IsValid` kontrolleri yapılmalı ve sorunlu nesneler `ST_MakeValid` ile onarılmalıdır."
+
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** Çoklu Geometri Çiz ve Onar
+*   **Uygulama Adımları:** `ST_GeomFromText('POLYGON(...)')` ile hatalı bir nesne yaratılır ve `ST_MakeValid` ile düzeltilir.
 
 ---
 
-## Ders İçeriği / Akış Planı
+## [Ders 7] 11:00 - 11:50 | Projeksiyonlar ve Mekansal İlişkiler
 
-### 1.1 — Platform: Docker ve pglite
-**(Kritik Soru: İstemci tarafı (client-side) veritabanı çözümleri üretim ortamları için neden yetersiz kalır? | Görev: Docker Container'a Bağlan)**
+### [11:00 - 11:25] SRID ve Projeksiyon Sistemleri
+**(Kritik Soru: Geography veri tipi ile Geometry arasındaki hesaplama farkı nedir?)**
 
-Konumsal veri işleme sistemlerini yapılandırırken, kullanılacak altyapı aracının seçimi sistemin genel güvenilirliğini etkiler. İstemci tarafında veya tarayıcı belleğinde çalışan hafif çözümler (pglite gibi) eğitim ve prototip aşamaları için uygun olabilir; ancak mevcut analizler ortaya koyuyor ki, yüksek işlem hacmi gerektiren üretim (production) süreçlerinde bu çözümler yeterli performansı sağlayamaz. Bu sebeple eğitimimizi, kurum mimarisine uygun şekilde yapılandırılmış Docker konteynerleri üzerinden gerçekleştireceğiz. Bağlantımızı doğruladıktan sonra, bu sistemin veriyi fiziksel depolama ünitelerinde nasıl yönettiğini analiz edeceğiz.
+**Teorik Anlatım:**
+"Küresel yüzeylerin dijital ekranlara aktarılması SRID ile mümkündür. EPSG:4326 açısal değerler kullanır. Doğru mesafe ölçümleri yapmak için bu verilerin metrik sisteme dönüştürülmesi şarttır. Bu süreç `ST_Transform` komutu kullanılarak yerel projeksiyonlara (EPSG:5254) geçişi sağlar. Geography küresel, Geometry düzlemsel hesaplamalar yapar."
 
-### 1.2 — PostgreSQL Veri Mimarisi ve Tablespace
-**(Kritik Soru: MVCC mimarisi, okuma ve yazma işlemlerinde eşzamanlılığı nasıl sağlar? | Görev: Tablo Alanlarını İncele)**
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Konya'yı Metrik Sisteme Taşı
+*   **Uygulama Adımları:** `SELECT ST_Transform(geom, 5254) FROM konya.mahalleler;` ile tüm veri metrik sisteme projekte edilir.
 
-Veritabanı yöneticileri için, verinin fiziksel olarak diskte nasıl organize edildiğini bilmek performans optimizasyonunun ilk adımıdır. PostgreSQL, farklı veri türlerini ayrı fiziksel konumlara yönlendirmek için `Tablespace` yapısını kullanır. Örneğin, yüksek I/O gerektiren mekansal indeksleri daha hızlı depolama birimlerine taşıyarak sorgu gecikmeleri azaltılabilir. Buna ek olarak, sistemin MVCC mimarisi okuma ve yazma operasyonlarının birbirini engellemesini önleyerek veri bütünlüğünü sağlar. Depolama mantığını anladıktan sonra, bu disk alanlarında işlenecek konumsal varlıkların standartlarını nasıl tanımlamalıyız?
+### [11:25 - 11:50] Mekansal İlişkiler ve JOIN
+**(Kritik Soru: ST_Intersects fonksiyonu sorgu optimizasyonunda nasıl konumlandırılır?)**
 
-### 1.3 — Geometri Tipleri ve ST_IsValid
-**(Kritik Soru: Makine ve insan tarafından okunabilen geometri formatları nelerdir? | Görev: Çoklu Geometri Çiz ve Onar)**
+**Teorik Anlatım:**
+"Konumsal analizin asıl katma değeri, bağımsız veriler arasındaki geometrik etkileşimleri tespit etmesidir. `ST_Intersects` veya `ST_Contains` operatörleri SQL'in yapısal `JOIN` komutlarıyla birleştiğinde (Spatial Join), idari sınırlar eşleştirmesi matematiksel kesişimle tespit edilir."
 
-Veritabanları mekansal analizler yaparken standartlaştırılmış geometri tanımlamalarına ihtiyaç duyar. Geometriler, metin formatı olarak WKT (Well-Known Text) veya işlemci performansını artıran ikili format olan WKB (Well-Known Binary) ile depolanır. Ancak veri entegrasyonu süreçlerinde en kritik aşama, içe aktarılan geometrilerin yapısal geçerliliğidir. Kendi üzerine katlanan çizgiler veya çakışan düğüm noktaları (invalid geometries) analiz süreçlerinde hatalı hesaplamalara yol açar. Veriler gösteriyor ki, operasyonel veri setlerinde mutlaka `ST_IsValid` kontrolleri yapılmalı ve sorunlu nesneler `ST_MakeValid` ile onarılmalıdır. Onarılan geometrilerin doğruluğu sağlandığına göre, bu nesnelerin dünya üzerindeki mutlak konumunu nasıl sabitleyeceğiz?
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Hastane Hangi Mahallede?
+*   **Uygulama Adımları:** Hastane noktaları ile Mahalle poligonları `ST_Intersects` şartıyla JOIN edilir.
 
-### 1.4 — SRID ve Projeksiyon Sistemleri
-**(Kritik Soru: Geography veri tipi ile Geometry veri tipi arasındaki hesaplama farklılığı nedir? | Görev: Konya'yı Metrik Sisteme Taşı)**
+---
 
-Küresel yüzeylerin dijital ekranlara veya veritabanı tablolarına aktarılması projeksiyon sistemleri (SRID) ile mümkündür. GPS sistemlerinin varsayılan standardı olan EPSG:4326 sistemi açısal değerler kullanır. Mevcut analizler gösteriyor ki, doğru mesafe ve alan ölçümleri yapmak için bu verilerin metrik sisteme dönüştürülmesi şarttır. Bu süreç `ST_Transform` komutu kullanılarak gerçekleştirilir ve yerel projeksiyonlara (örneğin EPSG:5254) geçiş yapılır. Sistem, Geography veri tipiyle küresel hesaplamalar, Geometry veri tipiyle ise düzlemsel hesaplamalar gerçekleştirir. Uygun projeksiyon sistemini seçtikten sonra, bu geometrilerin uzaysal ortamdaki karşılıklı ilişkilerini nasıl sorgulayacağız?
+## [Ders 8] 14:00 - 14:50 | Mekansal Ölçüm ve İleri Analizler
 
-### 1.5 — Mekansal İlişkiler ve JOIN
-**(Kritik Soru: ST_Intersects ve ST_Contains fonksiyonları sorgu optimizasyonunda nasıl konumlandırılır? | Görev: Hastane Hangi Mahallede?)**
+### [14:00 - 14:25] Ölçüm, Centroid ve Buffer
+**(Kritik Soru: Etiketleme işlemlerinde neden ST_PointOnSurface tercih edilmelidir?)**
 
-Konumsal analizin asıl katma değeri, bağımsız veriler arasındaki geometrik etkileşimleri tespit etmesidir. İki farklı veri kümesinin sınır veya yüzey çakışmaları, `ST_Intersects` veya `ST_Contains` gibi mantıksal operatörler ile belirlenir. Bu operatörler SQL'in yapısal `JOIN` komutlarıyla birleştiğinde (Spatial Join), bir hastanenin hangi idari sınırlar içerisinde yer aldığı ID eşleştirmesiyle değil, koordinatların matematiksel kesişimiyle tespit edilir. Kurumsal veritabanlarında, mekansal birleştirmeler analitik raporlamanın temel taşıdır. İdari ilişkileri kurduğumuza göre, bu veriler üzerindeki fiziksel ölçüm ve yakınlık analizlerini nasıl yürüteceğiz?
+**Teorik Anlatım:**
+"Mekansal ölçümlerde en sık karşılaşılan sorunlar yanlış referanslardır. Etiketleme yaparken ağırlık merkezi (`ST_Centroid`) yerine, poligonun içerisine düşmesi garanti edilen yüzey noktası (`ST_PointOnSurface`) tercih edilmelidir. Etki alanı analizlerinde ise `ST_Buffer` ile geometrik genişlemeler hesaplanır."
 
-### 1.6 — Ölçüm, Buffer ve KNN
-**(Kritik Soru: Uzaklık temelli sorgularda performans kaybını önlemek için KNN indeksi nasıl kullanılır? | Görev: En Yakın 5 Binayı Bul)**
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Yol Uzunluğu ve Tampon Alan (Buffer)
+*   **Uygulama Adımları:** Belirli yollar için `ST_Length` hesaplanır ve `ST_Buffer` ile 50 metrelik etki alanı çizilir.
 
-Mekansal ölçüm işlemlerinde en sık karşılaşılan sorunlar, doğru referans noktalarının veya fonksiyonların kullanılmamasıdır. Örneğin, etiketleme işlemlerinde alanın ağırlık merkezi yerine (`ST_Centroid`), poligonun içerisine düşmesi garanti edilen yüzey noktası (`ST_PointOnSurface`) tercih edilmelidir. Etki alanı analizlerinde ise `ST_Buffer` ile geometrik genişlemeler hesaplanır. Kritik karar alma süreçlerinde (örneğin "En yakın itfaiye istasyonu hangisi?" sorgusunda), tüm veriyi tarayan klasik mesafe fonksiyonları yerine, GiST indeksini doğrudan kullanarak saniyeler içinde sonuç döndüren KNN operatörü (`<->`) kullanılmalıdır. Algoritma temelini anladık; peki veri hacmi büyüdükçe bu sorguların performansını nasıl sabit tutacağız? Bölüm 2'de veritabanı optimizasyon stratejilerine odaklanıyoruz.
+### [14:25 - 14:50] En Yakın N Komşu (KNN)
+**(Kritik Soru: Uzaklık temelli sorgularda KNN indeksi nasıl kullanılır?)**
+
+**Teorik Anlatım:**
+"Kritik karar alma süreçlerinde (örneğin 'En yakın itfaiye istasyonu nerede?'), tüm veriyi tarayan klasik `ST_Distance` fonksiyonu sistemi kilitler. GiST indeksini doğrudan kullanarak saniyeler içinde sonuç döndüren KNN operatörü (`<->`) kullanılmalıdır. Bu algoritma performansı katlar."
+
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** En Yakın 5 Binayı Bul
+*   **Uygulama Adımları:** `ORDER BY geom <-> st_setsrid(st_makepoint(...), 5254) LIMIT 5;` sorgusu çalıştırılır.

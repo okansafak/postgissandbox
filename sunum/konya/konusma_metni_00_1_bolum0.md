@@ -1,61 +1,118 @@
 # PostGIS Akademi: Bölüm 0 - SQL'e Giriş
-**Konuşma Metni ve Sahne Notları**
+**1. Gün (2., 3., 4. ve 5. Dersler)**
+**Kapsamlı Ders Planı ve Sahne Metni**
 
 ---
 
-### [Açılış Anekdotu - Sahneye Çıkış]
-"Ekim 2020. Pandemi süreci, veri yönetimi altyapılarının küresel ölçekteki güvenilirliğini test eden zorlu bir dönemdi. Türkiye'de sağlık verileri, gelişmiş veritabanı mimarileri üzerinde işlenerek ısı haritalarına yansıtılırken; İngiltere Sağlık Bakanlığı, pozitif vaka kayıtlarını '.xls' formatında tutuyordu. Eski Excel sürümünün 65.536 satır sınırına ulaşması sonucu, sistem herhangi bir uyarı vermeden yeni verileri kaydetmeyi durdurdu. Analizler gösteriyor ki, 16.000'den fazla vaka kaydı sistemden silindi ve filyasyon süreçleri ciddi anlamda aksadı. Bu olay, kurumsal ölçekteki kritik verilerin standart ofis programlarıyla yönetilemeyeceğini açıkça ortaya koymaktadır. Karar destek mekanizmalarının güvenilirliği, verinin işlendiği platformun dayanıklılığına bağlıdır."
+## [Ders 2] 11:00 - 11:50 | Veritabanı Mantığı ve Veri Tipleri
 
----
+### [11:00 - 11:15] Açılış Anekdotu ve Veritabanı Nedir?
+**(Kritik Soru: Kurumsal ölçekte neden tablolama yazılımları yerine ilişkisel veritabanları tercih edilir?)**
 
-## Ders İçeriği / Akış Planı
+**Teorik Anlatım:**
+"Ekim 2020. Pandemi süreci, veri yönetimi altyapılarının küresel ölçekteki güvenilirliğini test eden zorlu bir dönemdi. Türkiye'de sağlık verileri, gelişmiş veritabanı mimarileri üzerinde işlenerek ısı haritalarına yansıtılırken; İngiltere Sağlık Bakanlığı, pozitif vaka kayıtlarını '.xls' formatında tutuyordu. Eski Excel sürümünün 65.536 satır sınırına ulaşması sonucu, sistem herhangi bir uyarı vermeden yeni verileri kaydetmeyi durdurdu. Analizler gösteriyor ki, 16.000'den fazla vaka kaydı sistemden silindi ve filyasyon süreçleri ciddi anlamda aksadı. Bu olay, kurumsal ölçekteki kritik verilerin standart ofis programlarıyla yönetilemeyeceğini açıkça ortaya koymaktadır. İlişkisel veritabanları (RDBMS), binlerce kullanıcının eşzamanlı olarak veri okumasına ve yazmasına olanak tanıyan asenkron bir mimari sunar. PostgreSQL, yüksek hacimli verilerin filtrelenmesi süreçlerinde tutarlılığı garanti eder."
 
-### 0.1 — Veritabanı Nedir?
-**(Kritik Soru: Kurumsal ölçekte neden tablolama yazılımları yerine ilişkisel veritabanları tercih edilir? | Görev: Mevcut Bağlantıyı Kontrol Et)**
+**Canlı Uygulama / Görev (5 Dakika):**
+*   **Görev:** Mevcut Bağlantıyı ve Rolü Kontrol Et
+*   **Uygulama Adımları:** SQL editöründe `SELECT current_user, current_database();` çalıştırılarak `postgres` yetkisi doğrulanır.
 
-Sistem eğitimimizin ilk adımında veri mimarisinin temellerine iniyoruz. Veriler gösteriyor ki, ilişkisel veritabanları (RDBMS), basit tablolama yazılımlarından yapısal olarak farklıdır. Veritabanı yönetim sistemleri, binlerce kullanıcının eşzamanlı olarak veri okumasına ve yazmasına olanak tanıyan asenkron bir mimari sunar. PostgreSQL, gelişmiş veri bütünlüğü standartları ve işlem güvenilirliği ile öne çıkar. Yüksek hacimli verilerin filtrelenmesi ve indekslenmesi süreçlerinde tutarlılığı garanti eder. İlk adımımız olarak, `SELECT current_user, current_database();` komutunu çalıştırarak sistem bağlantımızı ve yetki seviyelerimizi doğrulayacağız. Güvenilir bir bağlantı kurduktan sonra, çalışma ortamımızın standartlarını nasıl garanti altına alacağımızı incelemeliyiz.
-
-### 0.2 — Kurulum ve Veri Seti
+### [11:20 - 11:35] Kurulum ve Docker Standardizasyonu
 **(Kritik Soru: Geliştirme ortamlarında Docker kullanımının kurumsal faydaları nelerdir?)**
 
-Mevcut analizler ortaya koyuyor ki, altyapı farklılıkları (dependency hell), yazılım süreçlerindeki en büyük zaman kayıplarından biridir. Bu tutarsızlığı gidermek amacıyla eğitim ortamımızı Docker mimarisi üzerine kurguladık. Standardize edilmiş bir Docker Container, donanımdan bağımsız olarak aynı PostgreSQL ve PostGIS versiyonlarının çalışmasını güvence altına alır. İzole edilmiş bu ortam, kurulum hatalarını minimize ederek doğrudan veri yönetimine odaklanmamızı sağlar. Kurulum aşaması tamamlandığında, sisteme kaydedilecek olan bilginin niteliği önem kazanır. Veri yapılandırmasında hangi standartları kullanacağımızı nasıl belirliyoruz?
+**Teorik Anlatım:**
+"Altyapı farklılıkları (dependency hell), yazılım süreçlerindeki en büyük zaman kayıplarından biridir. Standardize edilmiş bir Docker Container, donanımdan bağımsız olarak aynı PostgreSQL ve PostGIS versiyonlarının çalışmasını güvence altına alır. İzole edilmiş bu ortam, kurulum hatalarını minimize ederek doğrudan veri yönetimine odaklanmamızı sağlar."
 
-### 0.3 — PostgreSQL Veri Tipleri
-**(Kritik Soru: NUMERIC ve REAL veri tipleri arasındaki yapısal fark nedir? | Görev: Personel Tablosu Tasarla)**
+### [11:35 - 11:50] PostgreSQL Veri Tipleri
+**(Kritik Soru: NUMERIC ve REAL veri tipleri arasındaki yapısal fark nedir?)**
 
-Veri kalitesi, uygun veri tipinin seçimiyle başlar. Finansal veriler ve bütçe planlamaları gibi kesinlik gerektiren durumlarda, yuvarlama hatalarına açık olan `REAL` veya `FLOAT` tipleri yerine, hassasiyeti yüksek `NUMERIC` tipi kullanılmalıdır. Standart metinler için `TEXT`, zaman bilgileri için ise coğrafi konum farklılıklarını yönetebilen `TIMESTAMPTZ` tercih edilir. Yapılandırılacak "Personel" tablosunda uygun veri tiplerinin kullanılması, ilerleyen süreçlerdeki sorgu performansını doğrudan etkileyecektir. Şemamızı ve veri tiplerimizi tanımladıktan sonra, bu tablolardan istenilen bilgiyi nasıl güvenle sorgulayacağımızı analiz etmeliyiz.
+**Teorik Anlatım:**
+"Veri kalitesi, uygun veri tipinin seçimiyle başlar. Finansal veriler gibi kesinlik gerektiren durumlarda, yuvarlama hatalarına açık olan `REAL` veya `FLOAT` tipleri yerine, hassasiyeti yüksek `NUMERIC` tipi kullanılmalıdır. Standart metinler için `TEXT`, zaman bilgileri için ise coğrafi konum farklılıklarını yönetebilen `TIMESTAMPTZ` tercih edilir. Yapılandırılacak tablolarda uygun veri tiplerinin kullanılması, sorgu performansını doğrudan etkileyecektir."
 
-### 0.4 — SELECT ve Sütun Seçimi
-**(Kritik Soru: Okuma işlemleri veritabanı üzerinde kilitlenmeye yol açar mı? | Görev: Sütunları Yeniden Adlandır)**
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** Personel Tablosu Tasarla
+*   **Uygulama Adımları:** `CREATE TABLE personel (id SERIAL PRIMARY KEY, ad TEXT, maas NUMERIC, ise_giris DATE);` komutu yazılarak temel DDL yetkinliği kazanılır.
 
-Veritabanıyla iletişimin temel bileşeni `SELECT` komutudur. Bu komut salt okunur bir işlem gerçekleştirir ve disk üzerindeki orijinal veriyi değiştirmez. PostgreSQL'in MVCC (Multi-Version Concurrency Control) mimarisi sayesinde okuma işlemleri, yazma işlemlerini engellemeden eşzamanlı olarak yürütülebilir. Görevimiz kapsamında, `konya.mahalleler` tablosundaki verileri çağıracak ve `AS` ifadesiyle çıktı sütunlarını yeniden adlandıracağız. Ancak kurum içi raporlamalarda tüm tabloyu çağırmak verimsizdir. Büyük veri setleri içerisinden sadece hedef kriterlere uyan kayıtları nasıl izole edeceğiz?
+---
 
-### 0.5 — WHERE ile Filtreleme
-**(Kritik Soru: Metin filtrelemelerinde LIKE ve ILIKE operatörleri ne zaman tercih edilmelidir? | Görev: Karatay Mahallelerini Bul)**
+## [Ders 3] 14:00 - 14:50 | Veri Sorgulama ve Filtreleme
 
-Analitik süreçlerin verimliliği, filtrelenen verinin doğruluğuna bağlıdır. `WHERE` koşulu, sunucu tarafında veri kümesini daraltarak ağ trafiğini azaltır ve işlemci yükünü optimize eder. Metin tabanlı sorgulamalarda, büyük/küçük harf duyarlılığı gerektiğinde `LIKE`, duyarsız aramalarda ise PostgreSQL'e özgü olan `ILIKE` operatörü kullanılır. Görevimiz, sadece 'Karatay' ilçesine bağlı mahalleleri izole edecek bir filtre tasarlamaktır. Doğru veriyi ayıkladık. Peki, elde edilen sonuç kümesinin sunucu belleğini zorlamadan kullanıcıya iletilmesini nasıl sağlarız?
+### [14:00 - 14:15] SELECT ve Sütun Seçimi
+**(Kritik Soru: Okuma işlemleri veritabanı üzerinde kilitlenmeye yol açar mı?)**
 
-### 0.6 — ORDER BY ve LIMIT (Sıralama)
-**(Kritik Soru: Büyük veri setlerinde LIMIT kullanımı donanım kaynaklarını nasıl korur? | Görev: En Az Nüfuslu 3 Mahalle)**
+**Teorik Anlatım:**
+"Veritabanıyla iletişimin temel bileşeni `SELECT` komutudur. Bu komut salt okunur bir işlem gerçekleştirir ve disk üzerindeki orijinal veriyi değiştirmez. PostgreSQL'in MVCC mimarisi sayesinde okuma işlemleri, yazma işlemlerini engellemeden eşzamanlı olarak yürütülebilir. Ancak kurum içi raporlamalarda tüm tabloyu (`SELECT *`) çağırmak ağ bandı açısından verimsizdir."
 
-İş zekası raporlarında genellikle verinin tamamı değil, en belirgin olan belirli bir yüzdesi talep edilir. Sorgu sonuçlarını istemci (client) tarafında sıralamak, ağ bandı ve bellek kapasitesi açısından verimsizdir. `ORDER BY` komutu kullanılarak veri sunucu seviyesinde sıralanmalı ve ardından `LIMIT` operatörüyle sınırlandırılmalıdır. Bu yaklaşım, sistem kaynaklarının optimum düzeyde kullanılmasını sağlar. Görevimiz doğrultusunda, nüfusu en az olan 3 mahalleyi listeleyeceğiz. Satır bazlı incelemeleri tamamladığımızda, yöneticilerin sıklıkla ihtiyaç duyduğu makro seviyedeki istatistiksel özetleri nasıl üreteceğimize geçebiliriz.
+**Canlı Uygulama / Görev (5 Dakika):**
+*   **Görev:** Sütunları Yeniden Adlandır (Alias)
+*   **Uygulama Adımları:** `SELECT ad AS "Mahalle Adı", nufus AS "Toplam Nüfus" FROM konya.mahalleler;`
 
-### 0.7 — Toplama Fonksiyonları
-**(Kritik Soru: NULL değerlerin agregasyon fonksiyonlarındaki etkisi nedir? | Görev: Ortalama Nüfusu Bul)**
+### [14:15 - 14:35] WHERE ile Filtreleme
+**(Kritik Soru: Metin filtrelemelerinde LIKE ve ILIKE operatörleri ne zaman tercih edilmelidir?)**
 
-Kurumsal analizlerde bütüncül bir perspektif sağlamak için `COUNT`, `SUM` ve `AVG` gibi agregasyon fonksiyonları (Toplama Fonksiyonları) kullanılır. Veriler gösteriyor ki, istatistiksel hesaplamalarda veri bütünlüğüne dikkat edilmelidir. Örneğin, `COUNT(*)` komutu tüm kayıtları sayarken, `COUNT(sütun_adı)` komutu sadece içinde veri olan satırları işler. NULL değerlerin analize etkisini göz ardı etmek, hatalı yönetim raporlarına sebep olabilir. Konya'nın ortalama mahalle nüfusunu hesapladıktan sonra, bu istatistiksel verileri daha anlamlı alt kategorilere nasıl ayıracağımızı incelemeliyiz.
+**Teorik Anlatım:**
+"Analitik süreçlerin verimliliği, filtrelenen verinin doğruluğuna bağlıdır. `WHERE` koşulu, sunucu tarafında veri kümesini daraltarak ağ trafiğini azaltır ve işlemci yükünü optimize eder. Metin tabanlı sorgulamalarda, büyük/küçük harf duyarlılığı gerektiğinde `LIKE`, duyarsız aramalarda ise PostgreSQL'e özgü olan `ILIKE` operatörü kullanılır."
 
-### 0.8 — GROUP BY ve HAVING
-**(Kritik Soru: Agregasyon sonuçları üzerinden filtreleme yapmak için neden WHERE kullanılamaz? | Görev: İlçelere Göre Toplam Nüfus)**
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** Karatay Mahallelerini Bul
+*   **Uygulama Adımları:** `SELECT ad, nufus FROM konya.mahalleler WHERE ilce = 'Karatay' AND nufus > 5000;`
 
-Veriyi demografik veya coğrafi kategorilere bölmek, analizlerin derinliğini artırır. `GROUP BY` komutu, veriyi ortak özniteliklere göre kümelendirir. Analizler gösteriyor ki, sık karşılaşılan hatalardan biri, gruplanmış verileri `WHERE` komutu ile filtrelemeye çalışmaktır. `WHERE` veri tablodan okunurken, `HAVING` ise veriler gruplandıktan sonra çalışır. İlçelere göre toplam nüfus kümelerini oluşturacak ve bu kümeleri analiz edeceğiz. Farklı özniteliklere sahip veri kümelerini izole edip grupladık. Peki, birbirlerinden farklı tablolarda duran bu veri setlerini bütüncül bir raporda nasıl birleştireceğiz?
+### [14:35 - 14:50] ORDER BY ve LIMIT (Sıralama)
+**(Kritik Soru: Büyük veri setlerinde LIMIT kullanımı donanım kaynaklarını nasıl korur?)**
 
-### 0.9 — JOIN ve Tablo İlişkileri
-**(Kritik Soru: İlişkisel ve mekansal birleştirmeler arasındaki kavramsal fark nedir? | Görev: Hastanesi Olmayan Mahalleleri Listele)**
+**Teorik Anlatım:**
+"İş zekası raporlarında genellikle verinin tamamı değil, en belirgin olan belirli bir yüzdesi talep edilir. Sorgu sonuçlarını istemci (client) tarafında sıralamak bellek kapasitesi açısından verimsizdir. `ORDER BY` komutu kullanılarak veri sunucu seviyesinde sıralanmalı ve ardından `LIMIT` operatörüyle sınırlandırılmalıdır."
 
-İlişkisel veritabanlarının temel prensibi, tekrarı önlemek amacıyla veriyi farklı tablolarda normalize edilmiş şekilde tutmaktır. Ayrı tablolardaki bu veri, `JOIN` komutları ile anlamlı iş zekası raporlarına dönüştürülür. Standart `JOIN` işlemleri ID numaraları gibi mantıksal veya alfabetik eşleşmelere dayanırken; ileride göreceğimiz mekansal `JOIN` işlemleri geometrik kesişimler üzerinden hesaplanır. Mevcut görevimizde `LEFT JOIN` kullanarak, hastane verisi ile eşleşmeyen, yani sağlık altyapısı bulunmayan mahalleleri raporlayacağız. Okuma süreçlerini tamamladığımıza göre, mevcut veriyi güncellerken alınması gereken sistem güvenlik önlemleri nelerdir?
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** En Az Nüfuslu 3 Mahalle
+*   **Uygulama Adımları:** `SELECT ad, nufus FROM konya.mahalleler ORDER BY nufus ASC LIMIT 3;`
 
-### 0.10 — Veri Yönetimi (DML)
-**(Kritik Soru: Kurumsal veritabanlarında DELETE işlemi neden risk taşır? | Görev: Yanlış Kaydı Sil)**
+---
 
-Veritabanında veri okuma (DQL) süreci ne kadar güvenliyse, veri manipülasyon (DML) süreci de o kadar dikkat gerektirir. `UPDATE` ve `DELETE` işlemleri kalıcıdır. Koşulsuz (WHERE kullanılmayan) bir güncelleme işlemi tablodaki tüm verileri etkiler. Kurumsal prensipler doğrultusunda, izlenebilirlik (audit) amacıyla kayıtların fiziksel olarak silinmesi yerine `is_active` gibi bir durum bayrağıyla (flag) mantıksal olarak devre dışı bırakılması önerilir. Temel SQL yetkinliklerini kurumsal bir perspektifle pekiştirdiğimize göre, standart veritabanlarına mekansal analiz yeteneği katmanın detaylarına geçebiliriz.
+## [Ders 4] 15:00 - 15:50 | Agregasyon ve Gruplama
+
+### [15:00 - 15:25] Toplama Fonksiyonları
+**(Kritik Soru: NULL değerlerin agregasyon fonksiyonlarındaki etkisi nedir?)**
+
+**Teorik Anlatım:**
+"Kurumsal analizlerde bütüncül bir perspektif sağlamak için `COUNT`, `SUM` ve `AVG` gibi agregasyon fonksiyonları kullanılır. İstatistiksel hesaplamalarda veri bütünlüğüne dikkat edilmelidir. Örneğin, `COUNT(*)` tüm kayıtları sayarken, `COUNT(sutun)` sadece içinde veri olan (NULL olmayan) satırları işler. NULL değerlerin analize etkisini göz ardı etmek, hatalı yönetim raporlarına sebep olabilir."
+
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Ortalama Nüfusu Bul
+*   **Uygulama Adımları:** Konya geneli toplam ve ortalama nüfus `SELECT SUM(nufus), AVG(nufus) FROM konya.mahalleler;` ile hesaplanır.
+
+### [15:25 - 15:50] GROUP BY ve HAVING
+**(Kritik Soru: Agregasyon sonuçları üzerinden filtreleme yapmak için neden WHERE kullanılamaz?)**
+
+**Teorik Anlatım:**
+"Veriyi demografik veya coğrafi kategorilere bölmek, analizlerin derinliğini artırır. `GROUP BY` komutu, veriyi ortak özniteliklere göre kümelendirir. Sık karşılaşılan hatalardan biri, gruplanmış verileri `WHERE` komutu ile filtrelemeye çalışmaktır. `WHERE` veri tablodan okunurken, `HAVING` ise veriler gruplandıktan sonra çalışır."
+
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** İlçelere Göre Toplam Nüfus
+*   **Uygulama Adımları:** `SELECT ilce, SUM(nufus) FROM konya.mahalleler GROUP BY ilce HAVING SUM(nufus) > 100000;`
+
+---
+
+## [Ders 5] 16:00 - 16:50 | Veri İlişkileri ve Yönetimi
+
+### [16:00 - 16:25] JOIN ve Tablo İlişkileri
+**(Kritik Soru: İlişkisel ve mekansal birleştirmeler arasındaki kavramsal fark nedir?)**
+
+**Teorik Anlatım:**
+"İlişkisel veritabanlarının temel prensibi, tekrarı önlemek amacıyla veriyi normalize edilmiş şekilde ayrı tutmaktır. Bu veriler `JOIN` komutları ile anlamlı raporlara dönüştürülür. Standart `JOIN` işlemleri ID numaraları gibi mantıksal eşleşmelere dayanırken; ileride göreceğimiz mekansal `JOIN` işlemleri geometrik kesişimler üzerinden hesaplanır."
+
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Hastanesi Olmayan Mahalleleri Listele
+*   **Uygulama Adımları:** Mahalleler ve Hastaneler tabloları `LEFT JOIN` kullanılarak `hastane.id IS NULL` şartıyla birleştirilir.
+
+### [16:25 - 16:45] Veri Yönetimi (DML)
+**(Kritik Soru: Kurumsal veritabanlarında DELETE işlemi neden risk taşır?)**
+
+**Teorik Anlatım:**
+"Veri okuma süreci ne kadar güvenliyse, veri manipülasyon (DML) süreci de o kadar dikkat gerektirir. `UPDATE` ve `DELETE` işlemleri kalıcıdır. Koşulsuz (WHERE kullanılmayan) bir güncelleme işlemi tüm verileri bozar. Kurumsal prensipler doğrultusunda, kayıtların fiziksel olarak silinmesi yerine `is_active` gibi bir durum bayrağıyla mantıksal olarak devre dışı bırakılması önerilir."
+
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** Yanlış Kaydı Sil
+*   **Uygulama Adımları:** Kontrollü bir veri silme veya güncelleme (`UPDATE`) operasyonu gerçekleştirilir.
+
+### [16:45 - 16:50] 1. Gün Kapanış
+"Temel SQL yetkinliklerini kurumsal bir perspektifle pekiştirdik. Yarın, bu standart tablolara gerçek mekansal zekayı (PostGIS) katarak devam edeceğiz."

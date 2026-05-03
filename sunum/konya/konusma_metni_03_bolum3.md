@@ -1,58 +1,111 @@
 # PostGIS Akademi: Bölüm 3 - Production, Ağ Analizi ve Proje
-**Konuşma Metni ve Sahne Notları**
+**3. Gün (11. Ders İkinci Yarısı, 12., 13., 14. ve 15. Dersler)**
+**Kapsamlı Ders Planı ve Sahne Metni**
 
 ---
 
-### [Açılış Anekdotu - Sahneye Çıkış]
-"Uluslararası lojistik ağları yöneten kurumlar, büyük ölçekli optimizasyon problemleriyle her gün yüzleşmektedir. Örneğin, global dağıtım şirketi UPS'in 'Asla sola dönme' kuralı basit bir şoför inisiyatifi değildir; milyonlarca rota ve kesişim noktasının analiz edildiği karmaşık bir ağ algoritmasının (network routing) çıktısıdır. Sağa dönüşlerin optimize edilmesiyle kurum, operasyon sürelerini kısaltırken yıllık yakıt maliyetlerini ve emisyon oranlarını büyük ölçüde düşürmüştür. Bu durum, coğrafi bilgi sistemlerinin yalnızca bir depolama ünitesi değil, verimlilik ve strateji üreten karar destek sistemleri olduğunu göstermektedir. Veriyi anlamlandırıp optimum kararları üretecek ağ algoritmalarını sistemlerimize nasıl entegre edeceğimiz konusuna geçiş yapıyoruz."
+## [Ders 11 - İkinci Yarı] 10:25 - 10:50 | Analitik Kümeleme
+
+### [10:25 - 10:35] Açılış Anekdotu
+"Uluslararası lojistik ağları yöneten kurumlar, büyük ölçekli optimizasyon problemleriyle her gün yüzleşmektedir. UPS'in 'Asla sola dönme' kuralı milyonlarca rotanın analiz edildiği karmaşık bir ağ algoritmasının çıktısıdır. Sağa dönüşlerin optimize edilmesiyle yıllık yakıt maliyetleri büyük ölçüde düşürülmüştür. Coğrafi bilgi sistemleri, verimlilik ve strateji üreten karar destek sistemleridir. Veriyi anlamlandırıp optimum kararları üretecek ağ algoritmalarını sistemlerimize entegre ediyoruz."
+
+### [10:35 - 10:50] Mekansal Gruplama ve Yoğunluk Analizi
+**(Kritik Soru: DBSCAN algoritması, geleneksel ısı haritalarına göre hangi analitik üstünlüklere sahiptir?)**
+
+**Teorik Anlatım:**
+"Büyük ölçekli şehir verilerini anlamlı birimlere ayırmak stratejik planlamanın ön koşuludur. Dağınık veri noktalarının servis bölgelerine bölünmesi gerektiğinde `KMeans` algoritması matematiksel bir denge sağlar. Suç istatistikleri veya kaza noktaları gibi yoğunluk tabanlı analizler söz konusu olduğunda `DBSCAN` algoritması öne çıkar. Geleneksel ısı haritaları görsel bir izlenim sunarken, DBSCAN algoritmaları gürültü verisini (noise) izole ederek karar süreçlerinde kullanılabilecek vektörel kümeler üretir."
+
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** Durak Kümeleme ve Yoğunluk Tespiti
+*   **Uygulama Adımları:** `ST_ClusterDBSCAN` fonksiyonu kullanılarak 100 metrelik yarıçap içindeki minimum 3 yoğunluk noktası tespit edilir.
 
 ---
 
-## Ders İçeriği / Akış Planı
+## [Ders 12] 11:00 - 11:50 | Ağ Analizi ve Rotalama
 
-### 3.1 — Mekansal Gruplama ve Yoğunluk Analizi
-**(Kritik Soru: Veri kümelerinin analizinde DBSCAN algoritması, geleneksel ısı haritalarına göre hangi analitik üstünlüklere sahiptir? | Görev: Durak Kümeleme ve Yoğunluk Tespiti)**
+### [11:00 - 11:25] pgRouting: Ağ Analizi Temelleri
+**(Kritik Soru: Ağ üzerinde çıkmaz sokakların bulunması algoritmik süreci nasıl etkiler?)**
 
-Büyük ölçekli şehir verilerini anlamlı birimlere ayırmak, stratejik planlamanın ön koşuludur. Dağınık veri noktalarının servis bölgelerine bölünmesi gerektiğinde `KMeans` algoritması matematiksel bir denge sağlar. Ancak suç istatistikleri veya kaza noktaları gibi yoğunluk (density) tabanlı analizler söz konusu olduğunda `DBSCAN` algoritması öne çıkar. Veriler gösteriyor ki, geleneksel ısı haritaları görsel bir izlenim sunarken, DBSCAN algoritmaları bağımsız gürültü verisini (noise) izole ederek karar süreçlerinde kullanılabilecek vektörel kümeler üretir. Analitik verimliliği sağlamak için mekansal kümeleme senaryolarını uyguladıktan sonra, bu noktalar arasında kuracağımız ulaşım ağının prensiplerine odaklanmalıyız.
+**Teorik Anlatım:**
+"Yol ağları veritabanında salt geometriler olarak tutulsa da, bu çizgilerin üzerinden geçilebilir bir rota oluşturabilmesi için grafik teorisine (Graph Theory) uyarlanması gerekir. `pgRouting` kütüphanesi, çizgileri düğümlere (node) bağlayarak aralarındaki seyahat mesafesini veya zamanını modellere işler. Çıkmaz yolların veya topoloji hatalarının temizlenmesi, Dijkstra gibi algoritmaların tutarlı sonuç vermesi için zorunludur."
 
-### 3.2 — pgRouting: Ağ Analizi Temelleri
-**(Kritik Soru: Ağ üzerinde çıkmaz sokakların (dead ends) bulunması algoritmik süreci nasıl etkiler? | Görev: Topoloji Hazırla ve Ambulans Rotası Çiz)**
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Topoloji Hazırla
+*   **Uygulama Adımları:** Yol tablosuna `source` ve `target` kolonları eklenerek `pgr_createTopology` komutu ile bir ağ yapısı kurulur.
 
-Yol ağları veritabanında salt geometriler olarak tutulsa da, bu çizgilerin üzerinden geçilebilir bir rota oluşturabilmesi için grafik teorisine (Graph Theory) uyarlanması gerekir. `pgRouting` kütüphanesi, çizgileri düğümlere (node) bağlayarak aralarındaki seyahat mesafesini veya zamanını (cost) modellere işler. Mevcut analizler ortaya koyuyor ki, çıkmaz yolların veya kesişmeyen (topology error) çizgilerin temizlenmesi, Dijkstra gibi algoritmaların tutarlı sonuç vermesi için zorunludur. Düğüm noktalarımızı hazırladık ve rotalarımızı kurguladık. Peki, bir aracın belirli bir maliyet bütçesi (zaman/mesafe) ile gidebileceği maksimum erişim alanını nasıl hesaplarız?
+### [11:25 - 11:50] En Kısa Yol (Dijkstra) Hesaplaması
+**(Kritik Soru: Rota hesaplamasında maliyet (cost) faktörü zaman mı yoksa mesafe mi olmalıdır?)**
 
-### 3.2 — Servis Alanı ve Çoklu Durak (TSP)
-**(Kritik Soru: Hizmet erişim alanları belirlenirken, geometrik buffer yaklaşımı neden yanıltıcı sonuçlar doğurur? | Görev: İtfaiye Kapsama Alanı ve Çöp Toplama Rotası)**
+**Teorik Anlatım:**
+"Düğümlerimiz hazır olduğunda, Dijkstra algoritması başlangıç noktasından hedefe giden en düşük maliyetli o kusursuz rotayı milisaniyeler içinde çizer. Maliyet faktörü sadece metre cinsinden uzunluk değildir; hız limitleri ve yol türleri de bu maliyeti doğrudan etkiler."
 
-Bir acil durum merkezinin 5 dakikalık yanıt süresi (response time) içinde hangi alanlara ulaşabileceği hesaplanırken havadan çizilen dairesel yarıçaplar (buffer) gerçekliği yansıtmaz. Coğrafi engeller ve tek yönlü sokaklar erişimi sınırlar. Bunun yerine `pgr_drivingDistance` fonksiyonu, yol ağının fiziksel kısıtlamalarını hesaba katarak gerçek bir hizmet poligonu oluşturur. Benzer şekilde, çoklu nokta ziyaretleri planlanırken Gezgin Satıcı Problemi (TSP) çözümleri kullanılarak, rotaların maliyeti minimize edilir. Dağıtım ve lojistik optimizasyonunu tamamladıktan sonra, kullanılan kaynak verilerin (yol ve parsel sınırları) geometrik doğruluğunu sistemsel olarak nasıl garanti edeceğimizi belirlemeliyiz.
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Ambulans Rotası Çiz
+*   **Uygulama Adımları:** `pgr_dijkstra` komutu kullanılarak A noktasından B noktasına en hızlı giden yol hesaplanıp harita üzerinde gösterilir.
 
-### 3.3 — PostGIS Topology: Veri Bütünlüğü
-**(Kritik Soru: Topoloji kuralları kullanılarak mekansal hatalar (gap/overlap) nasıl proaktif olarak engellenir? | Görev: Şemayı Kur ve Sınırı Düzenle)**
+---
 
-Coğrafi bilgi sistemlerinde veri doğruluğu, üretim ortamının en hassas noktasıdır. Parsellerin veya idari sınırların bağımsız poligonlar olarak çizilmesi, zamanla aralarında boşlukların (gap) veya çakışmaların (overlap) oluşmasına yol açar. Topolojik veri modellerinde ise poligonlar çizilmez; bunun yerine ortak sınır çizgileri (edge) tanımlanır. Komşu parseller aynı çizgiyi paylaştığı için, bir sınır değiştiğinde ilgili tüm yüzeyler otomatik güncellenir. Sistemsel tutarlılığı bu seviyede güvence altına aldıktan sonra, veri güvenliği ve kullanıcı erişim politikalarına geçiş yapıyoruz.
+## [Ders 13] 14:00 - 14:50 | Optimizasyon ve Veri Bütünlüğü
 
-### 3.4 — Kurumsal Yetki, RLS ve Güvenlik
-**(Kritik Soru: Veritabanı güvenlik politikalarında neden veri erişimi satır bazında (Row Level) kontrol edilmelidir? | Görev: Güvenlik Duvarı ve Read-Only Kullanıcı)**
+### [14:00 - 14:20] Servis Alanı ve Çoklu Durak (TSP)
+**(Kritik Soru: Hizmet erişim alanları belirlenirken, geometrik buffer yaklaşımı neden yanıltıcı sonuçlar doğurur?)**
 
-Gelişmiş kurumsal veritabanlarında, kullanıcı yetkilendirmesi tablonun ötesine geçmelidir. Veriler gösteriyor ki, okuma (SELECT) ve yazma (UPDATE/INSERT) yetkilerinin rollerle sınırlandırılması bir zorunluluktur. Ayrıca, Mekansal Satır Bazlı Güvenlik (Row Level Security - RLS) ile farklı bölgelerdeki yöneticilerin yalnızca kendi sorumlu oldukları ilçe veya mahalle sınırlarına ait kayıtları görebilmelerini sağlamak, veri gizliliği politikalarının merkezinde yer alır. Veri bütünlüğünü ve erişim yetkilerini kurguladık. Sistem kesintisi veya veri kaybı risklerine karşı felaket kurtarma senaryolarımızı nasıl planlıyoruz?
+**Teorik Anlatım:**
+"Bir acil durum merkezinin 5 dakikalık yanıt süresi içinde hangi alanlara ulaşabileceği hesaplanırken havadan çizilen dairesel yarıçaplar gerçekliği yansıtmaz. `pgr_drivingDistance` fonksiyonu, yol ağının fiziksel kısıtlamalarını hesaba katarak gerçek bir hizmet poligonu oluşturur. Çoklu nokta ziyaretleri için ise Gezgin Satıcı Problemi (TSP) algoritmaları kullanılır."
 
-### 3.5 — Felaket Kurtarma (PITR) ve Replikasyon
-**(Kritik Soru: WAL logları, veri kurtarma operasyonlarında ne tür bir esneklik sağlar? | Görev: Şema Yedeği Al ve Kurtarma Planı Yap)**
+**Canlı Uygulama / Görev (10 Dakika):**
+*   **Görev:** İtfaiye Kapsama Alanı
+*   **Uygulama Adımları:** İtfaiye istasyonundan hareketle 5 dakikalık (veya 500 cost) sürüş poligonu `pgr_drivingDistance` ve `ST_ConcaveHull` birleşimiyle çizdirilir.
 
-İş sürekliliği planlamasında (Business Continuity), veri kaybı toleransı sıfıra yakındır. Sunucu mimarilerinde `pg_dump` gibi mantıksal yedeklemelerin ötesine geçmek gerekir. Sistem logları (WAL) aracılığıyla yapılandırılan Zamanda Geriye Dönüş Kurtarması (Point-In-Time Recovery - PITR), operatör hatalarında veritabanını belirli bir saniyeye kadar geri alabilme olanağı tanır. Ayrıca kritik veriler, uzak sunuculara anlık olarak (Streaming Replication) çoğaltılmalıdır. Felaket senaryoları taslaklarımızı tamamladık. Son olarak, sistemin eşzamanlı kullanıcı trafiği altında sorunsuz işlemesini nasıl güvence altına alacağımıza değinelim.
+### [14:20 - 14:35] PostGIS Topology: Veri Bütünlüğü
+**(Kritik Soru: Topoloji kuralları ile mekansal hatalar (gap/overlap) nasıl proaktif olarak engellenir?)**
 
-### 3.5 — PgBouncer ve Canlı İzleme
-**(Kritik Soru: Eşzamanlı kullanıcı isteklerinin yoğunlaştığı durumlarda PgBouncer havuzu sunucu sağlığını nasıl korur? | Görev: Havuz Analizi ve Sorguyu Öldür)**
+**Teorik Anlatım:**
+"Coğrafi bilgi sistemlerinde veri doğruluğu esastır. Bağımsız poligonlar zamanla boşluklara (gap) veya çakışmalara (overlap) yol açar. Topolojik modellerde poligonlar çizilmez; ortak sınır çizgileri (edge) tanımlanır. Bir sınır değiştiğinde ilgili tüm yüzeyler otomatik güncellenir."
 
-Uygulamaların eşzamanlı (concurrent) trafiği arttığında, her bir istek sunucunun bellek kaynaklarını (RAM) zorlar. Bağlantı havuzlama çözümleri (`PgBouncer`), bu istekleri düzenleyerek sistem kaynaklarını dengeler. Bununla birlikte, uzun süren veya kaynak tüketen bloklayıcı sorguların anlık tespiti için `pg_stat_activity` görünümleri monitörize edilmeli ve operasyon ekipleri müdahale yöntemlerine hakim olmalıdır. Sistem sağlığı ve performans denetimi sağlandığına göre, bu teknolojilerin sahadaki pratik kullanımını test etme aşamasına geçebiliriz.
+### [14:35 - 14:50] Kurumsal Yetki ve RLS
+**(Kritik Soru: Veritabanı güvenlik politikalarında neden veri erişimi satır bazında kontrol edilmelidir?)**
 
-### 3.6 — Proje: Konya Acil Durum Analizi
-**(Kritik Soru: Mekansal veri seti analizlerinin GeoJSON olarak dışa aktarılması sistem entegrasyonuna nasıl katkı sağlar? | Görev: Nüfus Analizi ve Risk Raporu)**
+**Teorik Anlatım:**
+"Kullanıcı yetkilendirmesi tablonun ötesine geçmelidir. Mekansal Satır Bazlı Güvenlik (Row Level Security - RLS) ile farklı bölgelerdeki yöneticilerin yalnızca kendi ilçe sınırlarına ait kayıtları görebilmelerini sağlamak, veri gizliliği politikalarının merkezinde yer alır."
 
-Veri mimarileri ve ağ analizlerini tamamladıktan sonra, üretilen bilginin diğer kurumsal arayüzlerle paylaşılması esastır. Mekansal istatistiklerin `Spatial Join` yardımıyla bir araya getirilip analiz edilmesi ve sonuçların modern web servisleri tarafından doğrudan okunabilmesi için `GeoJSON` formatında sunulması kurumsal entegrasyonun standartları arasındadır. Entegrasyon süreçlerini standartlaştırdıktan sonra, veri akışını farklı bir seviyeye taşıyan mikroservis yaklaşımlarını inceleyeceğiz.
+---
 
-### 3.7 — Capstone: Konya Unified Mobility
-**(Kritik Soru: Gerçek zamanlı sistemlerde indeksleme stratejileri veri akışkanlığını nasıl etkiler? | Görev: Mikroservis Planla)**
+## [Ders 14] 15:00 - 15:50 | İş Sürekliliği ve Performans
 
-Eğitim sürecimizin finalinde, PostgreSQL'in sağladığı kararlılık ile modern programlama dillerinin dinamizmini birleştiriyoruz. Gerçek zamanlı (real-time) veri akışlarında oluşabilecek gecikme (latency) sorunları, doğru partition ve indeks yapılandırması ile optimize edilmektedir. Tasarlanan bu mikroservis tabanlı veri platformu, büyük hacimli akışların dahi sorunsuz işlenmesine ve analizine zemin hazırlar.
+### [15:00 - 15:25] Felaket Kurtarma (PITR) ve Replikasyon
+**(Kritik Soru: WAL logları, veri kurtarma operasyonlarında ne tür bir esneklik sağlar?)**
 
-Kurumsal veritabanı yönetiminin sınırlarını incelediğimiz bu süreçte; ham koordinatların optimize edilmiş tablolara, bu tabloların ise analitik karar destek sistemlerine nasıl dönüştüğünü deneyimledik. Kurulan bu yapı, kurumun mekansal verimlilik hedeflerine ulaşmasında temel mühendislik standardı olarak hizmet edecektir.
+**Teorik Anlatım:**
+"İş sürekliliği planlamasında (Business Continuity) veri kaybı toleransı sıfıra yakındır. Sistem logları (WAL) aracılığıyla yapılandırılan Zamanda Geriye Dönüş Kurtarması (PITR), operatör hatalarında veritabanını belirli bir saniyeye kadar geri alabilme olanağı tanır. Kritik veriler uzak sunuculara anlık olarak (Streaming Replication) çoğaltılmalıdır."
+
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Şema Yedeği Al
+*   **Uygulama Adımları:** `pg_dump` kullanılarak spesifik bir mekansal tablonun yedeği (backup) alınır.
+
+### [15:25 - 15:50] PgBouncer ve Canlı İzleme
+**(Kritik Soru: Eşzamanlı kullanıcı istekleri yoğunlaştığında PgBouncer sunucu sağlığını nasıl korur?)**
+
+**Teorik Anlatım:**
+"Eşzamanlı trafik arttığında her istek sunucunun belleğini zorlar. Bağlantı havuzlama (`PgBouncer`) bu istekleri düzenler. Uzun süren bloklayıcı sorguların tespiti için `pg_stat_activity` görünümleri monitörize edilmelidir."
+
+**Canlı Uygulama / Görev (15 Dakika):**
+*   **Görev:** Sorguyu Öldür
+*   **Uygulama Adımları:** `SELECT * FROM pg_stat_activity;` ile asılı kalan bir sorgu bulunur ve `pg_terminate_backend(pid)` ile sonlandırılır.
+
+---
+
+## [Ders 15] 16:00 - 16:50 | Final Projesi ve Kapanış
+
+### [16:00 - 16:30] Capstone Projesi: Konya Acil Durum Analizi
+**(Kritik Soru: Mekansal veri seti analizlerinin GeoJSON olarak dışa aktarılması entegrasyona nasıl katkı sağlar?)**
+
+**Teorik Anlatım:**
+"Eğitim sürecimizin finalinde, PostgreSQL'in kararlılığı ile mekansal zekayı birleştiriyoruz. Milyonlarca satırlık veriyi Spatial Join ile zenginleştirip risk haritalarını çıkartacağız. Üretilen bilginin web servisleri tarafından okunabilmesi için `GeoJSON` formatında sunulması kurumsal entegrasyonun standartlarındandır."
+
+**Canlı Uygulama / Görev (20 Dakika):**
+*   **Görev:** Nüfus Analizi ve GeoJSON Çıktı
+*   **Uygulama Adımları:** Hastane veya itfaiyeye uzak olan mahallelerin nüfus sayıları SQL ile tespit edilir ve `ST_AsGeoJSON` kullanılarak web servisine hazır hale getirilir.
+
+### [16:30 - 16:50] Kapanış: Unified Mobility ve Vizyon
+"Kurumsal veritabanı yönetiminin sınırlarını incelediğimiz bu süreçte; ham koordinatların optimize edilmiş tablolara, bu tabloların ise analitik karar destek sistemlerine nasıl dönüştüğünü deneyimledik. Kurulan bu yapı, Konya'nın mekansal verimlilik hedeflerine ulaşmasında temel mühendislik standardı olarak hizmet edecektir. Katılımlarınız için teşekkür ederiz."
