@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostGIS Akademi — Konya BB Eğitim Portalı</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --theme-black: #000000;
+        --theme-white: #ffffff;
+        --theme-yellow: #ffcb05; /* Konya BB Sarısı */
+        --theme-gray: #1a1a1a;
+        --theme-text-dim: rgba(255, 255, 255, 0.6);
+        --border: rgba(255, 255, 255, 0.1);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: var(--theme-black);
+        color: var(--theme-white);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ── Background Patterns ── */
+      .bg-pattern {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        opacity: 0.05;
+        background-image: 
+          radial-gradient(circle at 2px 2px, var(--theme-yellow) 1px, transparent 0);
+        background-size: 40px 40px;
+      }
+
+      .bg-gradient {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(circle at 80% 20%, #222 0%, #000 100%);
+      }
+
+      /* ── Header ── */
+      header {
+        border-bottom: 1px solid var(--border);
+        padding: 16px 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(20px);
+        z-index: 100;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo-konya-box {
+        background: var(--theme-yellow);
+        padding: 6px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-konya-box img { height: 28px; }
+
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 1.1rem;
+        letter-spacing: -0.02em;
+        color: var(--theme-white);
+      }
+
+      .brand-sub {
+        font-size: 0.7rem;
+        color: var(--theme-yellow);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      /* ── Main ── */
+      main {
+        flex: 1;
+        width: min(1200px, 100%);
+        margin: 0 auto;
+        padding: 40px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      /* ── Hero ── */
+      .hero {
+        margin-bottom: 40px;
+        max-width: 800px;
+      }
+
+      .hero-eyebrow {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--theme-yellow);
+        margin-bottom: 12px;
+      }
+
+      .hero h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 900;
+        line-height: 0.95;
+        margin-bottom: 16px;
+        letter-spacing: -0.04em;
+      }
+
+      .hero h1 span {
+        color: var(--theme-yellow);
+      }
+
+      .hero-lead {
+        font-size: 1rem;
+        color: var(--theme-text-dim);
+        line-height: 1.5;
+      }
+
+      /* ── Grid ── */
+      .grid-label {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--theme-text-dim);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .grid-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      /* ── Card ── */
+      .card {
+        background: var(--theme-gray);
+        border: 1px solid var(--border);
+        padding: 24px;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        border-color: var(--theme-yellow);
+        transform: translateY(-4px);
+        background: #222;
+      }
+
+      .card-num {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 3rem;
+        color: var(--theme-white);
+        opacity: 0.05;
+        position: absolute;
+        top: 5px;
+        right: 15px;
+        line-height: 1;
+      }
+
+      .card-badge {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--theme-yellow);
+        margin-bottom: 12px;
+      }
+
+      .card h3 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--theme-white);
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+
+      .card-desc {
+        font-size: 0.8rem;
+        color: var(--theme-text-dim);
+        line-height: 1.5;
+        margin-bottom: 20px;
+        flex: 1;
+      }
+
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+      }
+
+      .card-btn {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--theme-yellow);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .card-btn::after {
+        content: '→';
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover .card-btn::after {
+        transform: translateX(4px);
+      }
+
+      /* ── Featured Card (Oryantasyon) ── */
+      .card.featured {
+        grid-column: span 3;
+        background: var(--theme-yellow);
+        border: none;
+        padding: 32px;
+      }
+
+      .card.featured .card-num, 
+      .card.featured .card-badge,
+      .card.featured h3,
+      .card.featured .card-desc,
+      .card.featured .card-btn {
+        color: var(--theme-black);
+      }
+
+      .card.featured .card-num { opacity: 0.1; }
+
+      .card.featured:hover {
+        background: #ffdb4d;
+      }
+
+      /* ── Footer ── */
+      footer {
+        padding: 20px 64px;
+        border-top: 1px solid var(--border);
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      @media (max-width: 1024px) {
+        .card-grid { grid-template-columns: repeat(2, 1fr); }
+        .card.featured { grid-column: span 2; }
+      }
+
+      @media (max-width: 768px) {
+        body { overflow: auto; height: auto; }
+        header { padding: 16px 20px; }
+        main { padding: 40px 20px; }
+        .hero h1 { font-size: 2rem; }
+        .card-grid { grid-template-columns: 1fr; }
+        .card.featured { grid-column: span 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-gradient"></div>
+    <div class="bg-pattern"></div>
+
+    <header>
+      <div class="brand">
+        <div class="logo-konya-box">
+          <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">PostGIS Akademi</span>
+          <span class="brand-sub">Konya Büyükşehir Belediyesi</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="hero-eyebrow">Eğitim Materyalleri</p>
+        <h1>Şehrin Mekansal <span>Zekası</span></h1>
+        <p class="hero-lead">
+          Konya Büyükşehir Belediyesi PostGIS Akademi eğitim modülleri portalına hoş geldiniz. 
+          Buradan tüm sunum dosyalarına, oryantasyon materyallerine ve proje dökümanlarına erişebilirsiniz.
+        </p>
+      </section>
+
+      <div class="grid-label">Eğitim Modülleri</div>
+
+      <div class="card-grid">
+        <!-- Oryantasyon -->
+        <a href="./giris-oryantasyon.html" class="card featured">
+          <span class="card-num">00</span>
+          <span class="card-badge">Başlangıç</span>
+          <h3>Giriş ve Oryantasyon</h3>
+          <p class="card-desc">
+            Eğitmen profili, teknoloji yığını, CBS temel kavramları ve belediye odaklı mekansal senaryolara giriş.
+          </p>
+          <div class="card-footer">
+            <span class="card-btn">Eğitimi Başlat</span>
+          </div>
+        </a>
+
+        <!-- Bölüm 0 -->
+        <a href="./bolum-0.html" class="card">
+          <span class="card-num">00</span>
+          <span class="card-badge">SQL Temelleri</span>
+          <h3>Bölüm 0: SQL'e Giriş</h3>
+          <p class="card-desc">
+            PostGIS öncesi temel veritabanı sorgulama. SELECT, WHERE ve JOIN operasyonları.
+          </p>
+          <div class="card-footer">
+            <span class="card-btn">İncele</span>
+          </div>
+        </a>
+
+        <!-- Bölüm 1 -->
+        <a href="./bolum-1.html" class="card">
+          <span class="card-num">01</span>
+          <span class="card-badge">Mekansal SQL</span>
+          <h3>Bölüm 1: Mekansal Temeller</h3>
+          <p class="card-desc">
+            Geometri veri modelleri, projeksiyon (SRID) ve mekansal ilişkiler.
+          </p>
+          <div class="card-footer">
+            <span class="card-btn">İncele</span>
+          </div>
+        </a>
+
+        <!-- Bölüm 2 -->
+        <a href="./bolum-2.html" class="card">
+          <span class="card-num">02</span>
+          <span class="card-badge">Performans</span>
+          <h3>Bölüm 2: İndeks ve Optimizasyon</h3>
+          <p class="card-desc">
+            GiST indeksleme, EXPLAIN ANALYZE ve partitioning stratejileri.
+          </p>
+          <div class="card-footer">
+            <span class="card-btn">İncele</span>
+          </div>
+        </a>
+
+        <!-- Bölüm 3 -->
+        <a href="./bolum-3.html" class="card">
+          <span class="card-num">03</span>
+          <span class="card-badge">Analiz ve Proje</span>
+          <h3>Bölüm 3: İleri Analiz</h3>
+          <p class="card-desc">
+            pgRouting, kümeleme ve Konya Acil Durum Analizi projesi.
+          </p>
+          <div class="card-footer">
+            <span class="card-btn">İncele</span>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <footer>
+      <span>PostGIS Akademi v2.0</span>
+    </footer>
+  </body>
+</html>

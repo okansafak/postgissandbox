@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostGIS Akademi — Bölüm 0: SQL'e Giriş (Konya BB)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Kapak ve Oryantasyona Özel Tasarımlar */
+    .s1 { background: var(--theme-black); display: grid; grid-template-columns: 1fr 420px; height: 100%; }
+    .s1-left { display: flex; flex-direction: column; justify-content: space-between; padding: 56px 64px; }
+    .s1-logo-area { display: flex; align-items: center; gap: 0; }
+    .logo-benim { background: var(--theme-black); border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; letter-spacing: 0.02em; }
+    .logo-konya-box { background: var(--theme-yellow); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
+    .logo-konya-box img { height: 40px; }
+    .logo-konya-text { display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; color: var(--theme-black); }
+    .logo-konya-text .k-top { font-weight: 900; font-size: 14px; letter-spacing: 0.05em; line-height: 1; }
+    .logo-konya-text .k-mid { font-weight: 900; font-size: 11px; letter-spacing: 0.05em; line-height: 1.2; }
+    .logo-konya-text .k-bot { font-weight: 600; font-size: 8px; letter-spacing: 0.1em; line-height: 1; margin-top: 2px; }
+    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); margin: 0; }
+    .s1-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+    .s1-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 100px; color: var(--theme-white); line-height: 0.85; letter-spacing: -0.04em; }
+    .s1-title span { color: var(--theme-yellow); }
+    .s1-subtitle { font-size: 22px; color: #aaa; font-weight: 300; line-height: 1.5; max-width: 580px; }
+    .s1-right { background: var(--theme-yellow); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 48px; position: relative; overflow: hidden; }
+    .s1-geo-bg { position: absolute; inset: 0; opacity: 0.08; }
+    .s1-right-label { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 11px; letter-spacing: 0.2em; color: var(--theme-black); text-transform: uppercase; z-index: 1; }
+    .s1-right-number { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--theme-black); line-height: 1; z-index: 1; opacity: 0.15; position: absolute; bottom: -20px; right: -10px; }
+  </style>
+</head>
+
+<body>
+
+  <div class="deck-viewport">
+    <div class="deck-track" id="deckTrack">
+
+      <!-- SLAYT 1: KAPAK -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s1">
+            <div class="s1-left">
+              <div class="s1-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="s1-main">
+                <div class="s1-title">SQL'e<br><span>Giriş</span></div>
+                <div class="s1-subtitle">PostGIS'e başlamadan önce tamamlanması önerilen SQL temelleri. SELECT'ten JOIN'e, toplama fonksiyonlarından veri yönetimine.</div>
+              </div>
+            </div>
+            <div class="s1-right">
+              <svg class="s1-geo-bg" viewBox="0 0 400 720" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="200" cy="360" r="280" stroke="#000" stroke-width="1" fill="none" />
+                <line x1="0" y1="360" x2="400" y2="360" stroke="#000" stroke-width="0.5" />
+                <line x1="200" y1="0" x2="200" y2="720" stroke="#000" stroke-width="0.5" />
+              </svg>
+              <span class="s1-right-label">Bölüm Sıfır</span>
+              <div class="s1-right-number">00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 2: KURULUM VE VERİ SETİ -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.0 — Kurulum ve Veri Seti</div>
+              <div class="slide-header-num">02 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hazır <span>Docker</span> Ortamı</div>
+                <div class="s-text-tech">Eğitim için optimize edilmiş PostgreSQL 16 + PostGIS 3.4 ortamı Docker üzerinden tek komutla ayağa kalkar.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Veri Hazırlığı</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Proje klasöründeki <code>data.md</code> dosyasını takip ederek Natural Earth ve OSM (OpenStreetMap) verilerini veritabanına aktarabilirsiniz.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;"># Terminalde:
+docker-compose up -d
+
+# Veritabanına Bağlantı:
+Host: localhost
+User: egitim
+Pass: egitim2024
+DB: konya_egitim</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 3: 0.1 SELECT VE VERİ MODELİ -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.1 — SELECT ve Veri Modeli</div>
+              <div class="slide-header-num">03 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Tablo Yapısı ve <span>SELECT</span></div>
+                <div class="s-text-tech">Tablo = satır + sütun + veri tipi kısıtı. <code>SELECT</code> ile veri çekilir, ancak veri fiziksel olarak değişmez.</div>
+                
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya Büyükşehir Belediyesi kentsel dönüşüm birimi 31 ilçenin tüm parsel verilerini SELECT sorgusuyla çekerek anlık raporlar üretir. Aynı veriyi Excel'de açmak bile mümkün değildir.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus, nufus / alan_km2 AS yogunluk
+FROM sehirler 
+ORDER BY yogunluk DESC;</div>
+                
+                <div class="reveal-box" id="q1">
+                  <div class="reveal-trigger" onclick="document.getElementById('q1').classList.toggle('open')">
+                    Kritik Soru: SELECT yeni sütun ekler mi? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Hayır. SELECT içindeki hesaplamalar yalnızca sorgu sonucu (görünüm) için geçerlidir; fiziksel tablo değişmez. Kalıcı sütun için ALTER TABLE gerekir.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a1">
+                  <div class="reveal-trigger" onclick="document.getElementById('a1').classList.toggle('open')">
+                    Görev: Nüfusu 1 Milyon+ Şehirleri Filtrele <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ad, nufus FROM sehirler WHERE nufus > 1000000 ORDER BY nufus DESC;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 4: 0.2 VERİ TİPLERİ -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.2 — Veri Tipleri</div>
+              <div class="slide-header-num">04 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Doğru Veri, <span>Doğru Tip</span></div>
+                <div class="s-text-tech">Tamsayılar (INTEGER), ondalıklar (NUMERIC), metinler (TEXT), zamanlar (TIMESTAMPTZ) ve geometriler. Yanlış tip seçimi sistemleri kilitler.</div>
+                
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">TÜİK nüfus değerlerini INTEGER ile saklar — REAL (kayan nokta) tipi yuvarlama hatası yaparak istatistikleri bozabilir.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">CREATE TABLE sehirler (
+  id SERIAL PRIMARY KEY,
+  ad TEXT NOT NULL,
+  nufus INTEGER,
+  geom geometry(POINT, 4326)
+);</div>
+                
+                <div class="reveal-box" id="q2">
+                  <div class="reveal-trigger" onclick="document.getElementById('q2').classList.toggle('open')">
+                    Kritik Soru: Koordinatlar için hangi tip seçilmelidir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Ayrı X ve Y ondalık sütunları yerine PostGIS <code>geometry(POINT, 4326)</code> tipi kullanılmalıdır. Mekansal indeksleme sadece geometri tipiyle çalışır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a2">
+                  <div class="reveal-trigger" onclick="document.getElementById('a2').classList.toggle('open')">
+                    Görev: Acil Durum Tablosu Tasarla <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>id BIGSERIAL, aciklama TEXT, onem_derecesi SMALLINT, kayit_zamani TIMESTAMPTZ, konum geometry(POINT, 4326)</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: 0.3 WHERE -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.3 — WHERE ile Filtreleme</div>
+              <div class="slide-header-num">05 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hedefe Gitmek: <span>WHERE</span></div>
+                <div class="s-text-tech">Mantıksal bağlaçlarla (AND, OR) milyonlarca veri içinden aradığınızı milisaniyeler içinde çıkarırsınız.</div>
+                
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Önemli Avantaj</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Veritabanı indeksi olan bir WHERE komutunu çalıştırdığında, tüm satırları okumaz, sadece ağaç yapısından ilgili sayfayı çağırır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM sehirler 
+WHERE nufus > 1000000 
+  AND bolge IN ('Marmara', 'Ege') 
+  AND ad LIKE 'İ%';</div>
+                
+                <div class="reveal-box" id="q3">
+                  <div class="reveal-trigger" onclick="document.getElementById('q3').classList.toggle('open')">
+                    Kritik Soru: AND ile OR Arasındaki Fark? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    OR koşulu esnetir (iki koşuldan biri yeterlidir). AND koşulu daraltır (her iki koşulun da aynı anda sağlanması zorunludur).
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a3">
+                  <div class="reveal-trigger" onclick="document.getElementById('a3').classList.toggle('open')">
+                    Görev: Adı A ile başlayan VEYA nüfusu düşük <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT * FROM sehirler WHERE (ad LIKE 'A%' OR nufus &lt; 500000) AND nufus IS NOT NULL;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 6: 0.4 SIRALAMA VE LIMIT -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.4 — Sıralama ve Limit</div>
+              <div class="slide-header-num">06 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Düzen ve Limit: <span>ORDER BY</span></div>
+                <div class="s-text-tech">Sorgu sonuçlarını istenen değere göre sıralamak ve sadece ilk N satırı getirmek (LIMIT).</div>
+                
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">AFAD, deprem anında en yüksek nüfus yoğunluğuna sahip ilçeleri "ORDER BY yogunluk DESC LIMIT 10" ile çekerek otomatik kaynak önceliklendirmesi yapar.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM sehirler 
+ORDER BY nufus DESC 
+LIMIT 5 OFFSET 10;</div>
+                
+                <div class="reveal-box" id="q4">
+                  <div class="reveal-trigger" onclick="document.getElementById('q4').classList.toggle('open')">
+                    Kritik Soru: ORDER BY Neden Pahalı Olabilir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Sıralama büyük bellek ister. Milyonlarca satırı sıralamak diske yazmayı gerektirebilir. Çözüm: O sütuna B-Tree (veya GiST) indeks eklemektir.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a4">
+                  <div class="reveal-trigger" onclick="document.getElementById('a4').classList.toggle('open')">
+                    Görev: Nüfusu en büyük 3. ve 7. arası şehirler <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ad, nufus FROM sehirler ORDER BY nufus DESC LIMIT 5 OFFSET 2;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 7: 0.5 GROUP BY -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.5 — Toplama Fonksiyonları</div>
+              <div class="slide-header-num">07 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kümeleri Birleştirmek: <span>GROUP BY</span></div>
+                <div class="s-text-tech">Veriyi kategorilerine göre gruplayarak SUM, AVG, COUNT, MIN, MAX gibi matematiksel toplamalar yapmak.</div>
+                
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">HAVING vs WHERE</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">WHERE satırları tek tek filtreler. HAVING ise GROUP BY ile gruplanmış sonuçları filtreler. Sıralama: WHERE -> GROUP BY -> HAVING.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT bolge, COUNT(*) AS sehir, AVG(nufus) 
+FROM sehirler 
+GROUP BY bolge 
+HAVING COUNT(*) > 2;</div>
+                
+                <div class="reveal-box" id="q5">
+                  <div class="reveal-trigger" onclick="document.getElementById('q5').classList.toggle('open')">
+                    Kritik Soru: Neden WHERE COUNT(*) yazılamaz? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    WHERE, gruplama işleminden önce çalışır. Bu aşamada henüz COUNT veya AVG değeri bilinmez. Bu yüzden gruplanmış filtreler HAVING ile yapılır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a5">
+                  <div class="reveal-trigger" onclick="document.getElementById('a5').classList.toggle('open')">
+                    Görev: İlçe bazında 50+ binası olanlar <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ilce, COUNT(*) FROM binalar GROUP BY ilce HAVING COUNT(*) >= 50;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 8: 0.6 JOIN -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.6 — JOIN ile Tablo İlişkileri</div>
+              <div class="slide-header-num">08 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">İlişkisel Güç: <span>JOIN</span></div>
+                <div class="s-text-tech">Dağınık tabloları ortak bir ID (veya PostGIS'te ortak bir mekan / kesişim) üzerinden tek bir tabloda birleştirmek.</div>
+                
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">PostGIS ve JOIN</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Mekansal sorgularda JOIN koşulu genellikle ST_Intersects(a.geom, b.geom) gibi bir geometrik ilişki komutudur. İnanılmaz güçlüdür.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT s.ad, b.bolge_adi 
+FROM sehirler s 
+JOIN bolgeler b ON s.bolge_id = b.id;</div>
+                
+                <div class="reveal-box" id="q6">
+                  <div class="reveal-trigger" onclick="document.getElementById('q6').classList.toggle('open')">
+                    Kritik Soru: LEFT JOIN vs INNER JOIN? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    INNER JOIN sadece her iki tabloda da karşılığı olan satırları getirir. LEFT JOIN sol tablonun tamamını getirir, sağda karşılık yoksa o alanlara NULL basar.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a6">
+                  <div class="reveal-trigger" onclick="document.getElementById('a6').classList.toggle('open')">
+                    Görev: Tüm şehirler ve varsa bölgeleri <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT s.ad, b.bolge_adi FROM sehirler s LEFT JOIN bolgeler b ON s.bolge_id = b.id;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 9: 0.7 DML -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.7 — Veri Yönetimi (DML)</div>
+              <div class="slide-header-num">09 / 10</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Değişimi Yönetmek: <span>DML</span></div>
+                <div class="s-text-tech">INSERT ile ekle, UPDATE ile güncelle, DELETE ile sil. Fiziksel tablonun kaderini bu komutlar belirler.</div>
+                
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Tehlikeli Sular</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Eğer UPDATE veya DELETE yaparken WHERE koşulu yazmayı unutursanız, tablodaki tüm satırlar etkilenir ve geri dönüşü yoktur.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">INSERT INTO sehirler(ad, nufus) 
+VALUES('Konya', 2277000);
+
+UPDATE sehirler SET nufus = 2277001 
+WHERE ad = 'Konya';</div>
+                
+                <div class="reveal-box" id="q7">
+                  <div class="reveal-trigger" onclick="document.getElementById('q7').classList.toggle('open')">
+                    Kritik Soru: Hatalı UPDATE nasıl önlenir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    İşleme başlamadan önce <code>BEGIN;</code> çalıştırın. UPDATE sonrası sonucu <code>SELECT</code> ile kontrol edin. Hata varsa <code>ROLLBACK;</code>, doğruysa <code>COMMIT;</code> yapın.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 10: KAPANIŞ -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-final">
+            <div class="s-final-body">
+              <div class="s-final-left">
+                <div class="s6-quote">Temel SQL iskeleti hazır. Artık standart SQL komutlarına <em>PostGIS zekası</em> katma zamanı.</div>
+                <div style="color:#7a6100; font-size:14px; margin-top:20px">Tüm mekansal sorgular öğrendiğiniz SELECT ve JOIN yapılarına dayanır.</div>
+              </div>
+              <div class="s-final-right">
+                <div style="color:var(--theme-yellow); font-family:Montserrat; font-weight:800; font-size:12px; text-transform:uppercase">Sonraki Bölüm</div>
+                <div style="color:#fff; font-size:16px; font-weight:700; margin-top:8px">Bölüm 1: Spatial SQL Fundamentals</div>
+                <div style="margin-top:auto; color:#444; font-family:Montserrat; font-weight:900; font-size:11px; text-transform:uppercase">Konya Büyükşehir Belediyesi</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-controls">
+    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
+    <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="nav-status" id="navStatus">1 / 10</div>
+    <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </div>
+
+  <script>
+    (function () {
+      const track = document.getElementById('deckTrack');
+      const slides = document.querySelectorAll('.slide-outer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const status = document.getElementById('navStatus');
+      let currentIndex = 0;
+      function updateSlides() {
+        track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        status.textContent = `${currentIndex + 1} / ${slides.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === slides.length - 1;
+      }
+      nextBtn.addEventListener('click', () => { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } });
+      prevBtn.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; updateSlides(); } });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { if (currentIndex > 0) { currentIndex--; updateSlides(); } }
+      });
+    })();
+  </script>
+
+</body>
+</html>

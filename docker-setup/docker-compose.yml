@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgis-db:
+    image: postgis/postgis:16-3.4
+    container_name: konya_postgis_db
+    environment:
+      - POSTGRES_DB=konya_egitim
+      - POSTGRES_USER=egitim
+      - POSTGRES_PASSWORD=egitim2024
+    ports:
+      - "5444:5432"
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - ./data:/data
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    shm_size: '256mb'
+    command: >
+      postgres
+        -c shared_buffers=256MB
+        -c work_mem=64MB
+        -c maintenance_work_mem=128MB
+        -c max_parallel_workers_per_gather=2
+
+volumes:
+  postgres_data:

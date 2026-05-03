@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostGIS Akademi — Bölüm 2: Sorgular, İndeks ve Performans (Konya BB)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Kapak Özel Tasarımı */
+    .s1 { background: var(--theme-black); display: grid; grid-template-columns: 1fr 420px; height: 100%; }
+    .s1-left { display: flex; flex-direction: column; justify-content: space-between; padding: 56px 64px; }
+    .s1-logo-area { display: flex; align-items: center; gap: 0; }
+    .logo-benim { background: var(--theme-black); border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; letter-spacing: 0.02em; }
+    .logo-konya-box { background: var(--theme-yellow); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
+    .logo-konya-box img { height: 40px; }
+    .logo-konya-text { display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; color: var(--theme-black); }
+    .logo-konya-text .k-top { font-weight: 900; font-size: 14px; letter-spacing: 0.05em; line-height: 1; }
+    .logo-konya-text .k-mid { font-weight: 900; font-size: 11px; letter-spacing: 0.05em; line-height: 1.2; }
+    .logo-konya-text .k-bot { font-weight: 600; font-size: 8px; letter-spacing: 0.1em; line-height: 1; margin-top: 2px; }
+    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); margin: 0; }
+    .s1-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+    .s1-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 80px; color: var(--theme-white); line-height: 0.9; letter-spacing: -0.04em; }
+    .s1-title span { color: var(--theme-yellow); }
+    .s1-subtitle { font-size: 20px; color: #aaa; font-weight: 300; line-height: 1.5; max-width: 600px; }
+    .s1-right { background: var(--theme-yellow); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 48px; position: relative; overflow: hidden; }
+    .s1-geo-bg { position: absolute; inset: 0; opacity: 0.08; }
+    .s1-right-label { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 11px; letter-spacing: 0.2em; color: var(--theme-black); text-transform: uppercase; z-index: 1; }
+    .s1-right-number { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--theme-black); line-height: 1; z-index: 1; opacity: 0.15; position: absolute; bottom: -20px; right: -10px; }
+  </style>
+</head>
+
+<body>
+
+  <div class="deck-viewport">
+    <div class="deck-track" id="deckTrack">
+
+      <!-- SLAYT 1: KAPAK -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s1">
+            <div class="s1-left">
+              <div class="s1-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text">
+                    <span class="k-top">KONYA</span>
+                    <span class="k-mid">BÜYÜKŞEHİR</span>
+                    <span class="k-bot">BELEDİYESİ</span>
+                  </div>
+                </div>
+              </div>
+              <div class="s1-main">
+                <div class="s1-title">Sorgular, İndeks<br>ve <span>Performans</span></div>
+                <div class="s1-subtitle">Veri yükleme tekniklerinden ileri geometri işlemlerine, mekansal indeksleme stratejilerinden sorgu planı analizine.</div>
+              </div>
+            </div>
+            <div class="s1-right">
+              <svg class="s1-geo-bg" viewBox="0 0 400 720" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="200" cy="360" r="280" stroke="#000" stroke-width="1" fill="none" />
+                <line x1="0" y1="360" x2="400" y2="360" stroke="#000" stroke-width="0.5" />
+                <line x1="200" y1="0" x2="200" y2="720" stroke="#000" stroke-width="0.5" />
+              </svg>
+              <span class="s1-right-label">Bölüm İki</span>
+              <div class="s1-right-number">02</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 2: 2.1 VERİ YÜKLEME -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">2.1 — Veri Yükleme ve Dönüştürme</div>
+              <div class="slide-header-num">02 / 07</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Toplu <span>Veri</span> Aktarımı</div>
+                <div class="s-text-tech">Milyonlarca satırı COPY komutu veya ogr2ogr gibi araçlarla veritabanına hızla aktarmak.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya BB CBS departmanı, günlük TKGM, OSM ve saha verilerini otomatik pipeline'lar ile yükler. ogr2ogr aracı 200'den fazla CBS formatını destekler.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">-- ogr2ogr örneği
+ogr2ogr -f "PostgreSQL" PG:"dbname=konya_db" mahalleler.geojson
+
+-- COPY örneği (Toplu yükleme)
+COPY mahalleler FROM '/data/mahalle.csv' WITH (FORMAT csv, HEADER);</div>
+                <div class="reveal-box" id="q1">
+                  <div class="reveal-trigger" onclick="document.getElementById('q1').classList.toggle('open')">
+                    Kritik Soru: COPY neden INSERT'ten hızlıdır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    COPY komutu toplu yükleme için optimize edilmiştir. INSERT'e kıyasla 10–50 kat daha hızlıdır çünkü transaction log ek yükü minimumdur ve veriyi bloklar halinde yazar.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 3: 2.2 İLERİ GEOMETRİ İŞLEMLERİ -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">2.2 — İleri Geometri İşlemleri</div>
+              <div class="slide-header-num">03 / 07</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Basitleştirme ve <span>Kümeleme</span></div>
+                <div class="s-text-tech">Simplify, Union ve Intersection gibi karmaşık mekansal operatörler ile veriyi işlemek.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Örnek Senaryo</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya il sınırının 1:1000 ölçekli geometrisi web haritasında gereksiz detay içerir. ST_SimplifyPreserveTopology ile nokta sayısı azaltılarak veri boyutu %90 küçültülebilir.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_SimplifyPreserveTopology(
+  geom, 0.001
+) FROM konya.mahalleler WHERE ad = 'Meram Merkez';</div>
+                <div class="reveal-box" id="q2">
+                  <div class="reveal-trigger" onclick="document.getElementById('q2').classList.toggle('open')">
+                    Kritik Soru: ST_SubDivide neden kullanılır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Çok büyük ve karmaşık poligonları (binlerce noktalı) daha küçük parçalara böler. Bu, mekansal indeksin (GiST) çok daha verimli çalışmasını sağlar ve kesişim sorgularını hızlandırır.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 4: 2.3 İNDEKS VE PERFORMANS -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">2.3 — İndeks ve Performans</div>
+              <div class="slide-header-num">04 / 07</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">GiST <span>Mekansal</span> İndeks</div>
+                <div class="s-text-tech">Milyonlarca kayıt içinden arananı milisaniyeler içinde bulmak için Bounding Box hiyerarşisi kullanmak.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediye Veritabanı</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya parsel veritabanı gibi büyük tablolarda indeks olmadan sorgu yapmak dakikalar alabilir. GiST indeksi ile bu süre milisaniyelere düşer.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">CREATE INDEX idx_geom_gist 
+ON konya.mahalleler USING GIST(geom);
+ANALYZE konya.mahalleler;</div>
+                <div class="reveal-box" id="q3">
+                  <div class="reveal-trigger" onclick="document.getElementById('q3').classList.toggle('open')">
+                    Kritik Soru: KNN Operatörü nedir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    "En yakın komşu" (K-Nearest Neighbor) aramasıdır. `ORDER BY geom <-> point` şeklinde kullanılırsa GiST indeksini kullanarak en yakın N nesneyi inanılmaz bir hızla bulur.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: 2.4 EXPLAIN ANALYZE -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">2.4 — Sorgu Optimizasyonu</div>
+              <div class="slide-header-num">05 / 07</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Darboğazları <span>Teşhis</span> Etmek</div>
+                <div class="s-text-tech">EXPLAIN ANALYZE ile sorgunun arka planda nasıl çalıştığını ve nerede yavaşladığını görmek.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Profesyonel İpucu</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Eğer plan çıktısında "Sequential Scan" görüyorsanız, bu tüm tablonun satır satır tarandığı anlamına gelir. Bu durumda mutlaka bir GiST indeksi eklenmelidir.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">EXPLAIN ANALYZE 
+SELECT * FROM konya.osm_binalar 
+WHERE ST_Intersects(geom, '...');</div>
+                <div class="reveal-box" id="q4">
+                  <div class="reveal-trigger" onclick="document.getElementById('q4').classList.toggle('open')">
+                    Kritik Soru: ANALYZE neden gereklidir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    ANALYZE komutu tablo istatistiklerini günceller. Planlayıcı bu istatistiklere bakarak en hızlı yolu seçer. İstatistikler eskiyse planlayıcı yanlış karar verip sorguyu yavaşlatabilir.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 6: 2.5 BÜYÜK VERİ VE PARTITIONING -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">2.5 — Büyük Veri ve Partitioning</div>
+              <div class="slide-header-num">06 / 07</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ölçeklenebilir <span>Mimari</span></div>
+                <div class="s-text-tech">Table Partitioning ile devasa tabloları yönetilebilir parçalara bölmek.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Uygulama Alanı</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya araç takip sistemleri gibi milyonlarca konum üreten sistemlerde veriler aylık partition'lara bölünür. Bu sayede sadece ilgili ayın verisi taranır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">CREATE TABLE konum (id BIGINT, ...) 
+PARTITION BY RANGE (zaman);</div>
+                <div class="reveal-box" id="q5">
+                  <div class="reveal-trigger" onclick="document.getElementById('q5').classList.toggle('open')">
+                    Kritik Soru: Partition Pruning nedir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Planlayıcının sorgudaki filtreye bakarak gereksiz partition'ları tamamen elemesi işlemidir. Bu sayede 1 milyar satırlık tabloda bile sorgu hızı etkilenmez.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 7: KAPANIŞ -->
+      <div class="slide-outer">
+
+        <div class="slide-wrapper">
+          <div class="s-final">
+            <div class="s-final-body">
+              <div class="s-final-left">
+                <div class="s6-quote">Sorgularınızı optimize ettiniz, indekslerin gücünü keşfettiniz. Artık <em>üretim kalitesinde</em> bir PostGIS yöneticisisiniz.</div>
+                <div style="color:#7a6100; font-size:14px; margin-top:20px">Performans odaklı düşünmek, büyük veriyi yönetmenin ilk adımıdır.</div>
+              </div>
+              <div class="s-final-right">
+                <div style="color:var(--theme-yellow); font-family:Montserrat; font-weight:800; font-size:12px; text-transform:uppercase">Sonraki Bölüm</div>
+                <div style="color:#fff; font-size:16px; font-weight:700; margin-top:8px">Bölüm 3: Production ve Ağ Analizi</div>
+                <div style="margin-top:auto; color:#444; font-family:Montserrat; font-weight:900; font-size:11px; text-transform:uppercase">Konya Büyükşehir Belediyesi</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-controls">
+    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
+    <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="nav-status" id="navStatus">1 / 7</div>
+    <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </div>
+
+  <script>
+    (function () {
+      const track = document.getElementById('deckTrack');
+      const slides = document.querySelectorAll('.slide-outer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const status = document.getElementById('navStatus');
+      let currentIndex = 0;
+      function updateSlides() {
+        track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        status.textContent = `${currentIndex + 1} / ${slides.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === slides.length - 1;
+      }
+      nextBtn.addEventListener('click', () => { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } });
+      prevBtn.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; updateSlides(); } });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { if (currentIndex > 0) { currentIndex--; updateSlides(); } }
+      });
+    })();
+  </script>
+
+</body>
+</html>
