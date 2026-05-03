@@ -1,35 +1,12 @@
 -- ============================================================
--- PostGIS Akademi — 02: Konya Temel Veri Seti
--- Çalıştırılma Sırası: 3/6
+-- PostGIS Akademi — 04-base-data: Konya Temel Veri Seti
+-- Çalıştırılma Sırası: 4/7
 -- ============================================================
 -- Bu dosya, eğitim boyunca kullanılacak örnek verileri içerir.
 -- Gerçek dünya konumlarına yakın koordinatlar kullanılmıştır.
 
 -- ============================================================
--- 1. MAHALLELER (Bölüm 0: WHERE/GROUP BY, Bölüm 1: ST_Transform)
--- ============================================================
-INSERT INTO konya.mahalleler (ad, ilce, nufus, geom) VALUES
-('Yazır',          'Selçuklu', 69444, ST_GeomFromText('MULTIPOLYGON(((32.48 37.92, 32.51 37.92, 32.51 37.95, 32.48 37.95, 32.48 37.92)))', 4326)),
-('Bosna Hersek',   'Selçuklu', 39814, ST_GeomFromText('MULTIPOLYGON(((32.50 38.00, 32.53 38.00, 32.53 38.03, 32.50 38.03, 32.50 38.00)))', 4326)),
-('Akabe',          'Karatay',  18400, ST_GeomFromText('MULTIPOLYGON(((32.51 37.86, 32.54 37.86, 32.54 37.88, 32.51 37.88, 32.51 37.86)))', 4326)),
-('Karaaslan',      'Karatay',  12850, ST_GeomFromText('MULTIPOLYGON(((32.47 37.87, 32.50 37.87, 32.50 37.89, 32.47 37.89, 32.47 37.87)))', 4326)),
-('Hacıveyiszade',  'Karatay',  8200,  ST_GeomFromText('MULTIPOLYGON(((32.49 37.87, 32.51 37.87, 32.51 37.88, 32.49 37.88, 32.49 37.87)))', 4326)),
-('Şeker',          'Meram',    45200, ST_GeomFromText('MULTIPOLYGON(((32.42 37.84, 32.45 37.84, 32.45 37.87, 32.42 37.87, 32.42 37.84)))', 4326)),
-('Yenişehir',      'Meram',    27600, ST_GeomFromText('MULTIPOLYGON(((32.44 37.85, 32.47 37.85, 32.47 37.88, 32.44 37.88, 32.44 37.85)))', 4326)),
-('Loras',          'Meram',    6300,  ST_GeomFromText('MULTIPOLYGON(((32.40 37.82, 32.43 37.82, 32.43 37.85, 32.40 37.85, 32.40 37.82)))', 4326)),
-('Horozluhan',     'Selçuklu', 52100, ST_GeomFromText('MULTIPOLYGON(((32.45 37.93, 32.49 37.93, 32.49 37.96, 32.45 37.96, 32.45 37.93)))', 4326)),
-('Sille',          'Selçuklu', 3200,  ST_GeomFromText('MULTIPOLYGON(((32.38 37.95, 32.42 37.95, 32.42 37.98, 32.38 37.98, 32.38 37.95)))', 4326));
-
--- ============================================================
--- 2. İLÇE SINIRLARI (Bölüm 2: ST_Subdivide, Partitioning)
--- ============================================================
-INSERT INTO konya.ilce_sinirlari (ad, geom) VALUES
-('Selçuklu', ST_GeomFromText('MULTIPOLYGON(((32.35 37.90, 32.55 37.90, 32.55 38.10, 32.35 38.10, 32.35 37.90)))', 4326)),
-('Karatay',  ST_GeomFromText('MULTIPOLYGON(((32.45 37.82, 32.60 37.82, 32.60 37.92, 32.45 37.92, 32.45 37.82)))', 4326)),
-('Meram',    ST_GeomFromText('MULTIPOLYGON(((32.35 37.78, 32.50 37.78, 32.50 37.90, 32.35 37.90, 32.35 37.78)))', 4326));
-
--- ============================================================
--- 3. HASTANELER (Bölüm 0: LEFT JOIN, Bölüm 1: ST_Intersects/KNN)
+-- 1. HASTANELER (Bölüm 0: LEFT JOIN, Bölüm 1: ST_Intersects/KNN)
 -- ============================================================
 INSERT INTO konya.hastaneler (ad, kapasite, acil_servis, geom) VALUES
 ('Konya Şehir Hastanesi',         1250, true,  ST_SetSRID(ST_MakePoint(32.540, 37.865), 4326)),

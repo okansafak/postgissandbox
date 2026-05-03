@@ -1,6 +1,6 @@
 -- ============================================================
--- PostGIS Akademi — 05: İleri Analiz ve pgRouting Hazırlığı
--- Çalıştırılma Sırası: 6/6
+-- PostGIS Akademi — 07-analysis-advanced: İleri Analiz Verileri
+-- Çalıştırılma Sırası: 7/7
 -- ============================================================
 -- Bölüm 3 (Kümeleme, pgRouting, HexagonGrid) derslerinde
 -- kullanılacak ileri analiz yapıları.

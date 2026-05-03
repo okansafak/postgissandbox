@@ -1,6 +1,6 @@
 -- ============================================================
--- PostGIS Akademi — 03: Eğitim Geometrileri ve Test Verileri
--- Çalıştırılma Sırası: 4/6
+-- PostGIS Akademi — 05-training-geometries: Geometri Egzersizleri
+-- Çalıştırılma Sırası: 5/7
 -- ============================================================
 -- Bölüm 1 canlı uygulamalarında (Geometri Tipleri, ST_IsValid,
 -- ST_Buffer, ST_PointOnSurface) kullanılacak test nesneleri.

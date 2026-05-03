@@ -1,6 +1,6 @@
 -- ============================================================
--- PostGIS Akademi — 01-schema: Tablo Yapıları
--- Çalıştırılma Sırası: 2/6
+-- PostGIS Akademi — 02-schema: Tablo Yapıları
+-- Çalıştırılma Sırası: 2/7
 -- ============================================================
 -- NOT: Eklentiler ve şemalar 01-extensions.sql tarafından
 -- zaten oluşturulmuştur. Burada sadece tablolar tanımlanır.

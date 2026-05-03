@@ -1,6 +1,6 @@
 -- ============================================================
--- PostGIS Akademi — 04: Performans ve İndeksleme Test Verisi
--- Çalıştırılma Sırası: 5/6
+-- PostGIS Akademi — 06-performance-dataset: Performans Test Verisi
+-- Çalıştırılma Sırası: 6/7
 -- ============================================================
 -- Bölüm 2 (GiST İndeks, EXPLAIN ANALYZE, Seq Scan vs Index Scan)
 -- derslerinde kullanılacak büyük veri simülasyonu.
