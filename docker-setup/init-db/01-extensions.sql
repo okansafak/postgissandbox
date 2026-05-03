@@ -1,5 +1,6 @@
 -- ============================================================
--- PostGIS Akademi — 01: Eklenti ve Şema Oluşturma
+-- PostGIS Akademi — 01: Eklentiler ve Şema Oluşturma
+-- Çalıştırılma Sırası: 1/6 (İlk çalışır)
 -- ============================================================
 
 -- Mekansal Eklentiler
@@ -14,5 +15,5 @@ DO $$ BEGIN RAISE NOTICE 'PostGIS Sürümü: %', postgis_full_version(); END $$;
 
 -- Eğitim Şemaları
 CREATE SCHEMA IF NOT EXISTS konya;       -- Konya yerel verileri
-CREATE SCHEMA IF NOT EXISTS egitim;      -- Genel eğitim tabloları
-CREATE SCHEMA IF NOT EXISTS analiz;      -- İleri analiz tabloları
+CREATE SCHEMA IF NOT EXISTS egitim;      -- Genel eğitim tabloları (Bölüm 0)
+CREATE SCHEMA IF NOT EXISTS analiz;      -- İleri analiz ve performans tabloları
