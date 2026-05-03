@@ -29,10 +29,23 @@ Konya'nın güncel verilerini çekmek için [Overpass Turbo](https://overpass-tu
 | **konya.osm_binalar**| `way["building"]` | GiST İndeks, ST_Simplify | `binalar.geojson` |
 | **konya.duraklar**   | `node["highway"="bus_stop"]` | ST_ClusterKMeans (Bölüm 3) | `duraklar.geojson` |
 
-### B. Örnek CSV Dosyaları (Bölüm 2 İçin)
-Bölüm 2'deki "Staging ve Batch Processing" örneği için bir adet CSV dosyasına ihtiyacımız olacak.
-*   **İhtiyaç:** `veri.csv` adında, içerisinde Konya'daki sahte kaza veya olay verileri bulunan bir dosya.
-*   **Hazırlık:** Bu dosyayı docker container içerisine kopyalayarak `COPY konya.temp_tablo FROM 'veri.csv' WITH (FORMAT csv, HEADER);` komutunu test edeceğiz.
+### B. Açık Kaynaklardan Alternatif Veri İndirme (CSV ve SHP)
+Eğitim esnasında kullanılacak "Staging ve Toplu Veri Yükleme" (Bölüm 2) işlemleri için sahte veriler yerine global açık kaynakları kullanabilirsiniz:
+
+1. **Overpass Turbo (CSV Export):** 
+   Konya'daki eczaneleri (veya okulları) CSV olarak indirebilirsiniz. Overpass Turbo'da sol menüden kod alanına şu sorguyu yapıştırıp 'Dışa Aktar > Ham Veri' diyebilirsiniz:
+   ```text
+   [out:csv(::id, ::lat, ::lon, name, amenity)];
+   node["amenity"="pharmacy"]({{bbox}});
+   out;
+   ```
+   Bu dosyayı `veri.csv` olarak kaydederek `COPY konya.temp_tablo FROM 'veri.csv' WITH (FORMAT csv, HEADER);` komutuyla içeri alabilirsiniz.
+
+2. **USGS Earthquake Data (Gerçek Dünya CSV Testi):**
+   [USGS Earthquakes](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php) adresinden son 30 günün tüm küresel deprem verilerini CSV olarak indirebilir, devasa tablo yükleme (Staging) ve performans testlerini bu gerçek veri üzerinde yapabilirsiniz.
+
+3. **Natural Earth (Shapefile Küresel Analiz):**
+   Bölüm 1'deki "Geometry vs Geography" mesafe ölçümleri için [Natural Earth Populated Places](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/populated-places/) adresinden küresel şehirler Shapefile (`.shp`) verisini indirebilirsiniz.
 
 ---
 
