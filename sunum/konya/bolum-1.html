@@ -1,32 +1,158 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PostGIS Akademi — Bölüm 1: Mekansal SQL Temelleri (Konya BB)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <title>PostGIS Akademi — Bölüm 1: Spatial SQL Fundamentals (Konya BB)</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
     /* Kapak Özel Tasarımı */
-    .s1 { background: var(--theme-black); display: grid; grid-template-columns: 1fr 420px; height: 100%; }
-    .s1-left { display: flex; flex-direction: column; justify-content: space-between; padding: 56px 64px; }
-    .s1-logo-area { display: flex; align-items: center; gap: 0; }
-    .logo-benim { background: var(--theme-black); border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; letter-spacing: 0.02em; }
-    .logo-konya-box { background: var(--theme-yellow); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
-    .logo-konya-box img { height: 40px; }
-    .logo-konya-text { display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; color: var(--theme-black); }
-    .logo-konya-text .k-top { font-weight: 900; font-size: 14px; letter-spacing: 0.05em; line-height: 1; }
-    .logo-konya-text .k-mid { font-weight: 900; font-size: 11px; letter-spacing: 0.05em; line-height: 1.2; }
-    .logo-konya-text .k-bot { font-weight: 600; font-size: 8px; letter-spacing: 0.1em; line-height: 1; margin-top: 2px; }
-    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); margin: 0; }
-    .s1-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
-    .s1-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 80px; color: var(--theme-white); line-height: 0.9; letter-spacing: -0.04em; }
-    .s1-title span { color: var(--theme-yellow); }
-    .s1-subtitle { font-size: 20px; color: #aaa; font-weight: 300; line-height: 1.5; max-width: 600px; }
-    .s1-right { background: var(--theme-yellow); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 48px; position: relative; overflow: hidden; }
-    .s1-geo-bg { position: absolute; inset: 0; opacity: 0.08; }
-    .s1-right-label { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 11px; letter-spacing: 0.2em; color: var(--theme-black); text-transform: uppercase; z-index: 1; }
-    .s1-right-number { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--theme-black); line-height: 1; z-index: 1; opacity: 0.15; position: absolute; bottom: -20px; right: -10px; }
+    .s1 {
+      background: var(--theme-black);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      height: 100%;
+    }
+
+    .s1-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 56px 64px;
+    }
+
+    .s1-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .logo-benim {
+      background: var(--theme-black);
+      border: 2px solid var(--theme-white);
+      padding: 10px 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--theme-white);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+    }
+
+    .logo-konya-box {
+      background: var(--theme-yellow);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-konya-box img {
+      height: 40px;
+    }
+
+    .logo-konya-text {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Montserrat', sans-serif;
+      color: var(--theme-black);
+    }
+
+    .logo-konya-text .k-top {
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .logo-konya-text .k-mid {
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    .logo-konya-text .k-bot {
+      font-weight: 600;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .logo-divider {
+      width: 3px;
+      height: 44px;
+      background: var(--theme-yellow);
+      margin: 0;
+    }
+
+    .s1-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .s1-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 80px;
+      color: var(--theme-white);
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+    }
+
+    .s1-title span {
+      color: var(--theme-yellow);
+    }
+
+    .s1-subtitle {
+      font-size: 20px;
+      color: #aaa;
+      font-weight: 300;
+      line-height: 1.5;
+      max-width: 600px;
+    }
+
+    .s1-right {
+      background: var(--theme-yellow);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .s1-right-label {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--theme-black);
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    .s1-right-number {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 120px;
+      color: var(--theme-black);
+      line-height: 1;
+      z-index: 1;
+      opacity: 0.15;
+      position: absolute;
+      bottom: -20px;
+      right: -10px;
+    }
   </style>
 </head>
 
@@ -37,7 +163,6 @@
 
       <!-- SLAYT 1: KAPAK -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s1">
             <div class="s1-left">
@@ -46,24 +171,17 @@
                 <div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text">
-                    <span class="k-top">KONYA</span>
-                    <span class="k-mid">BÜYÜKŞEHİR</span>
-                    <span class="k-bot">BELEDİYESİ</span>
-                  </div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
               <div class="s1-main">
-                <div class="s1-title">Mekansal SQL<br><span>Temelleri</span></div>
-                <div class="s1-subtitle">Geometri veri modelinden projeksiyon sistemlerine, mekansal ilişkilerden ölçüm analitiğine — PostGIS'in temel yapı taşları.</div>
+                <div class="s1-title">Spatial SQL<br><span>Fundamentals</span></div>
+                <div class="s1-subtitle">Mekansal veritabanı mimarisi, geometri modelleri, projeksiyon sistemleri ve
+                  temel mekansal ilişkiler.</div>
               </div>
             </div>
             <div class="s1-right">
-              <svg class="s1-geo-bg" viewBox="0 0 400 720" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="200" cy="360" r="280" stroke="#000" stroke-width="1" fill="none" />
-                <line x1="0" y1="360" x2="400" y2="360" stroke="#000" stroke-width="0.5" />
-                <line x1="200" y1="0" x2="200" y2="720" stroke="#000" stroke-width="0.5" />
-              </svg>
               <span class="s1-right-label">Bölüm Bir</span>
               <div class="s1-right-number">01</div>
             </div>
@@ -71,40 +189,56 @@
         </div>
       </div>
 
-      <!-- SLAYT 2: 1.1 POSTGIS MIMARISI -->
+      <!-- SLAYT 2: 1.1 PLATFORM GİRİŞ -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-white">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.1 — Mekansal SQL Temelleri</div>
-              <div class="slide-header-num">02 / 08</div>
+              <div class="slide-header-title">1.1 — Kuruluma ve Platforma Giriş</div>
+              <div class="slide-header-num">02 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Veritabanında <span>Mekan</span> Zekası</div>
-                <div class="s-text-tech">PostGIS, PostgreSQL veritabanına mekansal nesne desteği ve analiz yetenekleri ekleyen bir eklentidir (extension).</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Kurumsal ekipler, altyapı karmaşıklığına girmeden PostGIS'in gücünü doğrudan SQL üzerinden kullanabilir. Bu eğitimde kullandığımız ortam, standart bir PostGIS veritabanının tüm özelliklerini sunar.</div>
+                <div class="s-headline-tech">Hoş Geldin <span>Konya</span></div>
+                <div class="s-text-tech">CBS, sadece harita çizmek değil; veriyi konumuyla yönetmektir. Docker ortamımız
+                  tam ölçekli bir PostGIS sunucusudur.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Resmi Doküman</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Her zaman en doğru bilgi için:
+                    <strong>postgis.net</strong></div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">CREATE EXTENSION postgis;
-SELECT postgis_version();</div>
-                <div class="reveal-box" id="q1">
-                  <div class="reveal-trigger" onclick="document.getElementById('q1').classList.toggle('open')">
-                    Kritik Soru: PostGIS sadece bir depo mudur? <span>▼</span>
+                <div class="code-block" style="margin-bottom:16px;">SELECT postgis_full_version();
+                  -- Konya Docker ortamında PostGIS 3.4+ aktiftir.</div>
+
+                <div class="reveal-box" id="q11">
+                  <div class="reveal-trigger" onclick="document.getElementById('q11').classList.toggle('open')">
+                    Kritik Soru: Neden pglite yerine Docker? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Hayır. PostGIS sadece veriyi saklamaz; mesafe hesabı, kesişim analizi, tampon alan (buffer) oluşturma gibi yüzlerce mekansal fonksiyonu SQL içinde çalıştırabilen bir analiz motorudur.
+                    Docker, gerçek bir sunucu ortamı sunar. pglite tarayıcıda çalıştığı için büyük verilerde ve gelişmiş
+                    analizlerde kısıtlıdır. Konya BB verileri için gerçek bir sunucu şarttır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g11">
+                  <div class="reveal-trigger" onclick="document.getElementById('g11').classList.toggle('open')">
+                    Görev: Sürüm Kontrolü Yap <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT postgis_version();</code> komutunu çalıştırarak sisteminizdeki PostGIS sürümünü not
+                    edin.
                   </div>
                 </div>
               </div>
@@ -113,39 +247,48 @@ SELECT postgis_version();</div>
         </div>
       </div>
 
-      <!-- SLAYT 3: 1.2 POSTGRESQL MIMARI -->
+      <!-- SLAYT 3: 1.2 POSTGRESQL MİMARİ -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.2 — Cluster, Database ve Schema</div>
-              <div class="slide-header-num">03 / 08</div>
+              <div class="slide-header-title">1.2 — PostgreSQL Temelleri ve Mimari</div>
+              <div class="slide-header-num">03 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Veri <span>Hiyerarşisi</span> ve MVCC</div>
-                <div class="s-text-tech">Cluster → Database → Schema → Table hiyerarşisi. MVCC sayesinde okuma işlemleri yazma işlemlerini bloklamaz.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Önemli Avantaj</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">MVCC (Multi-Version Concurrency Control) sayesinde, devasa mekansal analizler yapılırken veri girişi veya güncellemeler kesintiye uğramaz. Konya BB canlı sistemlerinde bu süreklilik kritiktir.</div>
-                </div>
+                <div class="s-headline-tech">Veri <span>Hiyerarşisi</span></div>
+                <div class="s-text-tech">Cluster (Servis) → Database → Schema → Table. Şemalar, farklı birimlerin
+                  verilerini izole eder.</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT current_database(), current_schema();</div>
-                <div class="reveal-box" id="q2">
-                  <div class="reveal-trigger" onclick="document.getElementById('q2').classList.toggle('open')">
-                    Kritik Soru: Veritabanları arası direkt JOIN yapılır mı? <span>▼</span>
+
+                <div class="reveal-box" id="q12">
+                  <div class="reveal-trigger" onclick="document.getElementById('q12').classList.toggle('open')">
+                    Kritik Soru: Şema kullanımı neden şarttır? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    PostgreSQL'de veritabanları tam izoledir. Direkt JOIN yapılamaz; bunun yerine veriler aynı veritabanı içinde farklı "Şema" (Schema) yapılarında tutulur veya FDW (Foreign Data Wrapper) kullanılır.
+                    Verileri mantıksal olarak gruplar (İmar, Ulaşım, Altyapı vb.). Bu sayede binlerce tablo arasında
+                    kaybolmazsınız ve yetki yönetimini kolaylaştırırsınız.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a12">
+                  <div class="reveal-trigger" onclick="document.getElementById('a12').classList.toggle('open')">
+                    Görev: Şemaları Listele <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT nspname FROM pg_namespace;</code> komutuyla veritabanındaki tüm şemaları görün.
                   </div>
                 </div>
               </div>
@@ -154,41 +297,54 @@ SELECT postgis_version();</div>
         </div>
       </div>
 
-      <!-- SLAYT 4: 1.3 GEOMETRI TEMELLERİ -->
+      <!-- SLAYT 4: 1.2 TABLESACE VE MVCC -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-white">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.3 — Geometri Temelleri</div>
-              <div class="slide-header-num">04 / 08</div>
+              <div class="slide-header-title">1.2 — Tablespace, MVCC ve İzolasyon</div>
+              <div class="slide-header-num">04 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">OGC <span>Geometri</span> Modeli</div>
-                <div class="s-text-tech">POINT, LINESTRING, POLYGON ve bunların MULTI* varyantları. Veriyi WKT (Well-Known Text) veya GeoJSON olarak ifade edebiliriz.</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Konya Örneği</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya il sınırlarını temsil etmek için MULTIPOLYGON kullanılmalıdır. Çünkü il sınırları içinde yer alan ayrık alanlar (örn: göller içindeki adalar) tek bir poligonla temsil edilemez.</div>
+                <div class="s-headline-tech">Yönetim <span>ve</span> Performans</div>
+                <div class="s-text-tech">Tablespace veriyi disklere dağıtırken, MVCC okuma/yazma çakışmalarını önler.
+                </div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Isolation Levels</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Read Committed, Serializable gibi seviyeler
+                    ile veri tutarlılığı en üst düzeyde sağlanır.</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_GeomFromText(
-  'POINT(32.48 37.87)', 4326
-);</div>
-                <div class="reveal-box" id="q3">
-                  <div class="reveal-trigger" onclick="document.getElementById('q3').classList.toggle('open')">
-                    Kritik Soru: ST_IsValid neden önemlidir? <span>▼</span>
+                <div class="code-block" style="margin-bottom:16px;">SHOW transaction_isolation;</div>
+
+                <div class="reveal-box" id="q13">
+                  <div class="reveal-trigger" onclick="document.getElementById('q13').classList.toggle('open')">
+                    Kritik Soru: MVCC neden mekansal analizde önemlidir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Kendi kendini kesen poligonlar (self-intersection) geçersizdir ve hatalı alan hesabı üretir. ST_IsValid ile geometri doğrulanır, ST_MakeValid ile onarılır.
+                    Devasa bir analiz sorgusu (SELECT) çalışırken, sahadaki personel veri girişi (INSERT) yapmaya devam
+                    edebilir. Kimse birbirini bekletmez.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g13">
+                  <div class="reveal-trigger" onclick="document.getElementById('g13').classList.toggle('open')">
+                    Görev: Tablespace Bilgisini Gör <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT * FROM pg_tablespace;</code> komutuyla varsayılan depolama alanlarını listeleyin.
                   </div>
                 </div>
               </div>
@@ -197,42 +353,211 @@ SELECT postgis_version();</div>
         </div>
       </div>
 
-      <!-- SLAYT 5: 1.4 SRID VE PROJEKSIYONLAR -->
+      <!-- SLAYT 5: 1.3 GEOMETRİ TİPLERİ -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.3 — Geometri Tipleri</div>
+              <div class="slide-header-num">05 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Temel <span>ve</span> Çoklu Yapılar</div>
+                <div class="s-text-tech">POINT, LINESTRING, POLYGON ve bunların MULTI* versiyonları. GEOMETRYCOLLECTION
+                  ile karma veri tipleri tek bir hücrede saklanabilir.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_GeomFromText('GEOMETRYCOLLECTION(POINT(0
+                  0),LINESTRING(1 1,2 2))');</div>
+
+                <div class="reveal-box" id="q14">
+                  <div class="reveal-trigger" onclick="document.getElementById('q14').classList.toggle('open')">
+                    Kritik Soru: POINT vs MULTIPOINT? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    POINT tek bir noktadır (elektrik direği). MULTIPOINT ise mantıksal olarak bir grup olan noktalar
+                    kümesidir (aynı parsele ait birden fazla kuyu).
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a15">
+                  <div class="reveal-trigger" onclick="document.getElementById('a15').classList.toggle('open')">
+                    Görev: Poligon Oluştur <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))');</code> (Not: Poligon mutlaka
+                    başladığı noktada bitmelidir!)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 6: 1.3 VERİ FORMATLARI VE METADATA -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.3 — WKT, EWKT, WKB ve Metadata</div>
+              <div class="slide-header-num">06 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Formatların <span>Dili</span></div>
+                <div class="s-text-tech">WKT (Metin), WKB (Binary), EWKT (SRID içeren metin). Tüm mekansal sütunlar
+                  <code>geometry_columns</code> görünümünde kayıtlıdır.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsBinary(geom) FROM konya.mahalleler LIMIT
+                  1;</div>
+
+                <div class="reveal-box" id="q16">
+                  <div class="reveal-trigger" onclick="document.getElementById('q16').classList.toggle('open')">
+                    Kritik Soru: Binary (WKB) neden önemlidir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Binary format, veriyi bilgisayarın anladığı dilde saklar. Metin dönüşümü gerektirmediği için
+                    okuma/yazma işlemlerinde çok daha hızlıdır ve hassasiyet kaybı yaşatmaz.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g16">
+                  <div class="reveal-trigger" onclick="document.getElementById('g16').classList.toggle('open')">
+                    Görev: Geometriyi Metin Olarak Gör <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_AsText(geom) FROM konya.mahalleler LIMIT 1;</code> komutuyla binary veriyi
+                    okunabilir hale getirin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 7: 1.3 GEÇERLİ VE GEÇERSİZ GEOMETRİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.3 — Geçerlilik (ST_IsValid)</div>
+              <div class="slide-header-num">07 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Geometri <span>Sağlığı</span></div>
+                <div class="s-text-tech">Kendi kendini kesen çizgiler (self-intersection) poligonu geçersiz kılar.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_IsValidReason(geom)
+                  FROM konya.mahalleler
+                  WHERE ST_IsValid(geom) = false;</div>
+
+                <div class="reveal-box" id="q17">
+                  <div class="reveal-trigger" onclick="document.getElementById('q17').classList.toggle('open')">
+                    Kritik Soru: Neden geçersiz veri oluşur? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Genellikle hatalı çizimlerden (kendi üzerine katlanan çizgiler) veya yanlış projeksiyon
+                    dönüşümlerinden kaynaklanır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a17">
+                  <div class="reveal-trigger" onclick="document.getElementById('a17').classList.toggle('open')">
+                    Görev: Hatalı Veriyi Onar <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_MakeValid(geom)</code> komutuyla hatalı poligonları otomatik olarak onarabilirsiniz.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 8: 1.4 SRID VE PROJEKSİYONLAR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
               <div class="slide-header-title">1.4 — SRID ve Projeksiyonlar</div>
-              <div class="slide-header-num">05 / 08</div>
+              <div class="slide-header-num">08 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Dünyayı <span>Düzleştirmek</span></div>
-                <div class="s-text-tech">Koordinat Referans Sistemleri (SRID). 4326 (WGS84 - Derece) ve Türkiye için metrik sistemler (örn: UTM 36N - EPSG:32636).</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Önemli Not</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">ST_SetSRID sadece etiket atar, koordinatları değiştirmez. ST_Transform ise koordinatları matematiksel olarak bir sistemden diğerine dönüştürür.</div>
+                <div class="s-headline-tech">Dünya <span>Yuvarlak</span> Ekran Düz</div>
+                <div class="s-text-tech">Kürenin düzleme aktarılmasına projeksiyon denir. Her sistem bir SRID (Spatial
+                  Reference ID) ile tanımlanır.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">spatial_ref_sys</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">PostGIS içindeki binlerce projeksiyonun
+                    parametreleri bu tabloda tutulur.</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Transform(
-  ST_SetSRID(ST_MakePoint(32.48, 37.87), 4326), 
-  32636
-));</div>
-                <div class="reveal-box" id="q4">
-                  <div class="reveal-trigger" onclick="document.getElementById('q4').classList.toggle('open')">
-                    Kritik Soru: Neden direkt mesafe ölçemeyiz? <span>▼</span>
+                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM spatial_ref_sys WHERE srid = 4326;
+                </div>
+
+                <div class="reveal-box" id="q18">
+                  <div class="reveal-trigger" onclick="document.getElementById('q18').classList.toggle('open')">
+                    Kritik Soru: EPSG nedir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    WGS84 (4326) sisteminde birim derecedir. ST_Distance komutu derece döner. Metre cinsinden ölçüm için veriyi metrik bir sisteme (UTM) dönüştürmek veya ::geography cast'i kullanmak gerekir.
+                    Projeksiyon sistemlerini standardize eden global koddur. Örn: 4326 (WGS84 - Küresel), 3857 (Web
+                    Mercator - Google Maps).
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g18">
+                  <div class="reveal-trigger" onclick="document.getElementById('g18').classList.toggle('open')">
+                    Görev: Projeksiyon Ara <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT srtext FROM spatial_ref_sys WHERE srid = 5255;</code> (Türkiye TM33 sistemi
+                    parametrelerini görün)
                   </div>
                 </div>
               </div>
@@ -241,87 +566,52 @@ SELECT postgis_version();</div>
         </div>
       </div>
 
-      <!-- SLAYT 6: 1.5 MEKANSAL İLİŞKİLER -->
+      <!-- SLAYT 9: 1.4 GEOMETRY VS GEOGRAPHY -->
       <div class="slide-outer">
-
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">1.5 — Mekansal İlişkiler</div>
-              <div class="slide-header-num">06 / 08</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Mekanda <span>Soru</span> Sormak</div>
-                <div class="s-text-tech">Contains, Within, Intersects, Touches, DWithin. "Bu parsel hangi mahallede?", "Bu boru hattı yolla kesişiyor mu?"</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediye Uygulaması</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Kent Bilgi Sistemlerinde bir binanın hangi mahallede olduğunu bulmak için ST_Within(bina_konum, mahalle_sinir) fonksiyonu kullanılır. Bu işlem saniyeler sürer.</div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad 
-FROM konya.mahalleler 
-WHERE ST_Within(
-  ST_SetSRID(ST_MakePoint(32.48, 37.87), 4326), 
-  geom
-);</div>
-                <div class="reveal-box" id="q5">
-                  <div class="reveal-trigger" onclick="document.getElementById('q5').classList.toggle('open')">
-                    Kritik Soru: Intersects vs Overlaps? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    ST_Intersects herhangi bir teması (içeride olsa bile) yakalar. ST_Overlaps ise sadece kısmi örtüşmeleri bulur; biri diğerinin tamamen içindeyse false döner.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 7: 1.6 ÖLÇÜM VE ANALİTİK -->
-      <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.6 — Ölçüm ve Analitik</div>
-              <div class="slide-header-num">07 / 08</div>
+              <div class="slide-header-title">1.4 — Geometry vs Geography Ayrımı</div>
+              <div class="slide-header-num">09 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>Metrikler</span></div>
-                <div class="s-text-tech">ST_Area, ST_Length, ST_Distance, ST_Buffer. Veriden sadece konum değil, sayısal değerler üretmek.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Örnek Senaryo</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Bir su borusu patladığında, etkilenen alanı bulmak için boru hattına 50 metrelik bir ST_Buffer (tampon) uygulanır ve bu alan içindeki bina sayısı ST_Intersects ile hesaplanır.</div>
-                </div>
+                <div class="s-headline-tech">Düzlem <span>mü</span> Küre mi?</div>
+                <div class="s-text-tech"><strong>Geometry:</strong> Kartezyen (düzlem) matematik kullanır. Birimi
+                  derecedir. <strong>Geography:</strong> Küresel matematik kullanır. Birimi metredir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Area(geom::geography) AS alan_m2 
-FROM konya.mahalleler 
-WHERE ad = 'Selçuklu Merkez';</div>
-                <div class="reveal-box" id="q6">
-                  <div class="reveal-trigger" onclick="document.getElementById('q6').classList.toggle('open')">
-                    Kritik Soru: Centroid her zaman içerde midir? <span>▼</span>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Distance(
+                  'POINT(32.49 37.87)'::geography,
+                  'POINT(32.50 37.88)'::geography
+                  ) AS metre_mesafe;</div>
+
+                <div class="reveal-box" id="q19">
+                  <div class="reveal-trigger" onclick="document.getElementById('q19').classList.toggle('open')">
+                    Kritik Soru: Neden her zaman Geography kullanmıyoruz? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Hayır. Geometrik ağırlık merkezi (ST_Centroid), "C" veya "U" şeklindeki poligonlarda sınırın dışında kalabilir. Her zaman poligon içinde bir nokta bulmak için ST_PointOnSurface kullanılmalıdır.
+                    Geography'nin matematiği çok daha ağır ve yavaştır. Ayrıca bazı PostGIS fonksiyonları Geography
+                    tipini desteklemez.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g19">
+                  <div class="reveal-trigger" onclick="document.getElementById('g19').classList.toggle('open')">
+                    Görev: Alan Ölç <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_Area(geom::geography) FROM konya.mahalleler LIMIT 1;</code> komutuyla bir mahallenin
+                    alanını metrekare cinsinden bulun.
                   </div>
                 </div>
               </div>
@@ -330,20 +620,500 @@ WHERE ad = 'Selçuklu Merkez';</div>
         </div>
       </div>
 
-      <!-- SLAYT 8: KAPANIŞ -->
+      <!-- SLAYT 10: 1.4 SETSRID VS TRANSFORM VE TR SİSTEMLERİ -->
       <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.4 — SetSRID != Transform ve Türkiye Sistemleri</div>
+              <div class="slide-header-num">10 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Dönüştürme <span>Sanatı</span></div>
+                <div class="s-text-tech"><strong>ST_SetSRID:</strong> Etiket yapıştırır (koordinatı ellemez).
+                  <strong>ST_Transform:</strong> Koordinatları matematiksel olarak başka bir sisteme çevirir.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Türkiye Sistemleri</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">ITRF96 / TM33 (EPSG:5255), UTM Zone 36N
+                    (EPSG:32636). Konya genellikle TM33 veya WGS84 kullanır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Transform(geom, 32636))
+                  FROM konya.mahalleler LIMIT 1;</div>
 
+                <div class="reveal-box" id="q110">
+                  <div class="reveal-trigger" onclick="document.getElementById('q110').classList.toggle('open')">
+                    Kritik Soru: Hangisi koordinatı değiştirir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    ST_Transform matematiksel işlem yapar ve koordinatı yeni sisteme taşır. ST_SetSRID ise sadece
+                    etiketi değiştirir, koordinat aynı kalır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g110">
+                  <div class="reveal-trigger" onclick="document.getElementById('g110').classList.toggle('open')">
+                    Görev: Web Mercator'a Çevir <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_Transform(geom, 3857) FROM konya.mahalleler LIMIT 1;</code> (Google Maps uyumlu
+                    format)
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 11: 1.5 MEKANSAL İLİŞKİLER 1 -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.5 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
+              <div class="slide-header-num">11 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Mekansal <span>Sorgu</span> Mantığı</div>
+                <div class="s-text-tech"><strong>ST_Contains:</strong> A, B'yi kapsar mı? <strong>ST_Within:</strong> A,
+                  B'nin içinde mi? <strong>ST_Intersects:</strong> Herhangi bir temas var mı?</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.mahalleler
+                  WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
+
+                <div class="reveal-box" id="q111">
+                  <div class="reveal-trigger" onclick="document.getElementById('q111').classList.toggle('open')">
+                    Kritik Soru: Contains vs Within? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Mahalle Bina'yı kapsar (Contains). Bina Mahalle'nin içindedir (Within). Mantık aynıdır, bakış açısı
+                    farklıdır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a21">
+                  <div class="reveal-trigger" onclick="document.getElementById('a21').classList.toggle('open')">
+                    Görev: Kesişen Alanları Bul <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Intersects(m.geom, 'POLYGON(...)');</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 12: 1.5 İLERİ İLİŞKİLER -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.5 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
+              <div class="slide-header-num">12 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Komşuluk <span>ve</span> Mesafe</div>
+                <div class="s-text-tech"><strong>ST_Touches:</strong> Sadece sınırdan temas (komşuluk).
+                  <strong>ST_DWithin:</strong> Belirli bir mesafe içindeki nesneler.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">ST_DWithin Neden Hızlı?</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">İndeks kullanarak tampon alan oluşturmadan
+                    (Buffer yapmadan) mesafe filtresi uygular.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">-- 500 metre içindekileri bul:
+                  SELECT * FROM konya.osm_binalar
+                  WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500);</div>
+
+                <div class="reveal-box" id="q112">
+                  <div class="reveal-trigger" onclick="document.getElementById('q112').classList.toggle('open')">
+                    Kritik Soru: ST_Touches neyi yakalamaz? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Eğer nesneler birbirinin üzerine biniyorsa (overlap) veya tamamen içindeyse ST_Touches FALSE döner.
+                    Sadece "yan yana" iseler TRUE döner.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g112">
+                  <div class="reveal-trigger" onclick="document.getElementById('g112').classList.toggle('open')">
+                    Görev: Kesişen Yolları Bul <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT * FROM konya.osm_yollar WHERE ST_Crosses(geom, 'LINESTRING(...)');</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 13: 1.5 MEKANSAL JOIN MANTIĞI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.5 — JOIN ile Mekansal İlişki</div>
+              <div class="slide-header-num">13 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Tabloları <span>Konumla</span> Bağlamak</div>
+                <div class="s-text-tech">ID alanına ihtiyaç duymadan, sadece haritadaki konumları üzerinden iki tabloyu
+                  birleştirmek.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT b.id, m.ad
+                  FROM konya.osm_binalar b
+                  JOIN konya.mahalleler m ON ST_Intersects(b.geom, m.geom)
+                  LIMIT 5;</div>
+
+                <div class="reveal-box" id="q113">
+                  <div class="reveal-trigger" onclick="document.getElementById('q113').classList.toggle('open')">
+                    Kritik Soru: Mekansal Join neden pahalıdır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Çünkü her bina ile her mahalle geometrisini karşılaştırır. Bu yüzden GiST indeksleri mekansal
+                    join'in olmazsa olmazıdır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g113">
+                  <div class="reveal-trigger" onclick="document.getElementById('g113').classList.toggle('open')">
+                    Görev: Hastane-Mahalle Join Yap <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT h.ad, m.ad FROM konya.hastaneler h JOIN konya.mahalleler m ON ST_Within(h.geom, m.geom);</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 14: 1.6 ÖLÇÜM FONKSİYONLARI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.6 — Ölçüm (Distance, Area, Perimeter)</div>
+              <div class="slide-header-num">14 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Geometrik <span>Hesaplar</span></div>
+                <div class="s-text-tech">Mesafe, alan ve çevre uzunluğu hesaplamak. Unutmayın: Geography birimi
+                  metredir, Geometry ise derece!</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Area(geom::geography) / 10000 AS hektar
+                  FROM konya.mahalleler LIMIT 5;</div>
+
+                <div class="reveal-box" id="q114">
+                  <div class="reveal-trigger" onclick="document.getElementById('q114').classList.toggle('open')">
+                    Kritik Soru: ST_Length neden derecedir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Eğer SRID 4326 ise birim derecedir. Metre almak için <code>::geography</code> cast'i veya
+                    projeksiyon dönüşümü şarttır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g114">
+                  <div class="reveal-trigger" onclick="document.getElementById('g114').classList.toggle('open')">
+                    Görev: Yol Uzunluğu Ölç <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_Length(geom::geography) FROM konya.osm_yollar LIMIT 5;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 15: 1.6 CENTROID VS POINTONSURFACE -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.6 — Centroid vs PointOnSurface</div>
+              <div class="slide-header-num">15 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ağırlık <span>Merkezi</span> Tuzağı</div>
+                <div class="s-text-tech"><strong>ST_Centroid:</strong> Matematiksel merkez (hilal gibi şekillerde dışarı
+                  taşabilir). <strong>ST_PointOnSurface:</strong> Garanti poligonun içinde bir nokta verir.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Centroid(geom)) FROM
+                  konya.mahalleler LIMIT 1;</div>
+
+                <div class="reveal-box" id="q115">
+                  <div class="reveal-trigger" onclick="document.getElementById('q115').classList.toggle('open')">
+                    Kritik Soru: Etiketleme için hangisi seçilmeli? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Her zaman ST_PointOnSurface. Çünkü bir mahalle etiketinin komşu mahallenin üzerinde görünmesini
+                    istemeyiz.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g115">
+                  <div class="reveal-trigger" onclick="document.getElementById('g115').classList.toggle('open')">
+                    Görev: Yüzey Noktasını Bul <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_AsText(ST_PointOnSurface(geom)) FROM konya.mahalleler LIMIT 1;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 16: 1.6 ANALİTİK FONKSİYONLAR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.6 — Buffer, Union ve Intersection</div>
+              <div class="slide-header-num">16 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Mekansal <span>Küme</span> İşlemleri</div>
+                <div class="s-text-tech">Tampon bölge (Buffer) oluşturma, geometrileri birleştirme (Union) veya kesişim
+                  alanlarını (Intersection) alma.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Buffer(geom::geography, 100)
+                  FROM konya.osm_yollar LIMIT 1; </div>
+
+                <div class="reveal-box" id="q116">
+                  <div class="reveal-trigger" onclick="document.getElementById('q116').classList.toggle('open')">
+                    Kritik Soru: Buffer her zaman poligon mu döner? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Evet. Noktadan da, çizgiden de buffer alsanız sonuç her zaman alanı olan bir poligondur.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g116">
+                  <div class="reveal-trigger" onclick="document.getElementById('g116').classList.toggle('open')">
+                    Görev: İki Mahalle Birleştir <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_Union(geom) FROM konya.mahalleler WHERE ad IN ('A', 'B');</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 17: 1.6 ENVELOPE VE CONVEXHULL -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.6 — Envelope ve ConvexHull</div>
+              <div class="slide-header-num">17 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kapsayıcı <span>Geometriler</span></div>
+                <div class="s-text-tech"><strong>ST_Envelope:</strong> Sınırlayıcı kutu (Bounding Box).
+                  <strong>ST_ConvexHull:</strong> Geometriyi saran en dar dışbükey zarf (lastik bant etkisi).</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Envelope(geom) FROM konya.mahalleler LIMIT
+                  1;</div>
+
+                <div class="reveal-box" id="q117">
+                  <div class="reveal-trigger" onclick="document.getElementById('q117').classList.toggle('open')">
+                    Kritik Soru: Envelope vs ConvexHull? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Envelope her zaman dikdörtgendir. ConvexHull ise geometrinin şekline daha yakın ama dışbükey bir
+                    zarftır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g117">
+                  <div class="reveal-trigger" onclick="document.getElementById('g117').classList.toggle('open')">
+                    Görev: Mahalle Grubunu Sar <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_ConvexHull(ST_Collect(geom)) FROM konya.mahalleler WHERE ilce = 'Selçuklu';</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 18: 1.6 EN YAKIN N KOMŞU (KNN) -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.6 — En Yakın N Komşu (KNN)</div>
+              <div class="slide-header-num">18 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Işık <span>Hızında</span> Mesafe</div>
+                <div class="s-text-tech"><code>&lt;-&gt;</code> operatörü, GiST indeksini kullanarak en yakın nesneleri
+                  milisaniyeler içinde getirir.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad FROM konya.hastaneler
+                  ORDER BY geom <-> ST_SetSRID(ST_Point(32.49, 37.87), 4326)
+                    LIMIT 3;</div>
+                <div class="reveal-box" id="q118">
+                  <div class="reveal-trigger" onclick="document.getElementById('q118').classList.toggle('open')">
+                    Kritik Soru: Neden ST_Distance kullanmıyoruz? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    ST_Distance tüm tabloyu hesaplayıp sıralar (çok yavaş). <-> operatörü ise indeks ağacında dolaşarak
+                      sadece en yakınları bulur (inanılmaz hızlı!).
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g118">
+                  <div class="reveal-trigger" onclick="document.getElementById('g118').classList.toggle('open')">
+                    Görev: En Yakın 5 Binayı Bul <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT id FROM konya.osm_binalar ORDER BY geom <-> 'POINT(...)' LIMIT 5;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 19: KAPANIŞ -->
+      <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-final">
             <div class="s-final-body">
               <div class="s-final-left">
-                <div class="s6-quote">Mekansal SQL'in temellerini attınız. PostGIS artık sadece bir veritabanı değil, sizin için bir <em>analiz katmanı</em>.</div>
-                <div style="color:#7a6100; font-size:14px; margin-top:20px">Öğrendiğiniz geometri ve projeksiyon bilgisi, ileri düzey mekansal sorguların anahtarıdır.</div>
+                <div class="s6-quote">Mekansal SQL'in temellerini attınız. Artık veriyi sadece görmüyor, <em>geometrik
+                    olarak sorguluyorsunuz.</em></div>
+                <div style="color:#7a6100; font-size:14px; margin-top:20px">Bölüm 2'de performans ve ileri analizlerle
+                  devam edeceğiz.</div>
               </div>
               <div class="s-final-right">
-                <div style="color:var(--theme-yellow); font-family:Montserrat; font-weight:800; font-size:12px; text-transform:uppercase">Sonraki Bölüm</div>
-                <div style="color:#fff; font-size:16px; font-weight:700; margin-top:8px">Bölüm 2: Sorgular, İndeks ve Performans</div>
-                <div style="margin-top:auto; color:#444; font-family:Montserrat; font-weight:900; font-size:11px; text-transform:uppercase">Konya Büyükşehir Belediyesi</div>
+                <div
+                  style="color:var(--theme-yellow); font-family:Montserrat; font-weight:800; font-size:12px; text-transform:uppercase">
+                  Sonraki Bölüm</div>
+                <div style="color:#fff; font-size:16px; font-weight:700; margin-top:8px">Bölüm 2: Sorgular, İndeks ve
+                  Performans</div>
+                <div
+                  style="margin-top:auto; color:#444; font-family:Montserrat; font-weight:900; font-size:11px; text-transform:uppercase">
+                  Konya Büyükşehir Belediyesi</div>
               </div>
             </div>
           </div>
@@ -354,10 +1124,20 @@ WHERE ad = 'Selçuklu Merkez';</div>
   </div>
 
   <div class="nav-controls">
-    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
-    <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 8</div>
-    <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg></a>
+    <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg></button>
+    <div class="nav-status" id="navStatus">1 / 19</div>
+    <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg></button>
   </div>
 
   <script>
@@ -384,4 +1164,5 @@ WHERE ad = 'Selçuklu Merkez';</div>
   </script>
 
 </body>
+
 </html>

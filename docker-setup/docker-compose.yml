@@ -9,7 +9,7 @@ services:
       - POSTGRES_USER=egitim
       - POSTGRES_PASSWORD=egitim2024
     ports:
-      - "5444:5432"
+      - "5442:5432"
     volumes:
       - ./init-db:/docker-entrypoint-initdb.d
       - ./data:/data

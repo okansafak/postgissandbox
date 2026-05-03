@@ -71,9 +71,60 @@
         </div>
       </div>
 
-      <!-- SLAYT 2: KURULUM VE VERİ SETİ -->
+      <!-- SLAYT 2: 0.1 VERİTABANI NEDİR? -->
       <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.1 — Veritabanı Nedir?</div>
+              <div class="slide-header-num">02 / 12</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Verinin <span>Kurumsal</span> Hafızası</div>
+                <div class="s-text-tech">Veritabanı, verilerin yapılandırılmış, güvenli ve hızlı erişilebilir şekilde saklandığı bir yönetim sistemidir.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Neden Gereklidir?</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Excel sınırlıdır. Veritabanı ise milyonlarca satırı saniyeler içinde işler, eşzamanlı erişime izin verir ve veri bütünlüğünü korur.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">-- İlişkisel Veritabanı (RDBMS)
+-- PostgreSQL: Dünyanın en gelişmiş açık kaynak veritabanı.
+-- PostGIS: PostgreSQL'e 'mekan' yeteneği katan eklenti.</div>
+                
+                <div class="reveal-box" id="q01">
+                  <div class="reveal-trigger" onclick="document.getElementById('q01').classList.toggle('open')">
+                    Kritik Soru: Neden Excel yerine Veritabanı? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Excel'de aynı anda sadece bir kişi yazabilir ve veri boyutu arttıkça yavaşlar. Veritabanı binlerce eşzamanlı kullanıcıyı destekler ve indeksleme ile anlık sonuç verir.
+                  </div>
+                </div>
 
+                <div class="reveal-box" id="a01">
+                  <div class="reveal-trigger" onclick="document.getElementById('a01').classList.toggle('open')">
+                    Görev: Mevcut Bağlantıyı Kontrol Et <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT current_user, current_database();</code> komutunu çalıştırarak hangi yetkiyle hangi veritabanında olduğunuzu görün.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 3: 0.2 KURULUM VE VERİ SETİ -->
+      <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
@@ -84,84 +135,26 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.0 — Kurulum ve Veri Seti</div>
-              <div class="slide-header-num">02 / 10</div>
+              <div class="slide-header-title">0.2 — Kurulum ve Veri Seti</div>
+              <div class="slide-header-num">03 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Hazır <span>Docker</span> Ortamı</div>
                 <div class="s-text-tech">Eğitim için optimize edilmiş PostgreSQL 16 + PostGIS 3.4 ortamı Docker üzerinden tek komutla ayağa kalkar.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Veri Hazırlığı</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Proje klasöründeki <code>data.md</code> dosyasını takip ederek Natural Earth ve OSM (OpenStreetMap) verilerini veritabanına aktarabilirsiniz.</div>
-                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;"># Terminalde:
 docker-compose up -d
 
-# Veritabanına Bağlantı:
-Host: localhost
-User: egitim
-Pass: egitim2024
-DB: konya_egitim</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+# Veritabanı: konya_egitim</div>
 
-      <!-- SLAYT 3: 0.1 SELECT VE VERİ MODELİ -->
-      <div class="slide-outer">
-
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text">
-                    <span class="k-top">KONYA</span>
-                    <span class="k-mid">BÜYÜKŞEHİR</span>
-                    <span class="k-bot">BELEDİYESİ</span>
-                  </div>
-                </div>
-              </div>
-              <div class="slide-header-title">0.1 — SELECT ve Veri Modeli</div>
-              <div class="slide-header-num">03 / 10</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Tablo Yapısı ve <span>SELECT</span></div>
-                <div class="s-text-tech">Tablo = satır + sütun + veri tipi kısıtı. <code>SELECT</code> ile veri çekilir, ancak veri fiziksel olarak değişmez.</div>
-                
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya Büyükşehir Belediyesi kentsel dönüşüm birimi 31 ilçenin tüm parsel verilerini SELECT sorgusuyla çekerek anlık raporlar üretir. Aynı veriyi Excel'de açmak bile mümkün değildir.</div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus, nufus / alan_km2 AS yogunluk
-FROM sehirler 
-ORDER BY yogunluk DESC;</div>
-                
-                <div class="reveal-box" id="q1">
-                  <div class="reveal-trigger" onclick="document.getElementById('q1').classList.toggle('open')">
-                    Kritik Soru: SELECT yeni sütun ekler mi? <span>▼</span>
+                <div class="reveal-box" id="q02">
+                  <div class="reveal-trigger" onclick="document.getElementById('q02').classList.toggle('open')">
+                    Kritik Soru: Docker neden tercih edilir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Hayır. SELECT içindeki hesaplamalar yalnızca sorgu sonucu (görünüm) için geçerlidir; fiziksel tablo değişmez. Kalıcı sütun için ALTER TABLE gerekir.
-                  </div>
-                </div>
-
-                <div class="reveal-box" id="a1">
-                  <div class="reveal-trigger" onclick="document.getElementById('a1').classList.toggle('open')">
-                    Görev: Nüfusu 1 Milyon+ Şehirleri Filtrele <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>SELECT ad, nufus FROM sehirler WHERE nufus > 1000000 ORDER BY nufus DESC;</code>
+                    "Benim bilgisayarımda çalışıyordu" sorununu bitirir. Herkesin bilgisayarında birebir aynı işletim sistemi ve veritabanı versiyonunun (PostgreSQL 16) çalışmasını sağlar.
                   </div>
                 </div>
               </div>
@@ -170,60 +163,97 @@ ORDER BY yogunluk DESC;</div>
         </div>
       </div>
 
-      <!-- SLAYT 4: 0.2 VERİ TİPLERİ -->
+      <!-- SLAYT 4: 0.3 VERİ TİPLERİ -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text">
-                    <span class="k-top">KONYA</span>
-                    <span class="k-mid">BÜYÜKŞEHİR</span>
-                    <span class="k-bot">BELEDİYESİ</span>
-                  </div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.2 — Veri Tipleri</div>
-              <div class="slide-header-num">04 / 10</div>
+              <div class="slide-header-title">0.3 — PostgreSQL Veri Tipleri</div>
+              <div class="slide-header-num">04 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Doğru Veri, <span>Doğru Tip</span></div>
-                <div class="s-text-tech">Tamsayılar (INTEGER), ondalıklar (NUMERIC), metinler (TEXT), zamanlar (TIMESTAMPTZ) ve geometriler. Yanlış tip seçimi sistemleri kilitler.</div>
-                
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">TÜİK nüfus değerlerini INTEGER ile saklar — REAL (kayan nokta) tipi yuvarlama hatası yaparak istatistikleri bozabilir.</div>
-                </div>
+                <div class="s-text-tech">INTEGER, NUMERIC, TEXT, TIMESTAMPTZ ve Mekansal tipler.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">CREATE TABLE sehirler (
+                <div class="code-block" style="margin-bottom:16px;">CREATE TABLE konya.yeni_projeler (
   id SERIAL PRIMARY KEY,
-  ad TEXT NOT NULL,
-  nufus INTEGER,
-  geom geometry(POINT, 4326)
+  proje_adi TEXT NOT NULL,
+  butce NUMERIC(15,2),
+  geom geometry(POLYGON, 4326)
 );</div>
                 
-                <div class="reveal-box" id="q2">
-                  <div class="reveal-trigger" onclick="document.getElementById('q2').classList.toggle('open')">
-                    Kritik Soru: Koordinatlar için hangi tip seçilmelidir? <span>▼</span>
+                <div class="reveal-box" id="q03">
+                  <div class="reveal-trigger" onclick="document.getElementById('q03').classList.toggle('open')">
+                    Kritik Soru: NUMERIC vs REAL farkı nedir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Ayrı X ve Y ondalık sütunları yerine PostGIS <code>geometry(POINT, 4326)</code> tipi kullanılmalıdır. Mekansal indeksleme sadece geometri tipiyle çalışır.
+                    NUMERIC tam hassasiyet sağlar (para birimleri için şarttır). REAL ise yaklaşık değer saklar ve küsuratlarda yuvarlama hatası yapabilir.
                   </div>
                 </div>
 
-                <div class="reveal-box" id="a2">
-                  <div class="reveal-trigger" onclick="document.getElementById('a2').classList.toggle('open')">
-                    Görev: Acil Durum Tablosu Tasarla <span>▼</span>
+                <div class="reveal-box" id="a03">
+                  <div class="reveal-trigger" onclick="document.getElementById('a03').classList.toggle('open')">
+                    Görev: Personel Tablosu Tasarla <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>id BIGSERIAL, aciklama TEXT, onem_derecesi SMALLINT, kayit_zamani TIMESTAMPTZ, konum geometry(POINT, 4326)</code>
+                    Ad (TEXT), Maas (NUMERIC), Giris_Tarihi (DATE) ve aktif mi (BOOLEAN) sütunlarını içeren bir tablo şeması hayal edin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: 0.4 SELECT VE SÜTUN SEÇİMİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.4 — SELECT ve Sütun Seçimi</div>
+              <div class="slide-header-num">05 / 12</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veriyi <span>Çağırmak</span></div>
+                <div class="s-text-tech">SELECT ile tablo sütunlarını seçer, gerekirse AS ile yeniden adlandırırız.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad AS mahalle_adi, 
+       nufus / 1000 AS bin_nufus 
+FROM konya.mahalleler;</div>
+
+                <div class="reveal-box" id="q04">
+                  <div class="reveal-trigger" onclick="document.getElementById('q04').classList.toggle('open')">
+                    Kritik Soru: SELECT veriyi değiştirir mi? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Hayır. SELECT sadece verinin bir "kopyasını" veya "görüntüsünü" getirir. Hesaplamalar anlıktır, diskteki veri değişmez.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a04">
+                  <div class="reveal-trigger" onclick="document.getElementById('a04').classList.toggle('open')">
+                    Görev: Sütunları Yeniden Adlandır <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>konya.mahalleler</code> tablosundan 'ad' sütununu 'Mahalle' ve 'ilce' sütununu 'İlçe' olarak SELECT edin.
                   </div>
                 </div>
               </div>
@@ -250,8 +280,8 @@ ORDER BY yogunluk DESC;</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.3 — WHERE ile Filtreleme</div>
-              <div class="slide-header-num">05 / 10</div>
+              <div class="slide-header-title">0.5 — WHERE ile Filtreleme</div>
+              <div class="slide-header-num">06 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -264,26 +294,26 @@ ORDER BY yogunluk DESC;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM sehirler 
-WHERE nufus > 1000000 
-  AND bolge IN ('Marmara', 'Ege') 
-  AND ad LIKE 'İ%';</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.mahalleler 
+WHERE nufus > 5000 
+  AND ilce IN ('Selçuklu', 'Meram') 
+  AND ad LIKE 'A%';</div>
                 
-                <div class="reveal-box" id="q3">
-                  <div class="reveal-trigger" onclick="document.getElementById('q3').classList.toggle('open')">
-                    Kritik Soru: AND ile OR Arasındaki Fark? <span>▼</span>
+                <div class="reveal-box" id="q05">
+                  <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
+                    Kritik Soru: LIKE ile ILIKE farkı? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    OR koşulu esnetir (iki koşuldan biri yeterlidir). AND koşulu daraltır (her iki koşulun da aynı anda sağlanması zorunludur).
+                    LIKE büyük/küçük harf duyarlıdır. ILIKE ise duyarsızdır. 'Konya' LIKE 'konya' FALSE dönerken, ILIKE ile TRUE döner.
                   </div>
                 </div>
 
-                <div class="reveal-box" id="a3">
-                  <div class="reveal-trigger" onclick="document.getElementById('a3').classList.toggle('open')">
-                    Görev: Adı A ile başlayan VEYA nüfusu düşük <span>▼</span>
+                <div class="reveal-box" id="a05">
+                  <div class="reveal-trigger" onclick="document.getElementById('a05').classList.toggle('open')">
+                    Görev: Karatay Mahallelerini Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT * FROM sehirler WHERE (ad LIKE 'A%' OR nufus &lt; 500000) AND nufus IS NOT NULL;</code>
+                    <code>SELECT * FROM konya.mahalleler WHERE ilce = 'Karatay' AND nufus < 1000;</code>
                   </div>
                 </div>
               </div>
@@ -310,8 +340,8 @@ WHERE nufus > 1000000
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.4 — Sıralama ve Limit</div>
-              <div class="slide-header-num">06 / 10</div>
+              <div class="slide-header-title">0.6 — ORDER BY ve LIMIT</div>
+              <div class="slide-header-num">07 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -324,25 +354,25 @@ WHERE nufus > 1000000
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM sehirler 
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.mahalleler 
 ORDER BY nufus DESC 
-LIMIT 5 OFFSET 10;</div>
+LIMIT 5 OFFSET 0;</div>
                 
-                <div class="reveal-box" id="q4">
-                  <div class="reveal-trigger" onclick="document.getElementById('q4').classList.toggle('open')">
-                    Kritik Soru: ORDER BY Neden Pahalı Olabilir? <span>▼</span>
+                <div class="reveal-box" id="q06">
+                  <div class="reveal-trigger" onclick="document.getElementById('q06').classList.toggle('open')">
+                    Kritik Soru: Neden LIMIT 1000000 yazmamalıyız? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Sıralama büyük bellek ister. Milyonlarca satırı sıralamak diske yazmayı gerektirebilir. Çözüm: O sütuna B-Tree (veya GiST) indeks eklemektir.
+                    Ağ üzerinden devasa veriyi taşımak hem sunucuyu hem ağ trafiğini kilitler. Sadece ihtiyacınız kadarını (sayfalama) LIMIT ile çekmelisiniz.
                   </div>
                 </div>
 
-                <div class="reveal-box" id="a4">
-                  <div class="reveal-trigger" onclick="document.getElementById('a4').classList.toggle('open')">
-                    Görev: Nüfusu en büyük 3. ve 7. arası şehirler <span>▼</span>
+                <div class="reveal-box" id="a06">
+                  <div class="reveal-trigger" onclick="document.getElementById('a06').classList.toggle('open')">
+                    Görev: En Az Nüfuslu 3 Mahalle <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ad, nufus FROM sehirler ORDER BY nufus DESC LIMIT 5 OFFSET 2;</code>
+                    <code>SELECT ad, nufus FROM konya.mahalleler ORDER BY nufus ASC LIMIT 3;</code>
                   </div>
                 </div>
               </div>
@@ -351,58 +381,95 @@ LIMIT 5 OFFSET 10;</div>
         </div>
       </div>
 
-      <!-- SLAYT 7: 0.5 GROUP BY -->
+      <!-- SLAYT 8: 0.7 TOPLAMA FONKSİYONLARI -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-white">
             <div class="slide-header">
               <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text">
-                    <span class="k-top">KONYA</span>
-                    <span class="k-mid">BÜYÜKŞEHİR</span>
-                    <span class="k-bot">BELEDİYESİ</span>
-                  </div>
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.5 — Toplama Fonksiyonları</div>
-              <div class="slide-header-num">07 / 10</div>
+              <div class="slide-header-title">0.7 — Toplama Fonksiyonları</div>
+              <div class="slide-header-num">08 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Kümeleri Birleştirmek: <span>GROUP BY</span></div>
-                <div class="s-text-tech">Veriyi kategorilerine göre gruplayarak SUM, AVG, COUNT, MIN, MAX gibi matematiksel toplamalar yapmak.</div>
-                
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">HAVING vs WHERE</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">WHERE satırları tek tek filtreler. HAVING ise GROUP BY ile gruplanmış sonuçları filtreler. Sıralama: WHERE -> GROUP BY -> HAVING.</div>
-                </div>
+                <div class="s-headline-tech">Veriyi <span>Özetlemek</span></div>
+                <div class="s-text-tech">COUNT, SUM, AVG gibi fonksiyonlarla milyonlarca satırı tek bir değere indirgemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT bolge, COUNT(*) AS sehir, AVG(nufus) 
-FROM sehirler 
-GROUP BY bolge 
-HAVING COUNT(*) > 2;</div>
-                
-                <div class="reveal-box" id="q5">
-                  <div class="reveal-trigger" onclick="document.getElementById('q5').classList.toggle('open')">
-                    Kritik Soru: Neden WHERE COUNT(*) yazılamaz? <span>▼</span>
+                <div class="code-block" style="margin-bottom:16px;">SELECT COUNT(*) AS toplam_mahalle, 
+       SUM(nufus) AS toplam_nufus 
+FROM konya.mahalleler;</div>
+
+                <div class="reveal-box" id="q07">
+                  <div class="reveal-trigger" onclick="document.getElementById('q07').classList.toggle('open')">
+                    Kritik Soru: COUNT(*) vs COUNT(sutun) farkı? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    WHERE, gruplama işleminden önce çalışır. Bu aşamada henüz COUNT veya AVG değeri bilinmez. Bu yüzden gruplanmış filtreler HAVING ile yapılır.
+                    COUNT(*) NULL olanlar dahil tüm satırları sayar. COUNT(sutun) ise o sütunda NULL olmayan satırları sayar.
                   </div>
                 </div>
 
-                <div class="reveal-box" id="a5">
-                  <div class="reveal-trigger" onclick="document.getElementById('a5').classList.toggle('open')">
-                    Görev: İlçe bazında 50+ binası olanlar <span>▼</span>
+                <div class="reveal-box" id="a07">
+                  <div class="reveal-trigger" onclick="document.getElementById('a07').classList.toggle('open')">
+                    Görev: Ortalama Nüfusu Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ilce, COUNT(*) FROM binalar GROUP BY ilce HAVING COUNT(*) >= 50;</code>
+                    <code>SELECT AVG(nufus) FROM konya.mahalleler;</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 9: 0.8 GROUP BY VE HAVING -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.8 — GROUP BY ve HAVING</div>
+              <div class="slide-header-num">09 / 12</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kümelere <span>Bölmek</span></div>
+                <div class="s-text-tech">Veriyi kategorilerine (ilçe vb.) göre gruplayıp filtrelemek.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">SELECT ilce, COUNT(*) 
+FROM konya.mahalleler 
+GROUP BY ilce 
+HAVING COUNT(*) > 5;</div>
+
+                <div class="reveal-box" id="q08">
+                  <div class="reveal-trigger" onclick="document.getElementById('q08').classList.toggle('open')">
+                    Kritik Soru: HAVING neden WHERE yerine geçer? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    WHERE gruplama yapılmadan önce çalışır, bu yüzden COUNT gibi toplam değerlerini göremez. HAVING ise gruplama bittikten sonra sonuçları filtreler.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a08">
+                  <div class="reveal-trigger" onclick="document.getElementById('a08').classList.toggle('open')">
+                    Görev: İlçelere Göre Toplam Nüfus <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ilce, SUM(nufus) FROM konya.mahalleler GROUP BY ilce ORDER BY SUM(nufus) DESC;</code>
                   </div>
                 </div>
               </div>
@@ -429,8 +496,8 @@ HAVING COUNT(*) > 2;</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.6 — JOIN ile Tablo İlişkileri</div>
-              <div class="slide-header-num">08 / 10</div>
+              <div class="slide-header-title">0.9 — JOIN ve Tablo İlişkileri</div>
+              <div class="slide-header-num">10 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -443,25 +510,25 @@ HAVING COUNT(*) > 2;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT s.ad, b.bolge_adi 
-FROM sehirler s 
-JOIN bolgeler b ON s.bolge_id = b.id;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT m.ad AS mahalle, h.ad AS hastane 
+FROM konya.mahalleler m 
+JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                 
-                <div class="reveal-box" id="q6">
-                  <div class="reveal-trigger" onclick="document.getElementById('q6').classList.toggle('open')">
-                    Kritik Soru: LEFT JOIN vs INNER JOIN? <span>▼</span>
+                <div class="reveal-box" id="q09">
+                  <div class="reveal-trigger" onclick="document.getElementById('q09').classList.toggle('open')">
+                    Kritik Soru: JOIN mi Mekansal Join mi? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    INNER JOIN sadece her iki tabloda da karşılığı olan satırları getirir. LEFT JOIN sol tablonun tamamını getirir, sağda karşılık yoksa o alanlara NULL basar.
+                    Standart JOIN 'id' gibi metin/sayı alanlarıyla çalışır. Mekansal JOIN (ST_Intersects gibi) ise geometrilerin çakışmasıyla çalışır. Mantık aynı, kriter farklıdır.
                   </div>
                 </div>
 
-                <div class="reveal-box" id="a6">
-                  <div class="reveal-trigger" onclick="document.getElementById('a6').classList.toggle('open')">
-                    Görev: Tüm şehirler ve varsa bölgeleri <span>▼</span>
+                <div class="reveal-box" id="a09">
+                  <div class="reveal-trigger" onclick="document.getElementById('a09').classList.toggle('open')">
+                    Görev: Hastanesi Olmayan Mahalleleri Listele <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT s.ad, b.bolge_adi FROM sehirler s LEFT JOIN bolgeler b ON s.bolge_id = b.id;</code>
+                    <code>SELECT m.ad FROM konya.mahalleler m LEFT JOIN konya.hastaneler h ON h.mahalle_id = m.id WHERE h.id IS NULL;</code>
                   </div>
                 </div>
               </div>
@@ -488,8 +555,8 @@ JOIN bolgeler b ON s.bolge_id = b.id;</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.7 — Veri Yönetimi (DML)</div>
-              <div class="slide-header-num">09 / 10</div>
+              <div class="slide-header-title">0.10 — Veri Yönetimi (DML)</div>
+              <div class="slide-header-num">11 / 12</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -502,18 +569,27 @@ JOIN bolgeler b ON s.bolge_id = b.id;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">INSERT INTO sehirler(ad, nufus) 
-VALUES('Konya', 2277000);
+                <div class="code-block" style="margin-bottom:16px;">INSERT INTO konya.mahalleler(ad, nufus, ilce) 
+VALUES('Yeni Mahalle', 1200, 'Selçuklu');
 
-UPDATE sehirler SET nufus = 2277001 
-WHERE ad = 'Konya';</div>
+UPDATE konya.mahalleler SET nufus = 1250 
+WHERE ad = 'Yeni Mahalle';</div>
                 
-                <div class="reveal-box" id="q7">
-                  <div class="reveal-trigger" onclick="document.getElementById('q7').classList.toggle('open')">
-                    Kritik Soru: Hatalı UPDATE nasıl önlenir? <span>▼</span>
+                <div class="reveal-box" id="q10">
+                  <div class="reveal-trigger" onclick="document.getElementById('q10').classList.toggle('open')">
+                    Kritik Soru: Neden silmek (DELETE) tehlikelidir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    İşleme başlamadan önce <code>BEGIN;</code> çalıştırın. UPDATE sonrası sonucu <code>SELECT</code> ile kontrol edin. Hata varsa <code>ROLLBACK;</code>, doğruysa <code>COMMIT;</code> yapın.
+                    Veritabanında "Geri Al" (Undo) butonu yoktur. WHERE koşulu unutulursa tüm tablo silinir. Profesyoneller bunun yerine "is_active" sütunuyla veriyi gizler.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a10">
+                  <div class="reveal-trigger" onclick="document.getElementById('a10').classList.toggle('open')">
+                    Görev: Yanlış Kaydı Sil <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>DELETE FROM konya.mahalleler WHERE ad = 'Yeni Mahalle';</code> (Dikkat: Sadece eklediğiniz kaydı silin!)
                   </div>
                 </div>
               </div>
@@ -548,7 +624,7 @@ WHERE ad = 'Konya';</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 10</div>
+    <div class="nav-status" id="navStatus">1 / 12</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 

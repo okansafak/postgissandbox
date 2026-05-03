@@ -7,29 +7,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Kapak Özel Tasarımı */
+    /* Kapak ve Özel Tasarım Stilleri */
     .s1 { background: var(--theme-black); display: grid; grid-template-columns: 1fr 420px; height: 100%; }
     .s1-left { display: flex; flex-direction: column; justify-content: space-between; padding: 56px 64px; }
     .s1-logo-area { display: flex; align-items: center; gap: 0; }
-    .logo-benim { background: var(--theme-black); border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; letter-spacing: 0.02em; }
+    .logo-benim { border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; }
     .logo-konya-box { background: var(--theme-yellow); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
     .logo-konya-box img { height: 40px; }
-    .logo-konya-text { display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; color: var(--theme-black); }
-    .logo-konya-text .k-top { font-weight: 900; font-size: 14px; letter-spacing: 0.05em; line-height: 1; }
-    .logo-konya-text .k-mid { font-weight: 900; font-size: 11px; letter-spacing: 0.05em; line-height: 1.2; }
-    .logo-konya-text .k-bot { font-weight: 600; font-size: 8px; letter-spacing: 0.1em; line-height: 1; margin-top: 2px; }
-    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); margin: 0; }
-    .s1-main { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
-    .s1-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 80px; color: var(--theme-white); line-height: 0.9; letter-spacing: -0.04em; }
+    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); }
+    .s1-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 72px; color: var(--theme-white); line-height: 0.9; }
     .s1-title span { color: var(--theme-yellow); }
-    .s1-subtitle { font-size: 20px; color: #aaa; font-weight: 300; line-height: 1.5; max-width: 600px; }
     .s1-right { background: var(--theme-yellow); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 48px; position: relative; overflow: hidden; }
-    .s1-geo-bg { position: absolute; inset: 0; opacity: 0.08; }
-    .s1-right-label { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 11px; letter-spacing: 0.2em; color: var(--theme-black); text-transform: uppercase; z-index: 1; }
-    .s1-right-number { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--theme-black); line-height: 1; z-index: 1; opacity: 0.15; position: absolute; bottom: -20px; right: -10px; }
+    .s1-right-number { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--theme-black); opacity: 0.15; position: absolute; bottom: -20px; right: -10px; }
   </style>
 </head>
-
 <body>
 
   <div class="deck-viewport">
@@ -37,34 +28,23 @@
 
       <!-- SLAYT 1: KAPAK -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s1">
             <div class="s1-left">
               <div class="s1-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box">
                   <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text">
-                    <span class="k-top">KONYA</span>
-                    <span class="k-mid">BÜYÜKŞEHİR</span>
-                    <span class="k-bot">BELEDİYESİ</span>
-                  </div>
+                  <div class="logo-konya-text"><span style="font-weight:900; font-size:14px;">KONYA</span><br><span style="font-weight:900; font-size:11px;">BÜYÜKŞEHİR</span></div>
                 </div>
               </div>
               <div class="s1-main">
-                <div class="s1-title">Sorgular, İndeks<br>ve <span>Performans</span></div>
-                <div class="s1-subtitle">Veri yükleme tekniklerinden ileri geometri işlemlerine, mekansal indeksleme stratejilerinden sorgu planı analizine.</div>
+                <div class="s1-title">Sorgular, İndeks<br><span>ve Performans</span></div>
+                <div class="s1-subtitle" style="color:#aaa; font-size:20px; margin-top:20px;">Veri yükleme stratejileri, ileri geometri analitiği, indeksleme derinlikleri ve sorgu planlama.</div>
               </div>
             </div>
             <div class="s1-right">
-              <svg class="s1-geo-bg" viewBox="0 0 400 720" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="200" cy="360" r="280" stroke="#000" stroke-width="1" fill="none" />
-                <line x1="0" y1="360" x2="400" y2="360" stroke="#000" stroke-width="0.5" />
-                <line x1="200" y1="0" x2="200" y2="720" stroke="#000" stroke-width="0.5" />
-              </svg>
-              <span class="s1-right-label">Bölüm İki</span>
+              <span style="font-weight:900; letter-spacing:0.2em; color:var(--theme-black);">Bölüm İki</span>
               <div class="s1-right-number">02</div>
             </div>
           </div>
@@ -73,42 +53,30 @@
 
       <!-- SLAYT 2: 2.1 VERİ YÜKLEME -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-white">
             <div class="slide-header">
               <div class="header-logo-area">
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.1 — Veri Yükleme ve Dönüştürme</div>
-              <div class="slide-header-num">02 / 07</div>
+              <div class="slide-header-title">2.1 — Veri Yükleme (CSV, GeoJSON, SHP)</div>
+              <div class="slide-header-num">02 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Toplu <span>Veri</span> Aktarımı</div>
-                <div class="s-text-tech">Milyonlarca satırı COPY komutu veya ogr2ogr gibi araçlarla veritabanına hızla aktarmak.</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya BB CBS departmanı, günlük TKGM, OSM ve saha verilerini otomatik pipeline'lar ile yükler. ogr2ogr aracı 200'den fazla CBS formatını destekler.</div>
-                </div>
+                <div class="s-headline-tech">CBS Veri <span>Aktarımı</span></div>
+                <div class="s-text-tech">ogr2ogr ve shp2pgsql ile PostGIS'e veri aktarımı.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- ogr2ogr örneği
-ogr2ogr -f "PostgreSQL" PG:"dbname=konya_db" mahalleler.geojson
-
--- COPY örneği (Toplu yükleme)
-COPY mahalleler FROM '/data/mahalle.csv' WITH (FORMAT csv, HEADER);</div>
-                <div class="reveal-box" id="q1">
-                  <div class="reveal-trigger" onclick="document.getElementById('q1').classList.toggle('open')">
-                    Kritik Soru: COPY neden INSERT'ten hızlıdır? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    COPY komutu toplu yükleme için optimize edilmiştir. INSERT'e kıyasla 10–50 kat daha hızlıdır çünkü transaction log ek yükü minimumdur ve veriyi bloklar halinde yazar.
-                  </div>
+                <div class="code-block">shp2pgsql -s 4326 veri.shp tablo | psql -d konya</div>
+                <div class="reveal-box" id="q21">
+                  <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">Kritik Soru: ogr2ogr neden tercih edilir? <span>▼</span></div>
+                  <div class="reveal-content">GeoJSON'dan veritabanına, KML'den Shape'e her türlü dönüşümü tek komutla yapabilir.</div>
+                </div>
+                <div class="reveal-box" id="g21">
+                  <div class="reveal-trigger" onclick="document.getElementById('g21').classList.toggle('open')">Görev: CSV Yükle <span>▼</span></div>
+                  <div class="reveal-content"><code>COPY konya.temp_tablo FROM 'veri.csv' WITH (FORMAT csv, HEADER);</code> komutunu deneyin.</div>
                 </div>
               </div>
             </div>
@@ -116,42 +84,32 @@ COPY mahalleler FROM '/data/mahalle.csv' WITH (FORMAT csv, HEADER);</div>
         </div>
       </div>
 
-      <!-- SLAYT 3: 2.2 İLERİ GEOMETRİ İŞLEMLERİ -->
+      <!-- SLAYT 3: 2.1 STAGING -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.2 — İleri Geometri İşlemleri</div>
-              <div class="slide-header-num">03 / 07</div>
+              <div class="slide-header-title">2.1 — Staging ve Batch Processing</div>
+              <div class="slide-header-num">03 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Basitleştirme ve <span>Kümeleme</span></div>
-                <div class="s-text-tech">Simplify, Union ve Intersection gibi karmaşık mekansal operatörler ile veriyi işlemek.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Örnek Senaryo</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya il sınırının 1:1000 ölçekli geometrisi web haritasında gereksiz detay içerir. ST_SimplifyPreserveTopology ile nokta sayısı azaltılarak veri boyutu %90 küçültülebilir.</div>
-                </div>
+                <div class="s-headline-tech">Ara Katman <span>Stratejisi</span></div>
+                <div class="s-text-tech">Ham veriyi önce "Staging" tabloya alıp temizleme.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_SimplifyPreserveTopology(
-  geom, 0.001
-) FROM konya.mahalleler WHERE ad = 'Meram Merkez';</div>
-                <div class="reveal-box" id="q2">
-                  <div class="reveal-trigger" onclick="document.getElementById('q2').classList.toggle('open')">
-                    Kritik Soru: ST_SubDivide neden kullanılır? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Çok büyük ve karmaşık poligonları (binlerce noktalı) daha küçük parçalara böler. Bu, mekansal indeksin (GiST) çok daha verimli çalışmasını sağlar ve kesişim sorgularını hızlandırır.
-                  </div>
+                <div class="code-block">INSERT INTO binalar (geom) SELECT ST_SetSRID(ST_MakePoint(x, y), 4326) FROM staging;</div>
+                <div class="reveal-box" id="q22">
+                  <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Batch Processing neden yapılır? <span>▼</span></div>
+                  <div class="reveal-content">Milyonlarca satırı tek bir işlemde işlemek RAM'i tüketir. Paketler halinde yüklemek daha güvenlidir.</div>
+                </div>
+                <div class="reveal-box" id="g22">
+                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Staging'den Aktar <span>▼</span></div>
+                  <div class="reveal-content">Staging tablosundaki geçersiz geometrileri <code>ST_MakeValid</code> ile düzelterek ana tabloya taşıyın.</div>
                 </div>
               </div>
             </div>
@@ -159,42 +117,32 @@ COPY mahalleler FROM '/data/mahalle.csv' WITH (FORMAT csv, HEADER);</div>
         </div>
       </div>
 
-      <!-- SLAYT 4: 2.3 İNDEKS VE PERFORMANS -->
+      <!-- SLAYT 4: 2.2 SIMPLIFY/SMOOTH -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-white">
             <div class="slide-header">
               <div class="header-logo-area">
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.3 — İndeks ve Performans</div>
-              <div class="slide-header-num">04 / 07</div>
+              <div class="slide-header-title">2.2 — ST_Simplify ve ST_Smooth</div>
+              <div class="slide-header-num">04 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">GiST <span>Mekansal</span> İndeks</div>
-                <div class="s-text-tech">Milyonlarca kayıt içinden arananı milisaniyeler içinde bulmak için Bounding Box hiyerarşisi kullanmak.</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediye Veritabanı</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya parsel veritabanı gibi büyük tablolarda indeks olmadan sorgu yapmak dakikalar alabilir. GiST indeksi ile bu süre milisaniyelere düşer.</div>
-                </div>
+                <div class="s-headline-tech">Geometri <span>Rafine</span> Etme</div>
+                <div class="s-text-tech">Nokta azaltma ve görsel yumuşatma teknikleri.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">CREATE INDEX idx_geom_gist 
-ON konya.mahalleler USING GIST(geom);
-ANALYZE konya.mahalleler;</div>
-                <div class="reveal-box" id="q3">
-                  <div class="reveal-trigger" onclick="document.getElementById('q3').classList.toggle('open')">
-                    Kritik Soru: KNN Operatörü nedir? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    "En yakın komşu" (K-Nearest Neighbor) aramasıdır. `ORDER BY geom <-> point` şeklinde kullanılırsa GiST indeksini kullanarak en yakın N nesneyi inanılmaz bir hızla bulur.
-                  </div>
+                <div class="code-block">SELECT ST_SimplifyPreserveTopology(geom, 10.0) FROM konya.mahalleler;</div>
+                <div class="reveal-box" id="q23">
+                  <div class="reveal-trigger" onclick="document.getElementById('q23').classList.toggle('open')">Kritik Soru: Simplify topolojiyi bozar mı? <span>▼</span></div>
+                  <div class="reveal-content">Evet, standart Simplify poligonları ayırabilir. <code>PreserveTopology</code> varyantı bu riski minimize eder.</div>
+                </div>
+                <div class="reveal-box" id="g23">
+                  <div class="reveal-trigger" onclick="document.getElementById('g23').classList.toggle('open')">Görev: Smoothing Uygula <span>▼</span></div>
+                  <div class="reveal-content"><code>ST_ChaikinSmoothing</code> fonksiyonunu 2 iterasyon ile mahalle sınırlarına uygulayın.</div>
                 </div>
               </div>
             </div>
@@ -202,42 +150,32 @@ ANALYZE konya.mahalleler;</div>
         </div>
       </div>
 
-      <!-- SLAYT 5: 2.4 EXPLAIN ANALYZE -->
+      <!-- SLAYT 5: 2.2 ST_SUBDIVIDE -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.4 — Sorgu Optimizasyonu</div>
-              <div class="slide-header-num">05 / 07</div>
+              <div class="slide-header-title">2.2 — ST_Subdivide: Performans Canavarı</div>
+              <div class="slide-header-num">05 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Darboğazları <span>Teşhis</span> Etmek</div>
-                <div class="s-text-tech">EXPLAIN ANALYZE ile sorgunun arka planda nasıl çalıştığını ve nerede yavaşladığını görmek.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Profesyonel İpucu</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Eğer plan çıktısında "Sequential Scan" görüyorsanız, bu tüm tablonun satır satır tarandığı anlamına gelir. Bu durumda mutlaka bir GiST indeksi eklenmelidir.</div>
-                </div>
+                <div class="s-headline-tech">Devasa <span>Veriyi</span> Parçala</div>
+                <div class="s-text-tech">Binlerce noktalı poligonları indeks-dostu parçalara bölmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">EXPLAIN ANALYZE 
-SELECT * FROM konya.osm_binalar 
-WHERE ST_Intersects(geom, '...');</div>
-                <div class="reveal-box" id="q4">
-                  <div class="reveal-trigger" onclick="document.getElementById('q4').classList.toggle('open')">
-                    Kritik Soru: ANALYZE neden gereklidir? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    ANALYZE komutu tablo istatistiklerini günceller. Planlayıcı bu istatistiklere bakarak en hızlı yolu seçer. İstatistikler eskiyse planlayıcı yanlış karar verip sorguyu yavaşlatabilir.
-                  </div>
+                <div class="code-block">SELECT ST_SubDivide(geom, 255) FROM konya.ilce_sinirlari;</div>
+                <div class="reveal-box" id="q24">
+                  <div class="reveal-trigger" onclick="document.getElementById('q24').classList.toggle('open')">Kritik Soru: Neden 255 nokta? <span>▼</span></div>
+                  <div class="reveal-content">255-512 arası nokta sayısı, GiST indeksi için en ideal "Bounding Box" boyutunu oluşturur.</div>
+                </div>
+                <div class="reveal-box" id="g24">
+                  <div class="reveal-trigger" onclick="document.getElementById('g24').classList.toggle('open')">Görev: İl Sınırını Böl <span>▼</span></div>
+                  <div class="reveal-content">Konya il sınırını 100 nokta limitiyle subdivide edip kaç parça oluştuğunu <code>COUNT(*)</code> ile görün.</div>
                 </div>
               </div>
             </div>
@@ -245,41 +183,32 @@ WHERE ST_Intersects(geom, '...');</div>
         </div>
       </div>
 
-      <!-- SLAYT 6: 2.5 BÜYÜK VERİ VE PARTITIONING -->
+      <!-- SLAYT 6: 2.2 LINEAR REFERENCING -->
       <div class="slide-outer">
-
         <div class="slide-wrapper">
           <div class="s-tech-white">
             <div class="slide-header">
               <div class="header-logo-area">
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.5 — Büyük Veri ve Partitioning</div>
-              <div class="slide-header-num">06 / 07</div>
+              <div class="slide-header-title">2.2 — Doğrusal Referanslama (Linear Referencing)</div>
+              <div class="slide-header-num">06 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Ölçeklenebilir <span>Mimari</span></div>
-                <div class="s-text-tech">Table Partitioning ile devasa tabloları yönetilebilir parçalara bölmek.</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Uygulama Alanı</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya araç takip sistemleri gibi milyonlarca konum üreten sistemlerde veriler aylık partition'lara bölünür. Bu sayede sadece ilgili ayın verisi taranır.</div>
-                </div>
+                <div class="s-headline-tech">Yol <span>Üzeri</span> Metraj</div>
+                <div class="s-text-tech">Hat üzerinde yüzde (%) veya mesafe bazlı konum bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">CREATE TABLE konum (id BIGINT, ...) 
-PARTITION BY RANGE (zaman);</div>
-                <div class="reveal-box" id="q5">
-                  <div class="reveal-trigger" onclick="document.getElementById('q5').classList.toggle('open')">
-                    Kritik Soru: Partition Pruning nedir? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Planlayıcının sorgudaki filtreye bakarak gereksiz partition'ları tamamen elemesi işlemidir. Bu sayede 1 milyar satırlık tabloda bile sorgu hızı etkilenmez.
-                  </div>
+                <div class="code-block">SELECT ST_LineLocatePoint(geom, 'POINT(32.5 37.8)') FROM osm_yollar;</div>
+                <div class="reveal-box" id="q25">
+                  <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: M Koordinatı nedir? <span>▼</span></div>
+                  <div class="reveal-content">Measure (Ölçü) koordinatıdır. Metraj veya zaman bilgisi burada saklanır (Z koordinatından farklıdır).</div>
+                </div>
+                <div class="reveal-box" id="g25">
+                  <div class="reveal-trigger" onclick="document.getElementById('g25').classList.toggle('open')">Görev: Orta Nokta Bul <span>▼</span></div>
+                  <div class="reveal-content"><code>ST_LineInterpolatePoint</code> ile bir yolun tam %50'sine bir nokta atayın.</div>
                 </div>
               </div>
             </div>
@@ -287,20 +216,420 @@ PARTITION BY RANGE (zaman);</div>
         </div>
       </div>
 
-      <!-- SLAYT 7: KAPANIŞ -->
+      <!-- SLAYT 7: 2.2 CLOSEST/AZIMUTH -->
       <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.2 — ST_ClosestPoint ve ST_Azimuth</div>
+              <div class="slide-header-num">07 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Mesafe <span>ve</span> Yön</div>
+                <div class="s-text-tech">En yakın koordinatı bulma ve iki nokta arası açı hesabı.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">SELECT degrees(ST_Azimuth(p1, p2)) AS derece;</div>
+                <div class="reveal-box" id="q26">
+                  <div class="reveal-trigger" onclick="document.getElementById('q26').classList.toggle('open')">Kritik Soru: Azimuth nerede kullanılır? <span>▼</span></div>
+                  <div class="reveal-content">Parsel yönelim analizlerinde veya yoldaki tabelaların bakış yönünü belirlemede kullanılır.</div>
+                </div>
+                <div class="reveal-box" id="g26">
+                  <div class="reveal-trigger" onclick="document.getElementById('g26').classList.toggle('open')">Görev: En Yakın Sınırı Bul <span>▼</span></div>
+                  <div class="reveal-content">Bir binadan en yakın parsel sınırına dikme indiren <code>ST_ShortestLine</code> komutunu çalıştırın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- SLAYT 8: 2.3 GIST/SP-GIST -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — GiST ve SP-GIST İndeksleme</div>
+              <div class="slide-header-num">08 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Mekansal <span>İndeks</span> Gücü</div>
+                <div class="s-text-tech">GiST ve çakışmayan veriler için SP-GIST farkı.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">CREATE INDEX idx_gist ON tablo USING GIST(geom);</div>
+                <div class="reveal-box" id="q27">
+                  <div class="reveal-trigger" onclick="document.getElementById('q27').classList.toggle('open')">Kritik Soru: SP-GIST ne zaman hızlanır? <span>▼</span></div>
+                  <div class="reveal-content">Nokta verileri (Adresler) gibi üst üste binmeyen, seyrek ama geniş alana yayılan verilerde GiST'ten hızlıdır.</div>
+                </div>
+                <div class="reveal-box" id="g27">
+                  <div class="reveal-trigger" onclick="document.getElementById('g27').classList.toggle('open')">Görev: İndeks Oluştur <span>▼</span></div>
+                  <div class="reveal-content"><code>osm_binalar</code> tablosunda GIST indeksi yoksa hemen oluşturun ve sorgu süresini ölçün.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 9: 2.3 && OPERATÖRÜ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — Bounding Box Operatörleri (&&)</div>
+              <div class="slide-header-num">09 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kutu <span>Matematiği</span></div>
+                <div class="s-text-tech">&& operatörü ile milisaniyeler içinde kesişim tespiti.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">SELECT * FROM mahalleler WHERE geom && ST_MakeEnvelope(...);</div>
+                <div class="reveal-box" id="q28">
+                  <div class="reveal-trigger" onclick="document.getElementById('q28').classList.toggle('open')">Kritik Soru: && neden vazgeçilmezdir? <span>▼</span></div>
+                  <div class="reveal-content">İndeksler arka planda sadece && operatörünü anlar. Gerçek poligon kesişiminden (Intersects) 100 kat hızlıdır.</div>
+                </div>
+                <div class="reveal-box" id="g28">
+                  <div class="reveal-trigger" onclick="document.getElementById('g28').classList.toggle('open')">Görev: Kutu Sorgusu Yap <span>▼</span></div>
+                  <div class="reveal-content">Belirlediğiniz bir koordinatın etrafındaki binaları sadece <code>&&</code> ile sorgulayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 10: 2.3 ÖZEL İNDEKSLER -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — Partial ve Functional İndeksler</div>
+              <div class="slide-header-num">10 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hafif <span>İndeksler</span></div>
+                <div class="s-text-tech">Sadece ihtiyacınız olan veriyi indeksleme sanatı.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">CREATE INDEX idx ON binalar(geom) WHERE durum = 'Aktif';</div>
+                <div class="reveal-box" id="q29">
+                  <div class="reveal-trigger" onclick="document.getElementById('q29').classList.toggle('open')">Kritik Soru: Functional Index nedir? <span>▼</span></div>
+                  <div class="reveal-content">Bir fonksiyonun sonucunu (Örn: ST_Centroid) önceden hesaplayıp indekslemek, sorguda o fonksiyonu hızlandırır.</div>
+                </div>
+                <div class="reveal-box" id="g29">
+                  <div class="reveal-trigger" onclick="document.getElementById('g29').classList.toggle('open')">Görev: Partial İndeks Kur <span>▼</span></div>
+                  <div class="reveal-content">Binalar tablosunda sadece "Okul" nitelikli olanları Partial olarak indeksleyin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 11: 2.3 ANALYZE/TAKiP -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — ANALYZE ve Kullanım Takibi</div>
+              <div class="slide-header-num">11 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">İstatistik <span>Toplama</span></div>
+                <div class="s-text-tech">Veritabanı planlayıcısını veri dağılımı hakkında bilgilendirmek.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">SELECT * FROM pg_stat_user_indexes;</div>
+                <div class="reveal-box" id="q210">
+                  <div class="reveal-trigger" onclick="document.getElementById('q210').classList.toggle('open')">Kritik Soru: ANALYZE neden şarttır? <span>▼</span></div>
+                  <div class="reveal-content">İstatistikler güncel değilse planlayıcı indeks yerine Sequental Scan (sıralı okuma) seçer ve sistem yavaşlar.</div>
+                </div>
+                <div class="reveal-box" id="g210">
+                  <div class="reveal-trigger" onclick="document.getElementById('g210').classList.toggle('open')">Görev: İndeksleri Takip Et <span>▼</span></div>
+                  <div class="reveal-content"><code>idx_scan</code> değeri 0 olan indeksleri bulun; bunlar sistemi boşuna yavaşlatıyor olabilir.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 12: 2.4 EXPLAIN ANALYZE -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.4 — EXPLAIN ANALYZE Giriş</div>
+              <div class="slide-header-num">12 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Sorgunun <span>Röntgeni</span></div>
+                <div class="s-text-tech">Sorgunun gerçek çalışma maliyetini ve sürelerini analiz etmek.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">EXPLAIN ANALYZE SELECT * FROM binalar WHERE ...</div>
+                <div class="reveal-box" id="q211">
+                  <div class="reveal-trigger" onclick="document.getElementById('q211').classList.toggle('open')">Kritik Soru: Tahmin vs Gerçek? <span>▼</span></div>
+                  <div class="reveal-content">EXPLAIN tahminleri, ANALYZE gerçek süreleri gösterir. İkisi arasındaki büyük fark indeks bozulmasına işarettir.</div>
+                </div>
+                <div class="reveal-box" id="g211">
+                  <div class="reveal-trigger" onclick="document.getElementById('g211').classList.toggle('open')">Görev: Plan Çıkart <span>▼</span></div>
+                  <div class="reveal-content">Herhangi bir mekansal sorgunun önüne <code>EXPLAIN ANALYZE</code> ekleyerek "Actual Time" değerini not edin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 13: 2.4 SEQ VS INDEX -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.4 — Seq Scan ve Index Scan Farkı</div>
+              <div class="slide-header-num">13 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Okuma <span>Performansı</span></div>
+                <div class="s-text-tech">Neden planlayıcı bazen indeksi kullanmaz?</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">-- Plan çıktısında göreceğiniz terimler:
+-- Index Scan using idx_name...
+-- Sequential Scan on table_name...</div>
+                <div class="reveal-box" id="q212">
+                  <div class="reveal-trigger" onclick="document.getElementById('q212').classList.toggle('open')">Kritik Soru: Seq Scan ne zaman iyidir? <span>▼</span></div>
+                  <div class="reveal-content">Tablo çok küçükse (Örn: 100 satır), indekse gitmek disk okuma maliyeti nedeniyle daha yavaş olabilir.</div>
+                </div>
+                <div class="reveal-box" id="g212">
+                  <div class="reveal-trigger" onclick="document.getElementById('g212').classList.toggle('open')">Görev: Maliyet Düşür <span>▼</span></div>
+                  <div class="reveal-content">Sorguda <code>SELECT *</code> yerine sadece ihtiyacınız olan kolonları seçerek <code>width</code> maliyetini azaltın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 14: 2.4 MESAFE TUZAĞI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.4 — ST_Distance Anti-Pattern</div>
+              <div class="slide-header-num">14 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hız <span>Kesiciler</span></div>
+                <div class="s-text-tech">İndeksi bozan sorgu alışkanlıklarından kurtulmak.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">-- Yavaş (Index Yok)
+WHERE ST_Distance(geom, p) < 500
+-- Hızlı (Index Var)
+WHERE ST_DWithin(geom, p, 500)</div>
+                <div class="reveal-box" id="q213">
+                  <div class="reveal-trigger" onclick="document.getElementById('q213').classList.toggle('open')">Kritik Soru: Neden DWithin? <span>▼</span></div>
+                  <div class="reveal-content">DWithin, mesafe filtresini <code>&&</code> operatörü ile optimize eder. Distance ise her satırı tek tek hesaplamak zorundadır.</div>
+                </div>
+                <div class="reveal-box" id="g213">
+                  <div class="reveal-trigger" onclick="document.getElementById('g213').classList.toggle('open')">Görev: Sorguyu Düzenle <span>▼</span></div>
+                  <div class="reveal-content">Eski bir <code>ST_Distance</code> sorgunuzu <code>ST_DWithin</code> ile değiştirip performans farkını <code>EXPLAIN</code> ile kanıtlayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 15: 2.4 FORMATLAR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.4 — EXPLAIN FORMAT (JSON, YAML)</div>
+              <div class="slide-header-num">15 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veriyi <span>Görselleştir</span></div>
+                <div class="s-text-tech">Plan çıktılarını analiz araçlarına uygun hale getirmek.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">EXPLAIN (FORMAT JSON, ANALYZE) SELECT ...</div>
+                <div class="reveal-box" id="q214">
+                  <div class="reveal-trigger" onclick="document.getElementById('q214').classList.toggle('open')">Kritik Soru: Neden JSON/YAML? <span>▼</span></div>
+                  <div class="reveal-content">Otomatik analiz araçları (Örn: PEV2) bu formatları kullanarak sorgu darboğazını grafiksel olarak gösterir.</div>
+                </div>
+                <div class="reveal-box" id="g214">
+                  <div class="reveal-trigger" onclick="document.getElementById('g214').classList.toggle('open')">Görev: YAML Çıktısı Al <span>▼</span></div>
+                  <div class="reveal-content">Daha okunaklı bir ağaç yapısı için <code>FORMAT YAML</code> kullanarak karmaşık bir join sorgusunu inceleyin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 16: 2.5 VACUUM/BLOAT -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.5 — VACUUM ve Tablo Şişmesi (Bloat)</div>
+              <div class="slide-header-num">16 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Disk <span>Bakımı</span></div>
+                <div class="s-text-tech">Silinen verilerin diskteki hayalet izlerini temizlemek.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">VACUUM FULL binalar; -- DİKKAT: Tabloyu kilitler</div>
+                <div class="reveal-box" id="q215">
+                  <div class="reveal-trigger" onclick="document.getElementById('q215').classList.toggle('open')">Kritik Soru: Bloat neden sorguyu yavaşlatır? <span>▼</span></div>
+                  <div class="reveal-content">Çünkü veritabanı "boş" satırları da RAM'e okur. 1GB'lık tablonun %50'si bloat ise, diskten boşuna 500MB veri okunur.</div>
+                </div>
+                <div class="reveal-box" id="g215">
+                  <div class="reveal-trigger" onclick="document.getElementById('g215').classList.toggle('open')">Görev: Bakım Planla <span>▼</span></div>
+                  <div class="reveal-content">En çok güncellenen tablonuzda <code>pg_stat_all_tables</code> üzerinden "dead tuples" sayısını kontrol edin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 17: 2.5 PARTITIONING -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.5 — Tablo Bölümleme (Partitioning)</div>
+              <div class="slide-header-num">17 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Büyük <span>Veri</span> Mimarisi</div>
+                <div class="s-text-tech">Veriyi fiziksel olarak mantıklı parçalara ayırmak.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">CREATE TABLE binalar_selcuklu PARTITION OF binalar FOR VALUES IN ('Selçuklu');</div>
+                <div class="reveal-box" id="q216">
+                  <div class="reveal-trigger" onclick="document.getElementById('q216').classList.toggle('open')">Kritik Soru: İlçe bazlı partitioning neden avantajlıdır? <span>▼</span></div>
+                  <div class="reveal-content">Çünkü sadece Selçuklu'da sorgu yaparken Meram veya Karatay verileri diske hiç uğramaz (Partition Pruning).</div>
+                </div>
+                <div class="reveal-box" id="g216">
+                  <div class="reveal-trigger" onclick="document.getElementById('g216').classList.toggle('open')">Görev: Partition Oluştur <span>▼</span></div>
+                  <div class="reveal-content">Adresler tablosunu 3 ana ilçeye göre <code>LIST</code> yöntemiyle bölümlemeyi planlayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 18: 2.5 PRUNING/TABLESPACE -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.5 — Partition Pruning ve Tablespace</div>
+              <div class="slide-header-num">18 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ölçeklenebilir <span>Altyapı</span></div>
+                <div class="s-text-tech">Fiziksel disk dağıtımı ve otomatik ayıklama.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block">SET enable_partition_pruning = on;</div>
+                <div class="reveal-box" id="q217">
+                  <div class="reveal-trigger" onclick="document.getElementById('q217').classList.toggle('open')">Kritik Soru: Tablespace nerede lazımdır? <span>▼</span></div>
+                  <div class="reveal-content">Aktif veriyi hızlı SSD'ye, 10 yıllık arşiv verisini ucuz HDD diskine koyarak maliyet avantajı sağlarız.</div>
+                </div>
+                <div class="reveal-box" id="g217">
+                  <div class="reveal-trigger" onclick="document.getElementById('g217').classList.toggle('open')">Görev: Pruning Kontrolü <span>▼</span></div>
+                  <div class="reveal-content">Sorgunuzun sadece ilgili partition'ı taradığını <code>EXPLAIN</code> çıktısındaki tablo isimlerinden teyit edin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 19: KAPANIŞ -->
+      <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-final">
             <div class="s-final-body">
               <div class="s-final-left">
-                <div class="s6-quote">Sorgularınızı optimize ettiniz, indekslerin gücünü keşfettiniz. Artık <em>üretim kalitesinde</em> bir PostGIS yöneticisisiniz.</div>
-                <div style="color:#7a6100; font-size:14px; margin-top:20px">Performans odaklı düşünmek, büyük veriyi yönetmenin ilk adımıdır.</div>
+                <div style="font-family:Montserrat; font-weight:900; font-size:48px; color:var(--theme-yellow);">Tebrikler!</div>
+                <div style="color:#fff; font-size:18px; margin-top:20px;">Artık endüstriyel seviyede bir <strong>PostGIS Performans Uzmanısınız.</strong></div>
+                <div style="color:#aaa; font-size:14px; margin-top:20px;">Bölüm 3: Uygulama ve Entegrasyon ile devam edeceğiz.</div>
               </div>
-              <div class="s-final-right">
-                <div style="color:var(--theme-yellow); font-family:Montserrat; font-weight:800; font-size:12px; text-transform:uppercase">Sonraki Bölüm</div>
-                <div style="color:#fff; font-size:16px; font-weight:700; margin-top:8px">Bölüm 3: Production ve Ağ Analizi</div>
-                <div style="margin-top:auto; color:#444; font-family:Montserrat; font-weight:900; font-size:11px; text-transform:uppercase">Konya Büyükşehir Belediyesi</div>
+              <div class="s-final-right" style="background:var(--theme-yellow); padding:40px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                <div style="font-weight:900; font-size:14px; color:var(--theme-black);">MODÜL TAMAMLANDI</div>
+                <div style="font-size:80px; font-weight:900; color:var(--theme-black); line-height:1;">100%</div>
               </div>
             </div>
           </div>
@@ -313,7 +642,7 @@ PARTITION BY RANGE (zaman);</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 7</div>
+    <div class="nav-status" id="navStatus">1 / 19</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 
