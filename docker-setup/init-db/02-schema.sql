@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS konya.ilce_sinirlari (
     id SERIAL PRIMARY KEY,
     ad VARCHAR(100) NOT NULL,
     plaka INTEGER DEFAULT 42,
+    nufus INTEGER,
     geom GEOMETRY(MULTIPOLYGON, 4326)
 );
 CREATE INDEX IF NOT EXISTS idx_ilce_geom ON konya.ilce_sinirlari USING GIST(geom);

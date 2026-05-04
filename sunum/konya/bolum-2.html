@@ -60,23 +60,23 @@
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.1 — Veri Yükleme (CSV, GeoJSON, SHP)</div>
+              <div class="slide-header-title">2.1 — Veri Yükleme (CSV ve COPY)</div>
               <div class="slide-header-num">02 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">CBS Veri <span>Aktarımı</span></div>
-                <div class="s-text-tech">ogr2ogr ve shp2pgsql ile PostGIS'e veri aktarımı.</div>
+                <div class="s-headline-tech">Toplu Veri <span>Aktarımı</span></div>
+                <div class="s-text-tech">Nüfus verileri gibi büyük tabloları saniyeler içinde yükleme.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">shp2pgsql -s 4326 veri.shp tablo | psql -d konya</div>
+                <div class="code-block">COPY konya.nufus_staging FROM 'data/nufus.csv' WITH (FORMAT text);</div>
                 <div class="reveal-box" id="q21">
-                  <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">Kritik Soru: ogr2ogr neden tercih edilir? <span>▼</span></div>
-                  <div class="reveal-content">GeoJSON'dan veritabanına, KML'den Shape'e her türlü dönüşümü tek komutla yapabilir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">Kritik Soru: COPY neden INSERT'ten hızlıdır? <span>▼</span></div>
+                  <div class="reveal-content">COPY, SQL parser'ı ve transaction loglarını atlayarak veriyi doğrudan disk sayfalarına yazar.</div>
                 </div>
                 <div class="reveal-box" id="g21">
-                  <div class="reveal-trigger" onclick="document.getElementById('g21').classList.toggle('open')">Görev: CSV Yükle <span>▼</span></div>
-                  <div class="reveal-content"><code>COPY konya.temp_tablo FROM 'veri.csv' WITH (FORMAT csv, HEADER);</code> komutunu deneyin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g21').classList.toggle('open')">Görev: Nüfus Verisini İncele <span>▼</span></div>
+                  <div class="reveal-content"><code>data/nufus.csv</code> dosyasındaki kirli yapıyı <code>SELECT * FROM nufus_staging LIMIT 10;</code> ile görün.</div>
                 </div>
               </div>
             </div>
@@ -93,23 +93,23 @@
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.1 — Staging ve Batch Processing</div>
+              <div class="slide-header-title">2.1 — Staging ve Regex Temizliği</div>
               <div class="slide-header-num">03 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Ara Katman <span>Stratejisi</span></div>
-                <div class="s-text-tech">Ham veriyi önce "Staging" tabloya alıp temizleme.</div>
+                <div class="s-headline-tech">Veri <span>Rafinasyonu</span></div>
+                <div class="s-text-tech">Kirli metinlerden düzenli sütunlar oluşturma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">INSERT INTO binalar (geom) SELECT ST_SetSRID(ST_MakePoint(x, y), 4326) FROM staging;</div>
+                <div class="code-block">SELECT (regexp_matches(raw_satir, '\((.*?)\)'))[1] FROM nufus_staging;</div>
                 <div class="reveal-box" id="q22">
-                  <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Batch Processing neden yapılır? <span>▼</span></div>
-                  <div class="reveal-content">Milyonlarca satırı tek bir işlemde işlemek RAM'i tüketir. Paketler halinde yüklemek daha güvenlidir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Regex neden PostGIS'te önemlidir? <span>▼</span></div>
+                  <div class="reveal-content">Dışarıdan gelen veriler (CAD, Excel) genelde standart dışıdır. Regex ile koordinat veya isim ayıklamak hayati önem taşır.</div>
                 </div>
                 <div class="reveal-box" id="g22">
-                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Staging'den Aktar <span>▼</span></div>
-                  <div class="reveal-content">Staging tablosundaki geçersiz geometrileri <code>ST_MakeValid</code> ile düzelterek ana tabloya taşıyın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Nüfusu Güncelle <span>▼</span></div>
+                  <div class="reveal-content">Staging'den temizlediğiniz nüfus verilerini <code>UPDATE ... FROM</code> ile ilçe sınırları tablosuna aktarın.</div>
                 </div>
               </div>
             </div>

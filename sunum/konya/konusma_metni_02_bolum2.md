@@ -13,8 +13,13 @@
 "2012 yılında, Knight Capital Group, üretim (production) ortamına yeni güncellemeleri aktardı. Optimizasyon hataları sebebiyle kurum 45 dakika içinde 440 Milyon Dolar zarar etti. Afet lojistiği gibi kritik operasyonlarda da sistem gecikmelerinin maliyeti büyüktür. Kurumsal mimarilerde performans, verinin nasıl yüklendiğiyle başlar. Ham verinin doğrudan aktif tablolara yazılması indeksleri zorlar. Endüstri standartları, veriyi önce bir ara belleğe (Staging) almayı, doğrulama sonrası paketler (Batch Processing) halinde canlıya aktarmayı önerir."
 
 **Canlı Uygulama / Görev (10 Dakika):**
-*   **Görev:** CSV Yükle ve Staging'den Aktar
-*   **Uygulama Adımları:** `ogr2ogr` aracıyla veri önce bir Staging tablosuna alınır. Ardından `INSERT INTO ... SELECT ...` ile asıl tabloya aktarılır.
+*   **Görev:** Nüfus Verisini (CSV) Temizle ve Aktar
+*   **Veri:** `data/nufus.csv` (Ham format: `2023|Konya(Ahırlı)-1868|5027.0|` veya `|Konya(Akören)-1753|5902.0|`)
+*   **Uygulama Adımları:** 
+    1. `konya.nufus_staging` tablosu oluşturulur.
+    2. `COPY` veya `INSERT` ile ham veri yüklenir.
+    3. Regex (`regexp_matches`) kullanılarak parantez içindeki ilçe adı ve nüfus miktarı ayıklanır.
+    4. `UPDATE ... FROM` ile `konya.ilce_sinirlari` tablosu güncellenir.
 
 ### [15:25 - 15:40] Geometri Optimizasyonu (Simplify ve Subdivide)
 **(Kritik Soru: ST_Simplify işleminin topolojik bütünlük üzerindeki etkileri nelerdir?)**
