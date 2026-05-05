@@ -69,24 +69,35 @@ for f in /docker-entrypoint-initdb.d/data/*_yollar.geojson; do
         -sql "SELECT text AS ad, 'Bilinmiyor' AS tip, '$ilce_adi' AS ilce FROM \"$layer_name\""
 done
 
-# 5. POI (HİS) AKTARIMI (Hastane, Okul, Durak vb.)
-# *_poi.geojson -> konya.poi
-echo ">>> İlçe POI verileri aktarılıyor..."
+# 5. POI (HİS) AKTARIMI (Ayrı Dosyalar Halinde)
 # Tabloyu temizle
 psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "TRUNCATE TABLE konya.poi;"
 
-for f in /docker-entrypoint-initdb.d/data/*_poi.geojson; do
+# 5.1 Hastaneler (*_hastane.geojson)
+for f in /docker-entrypoint-initdb.d/data/*_hastane.geojson; do
     filename=$(basename "$f")
-    layer_name="${filename%.geojson}"
-    ilce_adi="${layer_name%_poi}"
-    echo ">>>> $ilce_adi POI verileri yükleniyor ($layer_name)..."
-    
-    # Not: GeoJSON'da 'amenity' veya 'highway' gibi kolonlar kategori olarak kullanılır
-    ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" \
-        -nln konya.poi \
-        -append \
-        -lco GEOMETRY_NAME=geom \
-        -sql "SELECT name AS ad, COALESCE(amenity, highway, 'Bilinmiyor') AS kategori, '$ilce_adi' AS ilce FROM \"$layer_name\""
+    ilce_adi="${filename%_hastane.geojson}"
+    echo ">>>> $ilce_adi hastaneleri yükleniyor..."
+    ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" -nln konya.poi -append -lco GEOMETRY_NAME=geom \
+        -sql "SELECT name AS ad, 'Hastane' AS kategori, '$ilce_adi' AS ilce FROM \"${filename%.geojson}\""
+done
+
+# 5.2 Okullar (*_okul.geojson)
+for f in /docker-entrypoint-initdb.d/data/*_okul.geojson; do
+    filename=$(basename "$f")
+    ilce_adi="${filename%_okul.geojson}"
+    echo ">>>> $ilce_adi okulları yükleniyor..."
+    ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" -nln konya.poi -append -lco GEOMETRY_NAME=geom \
+        -sql "SELECT name AS ad, 'Okul' AS kategori, '$ilce_adi' AS ilce FROM \"${filename%.geojson}\""
+done
+
+# 5.3 Duraklar (*_durak.geojson)
+for f in /docker-entrypoint-initdb.d/data/*_durak.geojson; do
+    filename=$(basename "$f")
+    ilce_adi="${filename%_durak.geojson}"
+    echo ">>>> $ilce_adi durakları yükleniyor..."
+    ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" -nln konya.poi -append -lco GEOMETRY_NAME=geom \
+        -sql "SELECT name AS ad, 'Durak' AS kategori, '$ilce_adi' AS ilce FROM \"${filename%.geojson}\""
 done
 
 echo ">>> Veri aktarımı başarıyla tamamlandı."

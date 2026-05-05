@@ -1,0 +1,5042 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-05-05T18:27:14Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2781138630",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4802871,
+          37.8888918
+        ]
+      },
+      "id": "node/2781138630"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4227460451",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.2831863,
+          37.928911
+        ]
+      },
+      "id": "node/4227460451"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5111487421",
+        "amenity": "school",
+        "name": "Uğur Okulları Konya Kampüsü",
+        "name:en": "Uğur Schools",
+        "opening_hours": "Mo-Fr 08:00-18:00",
+        "phone": "+90 4444845",
+        "website": "https://ugurokullari.k12.tr/konyakampus/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4586456,
+          37.8863824
+        ]
+      },
+      "id": "node/5111487421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112704522",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kültürpark Turnike 2 (2425)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2425",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2425"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4887875,
+          37.8737642
+        ]
+      },
+      "id": "node/5112704522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112704523",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Özel Selçuklu Hastanesi",
+        "name:en": "Selçuklu Hospital",
+        "website": "http://www.selcuklu.com.tr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.489078,
+          37.8778385
+        ]
+      },
+      "id": "node/5112704523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112715821",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Özel Büyükşehir Hastanesi",
+        "name:en": "Büyükşehir Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4889041,
+          37.8780142
+        ]
+      },
+      "id": "node/5112715821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5113030621",
+        "amenity": "school",
+        "name": "Ahmet - Perihan Demirok İlkokulu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4622819,
+          37.8850354
+        ]
+      },
+      "id": "node/5113030621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5115064421",
+        "amenity": "school",
+        "name": "İşitme Engelliler İlkokulu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5018765,
+          37.9359116
+        ]
+      },
+      "id": "node/5115064421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116960026",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kalemoğlu (1674)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1674"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4612162,
+          37.8932511
+        ]
+      },
+      "id": "node/5116960026"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116960027",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4593389,
+          37.8928604
+        ]
+      },
+      "id": "node/5116960027"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116960028",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4602541,
+          37.8886804
+        ]
+      },
+      "id": "node/5116960028"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116960029",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Yeditepe (1682)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1682",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1682"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4762238,
+          37.8938084
+        ]
+      },
+      "id": "node/5116960029"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116960030",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Yeditepe (1682)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1682",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1682"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4757469,
+          37.8944065
+        ]
+      },
+      "id": "node/5116960030"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116980922",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.478212,
+          37.8907406
+        ]
+      },
+      "id": "node/5116980922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5116999222",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4654164,
+          37.893387
+        ]
+      },
+      "id": "node/5116999222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5117009421",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4629149,
+          37.8920717
+        ]
+      },
+      "id": "node/5117009421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5117273926",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Rauf Denktaş (1678)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1678",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1678"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4873099,
+          37.882917
+        ]
+      },
+      "id": "node/5117273926"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5117551027",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Dünyagöz Hastanesi",
+        "name:en": "Eye Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4845477,
+          37.8982881
+        ]
+      },
+      "id": "node/5117551027"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5119797223",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4624475,
+          37.8882885
+        ]
+      },
+      "id": "node/5119797223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5119797224",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eşrefoğlu İlkokulu (1658)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1658"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.464807,
+          37.8894904
+        ]
+      },
+      "id": "node/5119797224"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5119816021",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kalemoğlu (1674)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1674"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4615699,
+          37.8931861
+        ]
+      },
+      "id": "node/5119816021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5119816023",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4679932,
+          37.8909834
+        ]
+      },
+      "id": "node/5119816023"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121201721",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mahmut Sami Ramazanoğlu İHL (1661)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1661"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.480718,
+          37.8948091
+        ]
+      },
+      "id": "node/5121201721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121201821",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Konevi Lisesi (1662)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1662"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4842796,
+          37.8977279
+        ]
+      },
+      "id": "node/5121201821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121201921",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehteran (1634)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1634"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4883585,
+          37.8995874
+        ]
+      },
+      "id": "node/5121201921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121228823",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Parsana (5)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "5",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4902276,
+          37.8815097
+        ]
+      },
+      "id": "node/5121228823"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121228824",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4867346,
+          37.8781168
+        ]
+      },
+      "id": "node/5121228824"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121228923",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4825222,
+          37.8766847
+        ]
+      },
+      "id": "node/5121228923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121228924",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4850138,
+          37.8761235
+        ]
+      },
+      "id": "node/5121228924"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121228925",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4828305,
+          37.8771747
+        ]
+      },
+      "id": "node/5121228925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121938122",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Adapte (1401)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1401",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1401"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4945515,
+          37.9064817
+        ]
+      },
+      "id": "node/5121938122"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121938221",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eski Sille Cd (1660)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1660"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4718537,
+          37.8917208
+        ]
+      },
+      "id": "node/5121938221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5209913190",
+        "highway": "bus_stop"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4020684,
+          37.9020832
+        ]
+      },
+      "id": "node/5209913190"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6279718932",
+        "amenity": "school",
+        "name": "Mustafa Karacihan İlköğretm Okulu",
+        "website": "https://mustafakaraciganio.meb.k12.tr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4851212,
+          37.9047671
+        ]
+      },
+      "id": "node/6279718932"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6631953185",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Otogar Kavşağı (1547)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1547",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1547"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5122072,
+          37.9493851
+        ]
+      },
+      "id": "node/6631953185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11071846423",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "15 Temmuz Şehitler Durağı (3)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "3",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=3"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4933939,
+          37.8759391
+        ]
+      },
+      "id": "node/11071846423"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11077606071",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kültürpark Turnike 1 (2424)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2424",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2424"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4891298,
+          37.8737618
+        ]
+      },
+      "id": "node/11077606071"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11077606072",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "İnceminare (2419)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2419"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4905853,
+          37.8737306
+        ]
+      },
+      "id": "node/11077606072"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11120887999",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Parsana (5)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "5",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4900727,
+          37.8813331
+        ]
+      },
+      "id": "node/11120887999"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11120888000",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Rauf Denktaş (1678)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1678",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1678"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4872657,
+          37.8826407
+        ]
+      },
+      "id": "node/11120888000"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11148652137",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eşrefoğlu İlkokulu (1658)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1658"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4645617,
+          37.8897846
+        ]
+      },
+      "id": "node/11148652137"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11148652138",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mahmut Sami Ramazanoğlu İHL (1661)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1661"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4811251,
+          37.8946349
+        ]
+      },
+      "id": "node/11148652138"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11148652141",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Erenköy Hareket Merkezi (1690)",
+        "public_transport": "platform",
+        "ref": "1690"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4517264,
+          37.9135967
+        ]
+      },
+      "id": "node/11148652141"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11148652142",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Erenköy Hareket Merkezi (1690)",
+        "public_transport": "platform",
+        "ref": "1690"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4512511,
+          37.9141157
+        ]
+      },
+      "id": "node/11148652142"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11177891231",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Selçuklu YHT Garı (1399)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1399",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1399"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4992594,
+          37.8968338
+        ]
+      },
+      "id": "node/11177891231"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11177891235",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Selçuklu YHT Garı (1399)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1399",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1399"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4994037,
+          37.8966642
+        ]
+      },
+      "id": "node/11177891235"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11179643970",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Medicana Hastanesi (1248)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1248",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1248"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4982748,
+          37.8934031
+        ]
+      },
+      "id": "node/11179643970"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099333001",
+        "highway": "bus_stop",
+        "name": "Kambaş",
+        "ref": "1597"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5263154,
+          38.0176248
+        ]
+      },
+      "id": "node/12099333001"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099333901",
+        "highway": "bus_stop",
+        "name": "Bosna Mesaj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5237426,
+          38.01775
+        ]
+      },
+      "id": "node/12099333901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099334001",
+        "highway": "bus_stop",
+        "name": "Bosna Mesaj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5235343,
+          38.0178269
+        ]
+      },
+      "id": "node/12099334001"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099335101",
+        "highway": "bus_stop",
+        "name": "Mesaj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5217545,
+          38.0149075
+        ]
+      },
+      "id": "node/12099335101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099335102",
+        "highway": "bus_stop",
+        "name": "Mesaj"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5214212,
+          38.0148111
+        ]
+      },
+      "id": "node/12099335102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099335103",
+        "highway": "bus_stop",
+        "name": "Bosna Pazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5219269,
+          38.0118447
+        ]
+      },
+      "id": "node/12099335103"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099335104",
+        "highway": "bus_stop",
+        "name": "Akif"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5231273,
+          38.0091248
+        ]
+      },
+      "id": "node/12099335104"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099335301",
+        "highway": "bus_stop",
+        "name": "1597 Kambaş"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5263936,
+          38.0176275
+        ]
+      },
+      "id": "node/12099335301"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099338501",
+        "highway": "bus_stop",
+        "name": "Bosna Pazar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5221578,
+          38.0117928
+        ]
+      },
+      "id": "node/12099338501"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12145091673",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eski Sille Cd (1660)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1660"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4718398,
+          37.8913543
+        ]
+      },
+      "id": "node/12145091673"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12145091674",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Konevi Lisesi (1662)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1662"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4843759,
+          37.8973515
+        ]
+      },
+      "id": "node/12145091674"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12290363901",
+        "amenity": "school",
+        "name": "Can yüzdeyüz dershane"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4817717,
+          37.871438
+        ]
+      },
+      "id": "node/12290363901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12340390801",
+        "amenity": "school",
+        "name": "Melikşah Anaokulu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4771931,
+          37.889687
+        ]
+      },
+      "id": "node/12340390801"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12372531566",
+        "addr:neighbourhood": "Ferhuniye Mahallesi",
+        "addr:street": "Ulaşbaba Caddesi",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Konya Numune Hastanesi Acil",
+        "operator": "Sağlık Bakanlığı",
+        "operator:type": "government",
+        "operator:wikidata": "Q4294365"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.491073,
+          37.8804182
+        ]
+      },
+      "id": "node/12372531566"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12430795076",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kazım Karabekir (33)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "33",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4796818,
+          37.8704868
+        ]
+      },
+      "id": "node/12430795076"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12430795077",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "KOSKİ (32)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "32",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4836337,
+          37.8707303
+        ]
+      },
+      "id": "node/12430795077"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441263569",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "Mareşal Mustafa Kemal Ortaokulu (24)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "24",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.485158,
+          37.8725409
+        ]
+      },
+      "id": "node/12441263569"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441263593",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Şebi Arus (7)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "7",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4867078,
+          37.875768
+        ]
+      },
+      "id": "node/12441263593"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441263594",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "Ferhuniye (22)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "22",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4906832,
+          37.8766734
+        ]
+      },
+      "id": "node/12441263594"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441263596",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Beşyol (2112)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2112",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2112"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4941,
+          37.8779602
+        ]
+      },
+      "id": "node/12441263596"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441263597",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Nesrin Ayşegül İlkokulu (1273)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1273",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1273"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4955947,
+          37.8816287
+        ]
+      },
+      "id": "node/12441263597"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441263600",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Musalla Şehitlik (1274)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1274",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1274"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4970064,
+          37.8841909
+        ]
+      },
+      "id": "node/12441263600"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12441314902",
+        "bench": "yes",
+        "bin": "no",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "Emniyet Müdürlüğü (1275)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1275",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1275"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4992867,
+          37.8874037
+        ]
+      },
+      "id": "node/12441314902"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539618301",
+        "highway": "bus_stop",
+        "name": "1599 Nizam"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5300624,
+          38.015274
+        ]
+      },
+      "id": "node/12539618301"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539619101",
+        "highway": "bus_stop",
+        "name": "1599 Nizam"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5299859,
+          38.0152796
+        ]
+      },
+      "id": "node/12539619101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539619703",
+        "highway": "bus_stop",
+        "name": "1602 Yunus Emre Cami"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5342505,
+          38.0120087
+        ]
+      },
+      "id": "node/12539619703"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539619704",
+        "highway": "bus_stop",
+        "name": "1603 Bosna Komek"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5311628,
+          38.0111247
+        ]
+      },
+      "id": "node/12539619704"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539619902",
+        "highway": "bus_stop",
+        "name": "1600 Vatansever"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5316933,
+          38.0150678
+        ]
+      },
+      "id": "node/12539619902"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539626801",
+        "highway": "bus_stop",
+        "name": "1600 Vatansever"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5315722,
+          38.0150182
+        ]
+      },
+      "id": "node/12539626801"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539626802",
+        "highway": "bus_stop",
+        "name": "1882 Konya"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5342666,
+          38.0139031
+        ]
+      },
+      "id": "node/12539626802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539626803",
+        "highway": "bus_stop",
+        "name": "1882 Konya"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5341791,
+          38.013852
+        ]
+      },
+      "id": "node/12539626803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539632201",
+        "highway": "bus_stop",
+        "name": "1602 Yunus Emre Cami"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5341974,
+          38.0119612
+        ]
+      },
+      "id": "node/12539632201"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539632202",
+        "highway": "bus_stop",
+        "name": "1609 Yemeni"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5325189,
+          38.0092522
+        ]
+      },
+      "id": "node/12539632202"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539635801",
+        "highway": "bus_stop",
+        "name": "1603 Bosna Komek"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5310825,
+          38.0110609
+        ]
+      },
+      "id": "node/12539635801"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650002",
+        "highway": "bus_stop",
+        "name": "1609 Yemeni"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5324962,
+          38.0092228
+        ]
+      },
+      "id": "node/12539650002"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650003",
+        "highway": "bus_stop",
+        "name": "1548 Hızır"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5349218,
+          38.0058912
+        ]
+      },
+      "id": "node/12539650003"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650101",
+        "highway": "bus_stop",
+        "name": "1617 Ertuğrul Gazi İlkokulu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5357141,
+          38.0075156
+        ]
+      },
+      "id": "node/12539650101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650102",
+        "highway": "bus_stop",
+        "name": "1617 Ertuğrul Gazi İlkokulu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5356669,
+          38.0075503
+        ]
+      },
+      "id": "node/12539650102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650103",
+        "highway": "bus_stop",
+        "name": "1610 Mevlevi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5360098,
+          38.0037553
+        ]
+      },
+      "id": "node/12539650103"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650104",
+        "highway": "bus_stop",
+        "name": "1610 Mevlevi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5360392,
+          38.0037423
+        ]
+      },
+      "id": "node/12539650104"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12539650301",
+        "highway": "bus_stop",
+        "name": "1548 Hızır"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5348884,
+          38.0058769
+        ]
+      },
+      "id": "node/12539650301"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12620580302",
+        "amenity": "school",
+        "name": "Mehmet Halil İbrahim Hekimoğlu Anadolu Lisesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.515065,
+          37.983909
+        ]
+      },
+      "id": "node/12620580302"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12945195501",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "public_transport": "platform"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.489053,
+          37.8737944
+        ]
+      },
+      "id": "node/12945195501"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028389",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Beyazgül (2243)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2243",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2243"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.499607,
+          37.9397812
+        ]
+      },
+      "id": "node/13013028389"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028390",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Aruz (1424)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1424",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1424"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4990717,
+          37.9423927
+        ]
+      },
+      "id": "node/13013028390"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028391",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Adapte (1401)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1401",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1401"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4947783,
+          37.9063434
+        ]
+      },
+      "id": "node/13013028391"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028392",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Radar (1402)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1402",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1402"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4948622,
+          37.9082707
+        ]
+      },
+      "id": "node/13013028392"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028393",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Özlem (2262)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2262",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2262"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5001915,
+          37.9372414
+        ]
+      },
+      "id": "node/13013028393"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028394",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Beyazgül (2243)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2243",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2243"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.499799,
+          37.9400268
+        ]
+      },
+      "id": "node/13013028394"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028395",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Başkale (2244)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2244",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2244"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4990848,
+          37.9365758
+        ]
+      },
+      "id": "node/13013028395"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028396",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Zaviye (2315)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2315",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2315"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4929204,
+          37.9357794
+        ]
+      },
+      "id": "node/13013028396"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028397",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Başkale (2244)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2244",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2244"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4988953,
+          37.9366308
+        ]
+      },
+      "id": "node/13013028397"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028398",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Radar (1402)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1402",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1402"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4949433,
+          37.9083545
+        ]
+      },
+      "id": "node/13013028398"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028399",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eyüp Sultan (2261)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2261",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2261"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4981973,
+          37.9370294
+        ]
+      },
+      "id": "node/13013028399"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013028400",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kaşgarlı Mahmut (1492)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1492",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1492"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4943777,
+          37.9372125
+        ]
+      },
+      "id": "node/13013028400"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013113701",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Özlem (2262)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2262",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2262"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5000203,
+          37.9369972
+        ]
+      },
+      "id": "node/13013113701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013113702",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eyüp Sultan (2261)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2261",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2261"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4981779,
+          37.9372388
+        ]
+      },
+      "id": "node/13013113702"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013113703",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Eyüp Sultan Cami (1426)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1426",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1426"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.50775,
+          37.9372634
+        ]
+      },
+      "id": "node/13013113703"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013113704",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Aruz (1424)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1424",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1424"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4988979,
+          37.9423947
+        ]
+      },
+      "id": "node/13013113704"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013113705",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kaşgarlı Mahmut (1492)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1492",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1492"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4943799,
+          37.937027
+        ]
+      },
+      "id": "node/13013113705"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13013113706",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Zaviye (2315)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2315",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2315"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4931958,
+          37.9357405
+        ]
+      },
+      "id": "node/13013113706"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459682",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehmet Akif Lisesi (1417)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1417",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1417"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4975488,
+          37.9326471
+        ]
+      },
+      "id": "node/13017459682"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459683",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehmet Akif Lisesi (1417)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1417",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1417"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4975976,
+          37.9324945
+        ]
+      },
+      "id": "node/13017459683"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459684",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cazibe (1418)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1418",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1418"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4995932,
+          37.9339469
+        ]
+      },
+      "id": "node/13017459684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459685",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cazibe (1418)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1418",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1418"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4997811,
+          37.9339153
+        ]
+      },
+      "id": "node/13017459685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459686",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Hicret Cami (1416)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1416",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1416"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4951945,
+          37.9326082
+        ]
+      },
+      "id": "node/13017459686"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459687",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Hicret Cami (1416)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1416",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1416"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4951945,
+          37.9325094
+        ]
+      },
+      "id": "node/13017459687"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459688",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ceylangözü (1415)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1415",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1415"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.492827,
+          37.9313514
+        ]
+      },
+      "id": "node/13017459688"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459689",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ceylangözü (1415)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1415",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1415"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4932059,
+          37.9313478
+        ]
+      },
+      "id": "node/13017459689"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459690",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehtap (1414)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1414",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1414"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4966163,
+          37.9301385
+        ]
+      },
+      "id": "node/13017459690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459691",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehtap (1414)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1414",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1414"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4967831,
+          37.9302056
+        ]
+      },
+      "id": "node/13017459691"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459692",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Malazgirt Cami (1413)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1413",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1413"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4990401,
+          37.9284079
+        ]
+      },
+      "id": "node/13017459692"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459693",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Malazgirt Cami (1413)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1413",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1413"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4991974,
+          37.9284726
+        ]
+      },
+      "id": "node/13017459693"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459694",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Besim (1412)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1412",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1412"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.500386,
+          37.9267723
+        ]
+      },
+      "id": "node/13017459694"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459695",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Besim (1412)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1412",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1412"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5002137,
+          37.9264343
+        ]
+      },
+      "id": "node/13017459695"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459696",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Özsahra (1411)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1411",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1411"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5020579,
+          37.9245477
+        ]
+      },
+      "id": "node/13017459696"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459697",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Özsahra (1411)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1411",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1411"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5021737,
+          37.9246017
+        ]
+      },
+      "id": "node/13017459697"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459698",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Söğütdibi (1410)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1410",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1410"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5014636,
+          37.9230424
+        ]
+      },
+      "id": "node/13017459698"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459699",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Söğütdibi (1410)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1410",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1410"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5016527,
+          37.9230074
+        ]
+      },
+      "id": "node/13017459699"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017459700",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Sakarya (1409)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1409",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1409"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4968183,
+          37.9218567
+        ]
+      },
+      "id": "node/13017459700"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474601",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Sakarya (1409)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1409",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1409"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4968203,
+          37.9217343
+        ]
+      },
+      "id": "node/13017474601"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474602",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Masumhane (1408)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1408",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1408"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4940407,
+          37.9218541
+        ]
+      },
+      "id": "node/13017474602"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474603",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Masumhane (1408)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1408",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1408"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.494159,
+          37.9217317
+        ]
+      },
+      "id": "node/13017474603"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474604",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kabiliyet (1407)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1407",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1407"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4923956,
+          37.9199761
+        ]
+      },
+      "id": "node/13017474604"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474605",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Kabiliyet (1407)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1407",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1407"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927687,
+          37.9200024
+        ]
+      },
+      "id": "node/13017474605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474606",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Tarakçı (1406)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1406",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1406"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4924795,
+          37.9174017
+        ]
+      },
+      "id": "node/13017474606"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474607",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Tarakçı (1406)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1406",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1406"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927422,
+          37.9174142
+        ]
+      },
+      "id": "node/13017474607"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474608",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Anı (1405)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1405",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1405"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4952712,
+          37.9142663
+        ]
+      },
+      "id": "node/13017474608"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474609",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Anı (1405)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1405",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1405"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.495223,
+          37.9144958
+        ]
+      },
+      "id": "node/13017474609"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474610",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehmet Zahid Kotku İhl (1404)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1404",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1404"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4945127,
+          37.912111
+        ]
+      },
+      "id": "node/13017474610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474611",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mehmet Zahid Kotku İhl (1404)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1404",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1404"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4944309,
+          37.9121928
+        ]
+      },
+      "id": "node/13017474611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474612",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mimar Sinan Cami (1403)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1403",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1403"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927528,
+          37.9095437
+        ]
+      },
+      "id": "node/13017474612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474613",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Mimar Sinan Cami (1403)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1403",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1403"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4928344,
+          37.9095111
+        ]
+      },
+      "id": "node/13017474613"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474614",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Park Bahçeler Dai̇re Başkanlığı (2280)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2280",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2280"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4970612,
+          37.9034195
+        ]
+      },
+      "id": "node/13017474614"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474615",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Park Bahçeler Dai̇re Başkanlığı (2280)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2280",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2280"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4987698,
+          37.9028916
+        ]
+      },
+      "id": "node/13017474615"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474616",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Manifaturacılar (1400)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1400",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1400"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5028584,
+          37.8990359
+        ]
+      },
+      "id": "node/13017474616"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474617",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Manifaturacılar (1400)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1400",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1400"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5026766,
+          37.8991792
+        ]
+      },
+      "id": "node/13017474617"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474618",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Yanal (1397)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1397",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1397"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4930269,
+          37.892055
+        ]
+      },
+      "id": "node/13017474618"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474619",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Yanal (1397)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1397",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1397"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927818,
+          37.892183
+        ]
+      },
+      "id": "node/13017474619"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474620",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Çırağan (1396)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1396",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1396"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4899463,
+          37.8886774
+        ]
+      },
+      "id": "node/13017474620"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474621",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Çırağan (1396)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1396",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1396"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4903591,
+          37.8887999
+        ]
+      },
+      "id": "node/13017474621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474622",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Güvence (2282)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2282",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2282"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4886979,
+          37.8861096
+        ]
+      },
+      "id": "node/13017474622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474623",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Güvence (2282)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2282",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2282"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4881024,
+          37.8858617
+        ]
+      },
+      "id": "node/13017474623"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474624",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Trafik (6)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "6",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=6"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4878098,
+          37.8784209
+        ]
+      },
+      "id": "node/13017474624"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474625",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Trafik (6)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "6",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=6"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4875935,
+          37.8793122
+        ]
+      },
+      "id": "node/13017474625"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474626",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ferhuniye (22)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "22",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4906651,
+          37.8768505
+        ]
+      },
+      "id": "node/13017474626"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474627",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Türkü (1429)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1429",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1429"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4998295,
+          37.9440244
+        ]
+      },
+      "id": "node/13017474627"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474628",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Türkü (1429)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1429",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1429"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4997294,
+          37.9441841
+        ]
+      },
+      "id": "node/13017474628"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474629",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Dikmetaş (1430)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1430",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1430"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5034993,
+          37.9429321
+        ]
+      },
+      "id": "node/13017474629"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474630",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Dikmetaş (1430)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1430",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1430"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5033417,
+          37.9429607
+        ]
+      },
+      "id": "node/13017474630"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474631",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cumhuriyet Lisesi (1431)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1431",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1431"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5028593,
+          37.9400741
+        ]
+      },
+      "id": "node/13017474631"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474632",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cumhuriyet Lisesi (1431)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1431",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1431"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5026573,
+          37.9399666
+        ]
+      },
+      "id": "node/13017474632"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474633",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Binkonut Pazar (1432)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1432",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1432"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5033704,
+          37.9377513
+        ]
+      },
+      "id": "node/13017474633"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474634",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Binkonut Pazar (1432)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1432",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1432"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5035599,
+          37.9377982
+        ]
+      },
+      "id": "node/13017474634"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474635",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Papatya (2260)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2260",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2260"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4929514,
+          37.9404289
+        ]
+      },
+      "id": "node/13017474635"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474636",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Papatya (2260)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2260",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2260"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4932043,
+          37.9404251
+        ]
+      },
+      "id": "node/13017474636"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474637",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ünal (1472)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1472",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1472"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4929513,
+          37.9448326
+        ]
+      },
+      "id": "node/13017474637"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474638",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ünal (1472)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1472",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1472"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4932047,
+          37.9448187
+        ]
+      },
+      "id": "node/13017474638"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474639",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Konya Diş Hastanesi (1475)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1475",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1475"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4929216,
+          37.9496073
+        ]
+      },
+      "id": "node/13017474639"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474640",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Konya Diş Hastanesi (1475)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1475",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1475"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4932353,
+          37.9495881
+        ]
+      },
+      "id": "node/13017474640"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474641",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Akkonak (1473)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1473",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1473"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.492097,
+          37.9524851
+        ]
+      },
+      "id": "node/13017474641"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474642",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Akkonak (1473)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1473",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1473"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4925751,
+          37.9523895
+        ]
+      },
+      "id": "node/13017474642"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474643",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Türk Telekom Lisesi (2259)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2259",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2259"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4907484,
+          37.9541041
+        ]
+      },
+      "id": "node/13017474643"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13017474644",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Türk Telekom Lisesi (2259)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2259",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2259"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4905867,
+          37.9541961
+        ]
+      },
+      "id": "node/13017474644"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13018773300",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Afşin (2316)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2316",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2316"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4949904,
+          37.9271659
+        ]
+      },
+      "id": "node/13018773300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13018778401",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Afşin (2316)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2316",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2316"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4952566,
+          37.9271955
+        ]
+      },
+      "id": "node/13018778401"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13023086816",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Dr. Ali Eğribaş (1379)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1379",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1379"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5018213,
+          37.8951385
+        ]
+      },
+      "id": "node/13023086816"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13023086817",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Dr. Ali Eğribaş (1379)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1379",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1379"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5021353,
+          37.8949143
+        ]
+      },
+      "id": "node/13023086817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236325",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Revan (1494)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1494",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1494"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5079123,
+          37.9417078
+        ]
+      },
+      "id": "node/13030236325"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236326",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Yener (1493)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1493",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1493"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.504865,
+          37.9416075
+        ]
+      },
+      "id": "node/13030236326"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236327",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Saray Bosna (2265)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2265",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2265"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5002445,
+          37.9555399
+        ]
+      },
+      "id": "node/13030236327"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236328",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Otogar Cami (1511)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1511",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1511"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5072507,
+          37.9499326
+        ]
+      },
+      "id": "node/13030236328"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236329",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Sultan (2286)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2286",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2286"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5086111,
+          37.9538082
+        ]
+      },
+      "id": "node/13030236329"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236330",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Zeki Altındağ Cami (1497)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1497",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1497"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4985805,
+          37.9520946
+        ]
+      },
+      "id": "node/13030236330"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236331",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Adliye Lojmanları (1498)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1498",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1498"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4948229,
+          37.9519694
+        ]
+      },
+      "id": "node/13030236331"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236332",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Parsana Yayla Cami (1501)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1501",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1501"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4854895,
+          37.9563255
+        ]
+      },
+      "id": "node/13030236332"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236333",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Dolunay (1496)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1496",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1496"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5095151,
+          37.9473245
+        ]
+      },
+      "id": "node/13030236333"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236334",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ulunay (1495)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1495",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1495"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5091814,
+          37.9432329
+        ]
+      },
+      "id": "node/13030236334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236335",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Parsana Yayla Cami (1501)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1501",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1501"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4857009,
+          37.9565138
+        ]
+      },
+      "id": "node/13030236335"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236336",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cahit Zarifoğlu İlkokulu (2263)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2263",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2263"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5075613,
+          37.9559995
+        ]
+      },
+      "id": "node/13030236336"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236337",
+        "bench": "yes",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Revan (1494)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1494",
+        "shelter": "yes",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1494"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5082859,
+          37.9416129
+        ]
+      },
+      "id": "node/13030236337"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236338",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Öztekinler (2264)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2264",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2264"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5039425,
+          37.9559955
+        ]
+      },
+      "id": "node/13030236338"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236339",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Cahit Zarifoğlu İlkokulu (2263)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2263",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2263"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5075335,
+          37.9558836
+        ]
+      },
+      "id": "node/13030236339"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236340",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Sultan (2286)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2286",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2286"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5088279,
+          37.953741
+        ]
+      },
+      "id": "node/13030236340"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236341",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Dolunay (1496)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1496",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1496"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5092254,
+          37.9473433
+        ]
+      },
+      "id": "node/13030236341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236342",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Öztekinler (2264)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2264",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2264"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5039824,
+          37.95588
+        ]
+      },
+      "id": "node/13030236342"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236343",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Saray Bosna (2265)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2265",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=2265"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5000629,
+          37.95567
+        ]
+      },
+      "id": "node/13030236343"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236344",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Zeki Altındağ Cami (1497)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1497",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1497"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4985738,
+          37.9519808
+        ]
+      },
+      "id": "node/13030236344"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236345",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Şensözlü (1499)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1499",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1499"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4894823,
+          37.9541706
+        ]
+      },
+      "id": "node/13030236345"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236346",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Yener (1493)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1493",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1493"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5048626,
+          37.9417114
+        ]
+      },
+      "id": "node/13030236346"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236347",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Otogar (1419)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1419",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1419"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5107983,
+          37.948809
+        ]
+      },
+      "id": "node/13030236347"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236348",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Otogar Cami (1511)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1511",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1511"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5070204,
+          37.9500231
+        ]
+      },
+      "id": "node/13030236348"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236349",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ulunay (1495)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1495",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1495"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.509564,
+          37.9432025
+        ]
+      },
+      "id": "node/13030236349"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236350",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Şensözlü (1499)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1499",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1499"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4893565,
+          37.953951
+        ]
+      },
+      "id": "node/13030236350"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13030236351",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Adliye Lojmanları (1498)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1498",
+        "website": "https://atus.konya.bel.tr/atus/otobusum-nerede?durakNo=1498"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4948178,
+          37.9521101
+        ]
+      },
+      "id": "node/13030236351"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078158902",
+        "highway": "bus_stop",
+        "name": "Japon Parkı (1626)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5203198,
+          37.9799241
+        ]
+      },
+      "id": "node/13078158902"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078158903",
+        "highway": "bus_stop",
+        "name": "Gülbahçe (1625)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5231099,
+          37.9840785
+        ]
+      },
+      "id": "node/13078158903"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078161401",
+        "highway": "bus_stop",
+        "name": "Kılıçarslan Gençlik Merkezi (2301)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5203219,
+          38.0096141
+        ]
+      },
+      "id": "node/13078161401"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078161402",
+        "highway": "bus_stop",
+        "name": "Japon Parkı (1626)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5201187,
+          37.9798733
+        ]
+      },
+      "id": "node/13078161402"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078168101",
+        "highway": "bus_stop",
+        "name": "Gülbahçe (1625)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5233079,
+          37.9841821
+        ]
+      },
+      "id": "node/13078168101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078168102",
+        "highway": "bus_stop",
+        "name": "Hasip (1611)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5334519,
+          38.0025111
+        ]
+      },
+      "id": "node/13078168102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078174901",
+        "highway": "bus_stop",
+        "name": "Hasip (1611)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5334548,
+          38.0025584
+        ]
+      },
+      "id": "node/13078174901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078176103",
+        "highway": "bus_stop",
+        "name": "Ensar (1624)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5295322,
+          38.0035502
+        ]
+      },
+      "id": "node/13078176103"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078177501",
+        "highway": "bus_stop",
+        "name": "Ensar (1624)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5294316,
+          38.0035799
+        ]
+      },
+      "id": "node/13078177501"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13078177901",
+        "highway": "bus_stop",
+        "name": "Hakikat (1612)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5317698,
+          38.0042121
+        ]
+      },
+      "id": "node/13078177901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269929556",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Bosna Hersek Garajı",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1555",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.521061,
+          38.0197498
+        ]
+      },
+      "id": "node/13269929556"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269929557",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Bosna Hersek Garajı",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1555"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5211057,
+          38.0198228
+        ]
+      },
+      "id": "node/13269929557"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269943394",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Gökçeli (1568)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1568",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5270607,
+          37.962025
+        ]
+      },
+      "id": "node/13269943394"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269943395",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Gökçeli (1568)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1568",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5268,
+          37.9620773
+        ]
+      },
+      "id": "node/13269943395"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269943396",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Eminerler (14)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "14",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.526132,
+          37.9650072
+        ]
+      },
+      "id": "node/13269943396"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269943397",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Eminerler (14)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "14",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5261507,
+          37.9647728
+        ]
+      },
+      "id": "node/13269943397"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269943398",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Sancak Garajı (1569)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "ref": "1569",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5269616,
+          37.9664358
+        ]
+      },
+      "id": "node/13269943398"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13269943399",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Sancak Garajı (1569)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1569",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5268197,
+          37.9664359
+        ]
+      },
+      "id": "node/13269943399"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270066299",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Yeni Sancak (15)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "15",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5234421,
+          37.9663878
+        ]
+      },
+      "id": "node/13270066299"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270066300",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Yeni Sancak (15)",
+        "network": "https://atus.konya.bel.tr/",
+        "public_transport": "platform",
+        "ref": "15",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5235947,
+          37.9662504
+        ]
+      },
+      "id": "node/13270066300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270082609",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Aselsan Lisesi (2547)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2547",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5262681,
+          37.9589359
+        ]
+      },
+      "id": "node/13270082609"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270082610",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Aselsan Lisesi (2547)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2547",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5260265,
+          37.9590495
+        ]
+      },
+      "id": "node/13270082610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270082612",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Sümer (2548)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2548",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5290696,
+          37.9624482
+        ]
+      },
+      "id": "node/13270082612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270082613",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Sümer (2548)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2548",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5291615,
+          37.9624717
+        ]
+      },
+      "id": "node/13270082613"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270092101",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Taner (2546)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2546",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5217019,
+          37.9631632
+        ]
+      },
+      "id": "node/13270092101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13270092102",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Taner (2546)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2546",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5218365,
+          37.9632778
+        ]
+      },
+      "id": "node/13270092102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13272215194",
+        "highway": "bus_stop",
+        "public_transport": "platform",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5284082,
+          37.9724799
+        ]
+      },
+      "id": "node/13272215194"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13284971668",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Pınarbaşı Son (1340)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1340",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5945816,
+          38.0634136
+        ]
+      },
+      "id": "node/13284971668"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220983",
+        "bench": "yes",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "Göztepe Konutları (1598)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1568",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4400293,
+          37.935617
+        ]
+      },
+      "id": "node/13288220983"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220984",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Göztepe Konutları (1598)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1598",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4402352,
+          37.9355695
+        ]
+      },
+      "id": "node/13288220984"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220985",
+        "bench": "yes",
+        "bus": "yes",
+        "departures_board": "yes",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "Konutlar Göztepe Camii (1145)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1145",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4360275,
+          37.9352093
+        ]
+      },
+      "id": "node/13288220985"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220986",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Konutlar Göztepe Camii (1145)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1145",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4360432,
+          37.9351302
+        ]
+      },
+      "id": "node/13288220986"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220988",
+        "bench": "yes",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "lit": "yes",
+        "name": "Göztepe Konutları Giriş (1503)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1503",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4314242,
+          37.9341175
+        ]
+      },
+      "id": "node/13288220988"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220989",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Göztepe Konutları Giriş (1503)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1503",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4315304,
+          37.9340418
+        ]
+      },
+      "id": "node/13288220989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13366972394",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Ebu Vakkas (2537)",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2537",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5137447,
+          37.9488538
+        ]
+      },
+      "id": "node/13366972394"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13431204848",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Teberra (1765)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1765",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5293337,
+          37.9496904
+        ]
+      },
+      "id": "node/13431204848"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13431204849",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Teberra (1765)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1765",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5294969,
+          37.9498173
+        ]
+      },
+      "id": "node/13431204849"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13431204852",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Sancaktepe Parkı (1584)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1584",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5290777,
+          37.951991
+        ]
+      },
+      "id": "node/13431204852"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13431204853",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Sancaktepe Parkı (1584)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1584",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5290264,
+          37.9518671
+        ]
+      },
+      "id": "node/13431204853"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13431204854",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Taçmahal (2298)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2298",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5267463,
+          37.9510864
+        ]
+      },
+      "id": "node/13431204854"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13431204855",
+        "bus": "yes",
+        "highway": "bus_stop",
+        "name": "Taçmahal (2298)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2298",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5269177,
+          37.9511755
+        ]
+      },
+      "id": "node/13431204855"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13461787387",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Hatemoğlu (2261)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "2261",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5290554,
+          38.0027804
+        ]
+      },
+      "id": "node/13461787387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13461853330",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Nuri Küçükköylü (1260)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1260",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5055487,
+          37.9437932
+        ]
+      },
+      "id": "node/13461853330"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13461853331",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Nuri Küçükköylü (1260)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1260",
+        "shelter": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5054722,
+          37.9439283
+        ]
+      },
+      "id": "node/13461853331"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13461853333",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Taşer (1394)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1394",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5343914,
+          37.9701953
+        ]
+      },
+      "id": "node/13461853333"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13461853334",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Ayfer Gök Anaokulu (1393)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1393",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5368545,
+          37.970251
+        ]
+      },
+      "id": "node/13461853334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13461853335",
+        "bus": "yes",
+        "departures_board": "realtime",
+        "highway": "bus_stop",
+        "name": "Korgeneral Özkan Öktü (1391)",
+        "network": "https://atus.konya.bel.tr/",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "public_transport": "platform",
+        "ref": "1391",
+        "shelter": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5370149,
+          37.9712895
+        ]
+      },
+      "id": "node/13461853335"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13731075887",
+        "amenity": "school",
+        "education": "school",
+        "name": "Ted Koleji"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4359615,
+          37.9253153
+        ]
+      },
+      "id": "node/13731075887"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13731075888",
+        "amenity": "school",
+        "education": "school",
+        "name": "Altın Sayfa Koleji"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.441884,
+          37.9233014
+        ]
+      },
+      "id": "node/13731075888"
+    }
+  ]
+}

@@ -41,24 +41,37 @@ Aşağıdaki veriler `init-db/data/` klasöründe mevcuttur ve kurulumla birlikt
 - **Duraklar**: `node["highway"="bus_stop"]`
 - **Binalar**: `way["building"]`
 
-#### 2. İlçe Bazlı POI Verileri (Hastane, Okul, Durak vb.)
-Belirli bir ilçedeki önemli noktaları toplu olarak indirmek için:
+#### 2. İlçe Bazlı POI Verileri (Hastane, Okul, Durak)
+Analizlerde karmaşa olmaması için POI verilerini tiplerine göre ayrı ayrı indirip isimlendirmeniz önerilir:
 
+**A. Hastaneler**
 ```text
-[out:json][timeout:25];
-area["name"="Meram"]->.searchArea;
-(
-  node["amenity"~"hospital|school"](area.searchArea);
-  node["highway"="bus_stop"](area.searchArea);
-);
-out body;
->;
-out skel qt;
+[out:json];
+area["name"="Selçuklu"]->.a;
+node["amenity"="hospital"](area.a);
+out body; >; out skel qt;
 ```
+*Dosya Adı:* `selcuklu_hastane.geojson`
 
-**Kayıt Bilgisi:**
-- Dosyayı `[ilce_adi]_poi.geojson` olarak kaydedin (Örn: `meram_poi.geojson`).
-- Bu dosya otomatik olarak `konya.poi` tablosuna aktarılacak ve kategori bilgisi (hastane, okul vb.) otomatik doldurulacaktır.
+**B. Okullar**
+```text
+[out:json];
+area["name"="Selçuklu"]->.a;
+node["amenity"="school"](area.a);
+out body; >; out skel qt;
+```
+*Dosya Adı:* `selcuklu_okul.geojson`
+
+**C. Duraklar**
+```text
+[out:json];
+area["name"="Selçuklu"]->.a;
+node["highway"="bus_stop"](area.a);
+out body; >; out skel qt;
+```
+*Dosya Adı:* `selcuklu_durak.geojson`
+
+**Önemli:** Dosya isimleri `[ilce]_[tip].geojson` formatında olmalıdır. Sistem bu isimlerden otomatik olarak ilçe ve kategori bilgisini ayıklayarak `konya.poi` tablosuna yazacaktır.
 
 #### 3. İlçe Bazlı Yol Ağları (pgRouting İçin)
 Çumra, Meram, Selçuklu veya Karatay gibi spesifik ilçelerin yol ağlarını indirmek için:
