@@ -223,11 +223,10 @@
 
                 <div class="reveal-box" id="q11">
                   <div class="reveal-trigger" onclick="document.getElementById('q11').classList.toggle('open')">
-                    Kritik Soru: Neden pglite yerine Docker? <span>▼</span>
+                    Kritik Soru: PostgreSQL Tek Başına Yeterli mi? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Docker, gerçek bir sunucu ortamı sunar. pglite tarayıcıda çalıştığı için büyük verilerde ve gelişmiş
-                    analizlerde kısıtlıdır. Konya BB verileri için gerçek bir sunucu şarttır.
+                    PostgreSQL standart veriler için mükemmeldir; ancak Konya gibi devasa bir şehir verisinde "mekansal zekaya" ihtiyaç duyarız. PostGIS olmadan iki mahallenin komşu olduğunu veya bir binanın hangi parselde kaldığını saniyeler içinde hesaplayamayız. Mekansal indeksleme (GiST) gücü sadece PostGIS ile gelir.
                   </div>
                 </div>
 
