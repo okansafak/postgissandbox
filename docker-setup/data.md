@@ -35,9 +35,32 @@ Aşağıdaki veriler `init-db/data/` klasöründe mevcuttur ve kurulumla birlikt
 
 ### A. OpenStreetMap (OSM) — Overpass Turbo
 [Overpass Turbo](https://overpass-turbo.eu/) üzerinden Konya için şu sorguları GeoJSON olarak dışa aktarabilirsiniz:
+
+#### 1. Temel Noktasal Veriler
 - **Hastaneler**: `node["amenity"="hospital"]`
 - **Duraklar**: `node["highway"="bus_stop"]`
 - **Binalar**: `way["building"]`
+
+#### 2. İlçe Bazlı Yol Ağları (pgRouting İçin)
+Çumra, Meram, Selçuklu veya Karatay gibi spesifik ilçelerin yol ağlarını indirmek için aşağıdaki sorgu şablonunu kullanın:
+
+```text
+[out:json][timeout:25];
+// İlçeyi buraya yazın (Karatay, Meram, Selçuklu, Çumra vb.)
+area["name"="Selçuklu"]->.searchArea;
+(
+  way["highway"~"trunk|primary|secondary|tertiary|residential"](area.searchArea);
+);
+out body;
+>;
+out skel qt;
+```
+
+**İndirme Adımları:**
+1. Overpass Turbo'da sol menüye sorguyu yapıştırın.
+2. `Çalıştır (Run)` butonuna basın.
+3. Sağ üstteki `Dışa Aktar (Export)` menüsünden `GeoJSON` formatını seçin.
+4. Dosyayı `[ilce_adi]_yollar.geojson` olarak kaydedip `data/` klasörüne atın (Örn: `karatay_yollar.geojson`).
 
 ### B. CSV ve Global Veriler
 - **USGS Earthquake Data**: [Son 30 Günün Depremleri](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php) (CSV Import testi için ideal).
