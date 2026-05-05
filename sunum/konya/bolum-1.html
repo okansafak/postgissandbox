@@ -703,8 +703,8 @@ LIMIT 1;</div>
                   B'nin içinde mi? <strong>ST_Intersects:</strong> Herhangi bir temas var mı?</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.mahalleler
-WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Belirlenen noktaya temas eden mahalleyi bul</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.mahalleler -- Mahalleler tablosundan seç
+WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen mahalleyi bul</div>
 
                 <div class="reveal-box" id="q111">
                   <div class="reveal-trigger" onclick="document.getElementById('q111').classList.toggle('open')">
@@ -760,9 +760,8 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Belirlenen noktaya tem
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- 500 metre içindekileri bul:
-SELECT * FROM konya.osm_binalar
-WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- Noktaya 500m mesafe içindekiler</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.osm_binalar -- Binalar tablosundan seç
+WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m mesafe filtresi (index dostu)</div>
 
                 <div class="reveal-box" id="q112">
                   <div class="reveal-trigger" onclick="document.getElementById('q112').classList.toggle('open')">
