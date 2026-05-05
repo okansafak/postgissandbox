@@ -235,8 +235,10 @@ docker-compose up -d
                 <div class="s-text-tech">SELECT ile tablo sütunlarını seçer, gerekirse AS ile yeniden adlandırırız.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad AS ilce_adi, 
-       nufus / 1000 AS bin_nufus 
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad || ' Belediyesi' AS kurum_adi,
+       nufus AS kisi_sayisi,
+       nufus / 1000.0 AS nufus_k,
+       'KONYA' AS sehir
 FROM konya.ilce_sinirlari;</div>
 
                 <div class="reveal-box" id="q04">
