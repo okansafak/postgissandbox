@@ -69,6 +69,66 @@
             </div>
           </div>
         </div>
+      <!-- SLAYT 2: TANIŞMA VE BEKLENTİLER -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">Tanışma ve Beklentiler</div>
+              <div class="slide-header-num">02 / 13</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ekibi <span>Tanıyalım</span></div>
+                <div class="s-text-tech">Eğitime başlamadan önce ekibimizin teknik profilini ve beklentilerini anlamak, içeriği optimize etmemizi sağlar.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="reveal-box" id="q_intro_1" style="margin-bottom: 12px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('q_intro_1').classList.toggle('open')">
+                    1. Birim ve Görev Alanı <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Hangi birimde çalışıyorsunuz? (Ulaşım, İmar, Bilgi İşlem, Fen İşleri vb.) Temel sorumluluk alanlarınız neler?
+                  </div>
+                </div>
+                
+                <div class="reveal-box" id="q_intro_2" style="margin-bottom: 12px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('q_intro_2').classList.toggle('open')">
+                    2. Teknik Geçmiş <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Daha önce SQL, PostgreSQL veya PostGIS ile çalıştınız mı? Klasik CBS (QGIS, ArcGIS) araçlarına ne kadar aşinasınız?
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="q_intro_3" style="margin-bottom: 12px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('q_intro_3').classList.toggle('open')">
+                    3. Mevcut Veri Yapısı <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Şu an mekansal verilerinizi nasıl yönetiyorsunuz? (Shapefile, Excel, Oracle, MSSQL vb.)
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="q_intro_4">
+                  <div class="reveal-trigger" onclick="document.getElementById('q_intro_4').classList.toggle('open')">
+                    4. Beklentiler ve Hedefler <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Bu eğitimden sonra veritabanı üzerinde çözmek istediğiniz özel bir mekansal problem veya analiz var mı?
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- SLAYT 2: 0.1 VERİTABANI NEDİR? -->
@@ -84,7 +144,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.1 — Veritabanı Nedir?</div>
-              <div class="slide-header-num">02 / 12</div>
+              <div class="slide-header-num">03 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -136,7 +196,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.2 — Kurulum ve Veri Seti</div>
-              <div class="slide-header-num">03 / 12</div>
+              <div class="slide-header-num">04 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -176,7 +236,7 @@ docker-compose up -d
                 </div>
               </div>
               <div class="slide-header-title">0.3 — PostgreSQL Veri Tipleri</div>
-              <div class="slide-header-num">04 / 12</div>
+              <div class="slide-header-num">05 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -227,7 +287,7 @@ docker-compose up -d
                 </div>
               </div>
               <div class="slide-header-title">0.4 — SELECT ve Sütun Seçimi</div>
-              <div class="slide-header-num">05 / 12</div>
+              <div class="slide-header-num">06 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -283,7 +343,7 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
                 </div>
               </div>
               <div class="slide-header-title">0.5 — WHERE ile Filtreleme</div>
-              <div class="slide-header-num">06 / 12</div>
+              <div class="slide-header-num">07 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -352,7 +412,7 @@ WHERE nufus >= 50000                      -- Sayısal kıyaslama
                 </div>
               </div>
               <div class="slide-header-title">0.6 — ORDER BY ve LIMIT</div>
-              <div class="slide-header-num">07 / 12</div>
+              <div class="slide-header-num">08 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -407,7 +467,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
                 </div>
               </div>
               <div class="slide-header-title">0.7 — Toplama Fonksiyonları</div>
-              <div class="slide-header-num">08 / 12</div>
+              <div class="slide-header-num">09 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -456,7 +516,7 @@ FROM konya.ilce_sinirlari;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.8 — GROUP BY ve HAVING</div>
-              <div class="slide-header-num">09 / 12</div>
+              <div class="slide-header-num">10 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -512,7 +572,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
                 </div>
               </div>
               <div class="slide-header-title">0.9 — JOIN ve Tablo İlişkileri</div>
-              <div class="slide-header-num">10 / 12</div>
+              <div class="slide-header-num">11 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -572,7 +632,7 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.10 — Veri Yönetimi (DML)</div>
-              <div class="slide-header-num">11 / 12</div>
+              <div class="slide-header-num">12 / 13</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -646,7 +706,7 @@ WHERE ad = 'Yeni Mahalle';</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 12</div>
+    <div class="nav-status" id="navStatus">1 / 13</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 
