@@ -35,6 +35,12 @@ Aşağıdaki veriler `init-db/data/` klasöründe mevcuttur ve kurulumla birlikt
 | **konya.poi** *(durak)* | `selcuklu_durak.geojson` | ST_ClusterKMeans (Bölüm 3) |
 | **konya.poi** *(eczane)* | `selcuklu_eczane.geojson` | ST_ClusterDBSCAN (Bölüm 3) |
 | **konya.poi** *(cami)* | `selcuklu_cami.geojson` | Buffer analizi (Bölüm 1) |
+| **konya.poi** *(market)* | `selcuklu_market.geojson` | Ticari analiz (Bölüm 1) |
+
+### Bina Verileri
+| Tablo Adı | Kaynak Dosya | Açıklama / Kullanım Alanı |
+| :--- | :--- | :--- |
+| **konya.osm_binalar** | `selcuklu_bina.geojson` | KNN, İndeks, Partition, Yoğunluk (Bölüm 1, 2, 3) |
 
 ### Diğer Veriler
 | Tablo Adı | Kaynak Dosya | Açıklama / Kullanım Alanı |
@@ -49,13 +55,7 @@ Ders sunumları incelendiğinde aşağıdaki verilerin içerikte referans alınd
 
 | Eksik Veri | Kullanıldığı Bölüm | Kullanıldığı Senaryo | Overpass Tag |
 | :--- | :--- | :--- | :--- |
-| **osm_binalar** | Bölüm 1, 2, 3 | KNN, İndeks, Partition, Yoğunluk | `way["building"]` |
-| **kazalar** (sentetik) | Bölüm 3 | ST_ClusterDBSCAN, Isı haritası | ✅ *Otomatik üretiliyor (07-analysis-advanced.sql)* |
-| **itfaiye** | Bölüm 3 | Rota analizi, Erişim süresi | `node["amenity"="fire_station"]` |
 | **parklar** | Bölüm 1, 3 | Yeşil alan ölçümü, HexagonGrid | `way["leisure"="park"]` |
-| **marketler** | Bölüm 1 | Ticari erişilebilirlik analizi | `node["shop"~"supermarket\|convenience"]` |
-
-> **Not:** `osm_binalar` en kritik eksiktir — Bölüm 1 (KNN, Spatial Join), Bölüm 2 (GiST İndeks, &&, Partitioning) ve Bölüm 3'te (HexagonGrid yoğunluk) yoğun olarak kullanılmaktadır.
 
 ---
 
@@ -132,7 +132,16 @@ out body; >; out skel qt;
 ```
 *Dosya Adı:* `konya_itfaiye.geojson`
 
-**G. Diğer Önemli Noktalar (Ders Zenginleştirme)**
+**G. Yangın Vanaları (Proximity Analizi İçin)**
+```text
+[out:json];
+area["name"="Selçuklu"]->.a;
+node["emergency"="fire_hydrant"](area.a);
+out body; >; out skel qt;
+```
+*Dosya Adı:* `selcuklu_yangin_vanasi.geojson`
+
+**H. Diğer Önemli Noktalar (Ders Zenginleştirme)**
 Aşağıdaki tabloda verilen tag'leri kullanarak benzer sorgular oluşturabilirsiniz:
 
 | Kategori | Overpass Tag | Örnek Dosya Adı | Analiz Senaryosu |
@@ -197,18 +206,18 @@ COPY konya.nufus_staging FROM '/docker-entrypoint-initdb.d/data/nufus.csv' WITH 
 | **Bölüm 1** | ST_Intersects, ST_Contains | `konya.mahalleler`, `konya.poi` (hastane) | ✅ Hazır |
 | **Bölüm 1** | ST_DWithin, ST_Buffer | `konya.osm_yollar`, `konya.poi` (cami) | ✅ Hazır |
 | **Bölüm 1** | KNN (`<->`) | `konya.poi` (hastane, eczane) | ✅ Hazır |
-| **Bölüm 1** | Spatial Join (Bina-Mahalle) | `konya.osm_binalar` + `konya.mahalleler` | ⚠️ Bina eksik |
+| **Bölüm 1** | Spatial Join (Bina-Mahalle) | `konya.osm_binalar` + `konya.mahalleler` | ✅ Hazır |
 | **Bölüm 2** | CSV Import, Staging, Regex | `nufus.csv` → `konya.staging_import` | ✅ Hazır |
 | **Bölüm 2** | ST_Subdivide | `konya.ilce_sinirlari` | ✅ Hazır |
-| **Bölüm 2** | GiST İndeks, && operatörü | `konya.osm_binalar` | ⚠️ Bina eksik |
-| **Bölüm 2** | Partitioning | `konya.osm_binalar` (İlçe bazlı) | ⚠️ Bina eksik |
+| **Bölüm 2** | GiST İndeks, && operatörü | `konya.osm_binalar` | ✅ Hazır |
+| **Bölüm 2** | Partitioning | `konya.osm_binalar` (İlçe bazlı) | ✅ Hazır |
 | **Bölüm 2** | Linear Referencing | `konya.osm_yollar` | ✅ Hazır |
 | **Bölüm 3** | ST_ClusterKMeans | `konya.poi` (durak) | ✅ Hazır |
 | **Bölüm 3** | ST_ClusterDBSCAN | `konya.poi` (eczane) | ✅ Hazır |
-| **Bölüm 3** | ST_HexagonGrid | `konya.osm_binalar`, `konya.mahalleler` | ⚠️ Bina eksik |
+| **Bölüm 3** | ST_HexagonGrid | `konya.osm_binalar`, `konya.mahalleler` | ✅ Hazır |
 | **Bölüm 3** | pgr_dijkstra | `konya.osm_yollar` | ✅ Hazır |
 | **Bölüm 3** | TSP (Çoklu Durak) | `konya.osm_yollar` | ✅ Hazır |
-| **Bölüm 3** | Erişim Analizi (İtfaiye) | `konya.poi` (itfaiye) + `osm_yollar` | ⚠️ İtfaiye eksik |
+| **Bölüm 3** | Erişim Analizi (İtfaiye) | `konya.poi` (itfaiye) + `osm_yollar` | ✅ Hazır |
 
 ---
 
@@ -216,4 +225,3 @@ COPY konya.nufus_staging FROM '/docker-entrypoint-initdb.d/data/nufus.csv' WITH 
 - **Geometry Type**: Yol verileri `MULTILINESTRING` olarak tutulur. `ogr2ogr` aktarımında `-nlt MULTILINESTRING` kullanılması önerilir.
 - **SRID**: Tüm veriler varsayılan olarak `EPSG:4326` (WGS84) koordinat sistemindedir.
 - **Dizin Erişimi**: Docker içinde veriler `/docker-entrypoint-initdb.d/data/` yolunda bulunur. SQL komutlarında bu yol kullanılmalıdır.
-- **Öncelikli Eksik**: `osm_binalar` verisi 3 bölümde yoğun olarak kullanılmaktadır; eğitim öncesi mutlaka temin edilmelidir.

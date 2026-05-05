@@ -36,7 +36,6 @@ FROM konya.hastaneler;
 -- 3. Mahalle Yüzey Noktası Görünümü (Bölüm 1: Slayt 15 — ST_PointOnSurface)
 CREATE OR REPLACE VIEW analiz.v_mahalle_etiket AS
 SELECT
-    id,
     ad,
     ilce,
     ST_PointOnSurface(geom) AS etiket_noktasi

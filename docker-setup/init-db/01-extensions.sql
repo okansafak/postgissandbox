@@ -9,6 +9,7 @@ CREATE EXTENSION IF NOT EXISTS postgis_topology;
 CREATE EXTENSION IF NOT EXISTS postgis_raster;
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
 CREATE EXTENSION IF NOT EXISTS pgrouting;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Doğrulama
 DO $$ BEGIN RAISE NOTICE 'PostGIS Sürümü: %', postgis_full_version(); END $$;

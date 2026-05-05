@@ -1,0 +1,1682 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-05-05T18:56:50Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2539639832",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Gazi Caddesi",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4964777,
+          37.9387941
+        ]
+      },
+      "id": "node/2539639832"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2654197966",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5238988,
+          38.0104867
+        ]
+      },
+      "id": "node/2654197966"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2900525339",
+        "addr:city": "Konya",
+        "name": "Elif Nur Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5021699,
+          37.9186651
+        ]
+      },
+      "id": "node/2900525339"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2979204687",
+        "addr:city": "Konya",
+        "name": "Adesem",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4561063,
+          37.9014029
+        ]
+      },
+      "id": "node/2979204687"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3034185009",
+        "name": "Adesem",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4860998,
+          37.8953955
+        ]
+      },
+      "id": "node/3034185009"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3166335236",
+        "addr:city": "Konya",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5322728,
+          38.0112494
+        ]
+      },
+      "id": "node/3166335236"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3166335237",
+        "addr:city": "Konya",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.532547,
+          38.0112348
+        ]
+      },
+      "id": "node/3166335237"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3652684624",
+        "addr:city": "Selçuklu/Konya",
+        "name": "Cenk Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4817736,
+          37.904641
+        ]
+      },
+      "id": "node/3652684624"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3652703326",
+        "name": "Pima",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4814958,
+          37.9045767
+        ]
+      },
+      "id": "node/3652703326"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3658927128",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Büyük Hizmet Caddesi",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5264167,
+          38.0106796
+        ]
+      },
+      "id": "node/3658927128"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3658927129",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Büyük Hizmet Caddesi",
+        "brand": "Türkiye Tarım Kredi Kooperatif Market",
+        "brand:tr": "Türkiye Tarım Kredi Kooperatif Market",
+        "brand:wikidata": "Q127328776",
+        "name": "Türkiye Tarım Kredi Kooperatif Market",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5264348,
+          38.010842
+        ]
+      },
+      "id": "node/3658927129"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659705909",
+        "addr:city": "Selçuklu/Konya",
+        "name": "Migros",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5220251,
+          38.0127889
+        ]
+      },
+      "id": "node/3659705909"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659836954",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4881832,
+          37.9842117
+        ]
+      },
+      "id": "node/3659836954"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3692777298",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4923718,
+          37.918413
+        ]
+      },
+      "id": "node/3692777298"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3692778233",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Güzel Dere Caddesi",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "name:en": "Sincap Grocery Store",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4923839,
+          37.9194102
+        ]
+      },
+      "id": "node/3692778233"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702327260",
+        "name": "Can Büfe",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.599975,
+          37.9871721
+        ]
+      },
+      "id": "node/3702327260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702828768",
+        "name": "Ova AVM",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4547565,
+          37.8823335
+        ]
+      },
+      "id": "node/3702828768"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704616832",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Dr.Hulusi Baybal Caddesi",
+        "name": "Makromarket",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4841414,
+          37.8783972
+        ]
+      },
+      "id": "node/3704616832"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3737930802",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Mesaj Caddesi",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5205429,
+          37.9798698
+        ]
+      },
+      "id": "node/3737930802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3737930803",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Mesaj Caddesi",
+        "name": "Kocaman Market",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5206044,
+          37.9803185
+        ]
+      },
+      "id": "node/3737930803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3737990072",
+        "addr:city": "Selçuklu/Konya",
+        "name": "Sincap Market Zinciri",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5033311,
+          37.9569455
+        ]
+      },
+      "id": "node/3737990072"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3738023788",
+        "addr:city": "Selçuklu/Konya",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5086177,
+          37.9548191
+        ]
+      },
+      "id": "node/3738023788"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3738023789",
+        "addr:city": "Selçuklu/Konya",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5094638,
+          37.9548586
+        ]
+      },
+      "id": "node/3738023789"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3738023790",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "24",
+        "addr:street": "Sultan Caddesi",
+        "name": "Gross 42 Market",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5092265,
+          37.9552153
+        ]
+      },
+      "id": "node/3738023790"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812891686",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4771051,
+          37.9201535
+        ]
+      },
+      "id": "node/3812891686"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812891710",
+        "addr:city": "Selçuklu/Konya",
+        "name": "SütGross",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4781921,
+          37.9183372
+        ]
+      },
+      "id": "node/3812891710"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812891711",
+        "addr:city": "Selçuklu/Konya",
+        "name": "Öz Buhara Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4853102,
+          37.9215695
+        ]
+      },
+      "id": "node/3812891711"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812891716",
+        "addr:city": "Selçuklu/Konya",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4960156,
+          37.9390419
+        ]
+      },
+      "id": "node/3812891716"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812923684",
+        "addr:city": "Selçuklu/Konya",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5028633,
+          37.9374302
+        ]
+      },
+      "id": "node/3812923684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4034264270",
+        "addr:city": "Selçuklu/Konya",
+        "name": "Mesrur Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4544555,
+          37.9101722
+        ]
+      },
+      "id": "node/4034264270"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4034267135",
+        "name": "Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4526772,
+          37.9074822
+        ]
+      },
+      "id": "node/4034267135"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4034318181",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Karlıbel Caddesi",
+        "name": "Adesem",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4638136,
+          37.9095914
+        ]
+      },
+      "id": "node/4034318181"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063272799",
+        "addr:city": "Selçuklu/Konya",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5066164,
+          37.9490385
+        ]
+      },
+      "id": "node/4063272799"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063272848",
+        "addr:city": "Selçuklu/Konya",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5263533,
+          37.95832
+        ]
+      },
+      "id": "node/4063272848"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354823",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4982758,
+          37.9216224
+        ]
+      },
+      "id": "node/4063354823"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4370603293",
+        "addr:housenumber": "2",
+        "addr:postcode": "42700",
+        "addr:street": "hısım sk",
+        "name": "Gözde Market",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4866012,
+          37.9331735
+        ]
+      },
+      "id": "node/4370603293"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4560828989",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.477735,
+          37.8847042
+        ]
+      },
+      "id": "node/4560828989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4582983889",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4619066,
+          37.9085584
+        ]
+      },
+      "id": "node/4582983889"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5111400026",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4617369,
+          37.892543
+        ]
+      },
+      "id": "node/5111400026"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5111432721",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4615609,
+          37.8922676
+        ]
+      },
+      "id": "node/5111432721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112770422",
+        "name": "Çelikkayalar AVM",
+        "shop": "supermarket",
+        "website": "https://www.celikkayalaronline.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.482893,
+          37.8862242
+        ]
+      },
+      "id": "node/5112770422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112770423",
+        "name": "Asfora",
+        "shop": "supermarket",
+        "website": "http://www.asfora.com.tr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4831853,
+          37.8858517
+        ]
+      },
+      "id": "node/5112770423"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112790325",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4570375,
+          37.8903312
+        ]
+      },
+      "id": "node/5112790325"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112791422",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4830491,
+          37.8766447
+        ]
+      },
+      "id": "node/5112791422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112937322",
+        "brand": "Şok",
+        "brand:wikidata": "Q19613992",
+        "brand:wikipedia": "tr:Şok (market)",
+        "name": "Şok",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4771856,
+          37.8843899
+        ]
+      },
+      "id": "node/5112937322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5114987243",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4397379,
+          37.8872905
+        ]
+      },
+      "id": "node/5114987243"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5114987258",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4401717,
+          37.8816806
+        ]
+      },
+      "id": "node/5114987258"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5114994822",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4405216,
+          37.8883985
+        ]
+      },
+      "id": "node/5114994822"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5114997422",
+        "name": "Adese",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4393795,
+          37.8840715
+        ]
+      },
+      "id": "node/5114997422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5117278121",
+        "name": "Adnan Menderes Toptancı Hali",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4950665,
+          37.8919275
+        ]
+      },
+      "id": "node/5117278121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5209827904",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4137216,
+          37.9266892
+        ]
+      },
+      "id": "node/5209827904"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5439769949",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4776357,
+          37.9203407
+        ]
+      },
+      "id": "node/5439769949"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5922125229",
+        "addr:housenumber": "NO:10/D",
+        "addr:neighbourhood": "BİNKONUTLAR MH.",
+        "addr:street": "Hisarkule Sokak",
+        "name": "ŞEN ORTAKLAR MARKET",
+        "opening_hours": "Mo-Su 08:00-22:00",
+        "operator": "MARKET",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5047117,
+          37.9400582
+        ]
+      },
+      "id": "node/5922125229"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5991406158",
+        "name": "Bakkal",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3616415,
+          37.9543939
+        ]
+      },
+      "id": "node/5991406158"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6955017585",
+        "name": "Otogar Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5088493,
+          37.9503807
+        ]
+      },
+      "id": "node/6955017585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7939901163",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4535522,
+          37.8813095
+        ]
+      },
+      "id": "node/7939901163"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7941720734",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "brand:wikipedia": "en:Bim (company)",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4503915,
+          37.9002359
+        ]
+      },
+      "id": "node/7941720734"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7941725462",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4508716,
+          37.9021955
+        ]
+      },
+      "id": "node/7941725462"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8071642480",
+        "name": "Sögütlü Gross",
+        "shop": "supermarket",
+        "website": "http://www.sogutlugross.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4826887,
+          37.8865685
+        ]
+      },
+      "id": "node/8071642480"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8612275963",
+        "addr:city": "Selçuklu/Konya",
+        "addr:neighbourhood": "Malazgirt Mahalesi",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "brand:wikipedia": "tr:A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4977801,
+          37.926764
+        ]
+      },
+      "id": "node/8612275963"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9484203368",
+        "brand": "Migros",
+        "brand:wikidata": "Q1754510",
+        "brand:wikipedia": "en:Migros",
+        "name": "Migros",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4931181,
+          37.8903136
+        ]
+      },
+      "id": "node/9484203368"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10204149966",
+        "addr:city": "Konya",
+        "addr:district": "Selcuklu",
+        "addr:housenumber": "21",
+        "addr:neighbourhood": "Akincilar mahallesi",
+        "addr:postcode": "42100",
+        "addr:street": "Akıncılar Caddesi",
+        "name": "Kardesler Market",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4704782,
+          37.9029849
+        ]
+      },
+      "id": "node/10204149966"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11197603987",
+        "name": "Bizim Market'im",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5033993,
+          37.9536538
+        ]
+      },
+      "id": "node/11197603987"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11313894269",
+        "addr:housenumber": "1",
+        "addr:street": "Turgut Reis Caddesi",
+        "name": "Furkan market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5263339,
+          38.0149474
+        ]
+      },
+      "id": "node/11313894269"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11313894271",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "name": "BİM",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5273264,
+          38.0176229
+        ]
+      },
+      "id": "node/11313894271"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11482467923",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5102413,
+          37.9439364
+        ]
+      },
+      "id": "node/11482467923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11482467924",
+        "name": "Sarılar Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5054789,
+          37.9440334
+        ]
+      },
+      "id": "node/11482467924"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11482610875",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5035413,
+          37.9427734
+        ]
+      },
+      "id": "node/11482610875"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11810289313",
+        "name": "A101",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5238535,
+          37.9794691
+        ]
+      },
+      "id": "node/11810289313"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11834980278",
+        "name": "A101",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5211144,
+          37.98085
+        ]
+      },
+      "id": "node/11834980278"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11839098410",
+        "name": "A101",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5218589,
+          37.9755733
+        ]
+      },
+      "id": "node/11839098410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11915675833",
+        "addr:city": "KONYA",
+        "addr:district": "SELÇUKLU",
+        "addr:housenumber": "22B",
+        "addr:neighbourhood": "KOSOVA",
+        "addr:postcode": "42250",
+        "addr:street": "COŞANDERE",
+        "branch": "TEKNİK SERVİS",
+        "contact:facebook": "https://www.facebook.com/teknikdestekkonya",
+        "currency:TL": "yes",
+        "currency:USD": "yes",
+        "email": "www.teknikdestek@gmail.com",
+        "internet_access": "yes",
+        "name": "TEKNİK DESTEK KONYA",
+        "opening_hours": "24/7",
+        "operator": "TEKNİK DESTEK KONYA",
+        "payment:notes": "yes",
+        "payment:visa": "yes",
+        "phone": "+905339337835",
+        "shop": "supermarket",
+        "stroller": "yes",
+        "website": "https://www.teknikdestekkonya.com/",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5264423,
+          37.992379
+        ]
+      },
+      "id": "node/11915675833"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11951274059",
+        "brand": "A101",
+        "brand:wikidata": "Q6034496",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4833516,
+          37.8714285
+        ]
+      },
+      "id": "node/11951274059"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11951278536",
+        "branch": "Mini",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4878535,
+          37.8728705
+        ]
+      },
+      "id": "node/11951278536"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12000694831",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.7632046,
+          38.1224793
+        ]
+      },
+      "id": "node/12000694831"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12057305569",
+        "name": "Burç Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5282583,
+          38.0171701
+        ]
+      },
+      "id": "node/12057305569"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12057438869",
+        "addr:postcode": "42250",
+        "addr:street": "Büyük Hizmet Caddesi",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5270917,
+          38.0096098
+        ]
+      },
+      "id": "node/12057438869"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12057438870",
+        "name": "Bim",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5264848,
+          38.009493
+        ]
+      },
+      "id": "node/12057438870"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12057438969",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5213559,
+          38.0104182
+        ]
+      },
+      "id": "node/12057438969"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099335105",
+        "addr:postcode": "42250",
+        "addr:street": "Büyük Hizmet Caddesi",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5270945,
+          38.009481
+        ]
+      },
+      "id": "node/12099335105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12099348601",
+        "addr:postcode": "42250",
+        "addr:street": "Osmanlı Caddesi",
+        "name": "Çelikkayalar",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5250389,
+          38.0096968
+        ]
+      },
+      "id": "node/12099348601"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12290363902",
+        "brand": "BİM",
+        "brand:wikidata": "Q1022075",
+        "name": "BİM",
+        "opening_hours": "Mo-Su 09:00-21:00",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4605263,
+          37.9539076
+        ]
+      },
+      "id": "node/12290363902"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12291725774",
+        "name": "A101",
+        "not:brand:wikidata": "Q6034496",
+        "opening_hours": "Mo-Su 08:00-22:00",
+        "operator": "A101",
+        "payment:cash": "yes",
+        "payment:credit_cards": "yes",
+        "payment:debit_cards": "yes",
+        "phone": "+90 850 808 2101",
+        "shop": "supermarket",
+        "website": "https://www.a101.com.tr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5161683,
+          37.9936908
+        ]
+      },
+      "id": "node/12291725774"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12519665141",
+        "brand": "Türkiye Tarım Kredi Kooperatif Market",
+        "brand:tr": "Türkiye Tarım Kredi Kooperatif Market",
+        "changing_table": "no",
+        "level": "0",
+        "name": "Türkiye Tarım Kredi Kooperatif Market",
+        "shop": "supermarket",
+        "toilets:wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4922799,
+          37.9162558
+        ]
+      },
+      "id": "node/12519665141"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12520558765",
+        "name": "Emin",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4986635,
+          37.9133615
+        ]
+      },
+      "id": "node/12520558765"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12520558767",
+        "brand": "A101",
+        "name": "A101",
+        "opening_hours": "Mo-Su 09:00-21:30",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4990332,
+          37.9127761
+        ]
+      },
+      "id": "node/12520558767"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12560896562",
+        "name": "Bak Bu Gross",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4990212,
+          37.8870274
+        ]
+      },
+      "id": "node/12560896562"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12911468632",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.2367474,
+          38.0033693
+        ]
+      },
+      "id": "node/12911468632"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13045648323",
+        "name": "Akasya Market",
+        "shop": "convenience"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5083988,
+          37.9417557
+        ]
+      },
+      "id": "node/13045648323"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13204736191",
+        "brand": "Migros",
+        "brand:wikidata": "Q1754510",
+        "name": "Migros",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4812116,
+          37.8711385
+        ]
+      },
+      "id": "node/13204736191"
+    }
+  ]
+}

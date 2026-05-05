@@ -18,56 +18,40 @@ CREATE TABLE konya.nufus_staging (
 -- ADIM 2: COPY Komutu ile Veriyi İçeri Alma
 -- ------------------------------------------------------------
 -- COPY, büyük dosyalar için standarttır. 
--- Dosya yolu Docker konteyneri içindeki yol olmalıdır.
--- Not: Başlıktaki boş satırları ve metadata kısmını da alır, 
--- sonra temizleyeceğiz.
-
--- COPY konya.nufus_staging FROM '/docker-entrypoint-initdb.d/data/nufus.csv' WITH (FORMAT text);
+COPY konya.nufus_staging FROM '/docker-entrypoint-initdb.d/data/nufus.csv' WITH (FORMAT text);
 
 -- ------------------------------------------------------------
--- ADIM 3: INSERT Örneği (Manuel Giriş)
+-- ADIM 3: INSERT Örneği (Manuel Giriş - Eğitim Amaçlı)
 -- ------------------------------------------------------------
--- Küçük veri setleri veya testler için INSERT kullanılır.
--- nufus.csv'den örnek satırlar:
+-- (Bu kısım eğitimde manuel deneme için bırakılmıştır)
 INSERT INTO konya.nufus_staging VALUES 
-('2023|Konya(Ahırlı)-1868|5027.0|'),
-('|Konya(Akören)-1753|5902.0|'),
-('|Konya(Akşehir)-1122|92946.0|'),
-('2024|Konya(Ereğli)-1312|156253.0|');
+('2025|Konya(Örnek İlçe)-9999|1000.0|');
 
 -- ------------------------------------------------------------
 -- ADIM 4: Veriyi Temizleme ve Formatlandırma (Regex)
 -- ------------------------------------------------------------
--- Hedef: '|Konya(Ahırlı)-1868|5027.0|' -> 'Ahırlı', 5027
--- Regex açıklaması:
--- \((.*?)\)  -> Parantez içindeki metni (ilçe adı) yakalar.
--- \|(\d+\.?\d*)\| -> Boru (|) işaretleri arasındaki sayısal değeri (nüfus) yakalar.
-
-SELECT 
+-- Temizlenmiş veriyi bir view veya tablo olarak görelim.
+CREATE OR REPLACE VIEW konya.v_temiz_nufus AS
+SELECT DISTINCT ON (ilce_adi)
     (regexp_matches(raw_satir, '\((.*?)\)'))[1] as ilce_adi,
     (regexp_matches(raw_satir, '\|(\d+\.?\d*)\|'))[1]::numeric::integer as nufus,
     CASE 
         WHEN raw_satir ~ '^\d{4}' THEN LEFT(raw_satir, 4)
-        ELSE NULL -- Yıl bilgisi her satırda yok, üst satırdan gelmesi gerekir (İleri seviye)
+        ELSE NULL 
     END as yil
 FROM konya.nufus_staging
-WHERE raw_satir ~ '\('; -- Sadece içinde parantez olan (veri içeren) satırları al
+WHERE raw_satir ~ '\('
+ORDER BY ilce_adi, yil DESC; -- En güncel yılı al
 
 -- ------------------------------------------------------------
 -- ADIM 5: Asıl Tabloya (konya.ilce_sinirlari) Aktarma
 -- ------------------------------------------------------------
--- Staging tablosundaki temizlenmiş veriyi asıl tabloya UPDATE edelim.
+ALTER TABLE konya.ilce_sinirlari ADD COLUMN IF NOT EXISTS nufus INTEGER;
 
 UPDATE konya.ilce_sinirlari i
-SET nufus = t.temiz_nufus
-FROM (
-    SELECT 
-        (regexp_matches(raw_satir, '\((.*?)\)'))[1] as temiz_ad,
-        (regexp_matches(raw_satir, '\|(\d+\.?\d*)\|'))[1]::numeric::integer as temiz_nufus
-    FROM konya.nufus_staging
-    WHERE raw_satir ~ '\('
-) t
-WHERE i.ad = t.temiz_ad;
+SET nufus = t.nufus
+FROM konya.v_temiz_nufus t
+WHERE i.ad = t.ilce_adi;
 
 -- ------------------------------------------------------------
 -- ÖZET: COPY vs INSERT

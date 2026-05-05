@@ -235,9 +235,9 @@ docker-compose up -d
                 <div class="s-text-tech">SELECT ile tablo sütunlarını seçer, gerekirse AS ile yeniden adlandırırız.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad AS mahalle_adi, 
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad AS ilce_adi, 
        nufus / 1000 AS bin_nufus 
-FROM konya.mahalleler;</div>
+FROM konya.ilce_sinirlari;</div>
 
                 <div class="reveal-box" id="q04">
                   <div class="reveal-trigger" onclick="document.getElementById('q04').classList.toggle('open')">
@@ -294,10 +294,10 @@ FROM konya.mahalleler;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.mahalleler 
-WHERE nufus > 5000 
-  AND ilce IN ('Selçuklu', 'Meram') 
-  AND ad LIKE 'A%';</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.ilce_sinirlari 
+WHERE nufus > 50000 
+  AND ad IN ('Selçuklu', 'Meram', 'Karatay') 
+  AND ad LIKE '%a%';</div>
                 
                 <div class="reveal-box" id="q05">
                   <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
@@ -313,7 +313,7 @@ WHERE nufus > 5000
                     Görev: Karatay Mahallelerini Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT * FROM konya.mahalleler WHERE ilce = 'Karatay' AND nufus < 1000;</code>
+                    <code>SELECT * FROM konya.ilce_sinirlari WHERE ad = 'Karatay' AND nufus > 100000;</code>
                   </div>
                 </div>
               </div>
@@ -354,7 +354,7 @@ WHERE nufus > 5000
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.mahalleler 
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.ilce_sinirlari 
 ORDER BY nufus DESC 
 LIMIT 5 OFFSET 0;</div>
                 
@@ -372,7 +372,7 @@ LIMIT 5 OFFSET 0;</div>
                     Görev: En Az Nüfuslu 3 Mahalle <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ad, nufus FROM konya.mahalleler ORDER BY nufus ASC LIMIT 3;</code>
+                    <code>SELECT ad, nufus FROM konya.ilce_sinirlari ORDER BY nufus ASC LIMIT 3;</code>
                   </div>
                 </div>
               </div>
@@ -402,9 +402,9 @@ LIMIT 5 OFFSET 0;</div>
                 <div class="s-text-tech">COUNT, SUM, AVG gibi fonksiyonlarla milyonlarca satırı tek bir değere indirgemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT COUNT(*) AS toplam_mahalle, 
+                <div class="code-block" style="margin-bottom:16px;">SELECT COUNT(*) AS toplam_ilce, 
        SUM(nufus) AS toplam_nufus 
-FROM konya.mahalleler;</div>
+FROM konya.ilce_sinirlari;</div>
 
                 <div class="reveal-box" id="q07">
                   <div class="reveal-trigger" onclick="document.getElementById('q07').classList.toggle('open')">
@@ -420,7 +420,7 @@ FROM konya.mahalleler;</div>
                     Görev: Ortalama Nüfusu Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT AVG(nufus) FROM konya.mahalleler;</code>
+                    <code>SELECT AVG(nufus) FROM konya.ilce_sinirlari;</code>
                   </div>
                 </div>
               </div>
@@ -466,10 +466,10 @@ HAVING COUNT(*) > 5;</div>
 
                 <div class="reveal-box" id="a08">
                   <div class="reveal-trigger" onclick="document.getElementById('a08').classList.toggle('open')">
-                    Görev: İlçelere Göre Toplam Nüfus <span>▼</span>
+                    Görev: Birimlere Göre Toplam Maaş <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ilce, SUM(nufus) FROM konya.mahalleler GROUP BY ilce ORDER BY SUM(nufus) DESC;</code>
+                    <code>SELECT birim, SUM(maas) FROM egitim.personel GROUP BY birim ORDER BY SUM(maas) DESC;</code>
                   </div>
                 </div>
               </div>

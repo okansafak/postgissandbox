@@ -1,0 +1,171 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-05-05T19:06:01Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259021347",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:housenumber": "82",
+        "addr:neighbourhood": "Hüsamettin Çelebi Mahallesi",
+        "addr:postcode": "42100",
+        "addr:street": "Uluyayla Caddesi",
+        "amenity": "fire_station",
+        "building": "yes",
+        "name": "Selçuklu İtfaiye Merkezi",
+        "name:en": "Selçuklu Fire Department",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "phone": "+90 332 205 5763",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.490691,
+          37.9166753
+        ]
+      },
+      "id": "way/259021347"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526815743",
+        "amenity": "fire_station",
+        "building": "yes",
+        "name": "Fıre Statıon",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.574934,
+          37.9870897
+        ]
+      },
+      "id": "way/526815743"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1120654665",
+        "amenity": "fire_station",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4841006,
+          37.9571032
+        ]
+      },
+      "id": "way/1120654665"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1344350341",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:housenumber": "82",
+        "addr:neighbourhood": "Hüsamettin Çelebi Mahallesi",
+        "addr:postcode": "42100",
+        "addr:street": "Uluyayla Caddesi",
+        "amenity": "fire_station",
+        "email": "itfaiye@konya.bel.tr",
+        "name": "Konya Büyükşehir Belediyesi İtfaiye Dairesi Başkanlığı",
+        "operator": "Konya Büyükşehir Belediyesi",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4901567,
+          37.917018
+        ]
+      },
+      "id": "way/1344350341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4664315544",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.505248,
+          37.9439239
+        ]
+      },
+      "id": "node/4664315544"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10258952421",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.1632119,
+          38.0703653
+        ]
+      },
+      "id": "node/10258952421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10258953561",
+        "amenity": "fire_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.1637456,
+          38.0709333
+        ]
+      },
+      "id": "node/10258953561"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13110321467",
+        "emergency": "fire_hydrant"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5057526,
+          37.9399395
+        ]
+      },
+      "id": "node/13110321467"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13110321468",
+        "emergency": "fire_hydrant",
+        "fire_hydrant:type": "pillar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5023171,
+          37.9389171
+        ]
+      },
+      "id": "node/13110321468"
+    }
+  ]
+}

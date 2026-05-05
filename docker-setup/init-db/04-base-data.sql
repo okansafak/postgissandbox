@@ -6,65 +6,67 @@
 -- Gerçek dünya konumlarına yakın koordinatlar kullanılmıştır.
 
 -- ============================================================
--- 1. HASTANELER (Bölüm 0: LEFT JOIN, Bölüm 1: ST_Intersects/KNN)
+-- NOT: Hastaneler, Yollar, Binalar ve Duraklar (POI) gibi mekansal veriler
+-- artık '03-import-geojson.sh' betiği aracılığıyla doğrudan gerçek 
+-- OpenStreetMap (OSM) GeoJSON dosyalarından (data/ klasörü) içe aktarılmaktadır.
+-- Bu nedenle manuel, sahte INSERT işlemleri bu dosyadan kaldırılmıştır.
 -- ============================================================
-INSERT INTO konya.hastaneler (ad, kapasite, acil_servis, geom) VALUES
-('Konya Şehir Hastanesi',         1250, true,  ST_SetSRID(ST_MakePoint(32.540, 37.865), 4326)),
-('Meram Tıp Fakültesi',           950,  true,  ST_SetSRID(ST_MakePoint(32.425, 37.882), 4326)),
-('Numune Hastanesi',               600,  true,  ST_SetSRID(ST_MakePoint(32.492, 37.878), 4326)),
-('Karatay Devlet Hastanesi',       400,  true,  ST_SetSRID(ST_MakePoint(32.510, 37.870), 4326)),
-('Selçuklu Devlet Hastanesi',      350,  true,  ST_SetSRID(ST_MakePoint(32.470, 37.930), 4326)),
-('Özel Farabi Hastanesi',          200,  false, ST_SetSRID(ST_MakePoint(32.485, 37.890), 4326)),
-('Beyhekim Devlet Hastanesi',      450,  true,  ST_SetSRID(ST_MakePoint(32.465, 37.875), 4326));
-
--- ============================================================
--- 4. YOLLAR (Bölüm 1: Linear Referencing, Bölüm 3: pgr_dijkstra)
--- ============================================================
-INSERT INTO konya.osm_yollar (ad, tip, hiz_limiti, geom) VALUES
-('Mevlana Caddesi',         'Ana Arter',    50, ST_GeomFromText('LINESTRING(32.492 37.872, 32.498 37.871, 32.505 37.874)', 4326)),
-('Yeni İstanbul Caddesi',   'Devlet Yolu',  90, ST_GeomFromText('LINESTRING(32.497 37.894, 32.505 37.940, 32.515 38.050)', 4326)),
-('Ankara Caddesi',          'Devlet Yolu',  70, ST_GeomFromText('LINESTRING(32.490 37.880, 32.510 37.890, 32.530 37.870)', 4326)),
-('Nalçacı Caddesi',         'Ana Arter',    50, ST_GeomFromText('LINESTRING(32.460 37.870, 32.475 37.880, 32.492 37.878)', 4326)),
-('Konya-Aksaray Yolu',      'Otoyol',      120, ST_GeomFromText('LINESTRING(32.500 37.900, 32.600 38.000, 32.700 38.100)', 4326)),
-('Büsan Caddesi',           'Ana Arter',    50, ST_GeomFromText('LINESTRING(32.470 37.925, 32.485 37.935, 32.500 37.940)', 4326)),
-('Musalla Bağları Caddesi', 'Bulvar',       60, ST_GeomFromText('LINESTRING(32.450 37.885, 32.465 37.880, 32.480 37.870)', 4326)),
-('Feritpaşa Caddesi',       'Ana Arter',    50, ST_GeomFromText('LINESTRING(32.490 37.870, 32.488 37.860, 32.485 37.850)', 4326));
-
--- ============================================================
--- 5. BİNALAR (Bölüm 1: KNN, Bölüm 2: GiST İndeks Performans)
--- ============================================================
-INSERT INTO konya.osm_binalar (tip, mahalle_id, kat_sayisi, geom) VALUES
-('Mevlana Müzesi',              3, 2,  ST_GeomFromText('MULTIPOLYGON(((32.504 37.874, 32.505 37.874, 32.505 37.875, 32.504 37.875, 32.504 37.874)))', 4326)),
-('Büyükşehir Belediye Sarayı',  1, 8,  ST_GeomFromText('MULTIPOLYGON(((32.493 37.886, 32.494 37.886, 32.494 37.887, 32.493 37.887, 32.493 37.886)))', 4326)),
-('Alaaddin Camii',              3, 1,  ST_GeomFromText('MULTIPOLYGON(((32.495 37.876, 32.496 37.876, 32.496 37.877, 32.495 37.877, 32.495 37.876)))', 4326)),
-('Selçuklu Belediyesi',         1, 5,  ST_GeomFromText('MULTIPOLYGON(((32.472 37.932, 32.473 37.932, 32.473 37.933, 32.472 37.933, 32.472 37.932)))', 4326)),
-('Karatay Medresesi',           3, 1,  ST_GeomFromText('MULTIPOLYGON(((32.497 37.877, 32.498 37.877, 32.498 37.878, 32.497 37.878, 32.497 37.877)))', 4326)),
-('Konya Bilim Merkezi',         9, 3,  ST_GeomFromText('MULTIPOLYGON(((32.455 37.920, 32.456 37.920, 32.456 37.921, 32.455 37.921, 32.455 37.920)))', 4326)),
-('Meram Belediyesi',            6, 4,  ST_GeomFromText('MULTIPOLYGON(((32.440 37.860, 32.441 37.860, 32.441 37.861, 32.440 37.861, 32.440 37.860)))', 4326));
-
--- ============================================================
--- 6. DURAKLAR (Bölüm 3: ST_ClusterKMeans, DBSCAN)
--- ============================================================
-INSERT INTO konya.duraklar (ad, hat_no, geom) VALUES
-('Kültürpark',       'T1', ST_SetSRID(ST_MakePoint(32.490, 37.875), 4326)),
-('Belediye',         'T1', ST_SetSRID(ST_MakePoint(32.493, 37.887), 4326)),
-('Mevlana',          'T1', ST_SetSRID(ST_MakePoint(32.505, 37.874), 4326)),
-('Alaaddin',         'T1', ST_SetSRID(ST_MakePoint(32.495, 37.877), 4326)),
-('Selçuk Üniv.',     'T2', ST_SetSRID(ST_MakePoint(32.515, 37.960), 4326)),
-('Bosna Hersek',     'T2', ST_SetSRID(ST_MakePoint(32.510, 38.010), 4326)),
-('Büsan',            'T2', ST_SetSRID(ST_MakePoint(32.485, 37.935), 4326)),
-('Meram Bahçeleri',  'T3', ST_SetSRID(ST_MakePoint(32.440, 37.850), 4326)),
-('Şeker Fabrikası',  'T3', ST_SetSRID(ST_MakePoint(32.430, 37.845), 4326)),
-('Loras',            'T3', ST_SetSRID(ST_MakePoint(32.415, 37.835), 4326)),
-('Terminal',         'T1', ST_SetSRID(ST_MakePoint(32.520, 37.885), 4326)),
-('Karatay Sanayi',   'T4', ST_SetSRID(ST_MakePoint(32.555, 37.870), 4326));
 
 -- ============================================================
 -- 7. PERSONEL (Bölüm 0 - Ders 2: DML Egzersizi)
 -- ============================================================
-INSERT INTO egitim.personel (ad, soyad, maas, ise_giris) VALUES
-('Ahmet', 'Yılmaz',   8500.00, '2018-03-15'),
-('Ayşe',  'Kaya',     9200.50, '2019-07-01'),
-('Mehmet','Demir',     7800.00, '2020-01-10'),
-('Fatma', 'Çelik',   11000.00, '2015-09-20'),
-('Ali',   'Şahin',    6500.00, '2022-06-01');
+INSERT INTO egitim.personel (
+    ad, soyad, cinsiyet, unvan, birim, ilce, maas, ise_giris, aktif
+)
+SELECT
+-- AD
+(ARRAY[
+    'Ahmet','Mehmet','Mustafa','Ali','Hasan','Hüseyin','İbrahim','Yusuf','Osman','Murat',
+    'Emre','Mert','Burak','Can','Oğuz','Serkan','Halil','Ramazan','Eren','Kaan',
+    'Ayşe','Fatma','Zeynep','Elif','Emine','Merve','Esra','Sultan','Hatice','Derya',
+    'Nurgül','Gül','Sevgi','Yasemin','Büşra','Tuğba','İpek','Selin','Damla','Gizem',
+    'Sinem','Melis','Aylin','Hülya','Nesrin','Fadime','Şeyma','Sena','Rabia','Nazan'
+])[floor(random()*50 + 1)],
+-- SOYAD
+(ARRAY[
+    'Yılmaz','Kaya','Demir','Çelik','Şahin','Yıldız','Arslan','Koç','Kurt','Aydın',
+    'Öztürk','Aslan','Doğan','Kılıç','Çetin','Güneş','Erdoğan','Polat','Aksoy','Karaca',
+    'Bulut','Avcı','Taş','Kara','Güven','Erdem','Sezer','Yalçın','Işık','Uçar',
+    'Duman','Ekinci','Sarı','Özkan','Kaplan','Gök','Çakır','Balcı','Turan','Altun',
+    'Özdemir','Gül','Bozkurt','Aktaş','Bayram','Acar','Kocaman','Tuncer','Ergin','Şen'
+])[floor(random()*50 + 1)],
+-- CİNSİYET
+(ARRAY['Erkek','Kadın'])[floor(random()*2 + 1)],
+-- ÜNVAN (gerçekçi belediye kadrosu)
+(ARRAY[
+    'Daire Başkanı','Şube Müdürü','Müdür','Müdür Yardımcısı','Şef','Uzman',
+    'Mühendis (İnşaat)','Mühendis (Harita)','Mühendis (Makine)',
+    'Mühendis (Elektrik)','Mühendis (Çevre)','Yazılım Geliştirici',
+    'CBS Uzmanı','Şehir Plancısı','Mimar','Veri Analisti',
+    'Harita Teknikeri','Tekniker','Teknisyen',
+    'Zabıta Memuru','İtfaiye Eri','Operatör','Şoför',
+    'Saha Personeli','VHKİ','Memur','Avukat','Sosyal Çalışmacı'
+])[floor(random()*28 + 1)],
+-- BİRİM (Konya BB gerçek yapı)
+(ARRAY[
+    'Fen İşleri Dairesi', 'İmar ve Şehircilik Dairesi', 'Ulaşım Planlama ve Raylı Sistem',
+    'Park ve Bahçeler Dairesi', 'Çevre Koruma ve Kontrol', 'Zabıta Dairesi',
+    'İtfaiye Dairesi', 'KOSKİ Genel Müdürlüğü', 'Mali Hizmetler Dairesi',
+    'İnsan Kaynakları ve Eğitim', 'Bilgi İşlem Dairesi', 'Destek Hizmetleri',
+    'Etüt ve Proje Dairesi', 'Coğrafi Bilgi Sistemleri', 'Emlak ve İstimlak',
+    'Kırsal Hizmetler', 'Sosyal Hizmetler', 'Kültür ve Turizm',
+    'Strateji Geliştirme', 'Basın Yayın ve Halkla İlişkiler', 'Hukuk Müşavirliği',
+    'Mezarlıklar Müdürlüğü'
+])[floor(random()*22 + 1)],
+-- İLÇE
+(ARRAY[
+    'Selçuklu','Meram','Karatay','Kulu','Beyşehir',
+    'Ereğli','Akşehir','Seydişehir','Çumra','Ilgın'
+])[floor(random()*10 + 1)],
+-- MAAŞ (kamu gerçekçi 2026)
+round((random() * 60000 + 25000)::numeric, 2),
+-- İŞE GİRİŞ
+CURRENT_DATE - (floor(random() * 7300))::int,
+-- AKTİF
+CASE WHEN random() < 0.88 THEN true ELSE false END
+FROM generate_series(1, 1000);

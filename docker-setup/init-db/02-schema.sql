@@ -13,9 +13,13 @@
 -- Öğrenciler bu tabloyu CREATE TABLE ile oluşturmayı öğrenecek.
 -- Docker ortamında hazır olması için burada da tanımlıyoruz.
 CREATE TABLE IF NOT EXISTS egitim.personel (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     ad TEXT NOT NULL,
     soyad TEXT,
+    cinsiyet TEXT,
+    unvan TEXT,
+    birim TEXT,
+    ilce TEXT,
     maas NUMERIC(10,2),
     ise_giris DATE,
     aktif BOOLEAN DEFAULT true
@@ -54,15 +58,6 @@ CREATE TABLE IF NOT EXISTS konya.il_sinirlari (
 );
 CREATE INDEX IF NOT EXISTS idx_il_geom ON konya.il_sinirlari USING GIST(geom);
 
--- Hastaneler (Bölüm 0: JOIN, Bölüm 1: ST_Intersects/KNN)
-CREATE TABLE IF NOT EXISTS konya.hastaneler (
-    id SERIAL PRIMARY KEY,
-    ad VARCHAR(150) NOT NULL,
-    kapasite INTEGER,
-    acil_servis BOOLEAN DEFAULT true,
-    geom GEOMETRY(POINT, 4326)
-);
-CREATE INDEX IF NOT EXISTS idx_hastaneler_geom ON konya.hastaneler USING GIST(geom);
 
 -- Yollar - pgRouting uyumlu (Bölüm 1: Linear Referencing, Bölüm 3: Dijkstra)
 CREATE TABLE IF NOT EXISTS konya.osm_yollar (
@@ -89,15 +84,6 @@ CREATE TABLE IF NOT EXISTS konya.osm_binalar (
     geom GEOMETRY(MULTIPOLYGON, 4326)
 );
 CREATE INDEX IF NOT EXISTS idx_binalar_geom ON konya.osm_binalar USING GIST(geom);
-
--- Duraklar (Bölüm 3: ST_ClusterKMeans, DBSCAN)
-CREATE TABLE IF NOT EXISTS konya.duraklar (
-    id SERIAL PRIMARY KEY,
-    ad VARCHAR(150),
-    hat_no VARCHAR(50),
-    geom GEOMETRY(POINT, 4326)
-);
-CREATE INDEX IF NOT EXISTS idx_duraklar_geom ON konya.duraklar USING GIST(geom);
 
 -- POI - İlgi Noktaları (Genel amaçlı)
 CREATE TABLE IF NOT EXISTS konya.poi (
@@ -134,3 +120,18 @@ CREATE TABLE IF NOT EXISTS analiz.kazalar (
     geom GEOMETRY(POINT, 4326)
 );
 CREATE INDEX IF NOT EXISTS idx_kazalar_geom ON analiz.kazalar USING GIST(geom);
+
+-- Hastaneler (Bölüm 0: JOIN, Bölüm 1: ST_Intersects/KNN)
+-- NOT: Gerçek veriler POI tablosuna yüklendiği için, eski tablo yerine dinamik bir View oluşturuyoruz.
+-- Bu sayede eğitimdeki mahalle_id JOIN sorguları gerçek OSM verisiyle hatasız çalışır.
+CREATE OR REPLACE VIEW konya.hastaneler AS
+SELECT 
+    p.id, 
+    p.ad, 
+    m.id AS mahalle_id, 
+    500 AS kapasite, 
+    true AS acil_servis, 
+    p.geom
+FROM konya.poi p
+LEFT JOIN konya.mahalleler m ON ST_Intersects(p.geom, m.geom)
+WHERE p.kategori = 'Hastane';

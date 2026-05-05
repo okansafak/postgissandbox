@@ -68,7 +68,7 @@
                 <div class="s-text-tech">Noktaları birbirine en yakın "merkezlere" (K) göre gruplandırarak hizmet alanlarını optimize etmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id FROM konya.duraklar;</div>
+                <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id FROM konya.poi WHERE kategori = 'Durak';</div>
                 <div class="reveal-box" id="q31">
                   <div class="reveal-trigger" onclick="document.getElementById('q31').classList.toggle('open')">Kritik Soru: K sayısı nasıl seçilir? <span>▼</span></div>
                   <div class="reveal-content">Verinin doğasına göre; örneğin 10 tane çöp kamyonunuz varsa K=10 seçerek her kamyona bir bölge atayabilirsiniz.</div>
@@ -134,7 +134,7 @@
                 <div class="s-text-tech">Düzensiz noktaları düzenli altıgenlere hapsederek istatistiksel kıyaslama yapmak.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_HexagonGrid(1000, geom) FROM konya.selcuklu;</div>
+                <div class="code-block">SELECT ST_HexagonGrid(1000, geom) FROM konya.ilce_sinirlari WHERE ad = 'Selçuklu';</div>
                 <div class="reveal-box" id="q33">
                   <div class="reveal-trigger" onclick="document.getElementById('q33').classList.toggle('open')">Kritik Soru: Neden kare grid değil? <span>▼</span></div>
                   <div class="reveal-content">Altıgenler her komşusuyla eşit mesafededir. Karelerde ise köşegenler daha uzundur, bu da mesafe analizini bozar.</div>
@@ -202,7 +202,7 @@
                 <div class="s-text-tech">Geometrileri düğüm (Node) ve kenar (Edge) yapısına dönüştüren <code>pgr_createTopology</code> fonksiyonu.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_createTopology('konya.yollar', 0.00001);</div>
+                <div class="code-block">SELECT pgr_createTopology('konya.osm_yollar', 0.00001);</div>
                 <div class="reveal-box" id="q35">
                   <div class="reveal-trigger" onclick="document.getElementById('q35').classList.toggle('open')">Kritik Soru: Topology neden ayrı bir tabloda? <span>▼</span></div>
                   <div class="reveal-content">Ağ analizi matematiktir. Geometriyi her seferinde okumak yerine, düğümler arası bağlantıları (ID'ler) okumak çok daha hızlıdır.</div>
@@ -235,7 +235,7 @@
                 <div class="s-text-tech">Kopuk çizgileri, çıkmaz sokakları ve üst üste binen geometrileri <code>pgr_analyzeGraph</code> ile bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_analyzeGraph('konya.yollar', 0.00001);</div>
+                <div class="code-block">SELECT pgr_analyzeGraph('konya.osm_yollar', 0.00001);</div>
                 <div class="reveal-box" id="q36">
                   <div class="reveal-trigger" onclick="document.getElementById('q36').classList.toggle('open')">Kritik Soru: Çıkmaz sokaklar rotayı bozar mı? <span>▼</span></div>
                   <div class="reveal-content">Hayır ama gereksiz işlem yükü oluşturur. Kopuk yollar ise "Yol bulunamadı" hatasına neden olur.</div>
@@ -434,7 +434,7 @@
               </div>
               <div class="s-panel-right">
                 <div class="code-block">CREATE ROLE editor_role;
-GRANT SELECT, INSERT ON TABLE konya.binalar TO editor_role;</div>
+GRANT SELECT, INSERT ON TABLE konya.osm_binalar TO editor_role;</div>
                 <div class="reveal-box" id="q312">
                   <div class="reveal-trigger" onclick="document.getElementById('q312').classList.toggle('open')">Kritik Soru: Neden "SUPERUSER" kullanılmaz? <span>▼</span></div>
                   <div class="reveal-content">Hatalı bir SQL komutu tüm veritabanını silebilir. Herkesin sadece ihtiyacı olan tabloya yetkisi olmalıdır.</div>

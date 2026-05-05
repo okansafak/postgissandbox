@@ -1,0 +1,9 @@
+-- ============================================================
+-- PostGIS Akademi — Personel Çalışma Verisi
+-- ============================================================
+-- NOT: Bu dosyadaki veri üretme mantığı doğrudan 
+-- init-db/04-base-data.sql içine entegre edilmiştir.
+-- Veritabanı (Docker) ilk ayağa kalktığında egitim.personel 
+-- tablosuna otomatik olarak 1000 adet zengin, gerçekçi ve rastgele 
+-- veri (UUID destekli) eklenecektir.
+-- Bu dosyayı manuel olarak çalıştırmanıza artık gerek yoktur.
