@@ -502,7 +502,8 @@ WHERE ST_IsValid(geom) = false; -- Sadece geçersiz olanları süz</div>
                     Görev: Hatalı Veriyi Onar <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_MakeValid(geom)</code> komutuyla hatalı poligonları otomatik olarak onarabilirsiniz.
+                    <code>ST_MakeValid(geom)</code> fonksiyonu bozuk geometriyi onarılmış olarak <b>geri döner</b> (tabloyu değiştirmez). Kalıcı onarım için şu şekilde kullanılır: <br>
+                    <code>UPDATE konya.mahalleler SET geom = ST_MakeValid(geom) WHERE ST_IsValid(geom) = false;</code>
                   </div>
                 </div>
               </div>
