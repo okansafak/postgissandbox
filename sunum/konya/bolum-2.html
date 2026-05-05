@@ -69,7 +69,7 @@
                 <div class="s-text-tech">Nüfus verileri gibi büyük tabloları saniyeler içinde yükleme.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">COPY konya.nufus_staging FROM 'data/nufus.csv' WITH (FORMAT text);</div>
+                <div class="code-block">COPY konya.nufus_staging FROM 'data/nufus.csv' WITH (FORMAT text); -- CSV dosyasını hızlıca içeri al</div>
                 <div class="reveal-box" id="q21">
                   <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">Kritik Soru: COPY neden INSERT'ten hızlıdır? <span>▼</span></div>
                   <div class="reveal-content">COPY, SQL parser'ı ve transaction loglarını atlayarak veriyi doğrudan disk sayfalarına yazar.</div>
@@ -102,7 +102,7 @@
                 <div class="s-text-tech">Kirli metinlerden düzenli sütunlar oluşturma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT (regexp_matches(raw_satir, '\((.*?)\)'))[1] FROM nufus_staging;</div>
+                <div class="code-block">SELECT (regexp_matches(raw_satir, '\((.*?)\)'))[1] FROM nufus_staging; -- Regex ile metin ayıkla</div>
                 <div class="reveal-box" id="q22">
                   <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Regex neden PostGIS'te önemlidir? <span>▼</span></div>
                   <div class="reveal-content">Dışarıdan gelen veriler (CAD, Excel) genelde standart dışıdır. Regex ile koordinat veya isim ayıklamak hayati önem taşır.</div>
@@ -135,7 +135,7 @@
                 <div class="s-text-tech">Nokta azaltma ve görsel yumuşatma teknikleri.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_SimplifyPreserveTopology(geom, 10.0) FROM konya.mahalleler;</div>
+                <div class="code-block">SELECT ST_SimplifyPreserveTopology(geom, 10.0) FROM konya.mahalleler; -- Nokta sayısını azalt</div>
                 <div class="reveal-box" id="q23">
                   <div class="reveal-trigger" onclick="document.getElementById('q23').classList.toggle('open')">Kritik Soru: Simplify topolojiyi bozar mı? <span>▼</span></div>
                   <div class="reveal-content">Evet, standart Simplify poligonları ayırabilir. <code>PreserveTopology</code> varyantı bu riski minimize eder.</div>
@@ -168,7 +168,7 @@
                 <div class="s-text-tech">Binlerce noktalı poligonları indeks-dostu parçalara bölmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_SubDivide(geom, 255) FROM konya.ilce_sinirlari;</div>
+                <div class="code-block">SELECT ST_SubDivide(geom, 255) FROM konya.ilce_sinirlari; -- Büyük geometriyi parçalara böl</div>
                 <div class="reveal-box" id="q24">
                   <div class="reveal-trigger" onclick="document.getElementById('q24').classList.toggle('open')">Kritik Soru: Neden 255 nokta? <span>▼</span></div>
                   <div class="reveal-content">255-512 arası nokta sayısı, GiST indeksi için en ideal "Bounding Box" boyutunu oluşturur.</div>
@@ -201,7 +201,7 @@
                 <div class="s-text-tech">Hat üzerinde yüzde (%) veya mesafe bazlı konum bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_LineLocatePoint(geom, 'POINT(32.5 37.8)') FROM osm_yollar;</div>
+                <div class="code-block">SELECT ST_LineLocatePoint(geom, 'POINT(32.5 37.8)') FROM osm_yollar; -- Hat üzerindeki konumu bul</div>
                 <div class="reveal-box" id="q25">
                   <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: M Koordinatı nedir? <span>▼</span></div>
                   <div class="reveal-content">Measure (Ölçü) koordinatıdır. Metraj veya zaman bilgisi burada saklanır (Z koordinatından farklıdır).</div>
@@ -234,7 +234,7 @@
                 <div class="s-text-tech">En yakın koordinatı bulma ve iki nokta arası açı hesabı.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT degrees(ST_Azimuth(p1, p2)) AS derece;</div>
+                <div class="code-block">SELECT degrees(ST_Azimuth(p1, p2)) AS derece; -- İki nokta arası açıyı (bearing) hesapla</div>
                 <div class="reveal-box" id="q26">
                   <div class="reveal-trigger" onclick="document.getElementById('q26').classList.toggle('open')">Kritik Soru: Azimuth nerede kullanılır? <span>▼</span></div>
                   <div class="reveal-content">Parsel yönelim analizlerinde veya yoldaki tabelaların bakış yönünü belirlemede kullanılır.</div>
@@ -267,7 +267,7 @@
                 <div class="s-text-tech">GiST ve çakışmayan veriler için SP-GIST farkı.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE INDEX idx_gist ON tablo USING GIST(geom);</div>
+                <div class="code-block">CREATE INDEX idx_gist ON tablo USING GIST(geom); -- Mekansal (GiST) indeks oluştur</div>
                 <div class="reveal-box" id="q27">
                   <div class="reveal-trigger" onclick="document.getElementById('q27').classList.toggle('open')">Kritik Soru: SP-GIST ne zaman hızlanır? <span>▼</span></div>
                   <div class="reveal-content">Nokta verileri (Adresler) gibi üst üste binmeyen, seyrek ama geniş alana yayılan verilerde GiST'ten hızlıdır.</div>
@@ -300,7 +300,7 @@
                 <div class="s-text-tech">&& operatörü ile milisaniyeler içinde kesişim tespiti.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM mahalleler WHERE geom && ST_MakeEnvelope(...);</div>
+                <div class="code-block">SELECT * FROM mahalleler WHERE geom && ST_MakeEnvelope(...); -- Kutu (Bounding Box) ile hızlı arama</div>
                 <div class="reveal-box" id="q28">
                   <div class="reveal-trigger" onclick="document.getElementById('q28').classList.toggle('open')">Kritik Soru: && neden vazgeçilmezdir? <span>▼</span></div>
                   <div class="reveal-content">İndeksler arka planda sadece && operatörünü anlar. Gerçek poligon kesişiminden (Intersects) 100 kat hızlıdır.</div>
@@ -333,7 +333,7 @@
                 <div class="s-text-tech">Sadece ihtiyacınız olan veriyi indeksleme sanatı.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE INDEX idx ON binalar(geom) WHERE durum = 'Aktif';</div>
+                <div class="code-block">CREATE INDEX idx ON binalar(geom) WHERE durum = 'Aktif'; -- Şartlı (Partial) indeks oluştur</div>
                 <div class="reveal-box" id="q29">
                   <div class="reveal-trigger" onclick="document.getElementById('q29').classList.toggle('open')">Kritik Soru: Functional Index nedir? <span>▼</span></div>
                   <div class="reveal-content">Bir fonksiyonun sonucunu (Örn: ST_Centroid) önceden hesaplayıp indekslemek, sorguda o fonksiyonu hızlandırır.</div>
@@ -366,7 +366,7 @@
                 <div class="s-text-tech">Veritabanı planlayıcısını veri dağılımı hakkında bilgilendirmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pg_stat_user_indexes;</div>
+                <div class="code-block">SELECT * FROM pg_stat_user_indexes; -- İndeks kullanım istatistiklerini göster</div>
                 <div class="reveal-box" id="q210">
                   <div class="reveal-trigger" onclick="document.getElementById('q210').classList.toggle('open')">Kritik Soru: ANALYZE neden şarttır? <span>▼</span></div>
                   <div class="reveal-content">İstatistikler güncel değilse planlayıcı indeks yerine Sequental Scan (sıralı okuma) seçer ve sistem yavaşlar.</div>
@@ -399,7 +399,7 @@
                 <div class="s-text-tech">Sorgunun gerçek çalışma maliyetini ve sürelerini analiz etmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">EXPLAIN ANALYZE SELECT * FROM binalar WHERE ...</div>
+                <div class="code-block">EXPLAIN ANALYZE SELECT * FROM binalar WHERE ... -- Sorgu planını ve süresini analiz et</div>
                 <div class="reveal-box" id="q211">
                   <div class="reveal-trigger" onclick="document.getElementById('q211').classList.toggle('open')">Kritik Soru: Tahmin vs Gerçek? <span>▼</span></div>
                   <div class="reveal-content">EXPLAIN tahminleri, ANALYZE gerçek süreleri gösterir. İkisi arasındaki büyük fark indeks bozulmasına işarettir.</div>
@@ -467,9 +467,9 @@
                 <div class="s-text-tech">İndeksi bozan sorgu alışkanlıklarından kurtulmak.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Yavaş (Index Yok)
+                <div class="code-block">-- Yavaş (Hesaplama gerektirir)
 WHERE ST_Distance(geom, p) < 500
--- Hızlı (Index Var)
+-- Hızlı (İndeks kullanır)
 WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="reveal-box" id="q213">
                   <div class="reveal-trigger" onclick="document.getElementById('q213').classList.toggle('open')">Kritik Soru: Neden DWithin? <span>▼</span></div>
@@ -503,7 +503,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="s-text-tech">Plan çıktılarını analiz araçlarına uygun hale getirmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">EXPLAIN (FORMAT JSON, ANALYZE) SELECT ...</div>
+                <div class="code-block">EXPLAIN (FORMAT JSON, ANALYZE) SELECT ... -- Analiz sonucunu JSON olarak al</div>
                 <div class="reveal-box" id="q214">
                   <div class="reveal-trigger" onclick="document.getElementById('q214').classList.toggle('open')">Kritik Soru: Neden JSON/YAML? <span>▼</span></div>
                   <div class="reveal-content">Otomatik analiz araçları (Örn: PEV2) bu formatları kullanarak sorgu darboğazını grafiksel olarak gösterir.</div>
@@ -536,7 +536,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="s-text-tech">Silinen verilerin diskteki hayalet izlerini temizlemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">VACUUM FULL binalar; -- DİKKAT: Tabloyu kilitler</div>
+                <div class="code-block">VACUUM FULL binalar; -- Tabloyu temizle ve disk alanını geri kazan</div>
                 <div class="reveal-box" id="q215">
                   <div class="reveal-trigger" onclick="document.getElementById('q215').classList.toggle('open')">Kritik Soru: Bloat neden sorguyu yavaşlatır? <span>▼</span></div>
                   <div class="reveal-content">Çünkü veritabanı "boş" satırları da RAM'e okur. 1GB'lık tablonun %50'si bloat ise, diskten boşuna 500MB veri okunur.</div>
@@ -569,7 +569,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="s-text-tech">Veriyi fiziksel olarak mantıklı parçalara ayırmak.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE TABLE binalar_selcuklu PARTITION OF binalar FOR VALUES IN ('Selçuklu');</div>
+                <div class="code-block">CREATE TABLE binalar_selcuklu PARTITION OF binalar FOR VALUES IN ('Selçuklu'); -- Bölüm oluştur</div>
                 <div class="reveal-box" id="q216">
                   <div class="reveal-trigger" onclick="document.getElementById('q216').classList.toggle('open')">Kritik Soru: İlçe bazlı partitioning neden avantajlıdır? <span>▼</span></div>
                   <div class="reveal-content">Çünkü sadece Selçuklu'da sorgu yaparken Meram veya Karatay verileri diske hiç uğramaz (Partition Pruning).</div>
@@ -602,7 +602,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="s-text-tech">Fiziksel disk dağıtımı ve otomatik ayıklama.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SET enable_partition_pruning = on;</div>
+                <div class="code-block">SET enable_partition_pruning = on; -- Bölüm ayıklamayı (pruning) aktif et</div>
                 <div class="reveal-box" id="q217">
                   <div class="reveal-trigger" onclick="document.getElementById('q217').classList.toggle('open')">Kritik Soru: Tablespace nerede lazımdır? <span>▼</span></div>
                   <div class="reveal-content">Aktif veriyi hızlı SSD'ye, 10 yıllık arşiv verisini ucuz HDD diskine koyarak maliyet avantajı sağlarız.</div>

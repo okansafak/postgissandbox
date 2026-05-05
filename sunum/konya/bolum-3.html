@@ -68,7 +68,7 @@
                 <div class="s-text-tech">Noktaları birbirine en yakın "merkezlere" (K) göre gruplandırarak hizmet alanlarını optimize etmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id FROM konya.poi WHERE kategori = 'Durak';</div>
+                <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id FROM konya.poi WHERE kategori = 'Durak'; -- 10 gruba ayır</div>
                 <div class="reveal-box" id="q31">
                   <div class="reveal-trigger" onclick="document.getElementById('q31').classList.toggle('open')">Kritik Soru: K sayısı nasıl seçilir? <span>▼</span></div>
                   <div class="reveal-content">Verinin doğasına göre; örneğin 10 tane çöp kamyonunuz varsa K=10 seçerek her kamyona bir bölge atayabilirsiniz.</div>
@@ -101,7 +101,7 @@
                 <div class="s-text-tech">Belirli bir mesafe içinde (eps) en az N noktanın birleştiği "doğal" kümeleri tespit etmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_ClusterDBSCAN(geom, 0.01, 5) OVER() FROM konya.POI;</div>
+                <div class="code-block">SELECT ST_ClusterDBSCAN(geom, 0.01, 5) OVER() FROM konya.POI; -- Yoğunluk bazlı kümele</div>
                 <div class="reveal-box" id="q32">
                   <div class="reveal-trigger" onclick="document.getElementById('q32').classList.toggle('open')">Kritik Soru: DBSCAN neden "Isı Haritası"ndan iyidir? <span>▼</span></div>
                   <div class="reveal-content">Sadece yoğunluğu değil, aykırı (noise) verileri de tespit eder ve kümelerin sınırlarını net çizer.</div>
@@ -134,7 +134,7 @@
                 <div class="s-text-tech">Düzensiz noktaları düzenli altıgenlere hapsederek istatistiksel kıyaslama yapmak.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_HexagonGrid(1000, geom) FROM konya.ilce_sinirlari WHERE ad = 'Selçuklu';</div>
+                <div class="code-block">SELECT ST_HexagonGrid(1000, geom) FROM konya.ilce_sinirlari WHERE ad = 'Selçuklu'; -- 1km'lik altıgen grid</div>
                 <div class="reveal-box" id="q33">
                   <div class="reveal-trigger" onclick="document.getElementById('q33').classList.toggle('open')">Kritik Soru: Neden kare grid değil? <span>▼</span></div>
                   <div class="reveal-content">Altıgenler her komşusuyla eşit mesafededir. Karelerde ise köşegenler daha uzundur, bu da mesafe analizini bozar.</div>
@@ -202,7 +202,7 @@
                 <div class="s-text-tech">Geometrileri düğüm (Node) ve kenar (Edge) yapısına dönüştüren <code>pgr_createTopology</code> fonksiyonu.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_createTopology('konya.osm_yollar', 0.00001);</div>
+                <div class="code-block">SELECT pgr_createTopology('konya.osm_yollar', 0.00001); -- Ağ analizi topolojisi oluştur</div>
                 <div class="reveal-box" id="q35">
                   <div class="reveal-trigger" onclick="document.getElementById('q35').classList.toggle('open')">Kritik Soru: Topology neden ayrı bir tabloda? <span>▼</span></div>
                   <div class="reveal-content">Ağ analizi matematiktir. Geometriyi her seferinde okumak yerine, düğümler arası bağlantıları (ID'ler) okumak çok daha hızlıdır.</div>
@@ -235,7 +235,7 @@
                 <div class="s-text-tech">Kopuk çizgileri, çıkmaz sokakları ve üst üste binen geometrileri <code>pgr_analyzeGraph</code> ile bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_analyzeGraph('konya.osm_yollar', 0.00001);</div>
+                <div class="code-block">SELECT pgr_analyzeGraph('konya.osm_yollar', 0.00001); -- Ağ hatalarını analiz et</div>
                 <div class="reveal-box" id="q36">
                   <div class="reveal-trigger" onclick="document.getElementById('q36').classList.toggle('open')">Kritik Soru: Çıkmaz sokaklar rotayı bozar mı? <span>▼</span></div>
                   <div class="reveal-content">Hayır ama gereksiz işlem yükü oluşturur. Kopuk yollar ise "Yol bulunamadı" hatasına neden olur.</div>
@@ -268,7 +268,7 @@
                 <div class="s-text-tech">Başlangıç ve bitiş düğümleri (Node ID) arasında en düşük "maliyetli" rotayı çizmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pgr_dijkstra('SELECT id, source, target, cost FROM yollar', 1, 100);</div>
+                <div class="code-block">SELECT * FROM pgr_dijkstra('SELECT id, source, target, cost FROM yollar', 1, 100); -- En kısa rotayı bul</div>
                 <div class="reveal-box" id="q37">
                   <div class="reveal-trigger" onclick="document.getElementById('q37').classList.toggle('open')">Kritik Soru: "Cost" sadece mesafe midir? <span>▼</span></div>
                   <div class="reveal-content">Hayır; trafik, yol eğimi veya tek yön kısıtlaması da maliyete (cost) eklenebilir.</div>
@@ -301,7 +301,7 @@
                 <div class="s-text-tech">Bir noktadan (itfaiye vb.) 5 dakikalık sürüş mesafesinde gidilebilen tüm yolları belirlemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost FROM yollar', 1, 500);</div>
+                <div class="code-block">SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost FROM yollar', 1, 500); -- Servis alanı hesabı</div>
                 <div class="reveal-box" id="q38">
                   <div class="reveal-trigger" onclick="document.getElementById('q38').classList.toggle('open')">Kritik Soru: Buffer (Tampon) analiziyle farkı nedir? <span>▼</span></div>
                   <div class="reveal-content">Buffer kuş uçuşu (havadan) ölçer, Driving Distance gerçek sokak yolları üzerinden ölçer. Çok daha doğrudur.</div>
@@ -334,7 +334,7 @@
                 <div class="s-text-tech">N tane durağa en kısa toplam mesafeyle hangi sırayla uğranacağını hesaplamak.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pgr_tsp('SELECT id, x, y FROM nodes', 1);</div>
+                <div class="code-block">SELECT * FROM pgr_tsp('SELECT id, x, y FROM nodes', 1); -- Çoklu durak rotasını optimize et</div>
                 <div class="reveal-box" id="q39">
                   <div class="reveal-trigger" onclick="document.getElementById('q39').classList.toggle('open')">Kritik Soru: Neden pgRouting TSP? <span>▼</span></div>
                   <div class="reveal-content">Çünkü yolların yönünü, tek yön yasaklarını ve gerçek mesafeleri hesaba katar. Google Maps API'den çok daha maliyetsizdir.</div>
@@ -367,7 +367,7 @@
                 <div class="s-text-tech">Poligonlar arasındaki ortak sınırları (Edge) tek bir obje olarak yönetip boşlukları engellemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT CreateTopology('konya_topoloji', 4326);</div>
+                <div class="code-block">SELECT CreateTopology('konya_topoloji', 4326); -- Yeni topolojik şema oluştur</div>
                 <div class="reveal-box" id="q310">
                   <div class="reveal-trigger" onclick="document.getElementById('q310').classList.toggle('open')">Kritik Soru: Topoloji neden lükstür? <span>▼</span></div>
                   <div class="reveal-content">Çünkü veri girişi daha zordur ama veri kalitesi %100'dür. CBS profesyonelleri için "Kutsal Kase"dir.</div>
@@ -400,7 +400,7 @@
                 <div class="s-text-tech">Bir sınırı (Edge) oynattığınızda, o sınıra komşu olan tüm poligonların (Face) otomatik güncellenmesi.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_MoveIsoEdge('konya_topoloji', edge_id, new_geom);</div>
+                <div class="code-block">SELECT ST_MoveIsoEdge('konya_topoloji', edge_id, new_geom); -- Ortak sınırı/kenarı taşı</div>
                 <div class="reveal-box" id="q311">
                   <div class="reveal-trigger" onclick="document.getElementById('q311').classList.toggle('open')">Kritik Soru: "Gap" ve "Overlap" nasıl önlenir? <span>▼</span></div>
                   <div class="reveal-content">Topoloji sayesinde poligonlar sınırları paylaşır. Sınır tektir, bu yüzden arada boşluk kalması imkansızdır.</div>
@@ -433,8 +433,8 @@
                 <div class="s-text-tech">CBS personeli, veri girişi yapanlar ve sadece izleyenler için farklı SQL yetkileri (GRANT/REVOKE).</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE ROLE editor_role;
-GRANT SELECT, INSERT ON TABLE konya.osm_binalar TO editor_role;</div>
+                <div class="code-block">CREATE ROLE editor_role; -- Rol oluştur
+GRANT SELECT, INSERT ON TABLE konya.osm_binalar TO editor_role; -- Yetki ver</div>
                 <div class="reveal-box" id="q312">
                   <div class="reveal-trigger" onclick="document.getElementById('q312').classList.toggle('open')">Kritik Soru: Neden "SUPERUSER" kullanılmaz? <span>▼</span></div>
                   <div class="reveal-content">Hatalı bir SQL komutu tüm veritabanını silebilir. Herkesin sadece ihtiyacı olan tabloya yetkisi olmalıdır.</div>
@@ -468,7 +468,7 @@ GRANT SELECT, INSERT ON TABLE konya.osm_binalar TO editor_role;</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block">CREATE POLICY meram_only ON binalar 
-USING (ST_Intersects(geom, 'POLYGON(...)'));</div>
+USING (ST_Intersects(geom, 'POLYGON(...)')); -- Satır bazlı güvenlik (RLS)</div>
                 <div class="reveal-box" id="q313">
                   <div class="reveal-trigger" onclick="document.getElementById('q313').classList.toggle('open')">Kritik Soru: RLS performansı etkiler mi? <span>▼</span></div>
                   <div class="reveal-content">Evet, her sorguya otomatik bir filtre eklenir. Ancak mekansal indeks varsa bu etki milisaniyeler düzeyindedir.</div>
@@ -501,7 +501,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)'));</div>
                 <div class="s-text-tech">GeoServer veya MapSrv gibi uygulamaların veritabanına sadece okuma yetkisiyle bağlanması.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">ALTER USER geoserver SET default_transaction_read_only = on;</div>
+                <div class="code-block">ALTER USER geoserver SET default_transaction_read_only = on; -- Salt-okunur yap</div>
                 <div class="reveal-box" id="q314">
                   <div class="reveal-trigger" onclick="document.getElementById('q314').classList.toggle('open')">Kritik Soru: Neden bu ayarı yapıyoruz? <span>▼</span></div>
                   <div class="reveal-content">Web uygulaması üzerinden SQL Injection saldırısı olsa bile saldırgan veriyi değiştiremez veya silemez.</div>
@@ -534,7 +534,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)'));</div>
                 <div class="s-text-tech">PostGIS uzantıları ve mekansal indekslerle birlikte hatasız yedek alma (Custom Format).</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">pg_dump -Fc -n konya konya_db > yedek.dump</div>
+                <div class="code-block">pg_dump -Fc -n konya konya_db > yedek.dump -- Şemayı binary olarak yedekle</div>
                 <div class="reveal-box" id="q315">
                   <div class="reveal-trigger" onclick="document.getElementById('q315').classList.toggle('open')">Kritik Soru: SQL formatı mı Binary format mı? <span>▼</span></div>
                   <div class="reveal-content">Binary (-Fc) daha küçüktür ve `pg_restore` ile sadece istediğiniz tabloyu geri yüklemenize izin verir.</div>
@@ -567,7 +567,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)'));</div>
                 <div class="s-text-tech">Fiziksel kopyalama (Master-Slave) veya mantıksal tablo kopyalama farkları.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE PUBLICATION konya_pub FOR TABLE mahalleler;</div>
+                <div class="code-block">CREATE PUBLICATION konya_pub FOR TABLE mahalleler; -- Replikasyon yayını oluştur</div>
                 <div class="reveal-box" id="q316">
                   <div class="reveal-trigger" onclick="document.getElementById('q316').classList.toggle('open')">Kritik Soru: Mekansal veri Logical ile taşınır mı? <span>▼</span></div>
                   <div class="reveal-content">Evet! Sadece değişen satırlar (binlerce koordinat) ağ üzerinden diğer sunucuya akar, bant genişliğini korur.</div>
@@ -667,7 +667,7 @@ recovery_target_time = '2024-05-03 14:32:00'</div>
                 <div class="s-text-tech">Sunucuyu yoran "Katil Sorguları" anında tespit edip durdurma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT query, state, wait_event FROM pg_stat_activity;</div>
+                <div class="code-block">SELECT query, state, wait_event FROM pg_stat_activity; -- Aktif sorguları izle</div>
                 <div class="reveal-box" id="q319">
                   <div class="reveal-trigger" onclick="document.getElementById('q319').classList.toggle('open')">Kritik Soru: Sorgu neden "Lock"a düşer? <span>▼</span></div>
                   <div class="reveal-content">Uzun süren bir UPDATE işlemi varken aynı tabloyu biri silmeye çalışırsa veritabanı kilitlenir.</div>
@@ -702,7 +702,7 @@ recovery_target_time = '2024-05-03 14:32:00'</div>
               <div class="s-panel-right">
                 <div class="code-block">-- Proje SQL Bloğu:
 UPDATE binalar b SET mahalle_id = m.id 
-FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom);</div>
+FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom); -- Mekansal join ile güncelle</div>
                 <div class="reveal-box" id="q320">
                   <div class="reveal-trigger" onclick="document.getElementById('q320').classList.toggle('open')">Kritik Soru: Neden Spatial Join? <span>▼</span></div>
                   <div class="reveal-content">Çünkü ham veride mahalle adı olmayabilir. PostGIS koordinatlar üzerinden veriyi birleştirir.</div>
@@ -735,7 +735,7 @@ FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom);</div>
                 <div class="s-text-tech">Analiz sonuçlarını web haritasına veya mobil uygulamaya hazır hale getirmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_AsGeoJSON(t.*) FROM analiz_sonuclari t;</div>
+                <div class="code-block">SELECT ST_AsGeoJSON(t.*) FROM analiz_sonuclari t; -- Veriyi GeoJSON olarak dışa aktar</div>
                 <div class="reveal-box" id="q321">
                   <div class="reveal-trigger" onclick="document.getElementById('q321').classList.toggle('open')">Kritik Soru: Neden JSON export? <span>▼</span></div>
                   <div class="reveal-content">Tüm modern web kütüphaneleri (Leaflet, MapLibre vb.) veriyi doğrudan JSON olarak okuyup haritada çizebilir.</div>
@@ -803,7 +803,7 @@ import psycopg2
                 <div class="s-text-tech">Patroni veya Keepalived ile otomatik failover ve Dockerize edilmiş CBS mikroservisleri.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">docker compose up -d --scale postgis=3</div>
+                <div class="code-block">docker compose up -d --scale postgis=3 --no-recreate # Servisi 3 kopyaya çıkar (Load Balancing)</div>
                 <div class="reveal-box" id="q323">
                   <div class="reveal-trigger" onclick="document.getElementById('q323').classList.toggle('open')">Kritik Soru: Real-time sistemlerde en büyük risk nedir? <span>▼</span></div>
                   <div class="reveal-content">Veri birikmesi (Latency). Mekansal indeksler ve doğru partition stratejisi bu riski sıfırlar.</div>

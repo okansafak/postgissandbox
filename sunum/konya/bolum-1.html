@@ -219,8 +219,7 @@
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT postgis_full_version();
-                  -- Konya Docker ortamında PostGIS 3.4+ aktiftir.</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT postgis_full_version(); -- PostGIS ve tüm bağımlılıklarının detaylı sürüm bilgisi</div>
 
                 <div class="reveal-box" id="q11">
                   <div class="reveal-trigger" onclick="document.getElementById('q11').classList.toggle('open')">
@@ -271,7 +270,8 @@
                   verilerini izole eder.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT current_database(), current_schema();</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT current_database(), -- Aktif veritabanı adı
+       current_schema();   -- Aktif şema adı</div>
 
                 <div class="reveal-box" id="q12">
                   <div class="reveal-trigger" onclick="document.getElementById('q12').classList.toggle('open')">
@@ -327,7 +327,7 @@
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SHOW transaction_isolation;</div>
+                <div class="code-block" style="margin-bottom:16px;">SHOW transaction_isolation; -- Mevcut işlem izolasyon seviyesini göster</div>
 
                 <div class="reveal-box" id="q13">
                   <div class="reveal-trigger" onclick="document.getElementById('q13').classList.toggle('open')">
@@ -377,8 +377,7 @@
                   ile karma veri tipleri tek bir hücrede saklanabilir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_GeomFromText('GEOMETRYCOLLECTION(POINT(0
-                  0),LINESTRING(1 1,2 2))');</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_GeomFromText('GEOMETRYCOLLECTION(POINT(0 0),LINESTRING(1 1,2 2))'); -- Farklı tiplerin koleksiyonu</div>
 
                 <div class="reveal-box" id="q14">
                   <div class="reveal-trigger" onclick="document.getElementById('q14').classList.toggle('open')">
@@ -429,8 +428,9 @@
                   <code>geometry_columns</code> görünümünde kayıtlıdır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsBinary(geom) FROM konya.mahalleler LIMIT
-                  1;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsBinary(geom) -- Geometriyi binary (WKB) formatına çevir
+FROM konya.mahalleler 
+LIMIT 1;</div>
 
                 <div class="reveal-box" id="q16">
                   <div class="reveal-trigger" onclick="document.getElementById('q16').classList.toggle('open')">
@@ -480,9 +480,9 @@
                 <div class="s-text-tech">Kendi kendini kesen çizgiler (self-intersection) poligonu geçersiz kılar.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_IsValidReason(geom)
-                  FROM konya.mahalleler
-                  WHERE ST_IsValid(geom) = false;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_IsValidReason(geom) -- Geometri geçersizse nedenini açıkla
+FROM konya.mahalleler
+WHERE ST_IsValid(geom) = false; -- Sadece geçersiz olanları süz</div>
 
                 <div class="reveal-box" id="q17">
                   <div class="reveal-trigger" onclick="document.getElementById('q17').classList.toggle('open')">
@@ -538,8 +538,8 @@
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM spatial_ref_sys WHERE srid = 4326;
-                </div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM spatial_ref_sys 
+WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
 
                 <div class="reveal-box" id="q18">
                   <div class="reveal-trigger" onclick="document.getElementById('q18').classList.toggle('open')">
@@ -591,9 +591,9 @@
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT ST_Distance(
-                  'POINT(32.49 37.87)'::geography,
-                  'POINT(32.50 37.88)'::geography
-                  ) AS metre_mesafe;</div>
+  'POINT(32.49 37.87)'::geography, -- İlk nokta (geography tipi)
+  'POINT(32.50 37.88)'::geography  -- İkinci nokta (geography tipi)
+) AS metre_mesafe;                 -- Noktalar arası kuş uçuşu mesafe (metre)</div>
 
                 <div class="reveal-box" id="q19">
                   <div class="reveal-trigger" onclick="document.getElementById('q19').classList.toggle('open')">
@@ -650,8 +650,9 @@
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Transform(geom, 32636))
-                  FROM konya.mahalleler LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Transform(geom, 32636)) -- Geometriyi UTM 36N sistemine dönüştür
+FROM konya.mahalleler 
+LIMIT 1;</div>
 
                 <div class="reveal-box" id="q110">
                   <div class="reveal-trigger" onclick="document.getElementById('q110').classList.toggle('open')">
@@ -703,7 +704,7 @@
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.mahalleler
-                  WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
+WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Belirlenen noktaya temas eden mahalleyi bul</div>
 
                 <div class="reveal-box" id="q111">
                   <div class="reveal-trigger" onclick="document.getElementById('q111').classList.toggle('open')">
@@ -760,8 +761,8 @@
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- 500 metre içindekileri bul:
-                  SELECT * FROM konya.osm_binalar
-                  WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500);</div>
+SELECT * FROM konya.osm_binalar
+WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- Noktaya 500m mesafe içindekiler</div>
 
                 <div class="reveal-box" id="q112">
                   <div class="reveal-trigger" onclick="document.getElementById('q112').classList.toggle('open')">
@@ -811,10 +812,11 @@
                   birleştirmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT b.id, m.ad
-                  FROM konya.osm_binalar b
-                  JOIN konya.mahalleler m ON ST_Intersects(b.geom, m.geom)
-                  LIMIT 5;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT b.id, m.ad               -- Bina ID ve mahalle adını seç
+FROM konya.osm_binalar b        -- Binalar tablosunu 'b' olarak al
+JOIN konya.mahalleler m         -- Mahalleler tablosunu 'm' olarak al
+  ON ST_Intersects(b.geom, m.geom) -- Mekansal olarak kesişenleri bağla
+LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
 
                 <div class="reveal-box" id="q113">
                   <div class="reveal-trigger" onclick="document.getElementById('q113').classList.toggle('open')">
@@ -864,8 +866,9 @@
                   metredir, Geometry ise derece!</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Area(geom::geography) / 10000 AS hektar
-                  FROM konya.mahalleler LIMIT 5;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Area(geom::geography) / 10000 AS hektar -- Alanı hesapla (m2 -> hektar)
+FROM konya.mahalleler 
+LIMIT 5;</div>
 
                 <div class="reveal-box" id="q114">
                   <div class="reveal-trigger" onclick="document.getElementById('q114').classList.toggle('open')">
@@ -915,8 +918,9 @@
                   taşabilir). <strong>ST_PointOnSurface:</strong> Garanti poligonun içinde bir nokta verir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Centroid(geom)) FROM
-                  konya.mahalleler LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Centroid(geom)) -- Ağırlık merkezini bul ve metne çevir
+FROM konya.mahalleler 
+LIMIT 1;</div>
 
                 <div class="reveal-box" id="q115">
                   <div class="reveal-trigger" onclick="document.getElementById('q115').classList.toggle('open')">
@@ -966,8 +970,9 @@
                   alanlarını (Intersection) alma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Buffer(geom::geography, 100)
-                  FROM konya.osm_yollar LIMIT 1; </div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Buffer(geom::geography, 100) -- 100m tampon bölge (buffer) oluştur
+FROM konya.osm_yollar 
+LIMIT 1;</div>
 
                 <div class="reveal-box" id="q116">
                   <div class="reveal-trigger" onclick="document.getElementById('q116').classList.toggle('open')">
@@ -1016,8 +1021,9 @@
                   <strong>ST_ConvexHull:</strong> Geometriyi saran en dar dışbükey zarf (lastik bant etkisi).</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Envelope(geom) FROM konya.mahalleler LIMIT
-                  1;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Envelope(geom) -- Geometriyi saran sınırlayıcı kutuyu bul
+FROM konya.mahalleler 
+LIMIT 1;</div>
 
                 <div class="reveal-box" id="q117">
                   <div class="reveal-trigger" onclick="document.getElementById('q117').classList.toggle('open')">
@@ -1067,9 +1073,10 @@
                   milisaniyeler içinde getirir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad FROM konya.hastaneler
-                  ORDER BY geom <-> ST_SetSRID(ST_Point(32.49, 37.87), 4326)
-                    LIMIT 3;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad                             -- Hastane adını seç
+FROM konya.hastaneler                 -- Tabloyu belirt
+ORDER BY geom <-> ST_SetSRID(ST_Point(32.49, 37.87), 4326) -- İndeksle en yakını bul
+LIMIT 3;                              -- En yakın 3 taneyi getir</div>
                 <div class="reveal-box" id="q118">
                   <div class="reveal-trigger" onclick="document.getElementById('q118').classList.toggle('open')">
                     Kritik Soru: Neden ST_Distance kullanmıyoruz? <span>▼</span>
