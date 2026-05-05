@@ -235,11 +235,11 @@ docker-compose up -d
                 <div class="s-text-tech">SELECT ile tablo sütunlarını seçer, gerekirse AS ile yeniden adlandırırız.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad || ' Belediyesi' AS kurum_adi,
-       nufus AS kisi_sayisi,
-       nufus / 1000.0 AS nufus_k,
-       'KONYA' AS sehir
-FROM konya.ilce_sinirlari;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad || ' Belediyesi' AS kurum_adi, -- İsim birleştirme (concatenation)
+       nufus AS kisi_sayisi,             -- Sütun takma adı (alias)
+       nufus / 1000.0 AS nufus_k,        -- Matematiksel işlem (bin nüfus)
+       'KONYA' AS sehir                  -- Sabit değer (literal) ekleme
+FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
 
                 <div class="reveal-box" id="q04">
                   <div class="reveal-trigger" onclick="document.getElementById('q04').classList.toggle('open')">
@@ -305,10 +305,10 @@ FROM konya.ilce_sinirlari;</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus 
-FROM konya.ilce_sinirlari 
-WHERE nufus >= 50000 
-  AND (ad LIKE '%şehir' OR ad LIKE 'C%')
-  AND ad != 'Akşehir';</div>
+FROM konya.ilce_sinirlari                 -- Tablo seçimi
+WHERE nufus >= 50000                      -- Sayısal kıyaslama
+  AND (ad LIKE '%şehir' OR ad LIKE 'C%')  -- Metin desen eşleştirme (Pattern matching)
+  AND ad != 'Akşehir';                   -- Eşit değildir (Inequality)</div>
                 
                 <div class="reveal-box" id="q05">
                   <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
@@ -365,9 +365,11 @@ WHERE nufus >= 50000
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.ilce_sinirlari 
-ORDER BY nufus DESC 
-LIMIT 5 OFFSET 0;</div>
+                <div class="code-block" style="margin-bottom:16px;">-- Sıralama ve sınırlandırma
+SELECT ad, nufus 
+FROM konya.ilce_sinirlari 
+ORDER BY nufus DESC      -- Büyükten küçüğe sırala
+LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
                 
                 <div class="reveal-box" id="q06">
                   <div class="reveal-trigger" onclick="document.getElementById('q06').classList.toggle('open')">
@@ -413,8 +415,9 @@ LIMIT 5 OFFSET 0;</div>
                 <div class="s-text-tech">COUNT, SUM, AVG gibi fonksiyonlarla milyonlarca satırı tek bir değere indirgemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT COUNT(*) AS toplam_ilce, 
-       SUM(nufus) AS toplam_nufus 
+                <div class="code-block" style="margin-bottom:16px;">-- Toplama işlemleri
+SELECT COUNT(*) AS toplam_ilce, 
+       SUM(nufus) AS toplam_nufus
 FROM konya.ilce_sinirlari;</div>
 
                 <div class="reveal-box" id="q07">
@@ -461,10 +464,11 @@ FROM konya.ilce_sinirlari;</div>
                 <div class="s-text-tech">Veriyi kategorilerine (ilçe vb.) göre gruplayıp filtrelemek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ilce, COUNT(*) 
+                <div class="code-block" style="margin-bottom:16px;">-- Gruplama ve filtreleme
+SELECT ilce, COUNT(*) 
 FROM konya.mahalleler 
-GROUP BY ilce 
-HAVING COUNT(*) > 5;</div>
+GROUP BY ilce         -- Belirli sütuna göre paketle
+HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
 
                 <div class="reveal-box" id="q08">
                   <div class="reveal-trigger" onclick="document.getElementById('q08').classList.toggle('open')">
@@ -521,7 +525,8 @@ HAVING COUNT(*) > 5;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT m.ad AS mahalle, h.ad AS hastane 
+                <div class="code-block" style="margin-bottom:16px;">-- Tablo birleştirme
+SELECT m.ad AS mahalle, h.ad AS hastane 
 FROM konya.mahalleler m 
 JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                 
@@ -580,10 +585,16 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">INSERT INTO konya.mahalleler(ad, nufus, ilce) 
-VALUES('Yeni Mahalle', 1200, 'Selçuklu');
+                <div class="code-block" style="margin-bottom:16px;">-- INSERT: Yeni veri ekleme
+INSERT INTO konya.mahalleler(ad, nufus, ilce) 
+VALUES ('Yeni Mahalle', 1500, 'Selçuklu');
 
+-- UPDATE: Mevcut veriyi güncelleme
 UPDATE konya.mahalleler SET nufus = 1250 
+WHERE ad = 'Yeni Mahalle';
+
+-- DELETE: Veriyi silme
+DELETE FROM konya.mahalleler 
 WHERE ad = 'Yeni Mahalle';</div>
                 
                 <div class="reveal-box" id="q10">
