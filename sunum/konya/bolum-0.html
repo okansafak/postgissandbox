@@ -295,10 +295,10 @@ docker-compose up -d
                 <div class="s-text-tech">SELECT ile tablo sütunlarını seçer, gerekirse AS ile yeniden adlandırırız.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad || ' Belediyesi' AS kurum_adi, -- İsim birleştirme (concatenation)
-       nufus AS kisi_sayisi,             -- Sütun takma adı (alias)
-       nufus / 1000.0 AS nufus_k,        -- Matematiksel işlem (bin nüfus)
-       'KONYA' AS sehir                  -- Sabit değer (literal) ekleme
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad || ' Belediyesi' AS kurum_adi, -- İsim birleştirme
+       nufus AS kisi_sayisi,             -- Sütun takma adı
+       nufus / 1000.0 AS nufus_k,        -- Matematiksel işlem
+       'KONYA' AS sehir                  -- Sabit değer ekleme
 FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
 
                 <div class="reveal-box" id="q04">
@@ -365,10 +365,10 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus 
-FROM konya.ilce_sinirlari                 -- Tablo seçimi
-WHERE nufus >= 50000                      -- Sayısal kıyaslama
-  AND (ad LIKE '%şehir' OR ad LIKE 'C%')  -- Metin desen eşleştirme (Pattern matching)
-  AND ad != 'Akşehir';                   -- Eşit değildir (Inequality)</div>
+FROM konya.ilce_sinirlari   -- Tablo seçimi
+WHERE nufus >= 50000        -- Sayısal kıyaslama
+  AND ad LIKE '%şehir'     -- Metin eşleştirme
+  AND ad != 'Akşehir';      -- Eşit değildir</div>
                 
                 <div class="reveal-box" id="q05">
                   <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
