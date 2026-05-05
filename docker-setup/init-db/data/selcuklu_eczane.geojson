@@ -1,0 +1,4793 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-05-05T18:38:30Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3034185016",
+        "addr:city": "Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Merve Eczanesi",
+        "phone": "+90 332 236 54 84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4884408,
+          37.8945038
+        ]
+      },
+      "id": "node/3034185016"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3034185017",
+        "addr:city": "Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Cihanbeyli Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4881823,
+          37.8947967
+        ]
+      },
+      "id": "node/3034185017"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3166378343",
+        "addr:city": "Bosna Hersek Mah. Konya / Selçuklu",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Selçuklu Eczanesi",
+        "phone": "+90 332 241 20 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.527291,
+          38.0133872
+        ]
+      },
+      "id": "node/3166378343"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3168063935",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Beyhekim Eczanesi",
+        "phone": "+90 332 263 10 10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4890362,
+          37.9837022
+        ]
+      },
+      "id": "node/3168063935"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3278059378",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "89/L",
+        "addr:street": "Gülsarayı Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Begüm Eczanesi",
+        "operator": "Ecz. Gökhan DOĞU",
+        "phone": "+90 332 263 10 63"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4918941,
+          37.9849104
+        ]
+      },
+      "id": "node/3278059378"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3278059379",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "89/1",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yeniceoba Eczanesi",
+        "operator": "Ecz. Şafak ÖGÜCÜ",
+        "phone": "+90 332 350 10 49"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4855239,
+          37.9856959
+        ]
+      },
+      "id": "node/3278059379"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3278059380",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "89/H",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nurlu Eczanesi",
+        "operator": "Ecz. Havva Nur ÜLGEY",
+        "phone": "+90 332 255 4030"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4853281,
+          37.9856753
+        ]
+      },
+      "id": "node/3278059380"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3278059381",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "89/0",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Manolya Eczanesi",
+        "operator": "Ecz. Şerife BEKMEZCİ",
+        "phone": "+90 332 263 0903"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4850532,
+          37.9856414
+        ]
+      },
+      "id": "node/3278059381"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3652684616",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "İpek Eczanesi",
+        "phone": "+90 332 246 46 51"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4822079,
+          37.9047897
+        ]
+      },
+      "id": "node/3652684616"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3652684618",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Gürgenağacı Sokağı",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Hasan Baş Eczanesi",
+        "phone": "+90 332 246 00 60"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4817384,
+          37.904756
+        ]
+      },
+      "id": "node/3652684618"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3658927127",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "11/g",
+        "addr:street": "Osmanlı Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Meram Eczanesi",
+        "phone": "+90 332 321 5061"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5263724,
+          38.0105564
+        ]
+      },
+      "id": "node/3658927127"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3658927130",
+        "addr:city": "Selçuklu/Konya",
+        "addr:postcode": "42250",
+        "addr:street": "Büyük Hizmet Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Zeynep Özdemir Eczanesi",
+        "phone": "+90 332 241 4133"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5264187,
+          38.011309
+        ]
+      },
+      "id": "node/3658927130"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3658960334",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "3/G",
+        "addr:postcode": "42250",
+        "addr:street": "Osmanlı Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Bosna Fatih Eczanesi",
+        "phone": "+90 332 241 41 56",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5234431,
+          38.0104633
+        ]
+      },
+      "id": "node/3658960334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659715478",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Asya Eczanesi",
+        "phone": "+90 332 241 45 81"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5180321,
+          38.0153698
+        ]
+      },
+      "id": "node/3659715478"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659977487",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nur Eczanesi",
+        "phone": "+90 332 265 44 74"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5091045,
+          37.9563051
+        ]
+      },
+      "id": "node/3659977487"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659978650",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "34/I",
+        "addr:street": "Sultan Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akınbey Eczanesi",
+        "phone": "+90 332 265 22 23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5095547,
+          37.9573095
+        ]
+      },
+      "id": "node/3659978650"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659978651",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "18/D",
+        "addr:street": "Şehit Erkan Özbalcı Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yılmaz Eczanesi",
+        "phone": "+90 332 265 42 30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.510134,
+          37.9570402
+        ]
+      },
+      "id": "node/3659978651"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3659978654",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "20/A",
+        "addr:street": "Şehit Erkan Özbalcı Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yazır Eczanesi",
+        "phone": "+90 332 265 25 65"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5101426,
+          37.9568351
+        ]
+      },
+      "id": "node/3659978654"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660032800",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "19/C",
+        "addr:street": "Şule Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Efe Eczanesi",
+        "phone": "+90 332 255 52 19"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.525509,
+          37.9582477
+        ]
+      },
+      "id": "node/3660032800"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660032801",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "17/A",
+        "addr:street": "Şule Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sancak Eczanesi",
+        "phone": "+90 332 255 29 96"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.525509,
+          37.9584109
+        ]
+      },
+      "id": "node/3660032801"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660032802",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "19/B",
+        "addr:street": "Şule Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Hakyemez Eczanesi",
+        "phone": "+90 332 255 41 47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5255055,
+          37.9583356
+        ]
+      },
+      "id": "node/3660032802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660032803",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "25",
+        "addr:street": "Şule Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Odabaşı Eczanesi",
+        "phone": "+90 332 237 54 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5254046,
+          37.9584584
+        ]
+      },
+      "id": "node/3660032803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660032804",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "17/B",
+        "addr:street": "Şule Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tuna Eczanesi",
+        "phone": "+90 332 255 21 50"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5253993,
+          37.9586872
+        ]
+      },
+      "id": "node/3660032804"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660087252",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "2/C",
+        "addr:street": "Şehit Vali Karakoç Sk.",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Dost Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5002929,
+          37.9378569
+        ]
+      },
+      "id": "node/3660087252"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660087258",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "2/B",
+        "addr:street": "Şehit Vali Karakoç Sk.",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ege Eczanesi",
+        "phone": "+90 332 249 30 60"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5003599,
+          37.9378152
+        ]
+      },
+      "id": "node/3660087258"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3660087259",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Şehit Vali Karakoç Sk.",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Mayıs Eczanesi",
+        "phone": "+90 332 248 23 05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5004453,
+          37.9377511
+        ]
+      },
+      "id": "node/3660087259"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3661512233",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Kadı Sıraceddin Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Göksu Eczanesi",
+        "phone": "+90 332 237 09 99"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4905956,
+          37.8808359
+        ]
+      },
+      "id": "node/3661512233"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702854272",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Çevre Yolu Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kübra Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4557494,
+          37.8831582
+        ]
+      },
+      "id": "node/3702854272"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702854300",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Saray Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Aksoy Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4571125,
+          37.8849108
+        ]
+      },
+      "id": "node/3702854300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702854301",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Saray Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Hande Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4569887,
+          37.8849468
+        ]
+      },
+      "id": "node/3702854301"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702854302",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Saray Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "İlaçevi Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4568994,
+          37.8849687
+        ]
+      },
+      "id": "node/3702854302"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702854303",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Saray Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "İlknur Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4567915,
+          37.8849979
+        ]
+      },
+      "id": "node/3702854303"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3702854305",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Saray Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Merve Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.456696,
+          37.8850174
+        ]
+      },
+      "id": "node/3702854305"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704159240",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Parsana Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özge Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4916294,
+          37.8785462
+        ]
+      },
+      "id": "node/3704159240"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704159260",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Parsana Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özgül Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4915572,
+          37.8789751
+        ]
+      },
+      "id": "node/3704159260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704159261",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Parsana Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Emre Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4915633,
+          37.8790858
+        ]
+      },
+      "id": "node/3704159261"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704159288",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Parlakkaya Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4918025,
+          37.8806331
+        ]
+      },
+      "id": "node/3704159288"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704159309",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Ulaşbaba Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ümran Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4936468,
+          37.8790209
+        ]
+      },
+      "id": "node/3704159309"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3704482760",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "İrem Eczanesi",
+        "phone": "+90 332 237 08 63"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4824679,
+          37.876507
+        ]
+      },
+      "id": "node/3704482760"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3706163842",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Gürz Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Medi-Farma Eczanesi",
+        "phone": "+90 332 251 22 99"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4967932,
+          37.893028
+        ]
+      },
+      "id": "node/3706163842"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3706163843",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Gürz Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Birgül Göçer Eczanesi",
+        "phone": "+90 332 236 52 01"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4966377,
+          37.8930745
+        ]
+      },
+      "id": "node/3706163843"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3738023786",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Sultan Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Vizyon Eczanesi",
+        "phone": "+90 332 290 48 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.508593,
+          37.9571323
+        ]
+      },
+      "id": "node/3738023786"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812923690",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Eyüp Sultan Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Selçuk Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5026682,
+          37.9368146
+        ]
+      },
+      "id": "node/3812923690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3812946688",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Altındağ Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5084423,
+          37.9368182
+        ]
+      },
+      "id": "node/3812946688"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3904517901",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nalçacı Büyük Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4889341,
+          37.8803597
+        ]
+      },
+      "id": "node/3904517901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063353970",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Damla Eczanesi",
+        "phone": "+90 332 261 20 93"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5219348,
+          37.9793419
+        ]
+      },
+      "id": "node/4063353970"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063353980",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Serhat Eczanesi",
+        "phone": "+90 332 261 01 06"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5220671,
+          37.9793495
+        ]
+      },
+      "id": "node/4063353980"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063353983",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akdemir Eczanesi",
+        "phone": "+90 332 261 00 60"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5225318,
+          37.9797889
+        ]
+      },
+      "id": "node/4063353983"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063353984",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Melike Eczanesi",
+        "phone": "+90 332 261 22 12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.52291,
+          37.9797805
+        ]
+      },
+      "id": "node/4063353984"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354864",
+        "addr:city": "Selçuklu/Konya",
+        "addr:postcode": "42100",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nazar Eczanesi",
+        "phone": "+90 332 245 35 31"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4900482,
+          37.9121834
+        ]
+      },
+      "id": "node/4063354864"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354878",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "9/C",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kulu Cihan Eczanesi",
+        "phone": "+90 332 245 62 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4908941,
+          37.9115032
+        ]
+      },
+      "id": "node/4063354878"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354885",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "9/F",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Menekşe Eczanesi",
+        "phone": "+90 332 246 23 71"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4909627,
+          37.9115427
+        ]
+      },
+      "id": "node/4063354885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354886",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "11/A",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Hicret Eczanesi",
+        "phone": "+90 332 245 01 97"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.490996,
+          37.9116114
+        ]
+      },
+      "id": "node/4063354886"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354887",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "11/D",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Emel Eczanesi",
+        "phone": "+90 332 246 45 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4910776,
+          37.9117518
+        ]
+      },
+      "id": "node/4063354887"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354896",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "13/C",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Umut Eczanesi",
+        "phone": "+90 332 245 04 66"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4911962,
+          37.911857
+        ]
+      },
+      "id": "node/4063354896"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354902",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "17/A",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nurcan Eczanesi",
+        "phone": "+90 332 246 28 69"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4912944,
+          37.9120208
+        ]
+      },
+      "id": "node/4063354902"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063354903",
+        "addr:city": "Selçuklu/Konya",
+        "addr:housenumber": "19/A",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özçelik Eczanesi",
+        "phone": "+90 332 245 05 15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4913426,
+          37.9121129
+        ]
+      },
+      "id": "node/4063354903"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4063483221",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Elit Eczanesi",
+        "phone": "+90 332 265 40 32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4980374,
+          37.9478317
+        ]
+      },
+      "id": "node/4063483221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4593096991",
+        "addr:housenumber": "86",
+        "addr:postcode": "42110",
+        "addr:street": "bülbüllü",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Aydınlık eczanesi",
+        "name:en": "Pharmacy Aydinlik",
+        "name:tr": "Aydınlık Eczanesi",
+        "operator": "Fatma Şeyda Yetişen",
+        "phone": "+90 332 351 22 50"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.501676,
+          37.9107911
+        ]
+      },
+      "id": "node/4593096991"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4877894824",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tuba Eczanesi",
+        "phone": "+90 332 249 68 68"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5073398,
+          37.9280235
+        ]
+      },
+      "id": "node/4877894824"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4877894825",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ferdane Eczanesi",
+        "phone": "+90 332 249 99 30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5057631,
+          37.9282957
+        ]
+      },
+      "id": "node/4877894825"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5111477125",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özgüven Eczanesi",
+        "phone": "+90 332 324 26 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4622418,
+          37.8949577
+        ]
+      },
+      "id": "node/5111477125"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5121938021",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Selçuk Ecza Deposu",
+        "name:en": "Medical Drug Storage"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4808061,
+          37.8891585
+        ]
+      },
+      "id": "node/5121938021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6103889487",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Merve Çerşil Eczanesi",
+        "name:en": "Merve Çerşil Pharmacy",
+        "phone": "+90 332 246 18 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4913809,
+          37.9168288
+        ]
+      },
+      "id": "node/6103889487"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7939860057",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kibaroğlu Eczanesi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4576107,
+          37.8796412
+        ]
+      },
+      "id": "node/7939860057"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7941690698",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Duru Eczanesi",
+        "phone": "+90 332 502 14 93"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4662022,
+          37.8849439
+        ]
+      },
+      "id": "node/7941690698"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7941761208",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nesrin Eczanesi",
+        "phone": "+90 332 251 89 90"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4954015,
+          37.9273554
+        ]
+      },
+      "id": "node/7941761208"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10204184126",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4663726,
+          37.9015943
+        ]
+      },
+      "id": "node/10204184126"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851820",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ümit Eczanesi",
+        "phone": "+90 332 502 24 12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4321076,
+          37.8831887
+        ]
+      },
+      "id": "node/10208851820"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851821",
+        "amenity": "pharmacy",
+        "name": "Yeni Fakülte Eczanesi",
+        "phone": "+90 332 324 23 43"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.441395,
+          37.8914096
+        ]
+      },
+      "id": "node/10208851821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851822",
+        "amenity": "pharmacy",
+        "name": "Bektaş Eczanesi",
+        "phone": "+90 332 247 94 47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4408947,
+          37.8888144
+        ]
+      },
+      "id": "node/10208851822"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851823",
+        "amenity": "pharmacy",
+        "name": "Gürsoy Eczanesi",
+        "phone": "+90 332 323 90 90"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4411456,
+          37.8910804
+        ]
+      },
+      "id": "node/10208851823"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851921",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Meram Tıp Eczanesi",
+        "phone": "+90 332 502 24 12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4319157,
+          37.8832176
+        ]
+      },
+      "id": "node/10208851921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851922",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Melis Yalçın Eczanesi",
+        "phone": "+90 332 502 62 25"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.432269,
+          37.8831097
+        ]
+      },
+      "id": "node/10208851922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851923",
+        "amenity": "pharmacy",
+        "name": "Erol Can Eczanesi",
+        "phone": "+90 332 247 43 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4442748,
+          37.8902254
+        ]
+      },
+      "id": "node/10208851923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208851924",
+        "amenity": "pharmacy",
+        "name": "Gülşen Eczanesi",
+        "phone": "+90 332 322 20 20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4412634,
+          37.8912426
+        ]
+      },
+      "id": "node/10208851924"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208852221",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Marmara Eczanesi",
+        "phone": "+90 332 502 64 53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.431393,
+          37.8836274
+        ]
+      },
+      "id": "node/10208852221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208852222",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Veziroğlu Eczanesi",
+        "phone": "+90 332 502 64 53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4317556,
+          37.8833666
+        ]
+      },
+      "id": "node/10208852222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208852223",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sarı Eczanesi",
+        "phone": "+90 332 323 76 74"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4336708,
+          37.882266
+        ]
+      },
+      "id": "node/10208852223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208852417",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Güneş Eczanesi",
+        "phone": "+90 332 324 12 11"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4339088,
+          37.8822678
+        ]
+      },
+      "id": "node/10208852417"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10208852418",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ahenk Eczanesi",
+        "phone": "+90 332 324 12 11"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4361904,
+          37.8819023
+        ]
+      },
+      "id": "node/10208852418"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10224402115",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akincilar Eczanesi",
+        "phone": "+90 332 246 35 47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.465311,
+          37.9025496
+        ]
+      },
+      "id": "node/10224402115"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477109",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kampüs Eczanesi",
+        "phone": "+90 332 247 48 44"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5175562,
+          38.0165817
+        ]
+      },
+      "id": "node/10296477109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477110",
+        "addr:housenumber": "17/C",
+        "addr:street": "Mesaj Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özdemir Eczanesi",
+        "phone": "+90 332 241 22 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5250065,
+          38.0049971
+        ]
+      },
+      "id": "node/10296477110"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477111",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Gürel Eczanesi",
+        "phone": "+90 332 255 56 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5277169,
+          37.9504938
+        ]
+      },
+      "id": "node/10296477111"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477209",
+        "amenity": "pharmacy",
+        "name": "Burcu Eczanesi",
+        "phone": "+90 332 240 00 10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5307594,
+          38.0130481
+        ]
+      },
+      "id": "node/10296477209"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477210",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Saraybosna Eczanesi",
+        "phone": "+90 332 241 42 41"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5234355,
+          38.0091166
+        ]
+      },
+      "id": "node/10296477210"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477211",
+        "addr:housenumber": "7/AB",
+        "addr:street": "Turgut Özal Bulvarı",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yiğit Eczanesi",
+        "phone": "+90 332 851 27 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4909858,
+          37.9899236
+        ]
+      },
+      "id": "node/10296477211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477212",
+        "amenity": "pharmacy",
+        "name": "Aydan Eczanesi",
+        "phone": "+90 332 263 03 05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4852713,
+          37.9856759
+        ]
+      },
+      "id": "node/10296477212"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477213",
+        "addr:housenumber": "3/AB",
+        "addr:street": "Batıhan Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sibel Eczanesi",
+        "phone": "+90 332 261 13 59"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5148616,
+          37.9778317
+        ]
+      },
+      "id": "node/10296477213"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477214",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Esen Eczanesi",
+        "phone": "+90 332 261 14 53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5215134,
+          37.9804964
+        ]
+      },
+      "id": "node/10296477214"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477215",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Esra Yavuz Eczanesi",
+        "phone": "+90 332 248 47 48"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4941386,
+          37.9571352
+        ]
+      },
+      "id": "node/10296477215"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477216",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kaş Eczanesi",
+        "phone": "+90 332 249 00 05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5026493,
+          37.9431021
+        ]
+      },
+      "id": "node/10296477216"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477217",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sena Acar Eczanesi",
+        "phone": "+90 332 251 66 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5022049,
+          37.9446572
+        ]
+      },
+      "id": "node/10296477217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477218",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akdeniz Eczanesi",
+        "phone": "+90 332 321 11 50"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5024244,
+          37.9446376
+        ]
+      },
+      "id": "node/10296477218"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477219",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Gülis Eczanesi",
+        "phone": "+90 332 249 22 11"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4913858,
+          37.9354552
+        ]
+      },
+      "id": "node/10296477219"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477309",
+        "amenity": "pharmacy",
+        "name": "Türker Eczanesi",
+        "phone": "+90 332 241 42 41"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.521132,
+          38.0092118
+        ]
+      },
+      "id": "node/10296477309"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477310",
+        "amenity": "pharmacy",
+        "name": "Diriliş Eczanesi",
+        "phone": "+90 332 263 18 18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4857689,
+          37.9856841
+        ]
+      },
+      "id": "node/10296477310"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477311",
+        "amenity": "pharmacy",
+        "name": "Çay Eczanesi",
+        "phone": "+90 332 263 15 70"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4856691,
+          37.9857643
+        ]
+      },
+      "id": "node/10296477311"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477312",
+        "amenity": "pharmacy",
+        "name": "Esentepe Eczanesi",
+        "phone": "+90 332 263 00 83"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4853612,
+          37.9857065
+        ]
+      },
+      "id": "node/10296477312"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477313",
+        "amenity": "pharmacy",
+        "name": "Yenikent Eczanesi",
+        "phone": "+90 332 882 66 66"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4851502,
+          37.985681
+        ]
+      },
+      "id": "node/10296477313"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477314",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sena Yılmaz Eczanesi",
+        "phone": "+90 332 503 30 33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5138334,
+          37.9782208
+        ]
+      },
+      "id": "node/10296477314"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477315",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nefes Eczanesi",
+        "phone": "+90 332 355 12 12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5175164,
+          37.9656875
+        ]
+      },
+      "id": "node/10296477315"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477316",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akasya Eczanesi",
+        "phone": "+90 332 265 35 75"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4971378,
+          37.9503737
+        ]
+      },
+      "id": "node/10296477316"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477317",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Bardakçı Eczanesi",
+        "phone": "+90 332 320 22 33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5019922,
+          37.944665
+        ]
+      },
+      "id": "node/10296477317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477409",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Oğlakçı Eczanesi",
+        "phone": "+90 332 233 15 08"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5214202,
+          38.0092432
+        ]
+      },
+      "id": "node/10296477409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477410",
+        "amenity": "pharmacy",
+        "name": "Demirci Eczanesi",
+        "phone": "+90 332 261 00 09"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5295084,
+          38.0066249
+        ]
+      },
+      "id": "node/10296477410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477411",
+        "addr:housenumber": "17/D",
+        "addr:street": "Mesaj Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Öztürk Eczanesi",
+        "phone": "+90 332 241 55 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5249153,
+          38.005104
+        ]
+      },
+      "id": "node/10296477411"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477412",
+        "amenity": "pharmacy",
+        "name": "Özmen Eczanesi",
+        "phone": "+90 332 263 09 09"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4917049,
+          37.9849034
+        ]
+      },
+      "id": "node/10296477412"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477413",
+        "amenity": "pharmacy",
+        "name": "Simya Eczanesi",
+        "phone": "+90 332 503 23 24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4854113,
+          37.9857003
+        ]
+      },
+      "id": "node/10296477413"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477414",
+        "addr:housenumber": "116/L-K",
+        "addr:street": "Veysel Karani Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Saygılı Eczanesi",
+        "phone": "+90 332 255 55 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5219277,
+          37.9746581
+        ]
+      },
+      "id": "node/10296477414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477415",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sergül Eczanesi",
+        "phone": "+90 332 255 30 33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5212825,
+          37.9799936
+        ]
+      },
+      "id": "node/10296477415"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477417",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Çağlar Eczanesi",
+        "phone": "+90 332 261 03 06"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5221096,
+          37.9794201
+        ]
+      },
+      "id": "node/10296477417"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477418",
+        "amenity": "pharmacy",
+        "name": "Bahçeşehir Eczanesi",
+        "phone": "+90 332 362 22 20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5050348,
+          37.9609646
+        ]
+      },
+      "id": "node/10296477418"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477419",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Adapark Eczanesi",
+        "phone": "+90 332 502 44 99"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4899813,
+          37.9675929
+        ]
+      },
+      "id": "node/10296477419"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477420",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Metropol Eczanesi",
+        "phone": "+90 332 265 01 31"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4997627,
+          37.9549669
+        ]
+      },
+      "id": "node/10296477420"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477421",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Gece Eczanesi",
+        "phone": "+90 332 503 20 10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5085907,
+          37.9568194
+        ]
+      },
+      "id": "node/10296477421"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477422",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Zehra Eczanesi",
+        "phone": "+90 332 265 28 29"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5101081,
+          37.9564403
+        ]
+      },
+      "id": "node/10296477422"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477423",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Acay Eczanesi",
+        "phone": "+90 332 241 27 10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4947798,
+          37.9478435
+        ]
+      },
+      "id": "node/10296477423"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477424",
+        "addr:city": "Konya",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Alsancak Eczanesi",
+        "phone": "+90 332 503 00 54"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5207257,
+          37.9477068
+        ]
+      },
+      "id": "node/10296477424"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477425",
+        "amenity": "pharmacy",
+        "name": "Anadolu Zafer Eczanesi",
+        "phone": "+90 332 249 69 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5201904,
+          37.9404744
+        ]
+      },
+      "id": "node/10296477425"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477426",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ünlü Eczanesi",
+        "phone": "+90 332 251 46 46"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5018214,
+          37.9444167
+        ]
+      },
+      "id": "node/10296477426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477427",
+        "amenity": "pharmacy",
+        "name": "Eyüp Sultan Eczanesi",
+        "phone": "+90 332 248 24 84"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5106357,
+          37.9365617
+        ]
+      },
+      "id": "node/10296477427"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477428",
+        "amenity": "pharmacy",
+        "name": "Zeybek Eczanesi",
+        "phone": "+90 332 248 39 18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5103251,
+          37.936566
+        ]
+      },
+      "id": "node/10296477428"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477429",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Aysel Eczanesi",
+        "phone": "+90 332 251 51 71"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5008936,
+          37.9367854
+        ]
+      },
+      "id": "node/10296477429"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477509",
+        "addr:housenumber": "17/F",
+        "addr:street": "Mesaj Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Baran Eczanesi",
+        "phone": "+90 332 241 56 24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5248168,
+          38.005234
+        ]
+      },
+      "id": "node/10296477509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477510",
+        "addr:housenumber": "210/I",
+        "addr:street": "Veysel Karani Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Karabulut Eczanesi",
+        "phone": "+90 332 261 18 28"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5267209,
+          37.9972109
+        ]
+      },
+      "id": "node/10296477510"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477511",
+        "addr:housenumber": "210/H-F",
+        "addr:street": "Veysel Karani Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akça Eczanesi",
+        "phone": "+90 332 261 18 28"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.526699,
+          37.9969331
+        ]
+      },
+      "id": "node/10296477511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477512",
+        "addr:housenumber": "16/F",
+        "addr:street": "Fırat Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Organik Eczanesi",
+        "phone": "+90 332 261 18 28"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5139397,
+          37.9946715
+        ]
+      },
+      "id": "node/10296477512"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477513",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Bahar Eczanesi",
+        "phone": "+90 332 261 18 28"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5041011,
+          37.9818371
+        ]
+      },
+      "id": "node/10296477513"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477514",
+        "addr:housenumber": "97/B",
+        "addr:street": "Ulusal Sokak",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Makbule Güneş Eczanesi",
+        "phone": "+90 332 246 46 96"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5154416,
+          37.9771916
+        ]
+      },
+      "id": "node/10296477514"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477515",
+        "addr:housenumber": "113/B",
+        "addr:street": "Veysel Karani Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Seçkin Eczanesi",
+        "phone": "+90 332 350 87 57"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5210091,
+          37.9750088
+        ]
+      },
+      "id": "node/10296477515"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477516",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yücel Eczanesi",
+        "phone": "+90 332 261 16 85"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5216337,
+          37.9793455
+        ]
+      },
+      "id": "node/10296477516"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477517",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Gülyiğit Eczanesi",
+        "phone": "+90 332 261 21 93"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5221133,
+          37.9795148
+        ]
+      },
+      "id": "node/10296477517"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477518",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akıncı Eczanesi",
+        "phone": "+90 332 261 10 02"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5227157,
+          37.9797852
+        ]
+      },
+      "id": "node/10296477518"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477519",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Lotus Eczanesi",
+        "phone": "+90 332 355 12 12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5090436,
+          37.9722484
+        ]
+      },
+      "id": "node/10296477519"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477520",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Öz Şafak Eczanesi",
+        "phone": "+90 332 255 52 04"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5165139,
+          37.965902
+        ]
+      },
+      "id": "node/10296477520"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477521",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "İstanbul Eczanesi",
+        "phone": "+90 332 255 27 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.512961,
+          37.9628315
+        ]
+      },
+      "id": "node/10296477521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477522",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Savran Eczanesi",
+        "phone": "+90 332 255 10 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5125045,
+          37.9619993
+        ]
+      },
+      "id": "node/10296477522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477523",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tuna Eczanesi",
+        "phone": "+90 332 255 21 50"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5173624,
+          37.9569126
+        ]
+      },
+      "id": "node/10296477523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477524",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Dudu Eczanesi",
+        "phone": "+90 332 265 55 56"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5027266,
+          37.9602577
+        ]
+      },
+      "id": "node/10296477524"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477525",
+        "addr:housenumber": "42/H",
+        "addr:street": "Beyhekim Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nane Limon Eczanesi",
+        "phone": "+90 332 312 97 99"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4877896,
+          37.9640843
+        ]
+      },
+      "id": "node/10296477525"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477526",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sare Eczanesi",
+        "phone": "+90 332 503 00 98"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4956298,
+          37.9572453
+        ]
+      },
+      "id": "node/10296477526"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477527",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Furkan Eczanesi",
+        "phone": "+90 332 265 66 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5086121,
+          37.9565674
+        ]
+      },
+      "id": "node/10296477527"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477528",
+        "amenity": "pharmacy",
+        "name": "Gülden Eczanesi",
+        "phone": "+90 332 265 15 10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5101232,
+          37.9567596
+        ]
+      },
+      "id": "node/10296477528"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477529",
+        "amenity": "pharmacy",
+        "name": "Acar Eczanesi",
+        "phone": "+90 332 265 31 90"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5101152,
+          37.9569224
+        ]
+      },
+      "id": "node/10296477529"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477530",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akif Duman Eczanesi",
+        "phone": "+90 332 265 22 68"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5051345,
+          37.9499914
+        ]
+      },
+      "id": "node/10296477530"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477531",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Melek Eczanesi",
+        "phone": "+90 332 248 92 52"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927297,
+          37.9498578
+        ]
+      },
+      "id": "node/10296477531"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477532",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Karakurt Eczanesi",
+        "phone": "+90 332 255 56 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5275824,
+          37.9504014
+        ]
+      },
+      "id": "node/10296477532"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477534",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Burakcan Eczanesi",
+        "phone": "+90 332 251 95 95"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5003459,
+          37.9439204
+        ]
+      },
+      "id": "node/10296477534"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477535",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Altındağ Eczanesi",
+        "phone": "+90 332 249 57 07"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5020439,
+          37.9443851
+        ]
+      },
+      "id": "node/10296477535"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477536",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Beyza Eczanesi",
+        "phone": "+90 332 248 98 98"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5022751,
+          37.9443741
+        ]
+      },
+      "id": "node/10296477536"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477537",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Dost Eczanesi",
+        "phone": "+90 332 251 82 38"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5006966,
+          37.9367914
+        ]
+      },
+      "id": "node/10296477537"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477538",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Saygı Eczanesi",
+        "phone": "+90 332 248 20 20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5011536,
+          37.9367721
+        ]
+      },
+      "id": "node/10296477538"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477539",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Buhara Eczanesi",
+        "phone": "+90 332 249 48 33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4917633,
+          37.9363185
+        ]
+      },
+      "id": "node/10296477539"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477540",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tütüncü Eczanesi",
+        "phone": "+90 332 260 00 30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4913894,
+          37.9356862
+        ]
+      },
+      "id": "node/10296477540"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296477809",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Setenay Eczanesi",
+        "phone": "+90 332 261 13 59"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5144616,
+          37.9777987
+        ]
+      },
+      "id": "node/10296477809"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524511",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yunus Emre Eczanesi",
+        "phone": "+90 332 410 54 64"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5049218,
+          37.927787
+        ]
+      },
+      "id": "node/10296524511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524512",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sakarya Eczanesi",
+        "phone": "+90 332 238 70 67"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5010725,
+          37.9163821
+        ]
+      },
+      "id": "node/10296524512"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524513",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Plaza Eczanesi",
+        "phone": "+90 332 247 77 37"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4943542,
+          37.9058028
+        ]
+      },
+      "id": "node/10296524513"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524514",
+        "addr:housenumber": "15/A",
+        "addr:street": "Akabe Caddesi",
+        "amenity": "pharmacy",
+        "name": "Mekânı Şifa Eczanesi",
+        "phone": "+90 332 245 04 45"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4912497,
+          37.9119368
+        ]
+      },
+      "id": "node/10296524514"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524515",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Halk Eczanesi",
+        "phone": "+90 332 245 93 92"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4771646,
+          37.9097882
+        ]
+      },
+      "id": "node/10296524515"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524516",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özalkent Eczanesi",
+        "phone": "+90 332 235 42 45"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4770826,
+          37.9105614
+        ]
+      },
+      "id": "node/10296524516"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524517",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Zühre Olgun Eczanesi",
+        "phone": "+90 332 245 13 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4750679,
+          37.9106168
+        ]
+      },
+      "id": "node/10296524517"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296524518",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tuğçe Mine Eczanesi",
+        "phone": "+90 332 245 76 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4852984,
+          37.8987906
+        ]
+      },
+      "id": "node/10296524518"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525911",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:housenumber": "2/A",
+        "addr:neighbourhood": "Malazgirt Mahalesi",
+        "addr:street": "Tuna Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Malazgirt Eczanesi",
+        "phone": "+90 332 248 10 71"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4975937,
+          37.9286273
+        ]
+      },
+      "id": "node/10296525911"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525912",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özdur Eczanesi",
+        "phone": "+90 332 249 59 59"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4940734,
+          37.9219439
+        ]
+      },
+      "id": "node/10296525912"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525913",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Saraç Eczanesi",
+        "phone": "+90 332 246 60 05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.491485,
+          37.9167543
+        ]
+      },
+      "id": "node/10296525913"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525914",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Vitamin Eczanesi",
+        "phone": "+90 332 245 17 06"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4755742,
+          37.9100922
+        ]
+      },
+      "id": "node/10296525914"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525915",
+        "amenity": "pharmacy",
+        "name": "Ezgi Eczanesi",
+        "phone": "+90 332 245 76 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4888345,
+          37.9030309
+        ]
+      },
+      "id": "node/10296525915"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525916",
+        "addr:street": "Çelebi Murat Sokağı",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yeni Cihanbeyli Eczanesi",
+        "phone": "+90 332 255 21 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.482325,
+          37.9043349
+        ]
+      },
+      "id": "node/10296525916"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525917",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Meyra Eczanesi",
+        "phone": "+90 332 233 77 76"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4823636,
+          37.9044831
+        ]
+      },
+      "id": "node/10296525917"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296525918",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nurgül Eczanesi",
+        "phone": "+90 332 245 64 64"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4824273,
+          37.9045119
+        ]
+      },
+      "id": "node/10296525918"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526011",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nazar Eczanesi",
+        "phone": "+90 332 245 35 31"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4938059,
+          37.9304475
+        ]
+      },
+      "id": "node/10296526011"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526012",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Raziye Özen Eczanesi",
+        "phone": "+90 332 249 68 68"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.506388,
+          37.9282251
+        ]
+      },
+      "id": "node/10296526012"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526013",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Öztoprak Eczanesi",
+        "phone": "+90 332 245 14 01"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5050215,
+          37.9280606
+        ]
+      },
+      "id": "node/10296526013"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526014",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Asiye Eczanesi",
+        "phone": "+90 332 249 30 30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4988734,
+          37.9162975
+        ]
+      },
+      "id": "node/10296526014"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526015",
+        "addr:housenumber": "47/A",
+        "addr:street": "Yalıdere Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kurtar Eczanesi",
+        "phone": "+90 332 409 89 96"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5008415,
+          37.9166545
+        ]
+      },
+      "id": "node/10296526015"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526016",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Baha Eczanesi",
+        "phone": "+90 332 245 66 66"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4824607,
+          37.904393
+        ]
+      },
+      "id": "node/10296526016"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526110",
+        "amenity": "pharmacy",
+        "name": "Yeni Onur Eczanesi",
+        "phone": "+90 332 245 76 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4891061,
+          37.902064
+        ]
+      },
+      "id": "node/10296526110"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526609",
+        "addr:housenumber": "44/A",
+        "addr:street": "Barış Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Natura Eczanesi",
+        "phone": "+90 332 265 60 06"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4935597,
+          37.9310896
+        ]
+      },
+      "id": "node/10296526609"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526610",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Alper Eczanesi",
+        "phone": "+90 332 248 41 51"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4917276,
+          37.9261879
+        ]
+      },
+      "id": "node/10296526610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10296526809",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Müge Eczanesi",
+        "phone": "+90 332 353 61 10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5055682,
+          37.9283229
+        ]
+      },
+      "id": "node/10296526809"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250410",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Özcan Eczanesi",
+        "phone": "+90 332 247 50 90"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4718422,
+          37.8942984
+        ]
+      },
+      "id": "node/10298250410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250411",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Şafak Eczanesi",
+        "phone": "+90 332 247 13 64"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4587116,
+          37.9042128
+        ]
+      },
+      "id": "node/10298250411"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250412",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Doğa Eczanesi",
+        "phone": "+90 332 245 66 86"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4588721,
+          37.9043452
+        ]
+      },
+      "id": "node/10298250412"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250413",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Mermer Eczanesi",
+        "phone": "+90 332 247 71 71"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4544512,
+          37.8888457
+        ]
+      },
+      "id": "node/10298250413"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250414",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ertürk Eczanesi",
+        "phone": "+90 332 247 07 41"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4544481,
+          37.8886498
+        ]
+      },
+      "id": "node/10298250414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250415",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Arslangil Eczanesi",
+        "phone": "+90 332 341 11 88"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.501604,
+          37.9103193
+        ]
+      },
+      "id": "node/10298250415"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250416",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Türkmen Eczanesi",
+        "phone": "+90 332 238 61 97"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5018284,
+          37.9108315
+        ]
+      },
+      "id": "node/10298250416"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250417",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yaprak Eczanesi",
+        "phone": "+90 332 257 12 74"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5019152,
+          37.911028
+        ]
+      },
+      "id": "node/10298250417"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298250418",
+        "amenity": "pharmacy",
+        "name": "Bozal Karaman Eczanesi",
+        "phone": "+90 332 353 77 55"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5028789,
+          37.9062401
+        ]
+      },
+      "id": "node/10298250418"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256409",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Erol Eczanesi",
+        "phone": "+90 332 247 43 53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4636384,
+          37.9017529
+        ]
+      },
+      "id": "node/10298256409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256410",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Demet Eczanesi",
+        "phone": "+90 332 233 00 13"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4588176,
+          37.9049435
+        ]
+      },
+      "id": "node/10298256410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256411",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Narçiçeği Eczanesi",
+        "phone": "+90 332 247 80 47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4545928,
+          37.8883967
+        ]
+      },
+      "id": "node/10298256411"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256412",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ay Selim Eczanesi",
+        "phone": "+90 332 257 11 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4547883,
+          37.8881441
+        ]
+      },
+      "id": "node/10298256412"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256413",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Limon Eczanesi",
+        "phone": "+90 332 237 45 23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5013693,
+          37.9097523
+        ]
+      },
+      "id": "node/10298256413"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256414",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Karaağa Eczanesi",
+        "phone": "+90 332 351 41 35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5015007,
+          37.9100887
+        ]
+      },
+      "id": "node/10298256414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256509",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Filiz Eczanesi",
+        "phone": "+90 332 261 10 30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4646514,
+          37.9024393
+        ]
+      },
+      "id": "node/10298256509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256510",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kumru Eczanesi",
+        "phone": "+90 332 247 47 31"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4582754,
+          37.9037072
+        ]
+      },
+      "id": "node/10298256510"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256511",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Şimşir Eczanesi",
+        "phone": "+90 332 247 74 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4517322,
+          37.8947678
+        ]
+      },
+      "id": "node/10298256511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256512",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Sıla Eczanesi",
+        "phone": "+90 332 257 06 96"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4548569,
+          37.8882117
+        ]
+      },
+      "id": "node/10298256512"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10298256709",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Akşemsettin Eczanesi",
+        "phone": "+90 332 257 04 05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4548197,
+          37.8883009
+        ]
+      },
+      "id": "node/10298256709"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317810",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Çobanoğlu Eczanesi",
+        "phone": "+90 332 322 40 46"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4832002,
+          37.8741381
+        ]
+      },
+      "id": "node/10308317810"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317811",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nişantaşı Eczanesi",
+        "phone": "+90 332 321 61 11"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4795446,
+          37.876114
+        ]
+      },
+      "id": "node/10308317811"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317812",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nurefşan Eczanesi",
+        "phone": "+90 542 213 95 26"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4745429,
+          37.8793409
+        ]
+      },
+      "id": "node/10308317812"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317813",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ülkü Toy Eczanesi",
+        "phone": "+90 332 501 05 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4689223,
+          37.8786482
+        ]
+      },
+      "id": "node/10308317813"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317814",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Palmiye Eczanesi",
+        "phone": "+90 332 503 42 99"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4688478,
+          37.8783294
+        ]
+      },
+      "id": "node/10308317814"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317815",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Eylem Eczanesi",
+        "phone": "+90 332 351 38 81"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4585397,
+          37.8822524
+        ]
+      },
+      "id": "node/10308317815"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317816",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:neighbourhood": "Şeker Mahallesi",
+        "addr:street": "Hoca Cihan Tekke Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Martı Eczanesi",
+        "phone": "+90 332 312 36 18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4634058,
+          37.8822676
+        ]
+      },
+      "id": "node/10308317816"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308317818",
+        "addr:housenumber": "30/D",
+        "addr:street": "Adakale Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Karakaya Eczanesi",
+        "phone": "+90 332 350 50 52"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4684595,
+          37.8888584
+        ]
+      },
+      "id": "node/10308317818"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320009",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yeni Karaağa Eczanesi",
+        "phone": "+90 332 351 74 83"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4886946,
+          37.8708246
+        ]
+      },
+      "id": "node/10308320009"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320109",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Burak Eczanesi",
+        "phone": "+90 332 352 35 46"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4866574,
+          37.8719506
+        ]
+      },
+      "id": "node/10308320109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320111",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Vatan Eczanesi",
+        "phone": "+90 332 322 00 45"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4851013,
+          37.8739568
+        ]
+      },
+      "id": "node/10308320111"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320112",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Firdevs Eczanesi",
+        "phone": "+90 332 322 20 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4837558,
+          37.8747638
+        ]
+      },
+      "id": "node/10308320112"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320113",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Murat Eczanesi",
+        "phone": "+90 332 323 04 33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4691015,
+          37.8780702
+        ]
+      },
+      "id": "node/10308320113"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320114",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Erdem Eczanesi",
+        "phone": "+90 332 323 66 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.46915,
+          37.8787012
+        ]
+      },
+      "id": "node/10308320114"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320115",
+        "amenity": "pharmacy",
+        "name": "Buket Eczanesi",
+        "phone": "+90 332 501 19 99"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4634101,
+          37.8836293
+        ]
+      },
+      "id": "node/10308320115"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320116",
+        "amenity": "pharmacy",
+        "name": "Elif Sevde Eczanesi",
+        "phone": "+90 332 502 25 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4640591,
+          37.8842185
+        ]
+      },
+      "id": "node/10308320116"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320117",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ayşe Nur Eczanesi",
+        "phone": "+90 332 341 25 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4670571,
+          37.8872043
+        ]
+      },
+      "id": "node/10308320117"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320118",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Helun Eczanesi",
+        "phone": "+90 332 247 00 47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4681205,
+          37.8886322
+        ]
+      },
+      "id": "node/10308320118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320209",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Küçüksarı Eczanesi",
+        "phone": "+90 332 351 15 16"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.486291,
+          37.8707578
+        ]
+      },
+      "id": "node/10308320209"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320210",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Candan Eczanesi",
+        "phone": "+90 332 352 60 03"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.478973,
+          37.8897775
+        ]
+      },
+      "id": "node/10308320210"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320211",
+        "amenity": "pharmacy",
+        "name": "Kılınçarslan Eczanesi",
+        "phone": "+90 332 234 01 73"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.481815,
+          37.8860675
+        ]
+      },
+      "id": "node/10308320211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320309",
+        "addr:housenumber": "4/B",
+        "addr:street": "Sultan Cem Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Toptan Eczanesi",
+        "phone": "+90 332 351 75 23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4847408,
+          37.8709148
+        ]
+      },
+      "id": "node/10308320309"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320409",
+        "addr:housenumber": "18/A",
+        "addr:street": "Sultan Cem Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Form Eczanesi",
+        "phone": "+90 332 351 52 43"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4847658,
+          37.8711043
+        ]
+      },
+      "id": "node/10308320409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320410",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Evran Eczanesi",
+        "phone": "+90 332 323 07 47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4832435,
+          37.8767334
+        ]
+      },
+      "id": "node/10308320410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320411",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Hekimoğlu Eczanesi",
+        "phone": "+90 332 320 47 74"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4803922,
+          37.8708321
+        ]
+      },
+      "id": "node/10308320411"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320412",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Yeni Beyşehir Eczanesi",
+        "phone": "+90 332 233 71 66"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4822337,
+          37.8895404
+        ]
+      },
+      "id": "node/10308320412"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320509",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Şehirli Eczanesi",
+        "phone": "+90 332 352 06 63"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4867563,
+          37.8739637
+        ]
+      },
+      "id": "node/10308320509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320510",
+        "addr:housenumber": "7/C",
+        "addr:street": "Yahya Çavuş Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tuğçe Ekinci Eczanesi",
+        "phone": "+90 332 247 02 22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4843151,
+          37.8747354
+        ]
+      },
+      "id": "node/10308320510"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320511",
+        "addr:street": "Metehan Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Ferah Eczanesi",
+        "phone": "+90 332 320 47 91"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4847317,
+          37.8760353
+        ]
+      },
+      "id": "node/10308320511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320609",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Duygu Eczanesi",
+        "phone": "+90 332 323 06 05"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4693838,
+          37.8786199
+        ]
+      },
+      "id": "node/10308320609"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320610",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Zeynep Yılmaz Eczanesi",
+        "phone": "+90 332 312 92 62"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4688866,
+          37.8784427
+        ]
+      },
+      "id": "node/10308320610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320611",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Toprak Eczanesi",
+        "phone": "+90 332 351 38 81"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4620154,
+          37.8788718
+        ]
+      },
+      "id": "node/10308320611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320612",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Botanik Eczanesi",
+        "phone": "+90 332 408 39 38"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4669007,
+          37.8870029
+        ]
+      },
+      "id": "node/10308320612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320613",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Adakale Eczanesi",
+        "phone": "+90 332 247 99 97"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.468556,
+          37.8880089
+        ]
+      },
+      "id": "node/10308320613"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320614",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kekik Eczanesi",
+        "phone": "+90 332 247 65 65"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4679054,
+          37.8887761
+        ]
+      },
+      "id": "node/10308320614"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320615",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Çağlayan Eczanesi",
+        "phone": "+90 332 248 04 40"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4683612,
+          37.8886915
+        ]
+      },
+      "id": "node/10308320615"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308320616",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Tuncel Eczanesi",
+        "phone": "+90 332 236 77 18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4809284,
+          37.8882917
+        ]
+      },
+      "id": "node/10308320616"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823510",
+        "amenity": "pharmacy",
+        "name": "Narin Eczanesi",
+        "name:tr": "Nadir Eczanesi",
+        "phone": "+90 332 236 40 20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4963851,
+          37.8931596
+        ]
+      },
+      "id": "node/10308823510"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823610",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Esra Ünal Eczanesi",
+        "phone": "+90 332 233 25 20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4993413,
+          37.8893504
+        ]
+      },
+      "id": "node/10308823610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823611",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nisan Eczanesi",
+        "phone": "+90 332 235 00 77"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4992998,
+          37.8896376
+        ]
+      },
+      "id": "node/10308823611"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823612",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "İlhan Eczanesi",
+        "phone": "+90 332 236 45 06"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4874527,
+          37.8944396
+        ]
+      },
+      "id": "node/10308823612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823809",
+        "addr:housenumber": "4/A",
+        "addr:street": "Telgrafcı Hamdibey Caddesi",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Hayat Eczanesi",
+        "phone": "+90 332 238 77 48"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4977076,
+          37.8868306
+        ]
+      },
+      "id": "node/10308823809"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823810",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Çeşmeli Eczanesi",
+        "phone": "+90 332 234 23 43"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4887094,
+          37.8943719
+        ]
+      },
+      "id": "node/10308823810"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308823811",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Cihanbeyli Eczanesi",
+        "phone": "+90 332 236 06 90"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4881874,
+          37.8949782
+        ]
+      },
+      "id": "node/10308823811"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308824009",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Orçun Eczanesi",
+        "phone": "+90 332 234 14 33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4993773,
+          37.8898388
+        ]
+      },
+      "id": "node/10308824009"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10308824209",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Fırat Eczanesi",
+        "phone": "+90 332 236 34 15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4885135,
+          37.8948576
+        ]
+      },
+      "id": "node/10308824209"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310092909",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Esra Ayhan Eczanesi",
+        "phone": "+90 332 302 86 36"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4901881,
+          37.8844566
+        ]
+      },
+      "id": "node/10310092909"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310092910",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Şen Eczanesi",
+        "phone": "+90 332 353 43 54"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4888928,
+          37.885071
+        ]
+      },
+      "id": "node/10310092910"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310092911",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Aviva Eczanesi",
+        "phone": "+90 332 353 43 54"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4893963,
+          37.8858995
+        ]
+      },
+      "id": "node/10310092911"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310092912",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Bedir Eczanesi",
+        "phone": "+90 332 238 60 79"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4921523,
+          37.8855693
+        ]
+      },
+      "id": "node/10310092912"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310092913",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Nihal Eczanesi",
+        "phone": "+90 332 237 40 97"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4890754,
+          37.8872676
+        ]
+      },
+      "id": "node/10310092913"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310092914",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Kule Eczanesi",
+        "phone": "+90 332 220 00 00"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4929211,
+          37.8896015
+        ]
+      },
+      "id": "node/10310092914"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310093009",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Toruk Eczanesi",
+        "phone": "+90 332 234 07 07"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4909599,
+          37.8859803
+        ]
+      },
+      "id": "node/10310093009"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10310093109",
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "name": "Otogar Eczanesi",
+        "phone": "+90 332 233 31 15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4929889,
+          37.8872154
+        ]
+      },
+      "id": "node/10310093109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12717238424",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:housenumber": "No: 17/A",
+        "addr:neighbourhood": "Ferhuniye Mahallesi",
+        "addr:street": "Ulaşbaba Caddesi",
+        "amenity": "pharmacy",
+        "dispensing": "yes",
+        "healthcare": "pharmacy",
+        "name": "Hacettepe Eczanesi",
+        "opening_hours": "Mo-Sa 08:30-18:00",
+        "phone": "+90 332 237 75 60",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4916979,
+          37.8800581
+        ]
+      },
+      "id": "node/12717238424"
+    }
+  ]
+}

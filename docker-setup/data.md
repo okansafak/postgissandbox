@@ -70,13 +70,26 @@ out body; >; out skel qt;
 ```
 *Dosya Adı:* `selcuklu_durak.geojson`
 
-**D. Diğer Önemli Noktalar (Ders Zenginleştirme)**
+**D. Camiler (Gelişmiş Sorgu)**
+Hem nokta hem de poligon olarak tutulan camileri merkez noktasıyla birlikte indirmek için:
+```text
+[out:json][timeout:25];
+area["name"="Selçuklu"]->.a;
+(
+  node["amenity"="place_of_worship"]["religion"="muslim"](area.a);
+  way["amenity"="place_of_worship"]["religion"="muslim"](area.a);
+);
+out center;
+```
+*Dosya Adı:* `selcuklu_cami.geojson`
+
+**E. Diğer Önemli Noktalar (Ders Zenginleştirme)**
 Aşağıdaki tabloda verilen tag'leri kullanarak benzer sorgular oluşturabilirsiniz:
 
 | Kategori | Overpass Tag | Örnek Dosya Adı | Analiz Senaryosu |
 | :--- | :--- | :--- | :--- |
 | **Eczane** | `node["amenity"="pharmacy"]` | `selcuklu_eczane.geojson` | En yakın nöbetçi eczane (KNN) |
-| **Cami** | `node["amenity"="place_of_worship"]` | `meram_cami.geojson` | Hizmet etki alanı (Buffer) |
+| **Cami** | `node["amenity"="place_of_worship"]["religion"="muslim"]` | `meram_cami.geojson` | Hizmet etki alanı (Buffer) |
 | **Market** | `node["shop"~"supermarket|convenience"]` | `karatay_market.geojson` | Ticari erişilebilirlik analizi |
 | **Park** | `way["leisure"="park"]` | `selcuklu_park.geojson` | Mahalle başına yeşil alan ölçümü |
 
