@@ -83,8 +83,8 @@ for f in /docker-entrypoint-initdb.d/data/*_poi.geojson; do
         -sql "SELECT name AS ad, COALESCE(amenity, highway, 'POI') AS kategori, '$ilce_adi' AS ilce FROM \"${filename%.geojson}\""
 done
 
-# 5.2 Ayrı POI Dosyaları (Hastane, Okul, Durak)
-for type in hastane okul durak; do
+# 5.2 Ayrı POI Dosyaları (Hastane, Okul, Durak, Eczane, Cami, Market, Park vb.)
+for type in hastane okul durak eczane cami market park; do
     for f in /docker-entrypoint-initdb.d/data/*_${type}.geojson; do
         [ -e "$f" ] || continue
         filename=$(basename "$f")

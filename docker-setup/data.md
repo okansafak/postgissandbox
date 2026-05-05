@@ -64,14 +64,23 @@ out body; >; out skel qt;
 
 **C. Duraklar**
 ```text
-[out:json];
-area["name"="Selçuklu"]->.a;
+[out:json]; area["name"="Selçuklu"]->.a;
 node["highway"="bus_stop"](area.a);
 out body; >; out skel qt;
 ```
 *Dosya Adı:* `selcuklu_durak.geojson`
 
-**Önemli:** Dosya isimleri `[ilce]_[tip].geojson` formatında olmalıdır. Sistem bu isimlerden otomatik olarak ilçe ve kategori bilgisini ayıklayarak `konya.poi` tablosuna yazacaktır.
+**D. Diğer Önemli Noktalar (Ders Zenginleştirme)**
+Aşağıdaki tabloda verilen tag'leri kullanarak benzer sorgular oluşturabilirsiniz:
+
+| Kategori | Overpass Tag | Örnek Dosya Adı | Analiz Senaryosu |
+| :--- | :--- | :--- | :--- |
+| **Eczane** | `node["amenity"="pharmacy"]` | `selcuklu_eczane.geojson` | En yakın nöbetçi eczane (KNN) |
+| **Cami** | `node["amenity"="place_of_worship"]` | `meram_cami.geojson` | Hizmet etki alanı (Buffer) |
+| **Market** | `node["shop"~"supermarket|convenience"]` | `karatay_market.geojson` | Ticari erişilebilirlik analizi |
+| **Park** | `way["leisure"="park"]` | `selcuklu_park.geojson` | Mahalle başına yeşil alan ölçümü |
+
+**Önemli:** Dosya isimleri `[ilce]_[tip].geojson` formatında (Örn: `meram_eczane.geojson`) olmalıdır. Sistem bu isimlerden otomatik olarak ilçe ve kategori bilgisini ayıklayarak `konya.poi` tablosuna yazacaktır.
 
 #### 3. İlçe Bazlı Yol Ağları (pgRouting İçin)
 Çumra, Meram, Selçuklu veya Karatay gibi spesifik ilçelerin yol ağlarını indirmek için:

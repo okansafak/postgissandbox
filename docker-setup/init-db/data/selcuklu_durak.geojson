@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "generator": "overpass-turbo",
   "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
-  "timestamp": "2026-05-05T18:27:14Z",
+  "timestamp": "2026-05-05T18:34:30Z",
   "features": [
     {
       "type": "Feature",
@@ -37,26 +37,6 @@
     {
       "type": "Feature",
       "properties": {
-        "@id": "node/5111487421",
-        "amenity": "school",
-        "name": "Uğur Okulları Konya Kampüsü",
-        "name:en": "Uğur Schools",
-        "opening_hours": "Mo-Fr 08:00-18:00",
-        "phone": "+90 4444845",
-        "website": "https://ugurokullari.k12.tr/konyakampus/"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4586456,
-          37.8863824
-        ]
-      },
-      "id": "node/5111487421"
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "@id": "node/5112704522",
         "bus": "yes",
         "highway": "bus_stop",
@@ -74,75 +54,6 @@
         ]
       },
       "id": "node/5112704522"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/5112704523",
-        "amenity": "hospital",
-        "healthcare": "hospital",
-        "name": "Özel Selçuklu Hastanesi",
-        "name:en": "Selçuklu Hospital",
-        "website": "http://www.selcuklu.com.tr/"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.489078,
-          37.8778385
-        ]
-      },
-      "id": "node/5112704523"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/5112715821",
-        "amenity": "hospital",
-        "healthcare": "hospital",
-        "name": "Özel Büyükşehir Hastanesi",
-        "name:en": "Büyükşehir Hospital"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4889041,
-          37.8780142
-        ]
-      },
-      "id": "node/5112715821"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/5113030621",
-        "amenity": "school",
-        "name": "Ahmet - Perihan Demirok İlkokulu"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4622819,
-          37.8850354
-        ]
-      },
-      "id": "node/5113030621"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/5115064421",
-        "amenity": "school",
-        "name": "İşitme Engelliler İlkokulu"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.5018765,
-          37.9359116
-        ]
-      },
-      "id": "node/5115064421"
     },
     {
       "type": "Feature",
@@ -302,24 +213,6 @@
         ]
       },
       "id": "node/5117273926"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/5117551027",
-        "amenity": "hospital",
-        "healthcare": "hospital",
-        "name": "Dünyagöz Hastanesi",
-        "name:en": "Eye Hospital"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4845477,
-          37.8982881
-        ]
-      },
-      "id": "node/5117551027"
     },
     {
       "type": "Feature",
@@ -595,23 +488,6 @@
         ]
       },
       "id": "node/5209913190"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/6279718932",
-        "amenity": "school",
-        "name": "Mustafa Karacihan İlköğretm Okulu",
-        "website": "https://mustafakaraciganio.meb.k12.tr/"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4851212,
-          37.9047671
-        ]
-      },
-      "id": "node/6279718932"
     },
     {
       "type": "Feature",
@@ -1065,61 +941,6 @@
         ]
       },
       "id": "node/12145091674"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/12290363901",
-        "amenity": "school",
-        "name": "Can yüzdeyüz dershane"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4817717,
-          37.871438
-        ]
-      },
-      "id": "node/12290363901"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/12340390801",
-        "amenity": "school",
-        "name": "Melikşah Anaokulu"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4771931,
-          37.889687
-        ]
-      },
-      "id": "node/12340390801"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/12372531566",
-        "addr:neighbourhood": "Ferhuniye Mahallesi",
-        "addr:street": "Ulaşbaba Caddesi",
-        "amenity": "hospital",
-        "emergency": "yes",
-        "healthcare": "hospital",
-        "name": "Konya Numune Hastanesi Acil",
-        "operator": "Sağlık Bakanlığı",
-        "operator:type": "government",
-        "operator:wikidata": "Q4294365"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.491073,
-          37.8804182
-        ]
-      },
-      "id": "node/12372531566"
     },
     {
       "type": "Feature",
@@ -1608,22 +1429,6 @@
         ]
       },
       "id": "node/12539650301"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/12620580302",
-        "amenity": "school",
-        "name": "Mehmet Halil İbrahim Hekimoğlu Anadolu Lisesi"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.515065,
-          37.983909
-        ]
-      },
-      "id": "node/12620580302"
     },
     {
       "type": "Feature",
@@ -5003,40 +4808,6 @@
         ]
       },
       "id": "node/13461853335"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/13731075887",
-        "amenity": "school",
-        "education": "school",
-        "name": "Ted Koleji"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.4359615,
-          37.9253153
-        ]
-      },
-      "id": "node/13731075887"
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "@id": "node/13731075888",
-        "amenity": "school",
-        "education": "school",
-        "name": "Altın Sayfa Koleji"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          32.441884,
-          37.9233014
-        ]
-      },
-      "id": "node/13731075888"
     }
   ]
 }

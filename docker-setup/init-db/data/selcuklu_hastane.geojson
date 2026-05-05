@@ -1,0 +1,86 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-05-05T18:32:26Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112704523",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Özel Selçuklu Hastanesi",
+        "name:en": "Selçuklu Hospital",
+        "website": "http://www.selcuklu.com.tr/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.489078,
+          37.8778385
+        ]
+      },
+      "id": "node/5112704523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5112715821",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Özel Büyükşehir Hastanesi",
+        "name:en": "Büyükşehir Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4889041,
+          37.8780142
+        ]
+      },
+      "id": "node/5112715821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5117551027",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Dünyagöz Hastanesi",
+        "name:en": "Eye Hospital"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4845477,
+          37.8982881
+        ]
+      },
+      "id": "node/5117551027"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12372531566",
+        "addr:neighbourhood": "Ferhuniye Mahallesi",
+        "addr:street": "Ulaşbaba Caddesi",
+        "amenity": "hospital",
+        "emergency": "yes",
+        "healthcare": "hospital",
+        "name": "Konya Numune Hastanesi Acil",
+        "operator": "Sağlık Bakanlığı",
+        "operator:type": "government",
+        "operator:wikidata": "Q4294365"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.491073,
+          37.8804182
+        ]
+      },
+      "id": "node/12372531566"
+    }
+  ]
+}
