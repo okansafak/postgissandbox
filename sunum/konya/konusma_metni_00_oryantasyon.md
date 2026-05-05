@@ -1,5 +1,5 @@
 # PostGIS Akademi: Giriş ve Oryantasyon
-**1. Gün - 1. Ders (10:00 - 10:50)**
+**1. Gün - 1. Ders (10:00 - 11:00)**
 **Kapsamlı Ders Planı ve Sahne Metni**
 
 ---
@@ -19,7 +19,18 @@
 
 ---
 
-## [10:15 - 10:30] Altyapı ve Docker Kurulumu
+## [10:15 - 10:25] Tanışma ve Beklentiler
+**Eğitmen Notu:** Teknik detaylara girmeden önce ekibin profilini anlamak ve eğitimi bu ihtiyaçlara göre şekillendirmek kritik öneme sahiptir.
+
+**Yöneltilecek Sorular:**
+1. **Birim ve Görev:** Hangi birimden geliyorsunuz ve temel çalışma alanınız nedir? (Ulaşım, İmar, Bilgi İşlem, Fen İşleri vb.)
+2. **Teknik Tecrübe:** Daha önce SQL veya PostgreSQL ile çalıştınız mı? PostGIS veya genel CBS (GIS) araçlarına (QGIS, ArcGIS vb.) ne kadar aşinasınız?
+3. **Veri Yönetimi:** Şu an mekansal verilerinizi nerede tutuyorsunuz? (Shapefile, Excel, Oracle, MSSQL vb.)
+4. **Projeler ve İhtiyaçlar:** Aktif projelerinizde mekansal verileri nasıl kullanıyorsunuz? Bu eğitimden sonra veritabanı üzerinde çözmek istediğiniz özel bir problem (analiz, hız, güvenlik vb.) var mı?
+
+---
+
+## [10:25 - 10:40] Altyapı ve Docker Kurulumu
 **(Kritik Soru: Milyonlarca mekansal kayıt yapısal olarak nasıl indekslenir ve yönetilir?)**
 
 **Teorik Anlatım:**
@@ -36,7 +47,7 @@
 
 ---
 
-## [10:30 - 10:40] Mekansal Veri Tipleri ve Analiz Mantığı
+## [10:40 - 10:50] Mekansal Veri Tipleri ve Analiz Mantığı
 **(Kritik Soru: Vektör ve Raster modelleri arasındaki yapısal fark nedir?)**
 
 **Teorik Anlatım:**
@@ -44,7 +55,7 @@
 
 ---
 
-## [10:40 - 10:50] Temel Kavramlar ve Kapanış
+## [10:50 - 11:00] Temel Kavramlar ve Kapanış
 **(Kritik Soru: GiST İndeks mekanizması, sorgu sürelerini nasıl optimize eder?)**
 
 **Teorik Anlatım:**

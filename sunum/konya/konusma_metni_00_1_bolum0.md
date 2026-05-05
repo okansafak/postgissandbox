@@ -4,19 +4,6 @@
 
 ---
 
-## [Açılış] 10:45 - 11:00 | Tanışma ve Beklentiler
-
-### Tanışma ve Ekosistem Analizi
-**Eğitmen Notu:** Teknik detaylara girmeden önce ekibin profilini anlamak ve eğitimi bu ihtiyaçlara göre şekillendirmek kritik öneme sahiptir.
-
-**Yöneltilecek Sorular:**
-1. **Birim ve Görev:** Hangi birimden geliyorsunuz ve temel çalışma alanınız nedir? (Ulaşım, İmar, Bilgi İşlem, Fen İşleri vb.)
-2. **Teknik Tecrübe:** Daha önce SQL veya PostgreSQL ile çalıştınız mı? PostGIS veya genel CBS (GIS) araçlarına (QGIS, ArcGIS vb.) ne kadar aşinasınız?
-3. **Veri Yönetimi:** Şu an mekansal verilerinizi nerede tutuyorsunuz? (Shapefile, Excel, Oracle, MSSQL vb.)
-4. **Projeler ve İhtiyaçlar:** Aktif projelerinizde mekansal verileri nasıl kullanıyorsunuz? Bu eğitimden sonra veritabanı üzerinde çözmek istediğiniz özel bir problem (analiz, hız, güvenlik vb.) var mı?
-
----
-
 ## [Ders 2] 11:00 - 11:50 | Veritabanı Mantığı ve Veri Tipleri
 
 ### [11:00 - 11:15] Açılış Anekdotu ve Veritabanı Nedir?
