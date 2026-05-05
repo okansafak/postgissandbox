@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PostGIS Oryantasyon — Konya Büyükşehir Belediyesi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <style>
     /* Kapak ve Oryantasyona Özel Tasarımlar */
@@ -23,15 +26,71 @@
     }
 
     /* Logo Alanı Düzenlemesi */
-    .s1-logo-area { display: flex; align-items: center; gap: 0; }
-    .logo-benim { background: var(--theme-black); border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; letter-spacing: 0.02em; }
-    .logo-konya-box { background: var(--theme-yellow); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
-    .logo-konya-box img { height: 40px; }
-    .logo-konya-text { display: flex; flex-direction: column; font-family: 'Montserrat', sans-serif; color: var(--theme-black); }
-    .logo-konya-text .k-top { font-weight: 900; font-size: 14px; letter-spacing: 0.05em; line-height: 1; }
-    .logo-konya-text .k-mid { font-weight: 900; font-size: 11px; letter-spacing: 0.05em; line-height: 1.2; }
-    .logo-konya-text .k-bot { font-weight: 600; font-size: 8px; letter-spacing: 0.1em; line-height: 1; margin-top: 2px; }
-    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); margin: 0; }
+    .s1-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .logo-benim {
+      background: var(--theme-black);
+      border: 2px solid var(--theme-white);
+      padding: 10px 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--theme-white);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+    }
+
+    .logo-konya-box {
+      background: var(--theme-yellow);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-konya-box img {
+      height: 40px;
+    }
+
+    .logo-konya-text {
+      display: flex;
+      flex-direction: column;
+      font-family: 'Montserrat', sans-serif;
+      color: var(--theme-black);
+    }
+
+    .logo-konya-text .k-top {
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .logo-konya-text .k-mid {
+      font-weight: 900;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    .logo-konya-text .k-bot {
+      font-weight: 600;
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .logo-divider {
+      width: 3px;
+      height: 44px;
+      background: var(--theme-yellow);
+      margin: 0;
+    }
 
     .s1-main {
       flex: 1;
@@ -119,23 +178,23 @@
     .trainer-box {
       background: #f4f4f4;
       border-left: 4px solid var(--theme-yellow);
-      padding: 16px 20px;
-      margin-bottom: 12px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
       transition: transform 0.2s;
     }
 
     .trainer-box-title {
       font-family: 'Montserrat', sans-serif;
       font-weight: 800;
-      font-size: 15px;
+      font-size: 22px;
       color: var(--theme-black);
       margin-bottom: 4px;
     }
 
     .trainer-box-text {
-      font-size: 12px;
-      color: #666;
-      line-height: 1.5;
+      font-size: 14px;
+      color: #555;
+      line-height: 1.6;
     }
 
     /* Platform Panelleri */
@@ -310,7 +369,7 @@
                     Şafak.</span></div>
                 <div class="trainer-bio">
                   2013'ten beri CBS alanında, <b>açık kaynak teknolojilerle</b> web uygulamaları geliştiriyor ve
-                  mekansal veri üretiyorum. Amacım bu veriyi analitik bir zekaya dönüştürmek.
+                  mekansal veri üretiyorum.
                 </div>
                 <div
                   style="margin-top:32px; padding:20px; background:var(--theme-black); border-radius:4px; border-left:4px solid var(--theme-yellow); max-width:440px;">
@@ -323,7 +382,7 @@
               <div class="s-panel-right">
                 <div class="trainer-box">
                   <div class="trainer-box-title">Saha Deneyimi</div>
-                  <div class="trainer-box-text">Anka Geo'da 10 yıl; dijital ikiz, mobil haritalama ve devasa envanter
+                  <div class="trainer-box-text">AnkaGEO'da 10 yıl; mobil haritalama, dijital ikiz ve envanter
                     yönetimi projeleri.</div>
                 </div>
                 <div class="trainer-box">
@@ -365,10 +424,12 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Kurumsal <span>Veritabanı</span> Mimarisi</div>
-                <div class="s-text-tech">Sistemimiz gücünü <b>PostgreSQL</b> ve <b>PostGIS</b> entegrasyonundan alır. Bu yapı, veritabanını standart bir depodan güçlü bir mekansal analiz motoruna dönüştürür.</div>
+                <div class="s-text-tech">Sistemimiz gücünü <b>PostgreSQL</b> ve <b>PostGIS</b> entegrasyonundan alır. Bu
+                  yapı, veritabanını standart bir depodan güçlü bir mekansal analiz motoruna dönüştürür.</div>
                 <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Ölçeklenebilirlik</div>
-                  <div style="color:#888; font-size:12px; margin-top:4px">Milyonlarca mekansal kaydı milisaniyeler içinde indeksleyip sorgulama imkanı sunar. Konya BB altyapısının merkezidir.</div>
+                  <div style="color:#888; font-size:12px; margin-top:4px">Milyonlarca mekansal kaydı milisaniyeler
+                    içinde indeksleyip sorgulama imkanı sunar. Konya BB altyapısının merkezidir.</div>
                 </div>
               </div>
               <div class="s-panel-right" style="display:flex; flex-direction:column; justify-content:center; gap:16px;">
@@ -378,7 +439,8 @@
                     PG</div>
                   <div>
                     <div style="color:#fff; font-weight:700;">PostgreSQL</div>
-                    <div style="color:#666; font-size:12px;">Dünyanın en gelişmiş açık kaynak ilişkisel veritabanı.</div>
+                    <div style="color:#666; font-size:12px;">Dünyanın en gelişmiş açık kaynak ilişkisel veritabanı.
+                    </div>
                   </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:20px;">
@@ -387,7 +449,8 @@
                     GIS</div>
                   <div>
                     <div style="color:var(--theme-yellow); font-weight:700;">PostGIS</div>
-                    <div style="color:#666; font-size:12px;">Mekansal veri yönetimi ve ileri düzey topolojik analiz motoru.</div>
+                    <div style="color:#666; font-size:12px;">Mekansal veri yönetimi ve ileri düzey topolojik analiz
+                      motoru.</div>
                   </div>
                 </div>
                 <div style="display:flex; align-items:center; gap:20px;">
@@ -396,7 +459,8 @@
                     SQL</div>
                   <div>
                     <div style="color:#fff; font-weight:700;">Yapısal Sorgulama Dili</div>
-                    <div style="color:#666; font-size:12px;">Coğrafi soruları makinelere sormanın en evrensel ve hızlı yolu.</div>
+                    <div style="color:#666; font-size:12px;">Coğrafi soruları makinelere sormanın en evrensel ve hızlı
+                      yolu.</div>
                   </div>
                 </div>
               </div>
@@ -429,26 +493,35 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Vektör vs <span>Raster</span></div>
-                <div class="s-text-tech">Konumsal veriyi iki temel yöntemle temsil ederiz. PostGIS yapısal olarak <b>vektör</b> veriler üzerinde ve mekansal ilişkilerde uzmandır.</div>
+                <div class="s-text-tech">Konumsal veriyi iki temel yöntemle temsil ederiz. PostGIS yapısal olarak
+                  <b>vektör</b> veriler üzerinde ve mekansal ilişkilerde uzmandır.
+                </div>
               </div>
               <div class="s-panel-right" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                 <div class="model-card">
                   <span class="model-tag">En Yaygın</span>
                   <h4>Vektör Veri</h4>
                   <ul>
-                    <li style="margin-bottom:8px"><b>Point (Nokta):</b> Ağaçlar, su depoları, aydınlatma direkleri, duraklar.</li>
-                    <li style="margin-bottom:8px"><b>LineString (Çizgi):</b> Yol ağları, nehirler, fay hatları, isale hatları.</li>
-                    <li style="margin-bottom:8px"><b>Polygon (Çokgen):</b> Parseller, ilçe sınırları, bina oturum alanları.</li>
-                    <li style="margin-bottom:8px"><b>Multi Tipler:</b> Tek kayıtta birden fazla parça (Örn: Adalar, ayrık ormanlar).</li>
+                    <li style="margin-bottom:8px"><b>Point (Nokta):</b> Ağaçlar, su depoları, aydınlatma direkleri,
+                      duraklar.</li>
+                    <li style="margin-bottom:8px"><b>LineString (Çizgi):</b> Yol ağları, nehirler, fay hatları, isale
+                      hatları.</li>
+                    <li style="margin-bottom:8px"><b>Polygon (Çokgen):</b> Parseller, ilçe sınırları, bina oturum
+                      alanları.</li>
+                    <li style="margin-bottom:8px"><b>Multi Tipler:</b> Tek kayıtta birden fazla parça (Örn: Adalar,
+                      ayrık ormanlar).</li>
                     <li><b>Avantajı:</b> Kesin alan sınırları ve sonsuz yakınlaştırma imkanı sunar.</li>
                   </ul>
                 </div>
                 <div class="model-card">
                   <h4>Raster Veri</h4>
                   <ul>
-                    <li style="margin-bottom:8px"><b>Izgara (Pixel) Tabanlı:</b> Sürekli değişen olayları ızgara sistemiyle ifade eder.</li>
-                    <li style="margin-bottom:8px"><b>Uydu & Hava Görselliği:</b> Drone ortofotoları, Landsat vb. uydular.</li>
-                    <li style="margin-bottom:8px"><b>Yükseklik Modelleri:</b> DEM (Yükseklik) ve DSM (Yüzey) eğim/bakı modelleri.</li>
+                    <li style="margin-bottom:8px"><b>Izgara (Pixel) Tabanlı:</b> Sürekli değişen olayları ızgara
+                      sistemiyle ifade eder.</li>
+                    <li style="margin-bottom:8px"><b>Uydu & Hava Görselliği:</b> Drone ortofotoları, Landsat vb.
+                      uydular.</li>
+                    <li style="margin-bottom:8px"><b>Yükseklik Modelleri:</b> DEM (Yükseklik) ve DSM (Yüzey) eğim/bakı
+                      modelleri.</li>
                     <li style="margin-bottom:8px"><b>Tematik Analizler:</b> Isı haritaları ve yoğunluk yüzeyleri.</li>
                     <li><b>Dezavantajı:</b> Boyutları çok büyüktür ve aşırı yaklaşıldığında pikselleşir.</li>
                   </ul>
@@ -628,28 +701,45 @@
               </div>
               <div class="s-panel-right" style="overflow-y: auto; padding-right: 20px;">
                 <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow)">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">1. Afet ve Acil Durum (İtfaiye)</div>
-                  <div style="color:#aaa; font-size:12px">Yangın ihbarı alınan koordinatın 500m yarıçapındaki en yakın yangın musluklarını ve hidrantları milisaniyeler içinde listeleme.</div>
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">1. Afet ve Acil Durum
+                    (İtfaiye)</div>
+                  <div style="color:#aaa; font-size:12px">Yangın ihbarı alınan koordinatın 500m yarıçapındaki en yakın
+                    yangın musluklarını ve hidrantları milisaniyeler içinde listeleme.</div>
                 </div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">2. İmar ve Şehircilik Denetimi</div>
-                  <div style="color:#aaa; font-size:12px">Yeni yapı ruhsat taleplerinin; sit alanları, koruma kuşakları veya kamulaştırma sınırlarıyla çakışıp çakışmadığının otomatik kontrolü.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">2. İmar ve Şehircilik Denetimi
+                  </div>
+                  <div style="color:#aaa; font-size:12px">Yeni yapı ruhsat taleplerinin; sit alanları, koruma kuşakları
+                    veya kamulaştırma sınırlarıyla çakışıp çakışmadığının otomatik kontrolü.</div>
                 </div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">3. Ulaşım Planlama (Erişilebilirlik)</div>
-                  <div style="color:#aaa; font-size:12px">Otobüs ve tramvay duraklarının kapsama alanı analizi: "Hangi mahallede nüfusun yüzde kaçı bir durağa 300 metreden daha yakın?"</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">3. Ulaşım Planlama
+                    (Erişilebilirlik)</div>
+                  <div style="color:#aaa; font-size:12px">Otobüs ve tramvay duraklarının kapsama alanı analizi: "Hangi
+                    mahallede nüfusun yüzde kaçı bir durağa 300 metreden daha yakın?"</div>
                 </div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">4. Altyapı ve AYKOME Koordinasyonu</div>
-                  <div style="color:#aaa; font-size:12px">Planlanan kazı çalışmalarının mevcut fiber optik, doğalgaz ve içme suyu şebeke hatlarıyla kesişim analizi yaparak şebeke hasarlarını önleme.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">4. Altyapı ve AYKOME
+                    Koordinasyonu</div>
+                  <div style="color:#aaa; font-size:12px">Planlanan kazı çalışmalarının mevcut fiber optik, doğalgaz ve
+                    içme suyu şebeke hatlarıyla kesişim analizi yaparak şebeke hasarlarını önleme.</div>
                 </div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">5. Akıllı Şehir ve IoT (Araç Takip)</div>
-                  <div style="color:#aaa; font-size:12px">Yüz binlerce araçtan gelen anlık konum verilerini işleyerek şehir genelinde trafik yoğunluk haritaları ve hız koridoru analizleri üretme.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">5. Akıllı Şehir ve IoT (Araç
+                    Takip)</div>
+                  <div style="color:#aaa; font-size:12px">Yüz binlerce araçtan gelen anlık konum verilerini işleyerek
+                    şehir genelinde trafik yoğunluk haritaları ve hız koridoru analizleri üretme.</div>
                 </div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">6. Sosyal Belediyecilik (Yer Seçimi)</div>
-                  <div style="color:#aaa; font-size:12px">Yeni bir KOMEK veya Millet Kıraathanesi için; hedef kitlenin (yaş, eğitim) en yoğun olduğu ve hizmete erişimin en düşük olduğu "optimum" konumu bulma.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:10px">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px">6. Sosyal Belediyecilik (Yer
+                    Seçimi)</div>
+                  <div style="color:#aaa; font-size:12px">Yeni bir KOMEK veya Millet Kıraathanesi için; hedef kitlenin
+                    (yaş, eğitim) en yoğun olduğu ve hizmete erişimin en düşük olduğu "optimum" konumu bulma.</div>
                 </div>
               </div>
             </div>
@@ -687,7 +777,11 @@
   </div>
 
   <div class="nav-controls">
-    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
+    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
@@ -723,4 +817,5 @@
   </script>
 
 </body>
+
 </html>
