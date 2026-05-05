@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS konya.osm_yollar (
     target INTEGER,
     cost DOUBLE PRECISION,
     reverse_cost DOUBLE PRECISION,
-    geom GEOMETRY(LINESTRING, 4326)
+    geom GEOMETRY(MULTILINESTRING, 4326)
 );
 CREATE INDEX IF NOT EXISTS idx_yollar_geom ON konya.osm_yollar USING GIST(geom);
 

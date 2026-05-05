@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   postgis-db:
-    image: postgis/postgis:16-3.4
+    build: .
     container_name: konya_postgis_db
     environment:
       - POSTGRES_DB=konya_egitim

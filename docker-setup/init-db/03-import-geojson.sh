@@ -23,7 +23,7 @@ ogr2ogr -f "PostgreSQL" "$DB_CONN" \
     -lco GEOMETRY_NAME=geom \
     -overwrite \
     -progress \
-    -sql "SELECT text AS ad FROM features"
+    -sql "SELECT text AS ad FROM iller_maks"
 
 # 2. İLÇE SINIRLARI AKTARIMI
 # ilceler_maks.json -> konya.ilce_sinirlari
@@ -35,7 +35,7 @@ ogr2ogr -f "PostgreSQL" "$DB_CONN" \
     -lco GEOMETRY_NAME=geom \
     -overwrite \
     -progress \
-    -sql "SELECT text AS ad FROM features"
+    -sql "SELECT text AS ad FROM ilceler_maks"
 
 # 3. MAHALLELER AKTARIMI
 # mahalle_maks.json -> konya.mahalleler
@@ -47,24 +47,26 @@ ogr2ogr -f "PostgreSQL" "$DB_CONN" \
     -lco GEOMETRY_NAME=geom \
     -overwrite \
     -progress \
-    -sql "SELECT text AS ad, source_district_name AS ilce FROM features"
+    -sql "SELECT text AS ad, source_district_name AS ilce FROM mahalle_maks"
 
 # 4. YOLLAR AKTARIMI (Çoklu İlçe Verisi)
 # *_yollar.geojson -> konya.osm_yollar
 echo ">>> İlçe yolları aktarılıyor..."
-# Tabloyu önce temizle (eğer overwrite isteniyorsa)
+# Tabloyu önce temizle
 psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "TRUNCATE TABLE konya.osm_yollar;"
 
 for f in /docker-entrypoint-initdb.d/data/*_yollar.geojson; do
     filename=$(basename "$f")
-    ilce_adi="${filename%_yollar.geojson}"
-    echo ">>>> $ilce_adi yolları yükleniyor..."
+    layer_name="${filename%.geojson}"
+    ilce_adi="${layer_name%_yollar}"
+    echo ">>>> $ilce_adi yolları yükleniyor ($layer_name)..."
     
     ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" \
         -nln konya.osm_yollar \
         -append \
+        -nlt MULTILINESTRING \
         -lco GEOMETRY_NAME=geom \
-        -sql "SELECT name AS ad, highway AS tip, '$ilce_adi' AS ilce FROM features"
+        -sql "SELECT text AS ad, 'Bilinmiyor' AS tip, '$ilce_adi' AS ilce FROM \"$layer_name\""
 done
 
 echo ">>> Veri aktarımı başarıyla tamamlandı."
