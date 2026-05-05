@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS konya.poi (
     id SERIAL PRIMARY KEY,
     ad VARCHAR(200),
     kategori VARCHAR(100),
+    ilce VARCHAR(50),
     geom GEOMETRY(POINT, 4326)
 );
 CREATE INDEX IF NOT EXISTS idx_poi_geom ON konya.poi USING GIST(geom);

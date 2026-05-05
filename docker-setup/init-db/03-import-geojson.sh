@@ -69,4 +69,24 @@ for f in /docker-entrypoint-initdb.d/data/*_yollar.geojson; do
         -sql "SELECT text AS ad, 'Bilinmiyor' AS tip, '$ilce_adi' AS ilce FROM \"$layer_name\""
 done
 
+# 5. POI (HİS) AKTARIMI (Hastane, Okul, Durak vb.)
+# *_poi.geojson -> konya.poi
+echo ">>> İlçe POI verileri aktarılıyor..."
+# Tabloyu temizle
+psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "TRUNCATE TABLE konya.poi;"
+
+for f in /docker-entrypoint-initdb.d/data/*_poi.geojson; do
+    filename=$(basename "$f")
+    layer_name="${filename%.geojson}"
+    ilce_adi="${layer_name%_poi}"
+    echo ">>>> $ilce_adi POI verileri yükleniyor ($layer_name)..."
+    
+    # Not: GeoJSON'da 'amenity' veya 'highway' gibi kolonlar kategori olarak kullanılır
+    ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" \
+        -nln konya.poi \
+        -append \
+        -lco GEOMETRY_NAME=geom \
+        -sql "SELECT name AS ad, COALESCE(amenity, highway, 'Bilinmiyor') AS kategori, '$ilce_adi' AS ilce FROM \"$layer_name\""
+done
+
 echo ">>> Veri aktarımı başarıyla tamamlandı."

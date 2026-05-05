@@ -41,12 +41,30 @@ Aşağıdaki veriler `init-db/data/` klasöründe mevcuttur ve kurulumla birlikt
 - **Duraklar**: `node["highway"="bus_stop"]`
 - **Binalar**: `way["building"]`
 
-#### 2. İlçe Bazlı Yol Ağları (pgRouting İçin)
-Çumra, Meram, Selçuklu veya Karatay gibi spesifik ilçelerin yol ağlarını indirmek için aşağıdaki sorgu şablonunu kullanın:
+#### 2. İlçe Bazlı POI Verileri (Hastane, Okul, Durak vb.)
+Belirli bir ilçedeki önemli noktaları toplu olarak indirmek için:
 
 ```text
 [out:json][timeout:25];
-// İlçeyi buraya yazın (Karatay, Meram, Selçuklu, Çumra vb.)
+area["name"="Meram"]->.searchArea;
+(
+  node["amenity"~"hospital|school"](area.searchArea);
+  node["highway"="bus_stop"](area.searchArea);
+);
+out body;
+>;
+out skel qt;
+```
+
+**Kayıt Bilgisi:**
+- Dosyayı `[ilce_adi]_poi.geojson` olarak kaydedin (Örn: `meram_poi.geojson`).
+- Bu dosya otomatik olarak `konya.poi` tablosuna aktarılacak ve kategori bilgisi (hastane, okul vb.) otomatik doldurulacaktır.
+
+#### 3. İlçe Bazlı Yol Ağları (pgRouting İçin)
+Çumra, Meram, Selçuklu veya Karatay gibi spesifik ilçelerin yol ağlarını indirmek için:
+
+```text
+[out:json][timeout:25];
 area["name"="Selçuklu"]->.searchArea;
 (
   way["highway"~"trunk|primary|secondary|tertiary|residential"](area.searchArea);
@@ -56,11 +74,9 @@ out body;
 out skel qt;
 ```
 
-**İndirme Adımları:**
-1. Overpass Turbo'da sol menüye sorguyu yapıştırın.
-2. `Çalıştır (Run)` butonuna basın.
-3. Sağ üstteki `Dışa Aktar (Export)` menüsünden `GeoJSON` formatını seçin.
-4. Dosyayı `[ilce_adi]_yollar.geojson` olarak kaydedip `data/` klasörüne atın (Örn: `karatay_yollar.geojson`).
+**Kayıt Bilgisi:**
+- Dosyayı `[ilce_adi]_yollar.geojson` olarak kaydedin (Örn: `karatay_yollar.geojson`).
+- Bu veriler otomatik olarak `konya.osm_yollar` tablosuna aktarılacak ve ilçe bilgisi otomatik eklenecektir.
 
 ### B. CSV ve Global Veriler
 - **USGS Earthquake Data**: [Son 30 Günün Depremleri](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php) (CSV Import testi için ideal).
