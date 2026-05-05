@@ -426,9 +426,14 @@
                   <code>geometry_columns</code> görünümünde kayıtlıdır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsBinary(geom) -- Geometriyi binary (WKB) formatına çevir
-FROM konya.mahalleler 
-LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT 
+  ST_AsText(geom) AS wkt,     -- Well-Known Text (Metin)
+  ST_AsBinary(geom) AS wkb,   -- Well-Known Binary (İkili)
+  ST_AsEWKT(geom) AS ewkt     -- Extended WKT (SRID'li Metin)
+FROM konya.mahalleler LIMIT 1;
+
+-- Metadata Görünümü:
+SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
 
                 <div class="reveal-box" id="q16">
                   <div class="reveal-trigger" onclick="document.getElementById('q16').classList.toggle('open')">
