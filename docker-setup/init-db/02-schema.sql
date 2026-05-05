@@ -119,3 +119,18 @@ CREATE TABLE IF NOT EXISTS konya.staging_import (
     kategori TEXT,
     geom GEOMETRY(POINT, 4326)
 );
+
+-- ============================================================
+-- ANALİZ TABLOLARI (analiz şeması)
+-- ============================================================
+
+-- Sentetik Kaza Verileri (Bölüm 3: DBSCAN, Isı Haritası, HexGrid)
+CREATE TABLE IF NOT EXISTS analiz.kazalar (
+    id SERIAL PRIMARY KEY,
+    tarih TIMESTAMP DEFAULT NOW(),
+    siddet INTEGER CHECK (siddet BETWEEN 1 AND 5),  -- 1: Hafif, 5: Ölümlü
+    tur VARCHAR(50),
+    ilce VARCHAR(50) DEFAULT 'Selçuklu',
+    geom GEOMETRY(POINT, 4326)
+);
+CREATE INDEX IF NOT EXISTS idx_kazalar_geom ON analiz.kazalar USING GIST(geom);

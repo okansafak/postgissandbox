@@ -65,7 +65,58 @@ FROM
     ) AS hex;
 
 -- ============================================================
--- 4. ACİL DURUM ANALİZ TASLAĞ (Bölüm 3: Kapanış Projesi)
+-- 4. SENTETİK KAZA VERİSİ (Bölüm 3: DBSCAN, Isı Haritası)
+-- ============================================================
+-- Selçuklu yollarının kesişim noktalarını (kavşakları) bulup
+-- çevrelerine rastgele kaza noktaları serpme stratejisi.
+
+-- Adım 1: Kavşak noktalarını bul ve çevresine kazalar üret
+INSERT INTO analiz.kazalar (tarih, siddet, tur, ilce, geom)
+SELECT
+    -- Son 1 yıl içinde rastgele tarih
+    NOW() - (random() * interval '365 days'),
+    -- Şiddet: Ağırlıklı olarak hafif (1-2), az sayıda ağır (4-5)
+    CASE 
+        WHEN random() < 0.4 THEN 1
+        WHEN random() < 0.7 THEN 2
+        WHEN random() < 0.85 THEN 3
+        WHEN random() < 0.95 THEN 4
+        ELSE 5
+    END,
+    -- Kaza türü
+    (ARRAY['Maddi Hasarlı', 'Yaralanmalı', 'Zincirleme', 'Yaya Çarpma', 'Kavşak Kazası'])[floor(random() * 5 + 1)::int],
+    'Selçuklu',
+    -- Kavşak noktasının etrafında ±200m rastgele kayma
+    ST_SetSRID(
+        ST_MakePoint(
+            ST_X(kavsaklar.geom) + (random() - 0.5) * 0.004,
+            ST_Y(kavsaklar.geom) + (random() - 0.5) * 0.003
+        ), 4326
+    )
+FROM (
+    -- Selçuklu yollarının birbirleriyle kesiştiği noktaları bul
+    SELECT DISTINCT
+        (ST_DumpPoints(
+            ST_Intersection(a.geom, b.geom)
+        )).geom AS geom
+    FROM konya.osm_yollar a
+    JOIN konya.osm_yollar b ON ST_Intersects(a.geom, b.geom) AND a.id < b.id
+    WHERE a.ilce = 'selcuklu' AND b.ilce = 'selcuklu'
+    LIMIT 100  -- İlk 100 kavşak
+) AS kavsaklar,
+-- Her kavşak için 2-5 kaza üret
+generate_series(1, (2 + floor(random() * 4))::int) AS seri;
+
+-- Bilgilendirme
+DO $$ 
+DECLARE kaza_sayisi INTEGER;
+BEGIN
+    SELECT count(*) INTO kaza_sayisi FROM analiz.kazalar;
+    RAISE NOTICE 'PostGIS Akademi: % adet sentetik kaza kaydı oluşturuldu.', kaza_sayisi;
+END $$;
+
+-- ============================================================
+-- 5. ACİL DURUM ANALİZ TASLAĞ (Bölüm 3: Kapanış Projesi)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS analiz.riskli_binalar (
     bina_id INTEGER REFERENCES konya.osm_binalar(id),
@@ -74,6 +125,17 @@ CREATE TABLE IF NOT EXISTS analiz.riskli_binalar (
     risk_skoru DOUBLE PRECISION,
     geom GEOMETRY(MULTIPOLYGON, 4326)
 );
+
+-- Kaza DBSCAN Kümeleme Görünümü (eps ≈ 300m, min 3 kaza)
+CREATE OR REPLACE VIEW analiz.v_kaza_kumeleri AS
+SELECT
+    id,
+    tarih,
+    siddet,
+    tur,
+    ST_ClusterDBSCAN(geom, eps := 0.003, minpoints := 3) OVER () AS cluster_id,
+    geom
+FROM analiz.kazalar;
 
 -- Doğrulama
 DO $$ BEGIN RAISE NOTICE 'PostGIS Akademi: Tüm init-db betikleri başarıyla tamamlandı.'; END $$;

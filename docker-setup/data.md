@@ -50,7 +50,7 @@ Ders sunumları incelendiğinde aşağıdaki verilerin içerikte referans alınd
 | Eksik Veri | Kullanıldığı Bölüm | Kullanıldığı Senaryo | Overpass Tag |
 | :--- | :--- | :--- | :--- |
 | **osm_binalar** | Bölüm 1, 2, 3 | KNN, İndeks, Partition, Yoğunluk | `way["building"]` |
-| **kazalar** (sentetik) | Bölüm 3 | ST_ClusterDBSCAN, Isı haritası | *(Init SQL ile oluşturulabilir)* |
+| **kazalar** (sentetik) | Bölüm 3 | ST_ClusterDBSCAN, Isı haritası | ✅ *Otomatik üretiliyor (07-analysis-advanced.sql)* |
 | **itfaiye** | Bölüm 3 | Rota analizi, Erişim süresi | `node["amenity"="fire_station"]` |
 | **parklar** | Bölüm 1, 3 | Yeşil alan ölçümü, HexagonGrid | `way["leisure"="park"]` |
 | **marketler** | Bölüm 1 | Ticari erişilebilirlik analizi | `node["shop"~"supermarket\|convenience"]` |
