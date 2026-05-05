@@ -288,7 +288,15 @@ FROM konya.ilce_sinirlari;</div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Hedefe Gitmek: <span>WHERE</span></div>
-                <div class="s-text-tech">Mantıksal bağlaçlarla (AND, OR) milyonlarca veri içinden aradığınızı milisaniyeler içinde çıkarırsınız.</div>
+                <div class="s-text-tech">
+                  Mantıksal bağlaçlarla aradığınız veriyi süzersiniz:
+                  <ul style="font-size:13px; margin-top:12px; color:#ccc; line-height:1.6">
+                    <li><b>Eşitlik:</b> =, !=, &lt;&gt;, IN</li>
+                    <li><b>Kıyas:</b> &lt;, &gt;, &lt;=, &gt;=, BETWEEN</li>
+                    <li><b>Metin:</b> LIKE, ILIKE</li>
+                    <li><b>Bağlaç:</b> AND, OR, NOT</li>
+                  </ul>
+                </div>
                 
                 <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Önemli Avantaj</div>
@@ -298,9 +306,9 @@ FROM konya.ilce_sinirlari;</div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus 
 FROM konya.ilce_sinirlari 
-WHERE nufus BETWEEN 50000 AND 200000 
-  AND ad LIKE '%şehir'
-  AND ad NOT IN ('Beyşehir');</div>
+WHERE nufus >= 50000 
+  AND (ad LIKE '%şehir' OR ad LIKE 'A%')
+  AND ad != 'Akşehir';</div>
                 
                 <div class="reveal-box" id="q05">
                   <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
