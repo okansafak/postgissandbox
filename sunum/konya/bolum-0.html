@@ -294,10 +294,11 @@ FROM konya.ilce_sinirlari;</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus FROM konya.ilce_sinirlari 
-WHERE nufus > 50000 
-  AND ad IN ('Selçuklu', 'Meram', 'Karatay') 
-  AND ad LIKE '%a%';</div>
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus 
+FROM konya.ilce_sinirlari 
+WHERE nufus BETWEEN 50000 AND 200000 
+  AND ad LIKE '%şehir'
+  AND ad NOT IN ('Beyşehir');</div>
                 
                 <div class="reveal-box" id="q05">
                   <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
