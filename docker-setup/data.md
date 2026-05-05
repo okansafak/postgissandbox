@@ -1,104 +1,82 @@
-# Konya PostGIS Akademi — Veri Hazırlama Rehberi
+# Konya PostGIS Akademi — Veri Hazırlama ve Yönetim Rehberi
 
-Bu rehber, sunumlarda (Bölüm 0, 1, 2 ve 3) kullanılan gerçek dünya senaryolarını uygulayabilmeniz için gerekli verilerin temini ve veritabanına aktarımı için hazırlanmıştır. Eğitimlerin kusursuz geçmesi için veri altyapısının eksiksiz olması şarttır.
+Bu rehber, eğitim boyunca kullanılan verilerin temini, yapısı ve veritabanına aktarımı için hazırlanmıştır. Eğitimlerin kusursuz geçmesi için veri altyapısı `docker-setup` içerisinde hazır olarak sunulmaktadır.
 
-## 1. Veritabanı ve Şema Yapısı
-Eğitim boyunca tüm veriler `konya` veritabanı altında saklanacaktır. Temel veriler `konya` şemasında, analiz sonuçları ise `analiz` şemasında tutulacaktır.
-```sql
--- Docker ortamında bu adımlar init-db klasöründeki SQL'ler ile otomatik yapılır.
--- Ancak manuel kurulum için:
-CREATE DATABASE konya;
-\c konya
-CREATE SCHEMA konya;
-CREATE SCHEMA analiz;
+## 1. Veri Organizasyonu ve Otomasyon
+
+Eğitim verileri artık `docker-setup/init-db/data/` klasörü altında merkezi olarak yönetilmektedir. Docker ayağa kalktığında bu veriler otomatik olarak ilgili tablolara aktarılır.
+
+### Kurulum ve Başlatma
+```bash
+cd docker-setup
+docker compose up -d --build
 ```
+*Not: `--build` bayrağı, pgRouting ve GDAL araçlarını içeren özel imajın derlenmesini sağlar.*
 
 ---
 
-## 2. Veri Kaynakları ve İndirme Talimatları
+## 2. Mevcut Veri Setleri (Hazır Gelenler)
+
+Aşağıdaki veriler `init-db/data/` klasöründe mevcuttur ve kurulumla birlikte otomatik yüklenir:
+
+| Tablo Adı | Kaynak Dosya | Açıklama / Kullanım Alanı |
+| :--- | :--- | :--- |
+| **konya.il_sinirlari** | `iller_maks.json` | Türkiye il sınırları (Büyük ölçekli analizler) |
+| **konya.ilce_sinirlari**| `ilceler_maks.json` | Konya ilçe sınırları (ST_Subdivide, Partitioning) |
+| **konya.mahalleler** | `mahalle_maks.json` | Konya mahalle sınırları (Spatial Joins, Aggregations) |
+| **konya.osm_yollar** | `*_yollar.geojson` | Karatay, Meram, Selçuklu ve Çumra yol ağları (pgRouting) |
+| **konya.staging_import**| `nufus.csv` | Ham nüfus verisi (Bölüm 2: CSV Import & Staging) |
+
+---
+
+## 3. Ek Veri İndirme Talimatları (Egzersizler İçin)
+
+Öğrencilerin kendi verilerini çekebilmeleri için aşağıdaki kaynaklar önerilir:
 
 ### A. OpenStreetMap (OSM) — Overpass Turbo
-Konya'nın güncel verilerini çekmek için [Overpass Turbo](https://overpass-turbo.eu/) kullanacağız. Haritayı Konya üzerine getirin ve aşağıdaki sorguları çalıştırıp **GeoJSON** olarak dışa aktarın.
+[Overpass Turbo](https://overpass-turbo.eu/) üzerinden Konya için şu sorguları GeoJSON olarak dışa aktarabilirsiniz:
+- **Hastaneler**: `node["amenity"="hospital"]`
+- **Duraklar**: `node["highway"="bus_stop"]`
+- **Binalar**: `way["building"]`
 
-| Tablo Adı | Overpass Sorgu Kodu (Tag) | Ne İçin Kullanılacak? | Dosya Adı |
-| :--- | :--- | :--- | :--- |
-| **konya.mahalleler** | `relation["admin_level"="8"]["name"~"Mahallesi"]` | Kapsama (Contains), Alan Ölçümü | `mahalleler.geojson` |
-| **konya.ilce_sinirlari**| `relation["admin_level"="6"]` | ST_Subdivide ve Partitioning | `ilceler.geojson` |
-| **konya.hastaneler** | `node["amenity"="hospital"]` | JOIN, Buffer, KNN (<->) | `hastaneler.geojson` |
-| **konya.osm_yollar** | `way["highway"~"trunk\|primary\|secondary\|tertiary"]` | pgRouting, Linear Referencing | `yollar.geojson` |
-| **konya.osm_binalar**| `way["building"]` | GiST İndeks, ST_Simplify | `binalar.geojson` |
-| **konya.duraklar**   | `node["highway"="bus_stop"]` | ST_ClusterKMeans (Bölüm 3) | `duraklar.geojson` |
-
-### B. Açık Kaynaklardan Alternatif Veri İndirme (CSV ve SHP)
-Eğitim esnasında kullanılacak "Staging ve Toplu Veri Yükleme" (Bölüm 2) işlemleri için sahte veriler yerine global açık kaynakları kullanabilirsiniz:
-
-1. **Overpass Turbo (CSV Export):** 
-   Konya'daki eczaneleri (veya okulları) CSV olarak indirebilirsiniz. Overpass Turbo'da sol menüden kod alanına şu sorguyu yapıştırıp 'Dışa Aktar > Ham Veri' diyebilirsiniz:
-   ```text
-   [out:csv(::id, ::lat, ::lon, name, amenity)];
-   node["amenity"="pharmacy"]({{bbox}});
-   out;
-   ```
-   Bu dosyayı `veri.csv` olarak kaydederek `COPY konya.temp_tablo FROM 'veri.csv' WITH (FORMAT csv, HEADER);` komutuyla içeri alabilirsiniz.
-
-2. **USGS Earthquake Data (Gerçek Dünya CSV Testi):**
-   [USGS Earthquakes](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php) adresinden son 30 günün tüm küresel deprem verilerini CSV olarak indirebilir, devasa tablo yükleme (Staging) ve performans testlerini bu gerçek veri üzerinde yapabilirsiniz.
-
-3. **Natural Earth (Shapefile Küresel Analiz):**
-   Bölüm 1'deki "Geometry vs Geography" mesafe ölçümleri için [Natural Earth Populated Places](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/populated-places/) adresinden küresel şehirler Shapefile (`.shp`) verisini indirebilirsiniz.
+### B. CSV ve Global Veriler
+- **USGS Earthquake Data**: [Son 30 Günün Depremleri](https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php) (CSV Import testi için ideal).
+- **Natural Earth**: [Dünya Şehirleri](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/populated-places/) (Shapefile projeksiyon testleri için).
 
 ---
 
-## 3. Verileri İçe Aktarma (Import) Stratejileri
+## 4. Veri Aktarım Stratejileri (Eğitim Kapsamı)
 
-### ogr2ogr ile Aktarım (Terminalden)
-GeoJSON dosyalarını PostGIS'e aktarmanın en hızlı yoludur. Docker terminaline (veya lokal terminalinize) girerek çalıştırın:
-
+### ogr2ogr (GeoJSON -> PostGIS)
+Otomatik aktarım betiği (`03-import-geojson.sh`) şu mantıkla çalışır:
 ```bash
-# Mahalleleri aktar
-ogr2ogr -f "PostgreSQL" PG:"dbname=konya user=postgis password=postgis host=localhost port=5442" \
-  mahalleler.geojson -nln konya.mahalleler -lco GEOMETRY_NAME=geom
-
-# Yolları aktar (Ağ analizi için kritik)
-ogr2ogr -f "PostgreSQL" PG:"dbname=konya user=postgis password=postgis host=localhost port=5442" \
-  yollar.geojson -nln konya.osm_yollar -lco GEOMETRY_NAME=geom
+# İlçe yollarını döngüyle ve ilçe adını ekleyerek aktarma örneği:
+ogr2ogr -f "PostgreSQL" "$DB_CONN" "karatay_yollar.geojson" \
+    -nln konya.osm_yollar -append \
+    -sql "SELECT text AS ad, 'Bilinmiyor' AS tip, 'Karatay' AS ilce FROM karatay_yollar"
 ```
 
-### pgRouting (Ağ Analizi) İçin Topoloji Hazırlığı (Bölüm 3.2 Öncesi)
-`osm_yollar` tablosunu pgRouting'in anlayabileceği Node-Edge yapısına dönüştürmek:
+### PostgreSQL COPY (CSV -> Staging)
+Bölüm 2'de işlenecek kirli veri temizleme senaryosu:
 ```sql
-ALTER TABLE konya.osm_yollar ADD COLUMN source INTEGER;
-ALTER TABLE konya.osm_yollar ADD COLUMN target INTEGER;
-ALTER TABLE konya.osm_yollar ADD COLUMN cost DOUBLE PRECISION;
-
--- Maliyet (cost) olarak uzunluk hesaplanıyor
-UPDATE konya.osm_yollar SET cost = ST_Length(geom::geography);
-
--- Topoloji inşası (Bu işlem yolların birbirine bağlandığı düğümleri oluşturur)
-SELECT pgr_createTopology('konya.osm_yollar', 0.00001, 'geom', 'id');
+-- data/nufus.csv dosyasını staging tablosuna al
+COPY konya.nufus_staging FROM '/docker-entrypoint-initdb.d/data/nufus.csv' WITH (FORMAT text);
 ```
 
 ---
 
-## 4. Tam Kapsamlı Ders-Veri Eşleşme Matrisi
+## 5. Ders - Veri Eşleşme Matrisi
 
-| Eğitim Modülü | İşlenen Konu / Analiz | Hedef Tablo(lar) | İşlem ve Amacı |
-| :--- | :--- | :--- | :--- |
-| **Bölüm 0** | WHERE, GROUP BY, LIMIT | `konya.mahalleler` | Nüfusa göre sıralama, ilçeye göre gruplama. |
-| **Bölüm 0** | LEFT JOIN | `hastaneler` + `mahalleler` | Hastanesi olmayan mahalleleri bulma. |
-| **Bölüm 1** | ST_Transform | `konya.mahalleler` | EPSG:4326'dan yerel EPSG'ye (Metrik) geçiş. |
-| **Bölüm 1** | ST_Intersects, ST_Contains | `hastaneler` + `mahalleler` | Hastane hangi ilçede/mahallede düşüyor? |
-| **Bölüm 1** | KNN Operatörü (`<->`) | `konya.osm_binalar` | En yakın 5 binayı hızlıca bulma. |
-| **Bölüm 2** | ST_Subdivide | `konya.ilce_sinirlari` | Devasa ilçe poligonunu performans için parçalama. |
-| **Bölüm 2** | &&, EXPLAIN ANALYZE | `konya.osm_binalar` | Bounding Box testi ve indeks kullanımının incelenmesi. |
-| **Bölüm 2** | Partitioning (Tablo Bölümleme)| `konya.mahalleler` (İlçe bazlı) | Veriyi fiziksel disklere ayırarak hızlandırma (Pruning). |
-| **Bölüm 3** | ST_ClusterKMeans / DBSCAN | `konya.duraklar` / Kazalar | Nokta verilerinden yoğunluk bölgeleri çıkarma. |
-| **Bölüm 3** | pgr_dijkstra | `konya.osm_yollar` | İki nokta arası en kısa ve optimum rotanın bulunması. |
-| **Bölüm 3** | ST_HexagonGrid | `konya.mahalleler` | Konya haritasını petek (h3) gridlerine bölme. |
+| Eğitim Modülü | İşlenen Konu | Kullanılan Veri / Tablo |
+| :--- | :--- | :--- |
+| **Bölüm 0** | SQL Temelleri | `egitim.personel`, `konya.mahalleler` |
+| **Bölüm 1** | Spatial Analiz | `konya.mahalleler`, `konya.osm_yollar` (ST_Length, ST_Intersects) |
+| **Bölüm 2** | Performans & ETL | `nufus.csv` (Regex), `konya.ilce_sinirlari` (Subdivide, Indeks) |
+| **Bölüm 3** | İleri Analiz | `konya.osm_yollar` (pgr_dijkstra), `duraklar` (Clustering) |
 
 ---
 
-## 5. Eğitmen İçin Kritik Kontrol Listesi
-*   **SRID Uyumu:** İndirdiğiniz tüm GeoJSON verilerinin `EPSG:4326` (WGS84) olduğundan emin olun. Transform işlemleri eğitim sırasında yapılacaktır.
-*   **Tablo Şişmesi (Bloat):** Eğitim öncesi tablo güncellemeleri yaptıysanız, indeks bozulmalarını engellemek için eğitime girmeden önce mutlaka `VACUUM ANALYZE;` komutunu çalıştırın.
-*   **Validasyon:** Öğrencilere `ST_MakeValid` komutunu uygulamalı göstermek için `konya.ilce_sinirlari` tablosuna kasıtlı olarak hatalı bir poligon (self-intersection) ekleyebilirsiniz.
+## 6. Kritik Kontrol Listesi
+- **Geometry Type**: Yol verileri `MULTILINESTRING` olarak tutulur. `ogr2ogr` aktarımında `-nlt MULTILINESTRING` kullanılması önerilir.
+- **SRID**: Tüm veriler varsayılan olarak `EPSG:4326` (WGS84) koordinat sistemindedir.
+- **Dizin Erişimi**: Docker içinde veriler `/docker-entrypoint-initdb.d/data/` yolunda bulunur. SQL komutlarında bu yol kullanılmalıdır.
