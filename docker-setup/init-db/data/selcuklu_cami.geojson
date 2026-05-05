@@ -1,0 +1,6359 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-05-05T18:42:30Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/128082021",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Fatih Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927517,
+          37.902493
+        ]
+      },
+      "id": "way/128082021"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/128082040",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "check_date": "2025-01-21",
+        "denomination": "sunni",
+        "name": "Şehitler Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.499197,
+          37.9122199
+        ]
+      },
+      "id": "way/128082040"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/128082061",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Alaeddin Keykubad Camii",
+        "religion": "muslim",
+        "wheelchair": "no",
+        "wikidata": "Q2620007",
+        "wikimedia_commons": "Category:Alaeddin Mosque (Konya)",
+        "wikipedia": "tr:Alâeddin Camii (Konya)",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4927438,
+          37.8733567
+        ]
+      },
+      "id": "way/128082061"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/130541226",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "check_date": "2024-04-20",
+        "denomination": "sunni",
+        "name": "Ebubekir camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4557762,
+          37.8800369
+        ]
+      },
+      "id": "way/130541226"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/130541260",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Çınar Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4577257,
+          37.8829125
+        ]
+      },
+      "id": "way/130541260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/150625222",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3616612,
+          37.9300329
+        ]
+      },
+      "id": "way/150625222"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/150634872",
+        "amenity": "place_of_worship",
+        "building": "yes",
+        "name": "Ak  Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4198397,
+          37.9283851
+        ]
+      },
+      "id": "way/150634872"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/221615479",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Akabe Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4915666,
+          37.9126947
+        ]
+      },
+      "id": "way/221615479"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/221615495",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Nur Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5037036,
+          37.9097911
+        ]
+      },
+      "id": "way/221615495"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/221615546",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "İmamı Rabani Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5058059,
+          37.9179139
+        ]
+      },
+      "id": "way/221615546"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/221615577",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ali Efendi Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5021095,
+          37.9221932
+        ]
+      },
+      "id": "way/221615577"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/221615579",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Dumlupınar Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5055071,
+          37.923
+        ]
+      },
+      "id": "way/221615579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/223402474",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Parsana Büyük Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4909398,
+          37.8820584
+        ]
+      },
+      "id": "way/223402474"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/224489266",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Süleymaniye Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.497242,
+          37.918843
+        ]
+      },
+      "id": "way/224489266"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/224489307",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Buhara Nur Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4856527,
+          37.9242158
+        ]
+      },
+      "id": "way/224489307"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232146885",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Osmanlı Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5075624,
+          37.9154756
+        ]
+      },
+      "id": "way/232146885"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232409308",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Selçuklu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4881696,
+          37.9037757
+        ]
+      },
+      "id": "way/232409308"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232410922",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hamidye Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4886007,
+          37.8999978
+        ]
+      },
+      "id": "way/232410922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232410923",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Fatih Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4840106,
+          37.9012864
+        ]
+      },
+      "id": "way/232410923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232411587",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4721803,
+          37.893917
+        ]
+      },
+      "id": "way/232411587"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232411596",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Elmas Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4700184,
+          37.8891775
+        ]
+      },
+      "id": "way/232411596"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232411599",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hızır Yunus Emre Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4798412,
+          37.9043784
+        ]
+      },
+      "id": "way/232411599"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/232412272",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "building:levels": "3",
+        "denomination": "sunni",
+        "name": "Özdilek Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4851386,
+          37.895461
+        ]
+      },
+      "id": "way/232412272"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245072679",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Kömürcüler Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4789448,
+          37.9010077
+        ]
+      },
+      "id": "way/245072679"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245165013",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "check_date": "2025-01-21",
+        "denomination": "sunni",
+        "name": "Alemdar Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.49382,
+          37.9155976
+        ]
+      },
+      "id": "way/245165013"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245165014",
+        "addr:city": "Kocatepe Mh. / Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ulu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5056639,
+          37.9296036
+        ]
+      },
+      "id": "way/245165014"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245165023",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hz. Ebubekir Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5046269,
+          37.9400322
+        ]
+      },
+      "id": "way/245165023"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245165029",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4989609,
+          37.9602503
+        ]
+      },
+      "id": "way/245165029"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192332",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5038101,
+          37.9769675
+        ]
+      },
+      "id": "way/245192332"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192337",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Beyazıd Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5102074,
+          37.9694641
+        ]
+      },
+      "id": "way/245192337"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192345",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "M.T.A. camisi",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.523178,
+          37.9590116
+        ]
+      },
+      "id": "way/245192345"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192354",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ziyaret Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4860011,
+          37.9047503
+        ]
+      },
+      "id": "way/245192354"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192355",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Arafat Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4504316,
+          37.9013731
+        ]
+      },
+      "id": "way/245192355"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192356",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hocacihan Seyfullah camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4361637,
+          37.8888039
+        ]
+      },
+      "id": "way/245192356"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245192358",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mehmet Çal Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4350649,
+          37.8827877
+        ]
+      },
+      "id": "way/245192358"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245763922",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hüsamettin Çelebi Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4874849,
+          37.9164307
+        ]
+      },
+      "id": "way/245763922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245763965",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Mehmet Dalan Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4659619,
+          37.8914933
+        ]
+      },
+      "id": "way/245763965"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247011687",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Zeki Altındağ Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4958792,
+          37.9523468
+        ]
+      },
+      "id": "way/247011687"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247011694",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.496346,
+          37.9473391
+        ]
+      },
+      "id": "way/247011694"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247011695",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Süleyman Çelebi Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5045345,
+          37.945445
+        ]
+      },
+      "id": "way/247011695"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247011698",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hicret Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4953788,
+          37.9328235
+        ]
+      },
+      "id": "way/247011698"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247011699",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Kuba Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4955848,
+          37.9288207
+        ]
+      },
+      "id": "way/247011699"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247012843",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4712434,
+          37.9526078
+        ]
+      },
+      "id": "way/247012843"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247012845",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4671448,
+          37.9378152
+        ]
+      },
+      "id": "way/247012845"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247012846",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Mısırlı Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4713645,
+          37.9234935
+        ]
+      },
+      "id": "way/247012846"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247012847",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4733059,
+          37.9140864
+        ]
+      },
+      "id": "way/247012847"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247012848",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Beşerler Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4548711,
+          37.911197
+        ]
+      },
+      "id": "way/247012848"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247021727",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Abdül Hamid Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4900876,
+          37.9354465
+        ]
+      },
+      "id": "way/247021727"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247021730",
+        "addr:city": "Konya",
+        "addr:street": "Eyüp Sultan Caddesi",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Eyüp Sultan Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5085755,
+          37.9373871
+        ]
+      },
+      "id": "way/247021730"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247159261",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hz. İsmail Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4941952,
+          37.9446202
+        ]
+      },
+      "id": "way/247159261"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247159272",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4759662,
+          37.8898955
+        ]
+      },
+      "id": "way/247159272"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247159273",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yüksek Işıklar Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4762465,
+          37.8864924
+        ]
+      },
+      "id": "way/247159273"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/247159274",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Aliya İzzetbegoviç Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4798086,
+          37.8849115
+        ]
+      },
+      "id": "way/247159274"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/255903240",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6091818,
+          37.9735487
+        ]
+      },
+      "id": "way/255903240"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/257592311",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Sakarya Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5022084,
+          37.9184302
+        ]
+      },
+      "id": "way/257592311"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/257592322",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Karaali Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5023466,
+          37.9149995
+        ]
+      },
+      "id": "way/257592322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/257592329",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hadiye Sürmegöz Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4809119,
+          37.8777697
+        ]
+      },
+      "id": "way/257592329"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/257613109",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5853923,
+          37.9856202
+        ]
+      },
+      "id": "way/257613109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258755709",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Yeni Saadet Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4782366,
+          37.912953
+        ]
+      },
+      "id": "way/258755709"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258770642",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ebuzer Gifari Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4829382,
+          37.9152866
+        ]
+      },
+      "id": "way/258770642"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258770719",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hacı Kadir Uz Kız Kur'an Kursu",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4942892,
+          37.921572
+        ]
+      },
+      "id": "way/258770719"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258869754",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Yunus Emre Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4835467,
+          37.9102539
+        ]
+      },
+      "id": "way/258869754"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258870556",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Molla Gürani Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4611432,
+          37.8855914
+        ]
+      },
+      "id": "way/258870556"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258870557",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:neighbourhood": "Şeker Mahallesi",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Zembilli Ali Efendi Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4631688,
+          37.8828476
+        ]
+      },
+      "id": "way/258870557"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258870560",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4786322,
+          37.8876159
+        ]
+      },
+      "id": "way/258870560"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258875236",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Fatma Tüz Zehra Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.485153,
+          37.8882063
+        ]
+      },
+      "id": "way/258875236"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258897003",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4976315,
+          37.9239436
+        ]
+      },
+      "id": "way/258897003"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/258901582",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Mina Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4705572,
+          37.9050474
+        ]
+      },
+      "id": "way/258901582"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259021366",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "İmam-ı Azam Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4510598,
+          37.89708
+        ]
+      },
+      "id": "way/259021366"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259023290",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hazreti Ömer Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4725998,
+          37.8843679
+        ]
+      },
+      "id": "way/259023290"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259023300",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "H. Hamdi Tetik Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4545806,
+          37.9008149
+        ]
+      },
+      "id": "way/259023300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259023301",
+        "addr:city": "Selçuklu/Konya",
+        "addr:street": "Karlıbel Caddesi",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ramazanoğlu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4634275,
+          37.9088719
+        ]
+      },
+      "id": "way/259023301"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259193663",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Organize Sanayi Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5134889,
+          37.9183207
+        ]
+      },
+      "id": "way/259193663"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259917984",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Kuba Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5224466,
+          37.9863281
+        ]
+      },
+      "id": "way/259917984"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/259917987",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Zehra Hatun Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5149718,
+          37.9983877
+        ]
+      },
+      "id": "way/259917987"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260120019",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Selçuk Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4841782,
+          37.8848938
+        ]
+      },
+      "id": "way/260120019"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260120032",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hadim Kaya Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4874986,
+          37.8831495
+        ]
+      },
+      "id": "way/260120032"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260280581",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yaren Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4950953,
+          37.9822206
+        ]
+      },
+      "id": "way/260280581"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260283694",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Sille Esentepe Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.443359,
+          37.9210984
+        ]
+      },
+      "id": "way/260283694"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260283696",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Erenköy Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.460758,
+          37.9146906
+        ]
+      },
+      "id": "way/260283696"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/260439476",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ahmed-i Serif Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.491077,
+          37.9206524
+        ]
+      },
+      "id": "way/260439476"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/263461091",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4829096,
+          38.1734644
+        ]
+      },
+      "id": "way/263461091"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264721949",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Haci Kemal Onsun Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4887024,
+          37.8800081
+        ]
+      },
+      "id": "way/264721949"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264721950",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "İhsaniye Yeni Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4838145,
+          37.8743406
+        ]
+      },
+      "id": "way/264721950"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264721960",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Belediye Sarayı Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4854712,
+          37.8772227
+        ]
+      },
+      "id": "way/264721960"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264732322",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Tevhide Anne Nişantaşı Yeşil Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4849914,
+          37.8790977
+        ]
+      },
+      "id": "way/264732322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264732349",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Selçukoğlu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4846439,
+          37.8809967
+        ]
+      },
+      "id": "way/264732349"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264755257",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.472128,
+          37.880111
+        ]
+      },
+      "id": "way/264755257"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264755274",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Kurşuncular Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4816986,
+          37.8751565
+        ]
+      },
+      "id": "way/264755274"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/264865283",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Devri Cedid Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4869998,
+          37.8743764
+        ]
+      },
+      "id": "way/264865283"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265362113",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Şeker Murat Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4773409,
+          37.8773733
+        ]
+      },
+      "id": "way/265362113"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265362118",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Kiprit Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4741441,
+          37.8824494
+        ]
+      },
+      "id": "way/265362118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265376701",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mehmet Akif Ersoy Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4660909,
+          37.8809507
+        ]
+      },
+      "id": "way/265376701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265382862",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Bardakçı Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4861663,
+          37.8712809
+        ]
+      },
+      "id": "way/265382862"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265407136",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4781786,
+          37.8714662
+        ]
+      },
+      "id": "way/265407136"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265421143",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Beyhekim mescidi",
+        "religion": "muslim",
+        "wikidata": "Q127634896",
+        "wikimedia_commons": "Category:Beyhekim Mosque (Konya)",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4885033,
+          37.8717372
+        ]
+      },
+      "id": "way/265421143"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/265421146",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Büyük İhsaniye Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4808271,
+          37.8730181
+        ]
+      },
+      "id": "way/265421146"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/266831588",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6016705,
+          37.9936563
+        ]
+      },
+      "id": "way/266831588"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/267406246",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hatice Hatun Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4823395,
+          37.8832989
+        ]
+      },
+      "id": "way/267406246"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/268879200",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Mürşit Pınar Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4948281,
+          37.8857186
+        ]
+      },
+      "id": "way/268879200"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/269129234",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Haci Oglu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4977674,
+          37.888229
+        ]
+      },
+      "id": "way/269129234"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/274223649",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5144516,
+          37.9956108
+        ]
+      },
+      "id": "way/274223649"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/277959771",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Merkez Safa Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6004373,
+          38.0362326
+        ]
+      },
+      "id": "way/277959771"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/279542267",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Altınoluk Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5327532,
+          37.9541283
+        ]
+      },
+      "id": "way/279542267"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/281819167",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Başak Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5306181,
+          37.9300999
+        ]
+      },
+      "id": "way/281819167"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/281819176",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Yelda Ak Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.47408,
+          37.9597403
+        ]
+      },
+      "id": "way/281819176"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/281983945",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:housenumber": "147",
+        "addr:neighbourhood": "Horozluhan Mahallesi",
+        "addr:postcode": "42120",
+        "addr:street": "Ankara Caddesi",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Pınar Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5099666,
+          37.9024879
+        ]
+      },
+      "id": "way/281983945"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/283586912",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Adnan Menderes Toptancı Hal Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4921155,
+          37.892358
+        ]
+      },
+      "id": "way/283586912"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/283601277",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Malazgirt Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4991148,
+          37.9279458
+        ]
+      },
+      "id": "way/283601277"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/285179363",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "H. Ahmet Acar Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5307715,
+          37.962444
+        ]
+      },
+      "id": "way/285179363"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/285223752",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5386146,
+          37.9399504
+        ]
+      },
+      "id": "way/285223752"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287036108",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Esenler Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4639977,
+          37.8933545
+        ]
+      },
+      "id": "way/287036108"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287077710",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4696819,
+          37.8781707
+        ]
+      },
+      "id": "way/287077710"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287077713",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4736606,
+          37.8771574
+        ]
+      },
+      "id": "way/287077713"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287077721",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4796311,
+          37.8823763
+        ]
+      },
+      "id": "way/287077721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287246872",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4710716,
+          37.9000331
+        ]
+      },
+      "id": "way/287246872"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287468460",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Sadıklı Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.467077,
+          37.8982115
+        ]
+      },
+      "id": "way/287468460"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/287503811",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mürsemen Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4692375,
+          37.8834105
+        ]
+      },
+      "id": "way/287503811"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/288276880",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Şükrü Ersoy Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.463538,
+          37.8788881
+        ]
+      },
+      "id": "way/288276880"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/288612792",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hocacihan Büyük Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.445327,
+          37.8866038
+        ]
+      },
+      "id": "way/288612792"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/288792816",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Bayraktar Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.469657,
+          37.8945491
+        ]
+      },
+      "id": "way/288792816"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/288902834",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Bastonlu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4905,
+          37.939725
+        ]
+      },
+      "id": "way/288902834"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/289549418",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hüseyin Özkoyuncu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4536523,
+          37.9546015
+        ]
+      },
+      "id": "way/289549418"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/295349756",
+        "addr:city": "Konya",
+        "addr:street": "Adakale Caddesi",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Özlem Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4667549,
+          37.8859133
+        ]
+      },
+      "id": "way/295349756"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/296445974",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4642465,
+          37.919735
+        ]
+      },
+      "id": "way/296445974"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/300204789",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5095551,
+          37.9080625
+        ]
+      },
+      "id": "way/300204789"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308845254",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4027993,
+          38.0878475
+        ]
+      },
+      "id": "way/308845254"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308845255",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4043288,
+          38.0897569
+        ]
+      },
+      "id": "way/308845255"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308845256",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3310808,
+          38.0634492
+        ]
+      },
+      "id": "way/308845256"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308854331",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.9252492,
+          38.0866962
+        ]
+      },
+      "id": "way/308854331"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308854332",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.9078102,
+          38.0936241
+        ]
+      },
+      "id": "way/308854332"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308854333",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.7654591,
+          38.1224728
+        ]
+      },
+      "id": "way/308854333"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308854334",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.7414301,
+          38.1631034
+        ]
+      },
+      "id": "way/308854334"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/308854335",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6850765,
+          38.2454423
+        ]
+      },
+      "id": "way/308854335"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/309011072",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5971546,
+          37.9570422
+        ]
+      },
+      "id": "way/309011072"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/309011101",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Horozlu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5388649,
+          37.942672
+        ]
+      },
+      "id": "way/309011101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311095770",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Pınarbaşı Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5929611,
+          38.0595052
+        ]
+      },
+      "id": "way/311095770"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311095775",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6113907,
+          38.0858912
+        ]
+      },
+      "id": "way/311095775"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311095783",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.702324,
+          38.0883936
+        ]
+      },
+      "id": "way/311095783"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311099085",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Anadolu Sanayi Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5145702,
+          37.9323255
+        ]
+      },
+      "id": "way/311099085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311217687",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Bağlarbaşı Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.461181,
+          37.954924
+        ]
+      },
+      "id": "way/311217687"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311219172",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.465255,
+          37.9701852
+        ]
+      },
+      "id": "way/311219172"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311219187",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4325348,
+          38.0154345
+        ]
+      },
+      "id": "way/311219187"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311219188",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4774932,
+          38.0684888
+        ]
+      },
+      "id": "way/311219188"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/311516602",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mobilyacılar Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5090601,
+          37.915994
+        ]
+      },
+      "id": "way/311516602"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/312229439",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5262491,
+          38.1716691
+        ]
+      },
+      "id": "way/312229439"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/312229441",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6546451,
+          38.1635342
+        ]
+      },
+      "id": "way/312229441"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/312229450",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5527874,
+          38.1047073
+        ]
+      },
+      "id": "way/312229450"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/314572922",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Alemdar Sultan Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4641479,
+          37.8856736
+        ]
+      },
+      "id": "way/314572922"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/315569700",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5047761,
+          37.9050947
+        ]
+      },
+      "id": "way/315569700"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/320053802",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.2378793,
+          38.0026225
+        ]
+      },
+      "id": "way/320053802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/320053803",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.239778,
+          38.0035433
+        ]
+      },
+      "id": "way/320053803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/321595220",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.446528,
+          37.9170812
+        ]
+      },
+      "id": "way/321595220"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/321625319",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Ova Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4598816,
+          37.9279856
+        ]
+      },
+      "id": "way/321625319"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/324418168",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Kudüs Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4575382,
+          37.8939282
+        ]
+      },
+      "id": "way/324418168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/324428579",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Gökal Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4614778,
+          37.8808401
+        ]
+      },
+      "id": "way/324428579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/327536777",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Veysel Karani Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.473196,
+          37.8871923
+        ]
+      },
+      "id": "way/327536777"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/334466795",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4769761,
+          38.1317852
+        ]
+      },
+      "id": "way/334466795"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/360241353",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hocacihan Alaaddin Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4447157,
+          37.884716
+        ]
+      },
+      "id": "way/360241353"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/360241358",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hamidullah Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4422359,
+          37.884643
+        ]
+      },
+      "id": "way/360241358"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/360469858",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5060586,
+          37.9106113
+        ]
+      },
+      "id": "way/360469858"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/361365971",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3692019,
+          37.9574518
+        ]
+      },
+      "id": "way/361365971"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/361365972",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.359471,
+          37.9543257
+        ]
+      },
+      "id": "way/361365972"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/361367559",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3980942,
+          37.8982849
+        ]
+      },
+      "id": "way/361367559"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/361367560",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4016017,
+          37.9022388
+        ]
+      },
+      "id": "way/361367560"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/361367561",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4054589,
+          37.8978578
+        ]
+      },
+      "id": "way/361367561"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/361516026",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.7663891,
+          38.1246522
+        ]
+      },
+      "id": "way/361516026"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/365099047",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "H. Birol Polat Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4590764,
+          37.8994563
+        ]
+      },
+      "id": "way/365099047"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/365099054",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Farisi Bağdadi Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4564747,
+          37.9032468
+        ]
+      },
+      "id": "way/365099054"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/366435509",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4913113,
+          37.8797215
+        ]
+      },
+      "id": "way/366435509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/366443244",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ferhuniye Beşarebey Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4911455,
+          37.8760973
+        ]
+      },
+      "id": "way/366443244"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/422859203",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hacı Haydar Sultan Türbesi Dergahı",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.2907409,
+          37.9293059
+        ]
+      },
+      "id": "way/422859203"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/423023523",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4133588,
+          37.9275339
+        ]
+      },
+      "id": "way/423023523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/423023524",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Karataş Camii",
+        "name:en": "Karataş mosque",
+        "name:nl": "Karataş moskee",
+        "religion": "muslim",
+        "wikidata": "Q127788088",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4150101,
+          37.9289784
+        ]
+      },
+      "id": "way/423023524"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/436694898",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.2832322,
+          37.9315105
+        ]
+      },
+      "id": "way/436694898"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/447650503",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.1328334,
+          38.007906
+        ]
+      },
+      "id": "way/447650503"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/491379077",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4535097,
+          37.8853861
+        ]
+      },
+      "id": "way/491379077"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/491379081",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hocacihan Tatbikat Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4495486,
+          37.8925238
+        ]
+      },
+      "id": "way/491379081"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/491583478",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4813502,
+          37.923688
+        ]
+      },
+      "id": "way/491583478"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/523699208",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6152958,
+          37.982472
+        ]
+      },
+      "id": "way/523699208"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/523699286",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Nasrettin Hoca Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6226853,
+          37.9932985
+        ]
+      },
+      "id": "way/523699286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/523707841",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6070544,
+          37.9802217
+        ]
+      },
+      "id": "way/523707841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/523710622",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6296704,
+          37.9669716
+        ]
+      },
+      "id": "way/523710622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/524164877",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5938734,
+          37.9818111
+        ]
+      },
+      "id": "way/524164877"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/524411217",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6027545,
+          37.9778779
+        ]
+      },
+      "id": "way/524411217"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/524435140",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6798934,
+          38.0234936
+        ]
+      },
+      "id": "way/524435140"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/524440553",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.541711,
+          37.9512503
+        ]
+      },
+      "id": "way/524440553"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525697406",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hacıveyiszade Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4884357,
+          37.8762786
+        ]
+      },
+      "id": "way/525697406"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525697410",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Şazibey Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "wikidata": "Q127632893",
+        "wikimedia_commons": "Category:Şazibey Mosque",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4912168,
+          37.8743683
+        ]
+      },
+      "id": "way/525697410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525874675",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.517157,
+          37.9479077
+        ]
+      },
+      "id": "way/525874675"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525874686",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yeni Otogar Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5086162,
+          37.9498351
+        ]
+      },
+      "id": "way/525874686"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525874698",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Otogar Zeki Altındağ Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5066666,
+          37.9500084
+        ]
+      },
+      "id": "way/525874698"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525874706",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Tek Muradiye Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5153646,
+          37.9551383
+        ]
+      },
+      "id": "way/525874706"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525874712",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Sancak Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5220451,
+          37.9526693
+        ]
+      },
+      "id": "way/525874712"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525876210",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Fatih Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5093442,
+          37.9318747
+        ]
+      },
+      "id": "way/525876210"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525902041",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Zafer Sanayi Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5194741,
+          37.9404961
+        ]
+      },
+      "id": "way/525902041"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525904728",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5131507,
+          37.9399718
+        ]
+      },
+      "id": "way/525904728"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525934158",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Selçuk Sanayi Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5238995,
+          37.9323026
+        ]
+      },
+      "id": "way/525934158"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526228078",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Serhat Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5111266,
+          37.9434424
+        ]
+      },
+      "id": "way/526228078"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526270887",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Kayalar Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5189922,
+          38.0144079
+        ]
+      },
+      "id": "way/526270887"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526270892",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5152217,
+          38.0561754
+        ]
+      },
+      "id": "way/526270892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526271000",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Halil İbrahim Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5148184,
+          37.9788064
+        ]
+      },
+      "id": "way/526271000"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526274288",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Selçuk Üniversitesi Kampüs Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5125186,
+          38.0266194
+        ]
+      },
+      "id": "way/526274288"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526489796",
+        "addr:city": "Bosna Mah. Selçuklu / Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "H.Ahmet Akkaya Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5310192,
+          38.0167773
+        ]
+      },
+      "id": "way/526489796"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526489799",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yörünge Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5291634,
+          38.0132415
+        ]
+      },
+      "id": "way/526489799"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526489804",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yunus Emre Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.532996,
+          38.0120936
+        ]
+      },
+      "id": "way/526489804"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526544684",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Selçuklu 2016 Toki Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.491843,
+          37.9842711
+        ]
+      },
+      "id": "way/526544684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526561859",
+        "addr:housenumber": "6",
+        "addr:street": "Osmanlı Caddesi",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "İsmail Hakkı Konyalı Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5223115,
+          38.009273
+        ]
+      },
+      "id": "way/526561859"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526561892",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Bosna Ulu Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5234297,
+          38.0033937
+        ]
+      },
+      "id": "way/526561892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526760738",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hafize Leyla Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4407191,
+          37.8970146
+        ]
+      },
+      "id": "way/526760738"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526760740",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mesrur Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4536548,
+          37.9090169
+        ]
+      },
+      "id": "way/526760740"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526760747",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Terzioğlu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4512946,
+          37.9158036
+        ]
+      },
+      "id": "way/526760747"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526760756",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4381999,
+          37.9211016
+        ]
+      },
+      "id": "way/526760756"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/526841482",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5719292,
+          37.9784449
+        ]
+      },
+      "id": "way/526841482"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527086443",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hadimi Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4963392,
+          37.9395665
+        ]
+      },
+      "id": "way/527086443"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527086444",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Şeyh Şamil Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4984029,
+          37.9421377
+        ]
+      },
+      "id": "way/527086444"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527086486",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hazreti Huzeyfe Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5117321,
+          37.9563207
+        ]
+      },
+      "id": "way/527086486"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527093528",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "check_date": "2025-08-03",
+        "denomination": "sunni",
+        "name": "Kevser Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5008192,
+          37.9377571
+        ]
+      },
+      "id": "way/527093528"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527093533",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "İmam-ı Gazali Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5083171,
+          37.9447765
+        ]
+      },
+      "id": "way/527093533"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527116603",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4852058,
+          37.9560205
+        ]
+      },
+      "id": "way/527116603"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527116604",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hz. Ali Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4874326,
+          37.9508743
+        ]
+      },
+      "id": "way/527116604"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527219812",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hz. Bilal-i Habeşi Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5055125,
+          37.9270375
+        ]
+      },
+      "id": "way/527219812"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527221772",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4995567,
+          37.900549
+        ]
+      },
+      "id": "way/527221772"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527221781",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mimar Sinan Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4931802,
+          37.9093546
+        ]
+      },
+      "id": "way/527221781"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527222546",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mevlana Celaleddin-i Rumi Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4752652,
+          37.9073886
+        ]
+      },
+      "id": "way/527222546"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527225166",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4622922,
+          37.8976083
+        ]
+      },
+      "id": "way/527225166"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527225275",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mahmut Sami Ramazanoğlu AİHL Tatbikat Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4810331,
+          37.8961288
+        ]
+      },
+      "id": "way/527225275"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527228314",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Sultan Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4499089,
+          37.8807671
+        ]
+      },
+      "id": "way/527228314"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527228319",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mescid-i Kuba Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4418543,
+          37.8910495
+        ]
+      },
+      "id": "way/527228319"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527228326",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Akşemsettin Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4607539,
+          37.8888142
+        ]
+      },
+      "id": "way/527228326"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527232623",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hacı Mehmet Işıkçeviren Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5256745,
+          37.9931784
+        ]
+      },
+      "id": "way/527232623"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527232626",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Uhud Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4907507,
+          37.9054478
+        ]
+      },
+      "id": "way/527232626"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527249829",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yıldırım Beyazıt Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5087197,
+          37.9592671
+        ]
+      },
+      "id": "way/527249829"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527328113",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.501274,
+          37.8991191
+        ]
+      },
+      "id": "way/527328113"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527536953",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Karatay Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4982634,
+          37.908377
+        ]
+      },
+      "id": "way/527536953"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527578646",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4997666,
+          37.8962816
+        ]
+      },
+      "id": "way/527578646"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527578652",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5029526,
+          37.8951339
+        ]
+      },
+      "id": "way/527578652"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527615723",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4815533,
+          37.8895978
+        ]
+      },
+      "id": "way/527615723"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527615771",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Gülbey Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4892899,
+          37.8912837
+        ]
+      },
+      "id": "way/527615771"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527624817",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Aydınlıkevler Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4891035,
+          37.9104806
+        ]
+      },
+      "id": "way/527624817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527624818",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Geçit Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4891579,
+          37.8959337
+        ]
+      },
+      "id": "way/527624818"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527624822",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Mehmet Katırcı Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4891892,
+          37.887962
+        ]
+      },
+      "id": "way/527624822"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/527789066",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Haytaoğlu Parsana Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4889204,
+          37.8822505
+        ]
+      },
+      "id": "way/527789066"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528414288",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Yeşil Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4988034,
+          37.8918794
+        ]
+      },
+      "id": "way/528414288"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528776541",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Haci Ismail Caliskan Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4875901,
+          37.8865324
+        ]
+      },
+      "id": "way/528776541"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528783826",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "İmamoğlu Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4907485,
+          37.8855101
+        ]
+      },
+      "id": "way/528783826"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528789542",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Adnan Menderes Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4932283,
+          37.8881341
+        ]
+      },
+      "id": "way/528789542"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528950577",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4706388,
+          37.9169655
+        ]
+      },
+      "id": "way/528950577"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528950603",
+        "addr:city": "Selçuklu/Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "100. Beş Evler Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4635547,
+          37.9018129
+        ]
+      },
+      "id": "way/528950603"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528966727",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Şükrü Coplan Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5013208,
+          37.934286
+        ]
+      },
+      "id": "way/528966727"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/528966764",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5040676,
+          37.9341322
+        ]
+      },
+      "id": "way/528966764"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529504537",
+        "addr:city": "Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ammar Bin Yasir Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5357942,
+          38.0035486
+        ]
+      },
+      "id": "way/529504537"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529655553",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Nebahat-Hilmi Büyükkürekçi Tatbikat Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5270727,
+          38.0112996
+        ]
+      },
+      "id": "way/529655553"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529687855",
+        "addr:city": "Bosna Mah. Selçuklu / Konya",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Hizmet Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5313539,
+          38.0067045
+        ]
+      },
+      "id": "way/529687855"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529713536",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ensar Camii",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5086169,
+          37.9854677
+        ]
+      },
+      "id": "way/529713536"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529778675",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5229653,
+          37.9778084
+        ]
+      },
+      "id": "way/529778675"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529778676",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Cami",
+        "religion": "muslim",
+        "source": "bing",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5281656,
+          37.9747952
+        ]
+      },
+      "id": "way/529778676"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/564671953",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4664537,
+          37.9112567
+        ]
+      },
+      "id": "way/564671953"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/630519357",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4814703,
+          37.9333088
+        ]
+      },
+      "id": "way/630519357"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/630519370",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5126366,
+          37.9657266
+        ]
+      },
+      "id": "way/630519370"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/635410082",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3996034,
+          37.8988275
+        ]
+      },
+      "id": "way/635410082"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/670655474",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Işıklar Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4869094,
+          37.8903761
+        ]
+      },
+      "id": "way/670655474"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/682522260",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Hanaybaşı Sadıklar Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4489193,
+          37.9058246
+        ]
+      },
+      "id": "way/682522260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/682588071",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5240641,
+          37.9697609
+        ]
+      },
+      "id": "way/682588071"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/703423135",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "name": "Alemdar Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4478304,
+          37.8972196
+        ]
+      },
+      "id": "way/703423135"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/706303636",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4794361,
+          37.9078055
+        ]
+      },
+      "id": "way/706303636"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/737282172",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4727843,
+          37.9742827
+        ]
+      },
+      "id": "way/737282172"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/776931037",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4685706,
+          37.9300352
+        ]
+      },
+      "id": "way/776931037"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/776931046",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5169488,
+          37.989435
+        ]
+      },
+      "id": "way/776931046"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/776931049",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.521668,
+          37.9738499
+        ]
+      },
+      "id": "way/776931049"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/776931060",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5264464,
+          37.9527663
+        ]
+      },
+      "id": "way/776931060"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/777633566",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5982546,
+          38.041322
+        ]
+      },
+      "id": "way/777633566"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/777636950",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.6066442,
+          38.1322808
+        ]
+      },
+      "id": "way/777636950"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/777636968",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4786804,
+          38.0580843
+        ]
+      },
+      "id": "way/777636968"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/814927317",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4776788,
+          37.9274552
+        ]
+      },
+      "id": "way/814927317"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/821776348",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4779128,
+          37.9404266
+        ]
+      },
+      "id": "way/821776348"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/821793732",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4836912,
+          37.9528282
+        ]
+      },
+      "id": "way/821793732"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/851087717",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Ecdat Camii",
+        "religion": "muslim",
+        "website": "https://www.nekadardayanir.com",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5006432,
+          37.956418
+        ]
+      },
+      "id": "way/851087717"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/991403948",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5253177,
+          38.0199727
+        ]
+      },
+      "id": "way/991403948"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1049213559",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4487316,
+          37.888374
+        ]
+      },
+      "id": "way/1049213559"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1049213562",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4551165,
+          37.8881376
+        ]
+      },
+      "id": "way/1049213562"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1074778132",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Çay Camii",
+        "religion": "muslim",
+        "wikidata": "Q127788087",
+        "wikimedia_commons": "Category:Sille Çay Mosque",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4174469,
+          37.9263533
+        ]
+      },
+      "id": "way/1074778132"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1081717214",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4565683,
+          37.9522452
+        ]
+      },
+      "id": "way/1081717214"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1126434678",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4516763,
+          37.8806659
+        ]
+      },
+      "id": "way/1126434678"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1126438848",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.466813,
+          37.9561606
+        ]
+      },
+      "id": "way/1126438848"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1126440675",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5046254,
+          37.9665007
+        ]
+      },
+      "id": "way/1126440675"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1126453700",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "15 Temmuz Şehitler Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5204391,
+          37.9816903
+        ]
+      },
+      "id": "way/1126453700"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1126914630",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4604545,
+          37.9319458
+        ]
+      },
+      "id": "way/1126914630"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1135413739",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.3697267,
+          37.9526289
+        ]
+      },
+      "id": "way/1135413739"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1183679044",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.5268819,
+          38.2338211
+        ]
+      },
+      "id": "way/1183679044"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1204913622",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4729379,
+          37.8900002
+        ]
+      },
+      "id": "way/1204913622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1216459481",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.1660959,
+          37.951029
+        ]
+      },
+      "id": "way/1216459481"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1217969657",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.47942,
+          37.9194054
+        ]
+      },
+      "id": "way/1217969657"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1218284140",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.547021,
+          38.2035077
+        ]
+      },
+      "id": "way/1218284140"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1236528540",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4922497,
+          37.9253189
+        ]
+      },
+      "id": "way/1236528540"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1240153694",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4945977,
+          37.9626225
+        ]
+      },
+      "id": "way/1240153694"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1250927882",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "name": "Musalla Halkabiköşk Camii",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4957457,
+          37.8825062
+        ]
+      },
+      "id": "way/1250927882"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1253892731",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4893634,
+          37.9587059
+        ]
+      },
+      "id": "way/1253892731"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1271239312",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4837624,
+          37.987734
+        ]
+      },
+      "id": "way/1271239312"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1284586393",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.1827544,
+          38.0209538
+        ]
+      },
+      "id": "way/1284586393"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1310810562",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4901543,
+          38.0076567
+        ]
+      },
+      "id": "way/1310810562"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1310810564",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4849887,
+          38.0076396
+        ]
+      },
+      "id": "way/1310810564"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1408568441",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4918479,
+          38.0015643
+        ]
+      },
+      "id": "way/1408568441"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1423883435",
+        "amenity": "place_of_worship",
+        "building": "mosque",
+        "denomination": "sunni",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.45258,
+          37.9051339
+        ]
+      },
+      "id": "way/1423883435"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1436393145",
+        "amenity": "place_of_worship",
+        "building": "yes",
+        "name": "Mezarkaya Cami",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4181799,
+          37.9286139
+        ]
+      },
+      "id": "way/1436393145"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1444839269",
+        "addr:city": "Konya",
+        "addr:district": "Selçuklu",
+        "addr:housenumber": "19",
+        "addr:neighbourhood": "Ferhuniye Mahallesi",
+        "addr:postcode": "42060",
+        "addr:street": "Mümtazkoru Sokak",
+        "amenity": "place_of_worship",
+        "building": "yes",
+        "denomination": "sunni",
+        "name": "Ferhuniye Hacıkaymak Camii",
+        "religion": "muslim",
+        "wikidata": "Q136648843",
+        "wikimedia_commons": "Category:Ferhuniye Hacı Kaymak Mosque",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4901893,
+          37.8774324
+        ]
+      },
+      "id": "way/1444839269"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1474643825",
+        "amenity": "place_of_worship",
+        "building": "yes",
+        "name": "Sakahane (Hızır İlyas) Mescidi",
+        "religion": "muslim",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4913786,
+          37.87511
+        ]
+      },
+      "id": "way/1474643825"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1481040249",
+        "amenity": "place_of_worship",
+        "building": "yes",
+        "name": "Zevle Sultan Mescidi",
+        "religion": "muslim",
+        "wikidata": "Q127788382",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4890973,
+          37.8733649
+        ]
+      },
+      "id": "way/1481040249"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13288220987",
+        "addr:city": "Konya",
+        "addr:district": "Meram",
+        "addr:neighbourhood": "Erenköy",
+        "addr:street": "Huşu Sokak",
+        "amenity": "place_of_worship",
+        "denomination": "sunni",
+        "name": "Göztepe Konutlar Camii",
+        "religion": "muslim"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          32.4362569,
+          37.9345003
+        ]
+      },
+      "id": "node/13288220987"
+    }
+  ]
+}
