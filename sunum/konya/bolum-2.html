@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
@@ -61,7 +61,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — Veri Yükleme (CSV ve COPY)</div>
-              <div class="slide-header-num">02 / 19</div>
+              <div class="slide-header-num">02 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -84,7 +84,62 @@
         </div>
       </div>
 
-      <!-- SLAYT 3: 2.1 STAGING -->
+      <!-- SLAYT 3: 2.1 OGR2OGR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.1 — ogr2ogr ile Veri Taşıma</div>
+              <div class="slide-header-num">03 / 18</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Format <span>Çevirici</span></div>
+                <div class="s-text-tech">GDAL'ın <strong>ogr2ogr</strong> aracı; Shapefile, GeoJSON, KML, DXF ve GDB'yi doğrudan PostGIS'e aktarır. <code>-t_srs</code> ile koordinat sistemi dönüşümünü tek komutta tamamlar.</div>
+                <div class="s-text-tech" style="margin-top:14px; font-size:13px; opacity:0.8;">
+                  <strong>Ne zaman ogr2ogr?</strong><br>
+                  Dış kaynaklı mekansal format (SHP, GeoJSON, KML) → PostGIS<br><br>
+                  <strong>Ne zaman COPY?</strong><br>
+                  Veri zaten PostgreSQL formatındaysa — COPY daha hızlı
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:11px; line-height:1.6;">
+# Shapefile → PostGIS (koordinat dönüşümü ile)
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=localhost dbname=konya user=postgres" \
+  mahalleler.shp \
+  -nln konya.mahalleler \
+  -t_srs EPSG:4326 \
+  -overwrite
+
+# Sadece belirli alanları aktar
+ogr2ogr -f "PostgreSQL" \
+  PG:"host=localhost dbname=konya user=postgres" \
+  mahalleler.shp \
+  -nln konya.mahalleler \
+  -sql "SELECT id, ad, nufus FROM mahalleler" \
+  -t_srs EPSG:4326
+                </div>
+                <div class="reveal-box" id="q21x">
+                  <div class="reveal-trigger" onclick="document.getElementById('q21x').classList.toggle('open')">Kritik Soru: ogr2ogr ile COPY arasındaki fark ne zaman önemli? <span>▼</span></div>
+                  <div class="reveal-content">ogr2ogr format çevirisi + projeksiyon dönüşümü yapar; kaynak zaten PostgreSQL uyumlu düz veri ise <code>COPY</code> çok daha hızlıdır çünkü SQL parser ve transaction log yükü yoktur.</div>
+                </div>
+                <div class="reveal-box" id="a21x">
+                  <div class="reveal-trigger" onclick="document.getElementById('a21x').classList.toggle('open')">Görev: ogr2ogr ile GeoJSON Yükle <span>▼</span></div>
+                  <div class="reveal-content">Eğitim klasöründeki <code>mahalleler.geojson</code> dosyasını <code>-t_srs EPSG:4326</code> ile <code>konya.mahalleler_test</code> tablosuna aktarın ve <code>SELECT COUNT(*) FROM konya.mahalleler_test;</code> ile doğrulayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: 2.1 STAGING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -94,7 +149,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — Staging ve Regex Temizliği</div>
-              <div class="slide-header-num">03 / 19</div>
+              <div class="slide-header-num">04 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -117,7 +172,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 4: 2.2 SIMPLIFY/SMOOTH -->
+      <!-- SLAYT 5: 2.2 SIMPLIFY/SMOOTH -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -127,7 +182,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_Simplify ve ST_Smooth</div>
-              <div class="slide-header-num">04 / 19</div>
+              <div class="slide-header-num">05 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -150,7 +205,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 5: 2.2 ST_SUBDIVIDE -->
+      <!-- SLAYT 6: 2.2 ST_SUBDIVIDE -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -160,7 +215,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_Subdivide: Performans Canavarı</div>
-              <div class="slide-header-num">05 / 19</div>
+              <div class="slide-header-num">06 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -183,7 +238,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 6: 2.2 LINEAR REFERENCING -->
+      <!-- SLAYT 7: 2.2 LINEAR REFERENCING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -193,7 +248,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — Doğrusal Referanslama (Linear Referencing)</div>
-              <div class="slide-header-num">06 / 19</div>
+              <div class="slide-header-num">07 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -216,7 +271,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 7: 2.2 CLOSEST/AZIMUTH -->
+      <!-- SLAYT 8: 2.2 CLOSEST/AZIMUTH -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -226,7 +281,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_ClosestPoint ve ST_Azimuth</div>
-              <div class="slide-header-num">07 / 19</div>
+              <div class="slide-header-num">08 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -249,7 +304,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 8: 2.3 GIST/SP-GIST -->
+      <!-- SLAYT 9: 2.3 GIST/SP-GIST -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -259,7 +314,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — GiST ve SP-GIST İndeksleme</div>
-              <div class="slide-header-num">08 / 19</div>
+              <div class="slide-header-num">09 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -282,7 +337,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 9: 2.3 && OPERATÖRÜ -->
+      <!-- SLAYT 10: 2.3 && OPERATÖRÜ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -292,7 +347,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — Bounding Box Operatörleri (&&)</div>
-              <div class="slide-header-num">09 / 19</div>
+              <div class="slide-header-num">10 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -315,7 +370,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 10: 2.3 ÖZEL İNDEKSLER -->
+      <!-- SLAYT 11: 2.3 ÖZEL İNDEKSLER -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -325,7 +380,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — Partial ve Functional İndeksler</div>
-              <div class="slide-header-num">10 / 19</div>
+              <div class="slide-header-num">11 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -348,39 +403,6 @@
         </div>
       </div>
 
-      <!-- SLAYT 11: 2.3 ANALYZE/TAKiP -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.3 — ANALYZE ve Kullanım Takibi</div>
-              <div class="slide-header-num">11 / 19</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">İstatistik <span>Toplama</span></div>
-                <div class="s-text-tech">Veritabanı planlayıcısını veri dağılımı hakkında bilgilendirmek.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pg_stat_user_indexes; -- İndeks kullanım istatistiklerini göster</div>
-                <div class="reveal-box" id="q210">
-                  <div class="reveal-trigger" onclick="document.getElementById('q210').classList.toggle('open')">Kritik Soru: ANALYZE neden şarttır? <span>▼</span></div>
-                  <div class="reveal-content">İstatistikler güncel değilse planlayıcı indeks yerine Sequental Scan (sıralı okuma) seçer ve sistem yavaşlar.</div>
-                </div>
-                <div class="reveal-box" id="g210">
-                  <div class="reveal-trigger" onclick="document.getElementById('g210').classList.toggle('open')">Görev: İndeksleri Takip Et <span>▼</span></div>
-                  <div class="reveal-content"><code>idx_scan</code> değeri 0 olan indeksleri bulun; bunlar sistemi boşuna yavaşlatıyor olabilir.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- SLAYT 12: 2.4 EXPLAIN ANALYZE -->
       <div class="slide-outer">
         <div class="slide-wrapper">
@@ -391,7 +413,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — EXPLAIN ANALYZE Giriş</div>
-              <div class="slide-header-num">12 / 19</div>
+              <div class="slide-header-num">12 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -414,7 +436,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 13: 2.4 SEQ VS INDEX -->
+      <!-- SLAYT 14: 2.4 SEQ VS INDEX -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -424,7 +446,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — Seq Scan ve Index Scan Farkı</div>
-              <div class="slide-header-num">13 / 19</div>
+              <div class="slide-header-num">13 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -449,7 +471,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 14: 2.4 MESAFE TUZAĞI -->
+      <!-- SLAYT 15: 2.4 MESAFE TUZAĞI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -459,7 +481,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — ST_Distance Anti-Pattern</div>
-              <div class="slide-header-num">14 / 19</div>
+              <div class="slide-header-num">14 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -485,7 +507,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
         </div>
       </div>
 
-      <!-- SLAYT 15: 2.4 FORMATLAR -->
+      <!-- SLAYT 16: 2.4 FORMATLAR -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -495,7 +517,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — EXPLAIN FORMAT (JSON, YAML)</div>
-              <div class="slide-header-num">15 / 19</div>
+              <div class="slide-header-num">15 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -518,40 +540,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
         </div>
       </div>
 
-      <!-- SLAYT 16: 2.5 VACUUM/BLOAT -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.5 — VACUUM ve Tablo Şişmesi (Bloat)</div>
-              <div class="slide-header-num">16 / 19</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Disk <span>Bakımı</span></div>
-                <div class="s-text-tech">Silinen verilerin diskteki hayalet izlerini temizlemek.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block">VACUUM FULL binalar; -- Tabloyu temizle ve disk alanını geri kazan</div>
-                <div class="reveal-box" id="q215">
-                  <div class="reveal-trigger" onclick="document.getElementById('q215').classList.toggle('open')">Kritik Soru: Bloat neden sorguyu yavaşlatır? <span>▼</span></div>
-                  <div class="reveal-content">Çünkü veritabanı "boş" satırları da RAM'e okur. 1GB'lık tablonun %50'si bloat ise, diskten boşuna 500MB veri okunur.</div>
-                </div>
-                <div class="reveal-box" id="g215">
-                  <div class="reveal-trigger" onclick="document.getElementById('g215').classList.toggle('open')">Görev: Bakım Planla <span>▼</span></div>
-                  <div class="reveal-content">En çok güncellenen tablonuzda <code>pg_stat_all_tables</code> üzerinden "dead tuples" sayısını kontrol edin.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 17: 2.5 PARTITIONING -->
+      <!-- SLAYT 16: 2.5 PARTITIONING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -561,7 +550,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — Tablo Bölümleme (Partitioning)</div>
-              <div class="slide-header-num">17 / 19</div>
+              <div class="slide-header-num">16 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -584,7 +573,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
         </div>
       </div>
 
-      <!-- SLAYT 18: 2.5 PRUNING/TABLESPACE -->
+      <!-- SLAYT 17: 2.5 PARTITION PRUNING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -593,19 +582,22 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.5 — Partition Pruning ve Tablespace</div>
-              <div class="slide-header-num">18 / 19</div>
+              <div class="slide-header-title">2.5 — Partition Pruning</div>
+              <div class="slide-header-num">17 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Ölçeklenebilir <span>Altyapı</span></div>
-                <div class="s-text-tech">Fiziksel disk dağıtımı ve otomatik ayıklama.</div>
+                <div class="s-headline-tech">Akıllı <span>Okuma</span></div>
+                <div class="s-text-tech">WHERE koşuluna göre sadece ilgili partition'ların okunması. Gereksiz partition'lar hiç diske bile uğramaz.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SET enable_partition_pruning = on; -- Bölüm ayıklamayı (pruning) aktif et</div>
+                <div class="code-block">SET enable_partition_pruning = on; -- Bölüm ayıklamayı (pruning) aktif et
+
+-- Selçuklu sorgusunda Meram/Karatay partition'ları atlanır:
+EXPLAIN SELECT * FROM binalar WHERE ilce = 'Selçuklu';</div>
                 <div class="reveal-box" id="q217">
-                  <div class="reveal-trigger" onclick="document.getElementById('q217').classList.toggle('open')">Kritik Soru: Tablespace nerede lazımdır? <span>▼</span></div>
-                  <div class="reveal-content">Aktif veriyi hızlı SSD'ye, 10 yıllık arşiv verisini ucuz HDD diskine koyarak maliyet avantajı sağlarız.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q217').classList.toggle('open')">Kritik Soru: Pruning olmadan ne olur? <span>▼</span></div>
+                  <div class="reveal-content">Tüm partition'lar taranır. 10 ilçeli bir partition'da sadece 1 ilçe sorgulanıyorsa %90 gereksiz disk okuma yapılır.</div>
                 </div>
                 <div class="reveal-box" id="g217">
                   <div class="reveal-trigger" onclick="document.getElementById('g217').classList.toggle('open')">Görev: Pruning Kontrolü <span>▼</span></div>
@@ -642,7 +634,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 19</div>
+    <div class="nav-status" id="navStatus">1 / 18</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 

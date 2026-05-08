@@ -84,7 +84,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.1 — Veritabanı Nedir?</div>
-              <div class="slide-header-num">02 / 15</div>
+              <div class="slide-header-num">02 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -136,7 +136,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.2 — Kurulum Seçenekleri</div>
-              <div class="slide-header-num">03 / 15</div>
+              <div class="slide-header-num">03 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -186,7 +186,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.2.1 — Veri Setinin Yüklenmesi</div>
-              <div class="slide-header-num">04 / 15</div>
+              <div class="slide-header-num">04 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -242,7 +242,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.3.1 — Veri Tipleri (Sayı & Metin)</div>
-              <div class="slide-header-num">05 / 15</div>
+              <div class="slide-header-num">05 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -287,7 +287,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.3.2 — Tarih, Mantık ve Gelişmiş Tipler</div>
-              <div class="slide-header-num">06 / 15</div>
+              <div class="slide-header-num">06 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -338,7 +338,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.3.3 — Veri Tipleri: Örnek Uygulama</div>
-              <div class="slide-header-num">07 / 15</div>
+              <div class="slide-header-num">07 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -392,7 +392,7 @@ VALUES
                 </div>
               </div>
               <div class="slide-header-title">0.4 — SELECT ve Sütun Seçimi</div>
-              <div class="slide-header-num">08 / 15</div>
+              <div class="slide-header-num">08 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -448,7 +448,7 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
                 </div>
               </div>
               <div class="slide-header-title">0.5 — WHERE ile Filtreleme</div>
-              <div class="slide-header-num">09 / 15</div>
+              <div class="slide-header-num">09 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -535,7 +535,7 @@ WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
                 </div>
               </div>
               <div class="slide-header-title">0.6 — ORDER BY ve LIMIT</div>
-              <div class="slide-header-num">10 / 15</div>
+              <div class="slide-header-num">10 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -590,7 +590,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
                 </div>
               </div>
               <div class="slide-header-title">0.7 — Toplama Fonksiyonları</div>
-              <div class="slide-header-num">11 / 15</div>
+              <div class="slide-header-num">11 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -639,7 +639,7 @@ FROM konya.ilce_sinirlari;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.8 — GROUP BY ve HAVING</div>
-              <div class="slide-header-num">12 / 15</div>
+              <div class="slide-header-num">12 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -695,7 +695,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
                 </div>
               </div>
               <div class="slide-header-title">0.9 — JOIN ve Tablo İlişkileri</div>
-              <div class="slide-header-num">13 / 15</div>
+              <div class="slide-header-num">13 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -755,7 +755,7 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.10 — Veri Yönetimi (DML)</div>
-              <div class="slide-header-num">14 / 15</div>
+              <div class="slide-header-num">14 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -803,7 +803,360 @@ WHERE ad = 'Yeni Mahalle';</div>
         </div>
       </div>
 
-      <!-- SLAYT 10: KAPANIŞ -->
+      <!-- SLAYT 15: 0.11 CLUSTER – DATABASE – SCHEMA -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.11 — Cluster, Database ve Schema</div>
+              <div class="slide-header-num">15 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veri <span>Hiyerarşisi</span></div>
+                <div class="s-text-tech">PostgreSQL'de her şey bir sıra düzeni izler: Cluster (Servis) → Database → Schema → Table. Şemalar farklı birimlerin verilerini birbirinden izole eder.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediye Örneği</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya BB'de: <code>konya</code> veritabanı → <code>imar</code>, <code>ulasim</code>, <code>altyapi</code> şemaları → her birinde kendi tabloları. Şema olmadan binlerce tablo tek yerde birbirine karışır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Aktif bağlantı bilgisi
+SELECT current_database(),  -- Hangi veritabanında?
+       current_schema(),    -- Hangi şemada?
+       current_user;        -- Kim olarak?
+
+-- Tüm şemaları listele
+SELECT nspname AS sema_adi
+FROM pg_namespace
+WHERE nspname NOT LIKE 'pg_%'
+ORDER BY nspname;</div>
+                <div class="reveal-box" id="q011">
+                  <div class="reveal-trigger" onclick="document.getElementById('q011').classList.toggle('open')">
+                    Kritik Soru: Şema kullanımı neden şarttır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Verileri mantıksal olarak gruplar (İmar, Ulaşım, Altyapı vb.). Şema olmadan binlerce tablo arasında kaybolursunuz. <code>GRANT</code> yetkilerini şema düzeyinde vermek de çok daha kolaydır.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a011">
+                  <div class="reveal-trigger" onclick="document.getElementById('a011').classList.toggle('open')">
+                    Görev: Şema Oluştur <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>CREATE SCHEMA egitim;</code> komutuyla yeni bir şema oluşturun. Ardından <code>SET search_path = egitim;</code> ile o şemaya geçin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 16: 0.12 TABLESPACE MANTIĞI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.12 — Tablespace Mantığı</div>
+              <div class="slide-header-num">16 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Fiziksel <span>Disk</span> Yönetimi</div>
+                <div class="s-text-tech">Tablespace, veritabanı nesnelerini (tablo, indeks) istediğiniz fiziksel disk konumuna yönlendirmenizi sağlar.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Gerçek Hayat Senaryosu</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Aktif CBS verisi → hızlı <b style="color:#fff">SSD</b> (<code>ssd_fast</code>). 10 yıllık arşiv → ucuz <b style="color:#fff">HDD</b> (<code>hdd_archive</code>). Hem hız hem maliyet dengesi.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Mevcut tablespace'leri listele
+SELECT spcname AS adi,
+       pg_tablespace_location(oid) AS konum
+FROM pg_tablespace;
+
+-- Yeni tablespace oluştur
+CREATE TABLESPACE ssd_fast LOCATION '/mnt/ssd/pgdata';
+
+-- Tabloyu farklı diske taşı
+ALTER TABLE konya.mahalleler SET TABLESPACE ssd_fast;</div>
+                <div class="reveal-box" id="q012">
+                  <div class="reveal-trigger" onclick="document.getElementById('q012').classList.toggle('open')">
+                    Kritik Soru: Tablespace nerede lazımdır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Aktif veriyi hızlı SSD'ye, 10 yıllık arşiv verisini ucuz HDD diskine koyarak maliyet avantajı sağlarız. Büyük şehirlerin CBS sistemlerinde disk maliyeti ciddi bir kalemdir.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a012">
+                  <div class="reveal-trigger" onclick="document.getElementById('a012').classList.toggle('open')">
+                    Görev: Tablespace Kontrol Et <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT * FROM pg_tablespace;</code> komutuyla sisteminizde tanımlı tablespace'leri görün. <code>pg_default</code> ve <code>pg_global</code> her kurulumda hazır gelir.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 17: 0.13 MVCC VE TRANSACTION -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.13 — MVCC ve Transaction Yapısı</div>
+              <div class="slide-header-num">17 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Eşzamanlı <span>Güvenlik</span></div>
+                <div class="s-text-tech">MVCC (Multi-Version Concurrency Control), okuma ve yazma işlemlerinin birbirini bloke etmeden çalışmasını sağlar.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Mekansal Analizde Önemi</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Devasa bir analiz sorgusu (ST_Intersects ile tüm binalar) çalışırken, sahadaki personel aynı anda veri girişi (INSERT) yapmaya devam edebilir. Kimse kimseyi bekletmez.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Transaction (İşlem Grubu) kullanımı
+BEGIN;  -- İşlemi başlat
+
+  INSERT INTO konya.mahalleler(ad, nufus, ilce)
+  VALUES ('Test Mahalle', 100, 'Selçuklu');
+
+  UPDATE konya.mahalleler SET nufus = 150
+  WHERE ad = 'Test Mahalle';
+
+COMMIT;    -- Başarılıysa kalıcı yap
+-- ROLLBACK;  -- Hata durumunda tüm değişiklikleri geri al</div>
+                <div class="reveal-box" id="q013">
+                  <div class="reveal-trigger" onclick="document.getElementById('q013').classList.toggle('open')">
+                    Kritik Soru: COMMIT'siz ne olur? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Bağlantı kesilirse veya uygulama çökerse tüm değişiklikler otomatik geri alınır. Veri tutarlılığı korunur. Her kritik işlem grubu BEGIN...COMMIT bloğu içinde yapılmalıdır.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a013">
+                  <div class="reveal-trigger" onclick="document.getElementById('a013').classList.toggle('open')">
+                    Görev: ROLLBACK Dene <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>BEGIN;</code> ile bir işlem başlatın, geçici bir tablo oluşturun, ardından <code>ROLLBACK;</code> yapın. Tablonun kaybolduğunu doğrulayın.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 18: 0.14 ISOLATION LEVELS VE LOCK -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.14 — Isolation Levels ve Lock Mekanizması</div>
+              <div class="slide-header-num">18 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veri <span>Tutarlılığı</span></div>
+                <div class="s-text-tech">Eşzamanlı işlemlerin birbirinin verisini nasıl "gördüğünü" isolation level belirler. PostgreSQL varsayılanı: <code>READ COMMITTED</code>.</div>
+                <ul class="bullet-list" style="margin-top:16px; font-size:13px; line-height:1.7;">
+                  <li><b>Read Uncommitted:</b> Kirli okuma. (PostgreSQL desteklemez)</li>
+                  <li><b>Read Committed:</b> Sadece onaylı veriyi okur. (Varsayılan)</li>
+                  <li><b>Repeatable Read:</b> Snapshot transaction boyunca sabit kalır.</li>
+                  <li><b>Serializable:</b> Tam izolasyon. En yavaş ama en güvenli.</li>
+                </ul>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Mevcut izolasyon seviyesini gör
+SHOW transaction_isolation;
+
+-- Transaction için farklı seviye seç
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+-- Kritik işlemler burada...
+COMMIT;
+
+-- Lock'a düşmüş sorguları izle
+SELECT pid, query, wait_event, state
+FROM pg_stat_activity
+WHERE wait_event_type = 'Lock';</div>
+                <div class="reveal-box" id="q014">
+                  <div class="reveal-trigger" onclick="document.getElementById('q014').classList.toggle('open')">
+                    Kritik Soru: Lock neden oluşur ve nasıl çözülür? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Uzun süren bir UPDATE aynı tabloyu kilitlediğinde diğer işlemler bekler. <code>pg_stat_activity</code>'den bloke eden PID'i bulup <code>pg_terminate_backend(PID)</code> ile kilitli işlemi sonlandırabilirsiniz.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a014">
+                  <div class="reveal-trigger" onclick="document.getElementById('a014').classList.toggle('open')">
+                    Görev: İzolasyon Seviyesini Kontrol Et <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SHOW transaction_isolation;</code> komutunu çalıştırın. Konya eğitim veritabanının hangi varsayılan izolasyon seviyesinde olduğunu not edin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 19: 0.15 VACUUM ANALYZE AUTOVACUUM -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.15 — VACUUM, ANALYZE ve Autovacuum</div>
+              <div class="slide-header-num">19 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veritabanı <span>Bakımı</span></div>
+                <div class="s-text-tech">MVCC sayesinde silinen satırlar diskten hemen kalkmaz (Dead Tuple / Bloat). VACUUM hayalet verileri temizler, ANALYZE planlayıcı istatistiklerini günceller.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:16px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Autovacuum</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">PostgreSQL arka planda otomatik çalışır. Yoğun UPDATE/DELETE tablolarında <code>autovacuum_vacuum_scale_factor</code> ayarı gerekebilir.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Dead tuple / bloat kontrolü
+SELECT relname, n_dead_tup, n_live_tup,
+  round(n_dead_tup * 100.0 /
+    NULLIF(n_live_tup + n_dead_tup, 0), 1) AS bloat_pct
+FROM pg_stat_all_tables
+WHERE schemaname = 'konya'
+ORDER BY n_dead_tup DESC;
+
+-- Manuel bakım
+VACUUM konya.mahalleler;       -- Hafif (çevrimiçi)
+VACUUM FULL konya.mahalleler;  -- Tam (tablo kilitlenir!)
+ANALYZE konya.mahalleler;      -- İstatistik güncelle</div>
+                <div class="reveal-box" id="q015">
+                  <div class="reveal-trigger" onclick="document.getElementById('q015').classList.toggle('open')">
+                    Kritik Soru: Bloat neden sorguyu yavaşlatır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Veritabanı "boş" dead tuple'ları da RAM'e okur. 1 GB'lık tablonun %50'si bloat ise diskten boşuna 500 MB veri okunur. ANALYZE eksikse planlayıcı indeks yerine Seq Scan seçer.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a015">
+                  <div class="reveal-trigger" onclick="document.getElementById('a015').classList.toggle('open')">
+                    Görev: Bloat Kontrol Et <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Yukarıdaki sorguyu çalıştırarak eğitim veritabanındaki tablolarda dead tuple birikimi var mı kontrol edin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 20: 0.16 pg_stat_activity -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.16 — pg_stat_activity ve Performans Takibi</div>
+              <div class="slide-header-num">20 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Anlık <span>Sistem</span> Takibi</div>
+                <div class="s-text-tech">Sunucuda o an çalışan tüm sorguları, durumlarını ve bekleme nedenlerini <code>pg_stat_activity</code> ile görmek.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">"Katil Sorgu" Tespiti</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Sunucu CPU'su %100'e vurduğunda uzun çalışan sorgular (state = 'active') tespit edilerek sonlandırılabilir.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Aktif sorguları izle
+SELECT pid,
+       now() - query_start AS sure,
+       query, state, wait_event
+FROM pg_stat_activity
+WHERE state != 'idle'
+ORDER BY sure DESC;
+
+-- 5 dakikadan uzun çalışan sorguyu durdur
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'active'
+  AND query_start < now() - interval '5 minutes';</div>
+                <div class="reveal-box" id="q016">
+                  <div class="reveal-trigger" onclick="document.getElementById('q016').classList.toggle('open')">
+                    Kritik Soru: Sorgu neden "Lock" durumuna düşer? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Uzun süren bir UPDATE aynı tabloyu kilitlemişken başka biri aynı tabloya erişmeye çalışırsa Lock bekleme başlar. CBS'de büyük mekansal güncelleme sorgularında sık görülür.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a016">
+                  <div class="reveal-trigger" onclick="document.getElementById('a016').classList.toggle('open')">
+                    Görev: Aktif Sorguları Gör <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT pid, query, state FROM pg_stat_activity WHERE state != 'idle';</code> komutuyla veritabanınızda o an çalışan tüm sorguları listeleyin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 21: KAPANIŞ -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -829,7 +1182,7 @@ WHERE ad = 'Yeni Mahalle';</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 15</div>
+    <div class="nav-status" id="navStatus">1 / 21</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 

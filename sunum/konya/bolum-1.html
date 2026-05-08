@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -204,7 +204,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.1 — Kuruluma ve Platforma Giriş</div>
-              <div class="slide-header-num">02 / 19</div>
+              <div class="slide-header-num">02 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -244,114 +244,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 3: 1.2 POSTGRESQL MİMARİ -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
-                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">1.2 — PostgreSQL Temelleri ve Mimari</div>
-              <div class="slide-header-num">03 / 19</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Veri <span>Hiyerarşisi</span></div>
-                <div class="s-text-tech">Cluster (Servis) → Database → Schema → Table. Şemalar, farklı birimlerin
-                  verilerini izole eder.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT current_database(), -- Aktif veritabanı adı
-       current_schema();   -- Aktif şema adı</div>
-
-                <div class="reveal-box" id="q12">
-                  <div class="reveal-trigger" onclick="document.getElementById('q12').classList.toggle('open')">
-                    Kritik Soru: Şema kullanımı neden şarttır? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Verileri mantıksal olarak gruplar (İmar, Ulaşım, Altyapı vb.). Bu sayede binlerce tablo arasında
-                    kaybolmazsınız ve yetki yönetimini kolaylaştırırsınız.
-                  </div>
-                </div>
-
-                <div class="reveal-box" id="a12">
-                  <div class="reveal-trigger" onclick="document.getElementById('a12').classList.toggle('open')">
-                    Görev: Şemaları Listele <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>SELECT nspname FROM pg_namespace;</code> komutuyla veritabanındaki tüm şemaları görün.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 4: 1.2 TABLESACE VE MVCC -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
-                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">1.2 — Tablespace, MVCC ve İzolasyon</div>
-              <div class="slide-header-num">04 / 19</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Yönetim <span>ve</span> Performans</div>
-                <div class="s-text-tech">Tablespace veriyi disklere dağıtırken, MVCC okuma/yazma çakışmalarını önler.
-                </div>
-                <div class="card-tech"
-                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Isolation Levels</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Read Committed, Serializable gibi seviyeler
-                    ile veri tutarlılığı en üst düzeyde sağlanır.</div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SHOW transaction_isolation; -- Mevcut işlem izolasyon seviyesini göster</div>
-
-                <div class="reveal-box" id="q13">
-                  <div class="reveal-trigger" onclick="document.getElementById('q13').classList.toggle('open')">
-                    Kritik Soru: MVCC neden mekansal analizde önemlidir? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Devasa bir analiz sorgusu (SELECT) çalışırken, sahadaki personel veri girişi (INSERT) yapmaya devam
-                    edebilir. Kimse birbirini bekletmez.
-                  </div>
-                </div>
-
-                <div class="reveal-box" id="g13">
-                  <div class="reveal-trigger" onclick="document.getElementById('g13').classList.toggle('open')">
-                    Görev: Tablespace Bilgisini Gör <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>SELECT * FROM pg_tablespace;</code> komutuyla varsayılan depolama alanlarını listeleyin.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 5: 1.3 GEOMETRİ TİPLERİ -->
+      <!-- SLAYT 3: 1.3 GEOMETRİ TİPLERİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -366,7 +259,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.3 — Geometri Tipleri</div>
-              <div class="slide-header-num">05 / 19</div>
+              <div class="slide-header-num">03 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -417,7 +310,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.3 — WKT, EWKT, WKB ve Metadata</div>
-              <div class="slide-header-num">06 / 19</div>
+              <div class="slide-header-num">04 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -475,7 +368,7 @@ SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
                 </div>
               </div>
               <div class="slide-header-title">1.3 — Geçerlilik (ST_IsValid)</div>
-              <div class="slide-header-num">07 / 19</div>
+              <div class="slide-header-num">05 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -527,7 +420,7 @@ WHERE ST_IsValid(geom) = false; -- Sadece geçersiz olanları süz</div>
                 </div>
               </div>
               <div class="slide-header-title">1.4 — SRID ve Projeksiyonlar</div>
-              <div class="slide-header-num">08 / 19</div>
+              <div class="slide-header-num">06 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -585,7 +478,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="slide-header-title">1.4 — Geometry vs Geography Ayrımı</div>
-              <div class="slide-header-num">09 / 19</div>
+              <div class="slide-header-num">07 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -639,7 +532,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="slide-header-title">1.4 — SetSRID != Transform ve Türkiye Sistemleri</div>
-              <div class="slide-header-num">10 / 19</div>
+              <div class="slide-header-num">08 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -698,7 +591,7 @@ LIMIT 1;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.5 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
-              <div class="slide-header-num">11 / 19</div>
+              <div class="slide-header-num">09 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -749,7 +642,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
                 </div>
               </div>
               <div class="slide-header-title">1.5 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
-              <div class="slide-header-num">12 / 19</div>
+              <div class="slide-header-num">10 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -806,7 +699,7 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
                 </div>
               </div>
               <div class="slide-header-title">1.5 — JOIN ile Mekansal İlişki</div>
-              <div class="slide-header-num">13 / 19</div>
+              <div class="slide-header-num">11 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -860,7 +753,7 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — Ölçüm (Distance, Area, Perimeter)</div>
-              <div class="slide-header-num">14 / 19</div>
+              <div class="slide-header-num">12 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -912,7 +805,7 @@ LIMIT 5;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — Centroid vs PointOnSurface</div>
-              <div class="slide-header-num">15 / 19</div>
+              <div class="slide-header-num">13 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -964,7 +857,7 @@ LIMIT 1;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — Buffer, Union ve Intersection</div>
-              <div class="slide-header-num">16 / 19</div>
+              <div class="slide-header-num">14 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1015,7 +908,7 @@ LIMIT 1;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — Envelope ve ConvexHull</div>
-              <div class="slide-header-num">17 / 19</div>
+              <div class="slide-header-num">15 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1067,7 +960,7 @@ LIMIT 1;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — En Yakın N Komşu (KNN)</div>
-              <div class="slide-header-num">18 / 19</div>
+              <div class="slide-header-num">16 / 17</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1143,7 +1036,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
       </svg></button>
-    <div class="nav-status" id="navStatus">1 / 19</div>
+    <div class="nav-status" id="navStatus">1 / 17</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
