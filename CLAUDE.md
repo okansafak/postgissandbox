@@ -1,67 +1,90 @@
-# PostGIS Akademi - YZ (AI) Asistan Rehberi
+# CLAUDE.md
 
-Bu proje, kullanıcılara doğrudan tarayıcı üzerinden interaktif bir şekilde PostGIS ve PostgreSQL öğreten bir React/Vite uygulamasıdır. İçerisinde in-browser PostgreSQL (PGLite) barındırır ve mekan-tabanlı (spatial) verileri OpenLayers üzerinden haritalandırır.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🚀 Proje Komutları
+## Development Commands
 
-- **Geliştirme Sunucusu:** `npm run dev` (Vite)
-- **Derleme (Build):** `npm run build` (TypeScript derlemesi + Vite build)
-- **Önizleme (Preview):** `npm run preview`
-- **Linter:** `npm run lint`
+Run from `postgis-akademi/`:
 
-## 🛠 Teknoloji Yığını (Tech Stack)
+```bash
+npm run dev       # Vite dev server at http://localhost:5173 (HMR)
+npm run build     # tsc -b && vite build → dist/
+npm run lint      # ESLint flat config
+npm run preview   # Static preview of dist/
+```
 
-- **Platform:** React 19, TypeScript, Vite
-- **Veritabanı:** `@electric-sql/pglite` ve `@electric-sql/pglite-postgis` (WebAssembly tabanlı In-Browser PostgreSQL)
-- **Harita:** OpenLayers (`ol`)
-- **Stil & UI:** Tailwind CSS, `clsx`, `tailwind-merge`, Radix UI (Tabs, Tooltip), Lucide React, Panel yönetimi için `react-resizable-panels`
-- **Durum Yönetimi (State):** Zustand (`zustand`)
-- **Kod/SQL Editörü:** CodeMirror (`@uiw/react-codemirror`, `@codemirror/lang-sql`)
-- **İçerik (Dersler):** MDX (`@mdx-js/react`, `remark-gfm`)
-- **Router:** React Router DOM v6
+No test runner is wired up yet (Vitest is in dependencies but has no config or test files).
 
-## 📂 Dizin Yapısı ve Mimari Özet
+## Architecture
 
-- `src/components/`
-  - `editor/` - `SqlEditor.tsx` (Kullanıcının SQL kodu yazdığı CodeMirror editörü)
-  - `map/` - `SpatialMap.tsx` (Mekansal sorgu sonuçlarının OpenLayers ile çizildiği harita)
-  - `results/` - `ResultTable.tsx` ve `ExplainPlan.tsx` (SQL sorgu sonuçları ve analiz)
-  - `lesson/` - Eğitim modülü bileşenleri (`CurriculumSidebar.tsx`, MDX içeriği)
-  - `ui/` - Ortak UI bileşenleri / İkonlar
-- `src/content/` - Derslerin Markdown/MDX halindeki metinleri (Örn: `day-0`, `day-1` altında modüller).
-- `src/pglite/` - WebAssembly PostgreSQL istemcisini (`client.ts`), mock data/fixture'ları (`fixtures.ts`) ve sorgu sonuçlarını GeoJSON'a çeviren yapıyı (`geojson-adapter.ts`) bulundurur.
-- `src/store/` - Zustand bazlı merkezi depolar (`editorStore.ts`, `mapStore.ts`, `progressStore.ts`).
-- `src/curriculum/` - Eğitim programının ağaç (tree) ve seviye yapısı (`structure.ts`, `progress.ts`).
-- `lesson-cards/` - Müfredat içeriği taslak metinleri ve durum takipleri.
-- `sunum/` - Eğitmen veya rehber sunumlarına ait HTML/MD dosyaları.
+### Zero-Backend, Browser-Only
 
-## 💻 Kodlama Standartları ve Kuralları
+PGlite (PostgreSQL compiled to WASM) runs entirely in the browser, persisting to IndexedDB at `idb://postgis-akademi`. No server exists. The app is deployable as a static site.
 
-1. **TypeScript Kullanımı:** 
-   - Projenin tamamı TypeScript ile yazılmaktadır. Fonksiyon, State ve Component'lar kesin (strict) olarak tiplendirilmelidir (ör: `interface` veya `type` kullanımı zorunludur).
-   - "any" kullanımı kesinlikle en aza indirilmelidir. Özel PostgreSQL ve GeoJSON dönüşleri için uygun `@types/geojson` referansları kullanılmalıdır.
+### Web Worker Message Protocol
 
-2. **React ve Component Mimarisi:**
-   - Sadece Fonksiyonel Component'lar (Functional Components) kullanılmalıdır.
-   - İsimlendirmeler PascalCase (Örn: `SpatialMap.tsx`) olmalıdır. Hooks ve yardımcı fonksiyonlar için camelCase kullanılmalıdır.
-   - Component'ları iç içe geçirmek yerine modüler ve tekrar kullanılabilir küçük bileşenler hedeflenmelidir (Single Responsibility).
+PGlite runs in `src/pglite/worker.ts` to avoid blocking the UI. The protocol is a discriminated union:
 
-3. **Stil (Tailwind CSS):**
-   - Sınıflar, `clsx` ve `tailwind-merge` birleştirilerek temiz ve çakışmasız yazılmalıdır (shadcn/ui yaklaşımında olduğu gibi genelde bir `cn()` veya `utils.ts` içindeki bir yapı ile).
-   - Özel component CSS'leri zorunlu olmadıkça kullanılmamalı, her şey Tailwind utility sınıfları ve `index.css` içindeki yapılandırma ile çözülmelidir.
+- Request: `{ id: string, kind: 'query' | 'exec' | 'ping', sql?: string }`
+- Response: `{ id: string, ok: boolean, rows?, fields?, durationMs?, error? }`
 
-4. **Durum Yönetimi (State):**
-   - Lokal veya geçici (ephemeral) durumlar `useState` veya `useReducer` ile yönetilir.
-   - Global seviye özellikler, editördeki sorgu verisi, haritadaki layerlar ve kullanıcının dersteki ilerlemesi `Zustand` (%src/store) tarafından yönetilecektir.
+The UI thread (`src/pglite/client.ts`) tracks in-flight requests by UUID with a 30-second timeout. Workers are imported via Vite's `?worker` syntax: `import DbWorker from './worker?worker'`. The startup handshake uses the sentinel ID `__init__`.
 
-5. **Veritabanı Geliştirmeleri (PGLite / PostGIS):**
-   - Tüm PostGIS sorguları istemci-tarafında PGLite (WASM) kullanılarak çalıştırılmaktadır. Hiçbir harici backend veritabanı yoktur.
-   - Haritada görselleştirilmesi gereken veriler PGLite'tan "GeoJSON" formatında çekilmeli veya `geojson-adapter.ts` üzerinden dönüştürülüp OpenLayers formatına (`ol`) uyarlanmalıdır.
-   - Uygulama ilk açıldığında `worker.ts` & PGLite veritabanını boot eder ve gerekli tablolar `fixtures.ts` yardımıyla memory veritabanına basılır.
+### Geometry Auto-Detection and CTE Wrapping
 
-## 🤖 AI / Ajana (Sana) Tavsiyeler
+`src/pglite/geojson-adapter.ts` transparently converts geometry query results for the map without modifying user-visible SQL. When geometry columns are detected (by field OID range 17001–17003 or value inspection), the adapter silently re-executes the query wrapped in a CTE:
 
-- Eğer bir SQL sorgusu bozuluyorsa, sorunun `PGLite` içindeki bir PostGIS eklenti eksikliği veya versiyon problemi olup olmadığına dikkat et. Pglite eklentilerinde henüz tam PostgreSQL PostGIS eşdeğeri sağlanmamış fonksiyonlar olabilir.
-- Yeni bir eğitim veya ders modülü ekleneceğinde `src/content/` altındaki MDX yapısını ve ardından `src/curriculum/structure.ts` doyasını güncelle.
-- UI düzenlemeleri yapıldığında, Tailwind'in sağladığı utility class'larının `react-resizable-panels` sınırları içerisinde duyarlı (responsive) davrandığından emin ol.
-- PGLite client sorguları senkrona yakın (çok hızlı) çalışsa da Promises (async/await) ile asenkron mimaride yönetilmelidir.
+```sql
+WITH __user_query AS (<sanitized user sql>)
+SELECT *, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS __geojson
+FROM __user_query
+```
+
+The wrapper always reprojects to EPSG:4326 before display. If the wrapper query fails, it falls back gracefully. SQL passed to the adapter must have trailing semicolons and comments stripped first (the adapter handles this).
+
+### Vite Critical Notes
+
+- The MDX rollup plugin **must** have `enforce: 'pre'` in `vite.config.ts`; without it, Vite processes MDX files before the plugin can handle them.
+- `@electric-sql/pglite` and `@electric-sql/pglite-postgis` are excluded from `optimizeDeps` because they are native ES modules (WASM).
+- Web Worker output format must be `'es'` for ES module syntax to work in workers.
+- The `/sunum/` path is served via a custom Vite middleware from `sunum/` directory and copied to `dist/sunum/` on build.
+
+### TypeScript Strict Flags
+
+Build fails on violations of: `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noUnusedLocals`, `noUnusedParameters`. Common traps:
+- Array index access (`arr[i]`) returns `T | undefined` — always guard.
+- Optional property `foo?: string` is not assignable to `foo: string | undefined` with `exactOptionalPropertyTypes`.
+- Path alias `@/` → `src/` is configured in both `tsconfig.app.json` and `vite.config.ts`.
+
+## Key Patterns
+
+### Adding a New Lesson
+
+Two files must stay in sync:
+1. Create the MDX file at `src/content/day-{N}/module-{N}/lesson-{slug}.mdx`
+2. Add the `Lesson` entry to the `CURRICULUM` array in `src/curriculum/structure.ts`
+
+`structure.ts` also owns `MODULE_META` (module titles and durations). Module display numbering differs from actual module numbers — see `getModuleDisplayNumber()` and `getActualModuleNumber()` in that file if adding modules across days.
+
+### Interactive SQL Blocks in MDX
+
+Use `<RunnableBlock sql={...} label="..." description="..." />` in MDX files. Clicking "Run" calls `setSql()` on `editorStore`, loading the SQL into the editor — it does not auto-execute. The `description` prop is hidden behind a toggle button.
+
+### State Stores
+
+Three focused Zustand stores in `src/store/`:
+- `editorStore`: `sql`, `result`, `error`, `isRunning` — single source of truth for the editor/query cycle
+- `mapStore`: `layers` array (one layer per query result, replaced not appended), `shouldFit` trigger for auto-zoom
+- `progressStore`: `completedLessons` string array, persisted to `localStorage` key `postgis-akademi-progress`
+
+### Exercise Validation
+
+`src/exercises/validator.ts` validates query results against `Exercise.expectedResult`, which supports: `rowCount`, `exactRows`, `geometryEquals`, `customValidator`. See `src/exercises/comparators.ts` for the row-comparison logic.
+
+## PGlite / PostGIS Limitations
+
+PGlite's PostGIS extension does not implement the full PostgreSQL PostGIS feature set. Functions that are missing or behave differently will silently fail or error at runtime — not at build time. Unsupported features (pgRouting, postgis_topology, streaming replication) must be handled with conceptual explanations or diagrams, not live queries.
+
+## Language
+
+All user-facing UI text and lesson content is Turkish.

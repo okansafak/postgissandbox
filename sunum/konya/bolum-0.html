@@ -84,7 +84,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.1 — Veritabanı Nedir?</div>
-              <div class="slide-header-num">02 / 12</div>
+              <div class="slide-header-num">02 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -135,35 +135,36 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.2 — Kurulum ve Veri Seti</div>
-              <div class="slide-header-num">03 / 12</div>
+              <div class="slide-header-title">0.2 — Kurulum Seçenekleri</div>
+              <div class="slide-header-num">03 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Hazır <span>Docker</span> Ortamı</div>
-                <div class="s-text-tech">Eğitim için optimize edilmiş PostgreSQL 16 + PostGIS 3.4 ortamı Docker üzerinden tek komutla ayağa kalkar.</div>
+                <div class="s-headline-tech"><span>PostGIS</span> Kurulumu</div>
+                <div class="s-text-tech">Eğitim ortamı için PostgreSQL 16 ve PostGIS eklentisine ihtiyacımız var. İki farklı yöntemden birini seçebilirsiniz:</div>
+                
+                <div class="card-tech" style="background:#222; border-color:var(--theme-accent); margin-top:16px;">
+                  <div style="color:var(--theme-accent); font-weight:800; font-size:14px">Seçenek A: Docker (Önerilen)</div>
+                  <div style="color:#aaa; font-size:11px; margin-top:4px">
+                    Bilgisayarınıza <b style="color:#fff">Docker Desktop</b> kurun ve çalıştırın.<br>Terminalde aşağıdaki komutu verin:<br><br>
+                    <code style="color:#fff">docker-compose up -d</code>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;"># Terminalde:
-docker-compose up -d
-
-# Veritabanı: konya_egitim</div>
+                <div style="font-weight:bold; color:var(--theme-blue); margin-bottom:8px; font-size: 14px;">Seçenek B: Windows'a Doğrudan Kurulum</div>
+                <ul class="bullet-list" style="margin-bottom:16px;">
+                  <li><b>1. Nesne İlişkisel Veritabanı:</b> EnterpriseDB sitesinden PostgreSQL 16 Windows yükleyicisini indirip kurun.</li>
+                  <li><b>2. Mekansal Eklenti (PostGIS):</b> Kurulum bitimindeki <i>Stack Builder</i> ekranında <i>Spatial Extensions</i> altından PostGIS'i seçerek yüklemeyi tamamlayın.</li>
+                  <li><b>3. Şifre ve Port:</b> Kurulum sırasında varsayılan kullanıcı <code style="display:inline; padding:2px 4px; border-radius:3px; background:rgba(255,255,255,0.1)">postgres</code> şifrenizi unutmayın. (Port: 5432)</li>
+                </ul>
 
                 <div class="reveal-box" id="q02">
                   <div class="reveal-trigger" onclick="document.getElementById('q02').classList.toggle('open')">
-                    Kritik Soru: Docker neden tercih edilir? <span>▼</span>
+                    Kritik Soru: Neden Docker Önerilir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    "Benim bilgisayarımda çalışıyordu" sorununu bitirir. Herkesin bilgisayarında birebir aynı işletim sistemi ve veritabanı versiyonunun (PostgreSQL 16) çalışmasını sağlar.
-                  </div>
-                </div>
-
-                <div class="reveal-box" id="a02">
-                  <div class="reveal-trigger" onclick="document.getElementById('a02').classList.toggle('open')">
-                    Görev: Konteyner Durumunu Kontrol Et <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Terminalde <code>docker ps</code> komutunu çalıştırarak veritabanı konteynerının (up) durumunda olduğunu ve 5432 portunun aktifliğini doğrulayın.
+                    "Benim bilgisayarımda çalışıyordu" sorununu bitirir. Kurulum, konfigürasyon ve "path" hataları yaşanmaz. Herkeste izole, aynı sürüm ve tamamen aynı ortam anında ayağa kalkar.
                   </div>
                 </div>
               </div>
@@ -172,7 +173,63 @@ docker-compose up -d
         </div>
       </div>
 
-      <!-- SLAYT 4: 0.3 VERİ TİPLERİ -->
+      <!-- SLAYT 0.2.1: VERİ SETİNİN YÜKLENMESİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.2.1 — Veri Setinin Yüklenmesi</div>
+              <div class="slide-header-num">04 / 15</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hazır Veriyi <span>İçe Aktarma</span></div>
+                <div class="s-text-tech">Eğitmen tarafından paylaşılan <b>konya_egitim_yedek.sql</b> dosyasını kendi ortamınıza yüklemek için gerekli komutlar.</div>
+                
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Docker Kuranlar İçin (Seçenek A)</div>
+                  <div style="color:#aaa; font-size:11px; margin-top:8px; line-height:1.7">
+                    <b style="color:#fff">Adım 1</b> — SQL dosyasının bulunduğu klasörde PowerShell açın:<br>
+                    <span style="color:#666; font-size:10px">💡 İpucu: Klasörün içinde Shift + Sağ Tık → "PowerShell penceresini burada aç"</span><br><br>
+                    <b style="color:#fff">Adım 2</b> — Dosyayı konteynere kopyalayın:<br>
+                    <code style="color:#fff">docker cp konya_egitim_yedek.sql konya_postgis_db:/konya_egitim_yedek.sql</code><br><br>
+                    <b style="color:#fff">Adım 3</b> — Veriyi içe aktarın:<br>
+                    <code style="color:#fff">docker exec -it konya_postgis_db psql -U egitim -d konya_egitim -f /konya_egitim_yedek.sql</code>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-weight:bold; color:var(--theme-black); margin-bottom:8px; font-size: 14px;">Windows'a Normal Kuranlar (Seçenek B)</div>
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.4;"># Terminali SQL dosyasının olduğu klasörde açın
+
+# Adım 1 (Veritabanı yoksa oluşturun):
+"C:\Program Files\PostgreSQL\16\bin\createdb.exe" -U postgres konya_egitim
+
+# Adım 2 (Veriyi yükleyin):
+"C:\Program Files\PostgreSQL\16\bin\psql.exe" -U postgres -d konya_egitim -f konya_egitim_yedek.sql
+</div>
+                <div class="reveal-box" id="q02b">
+                  <div class="reveal-trigger" onclick="document.getElementById('q02b').classList.toggle('open')">
+                    GUI (pgAdmin) ile yüklemek istersem? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    pgAdmin 4'ü açın, <code>konya_egitim</code> isminde bir veritabanı oluşturun. Üzerine sağ tıklayıp <b>Query Tool</b>'u açın. Üstteki klasör ikonundan SQL dosyasını seçip <b>Play (F5)</b> tuşuyla çalıştırın.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 4: 0.3.1 VERİ TİPLERİ 1 -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -184,37 +241,136 @@ docker-compose up -d
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.3 — PostgreSQL Veri Tipleri</div>
-              <div class="slide-header-num">04 / 12</div>
+              <div class="slide-header-title">0.3.1 — Veri Tipleri (Sayı & Metin)</div>
+              <div class="slide-header-num">05 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Doğru Veri, <span>Doğru Tip</span></div>
-                <div class="s-text-tech">INTEGER, NUMERIC, TEXT, TIMESTAMPTZ ve Mekansal tipler.</div>
+                <div class="s-headline-tech">Temel <span>Veriler</span></div>
+                <div class="s-text-tech">PostgreSQL'de verileri en verimli şekilde depolamak için doğru veri tipini seçmek kritik öneme sahiptir. Sayısal ve Metin tipleri en temel bileşenlerdir.</div>
+                <ul class="bullet-list" style="margin-top:16px;">
+                  <li><b>Sayısal:</b> Miktar, tutar, ID gibi alanlar.</li>
+                  <li><b>Metin:</b> İsim, adres, açıklama gibi alanlar.</li>
+                </ul>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">CREATE TABLE konya.yeni_projeler (
-  id SERIAL PRIMARY KEY,
-  proje_adi TEXT NOT NULL,
-  butce NUMERIC(15,2),
-  geom geometry(POLYGON, 4326)
-);</div>
+                <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; color:var(--theme-yellow); margin-bottom:10px;">Sayısal (Numeric) Tipler</div>
+                <ul class="bullet-list" style="margin-bottom:20px; font-size:14px; line-height:1.6;">
+                  <li><b>INTEGER (INT):</b> Tam sayılar. Genellikle ID'ler, adetler için kullanılır. (Örn: <code>1500</code>)</li>
+                  <li><b>BIGINT:</b> Çok büyük tam sayılar. Milyarlarca satır varsa veya T.C. Kimlik no gibi sayısal veriler için.</li>
+                  <li><b>NUMERIC / DECIMAL:</b> Kesin kesirli sayılar. Bütçe ve parasal verilerde hata istenmezse şarttır. (Örn: <code>NUMERIC(15,2)</code>)</li>
+                  <li><b>REAL / DOUBLE PRECISION:</b> Kayan noktalı (yaklaşık) sayılar. Matematiksel modellemeler ve bazı koordinatlar için (kesinlik çok önemli değilse).</li>
+                </ul>
+
+                <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; color:var(--theme-blue); margin-bottom:10px;">Metin (String) Tipleri</div>
+                <ul class="bullet-list" style="margin-bottom:0; font-size:14px; line-height:1.6;">
+                  <li><b>VARCHAR(n):</b> Maksimum <i>n</i> uzunlukta değişken metin. (Örn: <code>VARCHAR(50)</code> isimler için)</li>
+                  <li><b>CHAR(n):</b> Sabit uzunluk. Veri kısaysa sonuna boşluk ekler. Artık pek önerilmez.</li>
+                  <li><b>TEXT:</b> Sınırsız uzunlukta metin. PostgreSQL'de performans kaybı olmadan çok uzun açıklamalar için güvenle kullanılabilir.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: 0.3.2 VERİ TİPLERİ 2 -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.3.2 — Tarih, Mantık ve Gelişmiş Tipler</div>
+              <div class="slide-header-num">06 / 15</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Gelişmiş <span>Veriler</span></div>
+                <div class="s-text-tech">Zamanı, mantıksal durumları depolamak ve yeni nesil modern uygulamalar için JSON, Array gibi yapılardan faydalanmak.</div>
                 
-                <div class="reveal-box" id="q03">
-                  <div class="reveal-trigger" onclick="document.getElementById('q03').classList.toggle('open')">
-                    Kritik Soru: NUMERIC vs REAL farkı nedir? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    NUMERIC tam hassasiyet sağlar (para birimleri için şarttır). REAL ise yaklaşık değer saklar ve küsuratlarda yuvarlama hatası yapabilir.
+                <div class="card-tech" style="background:#222; border-color:var(--theme-accent); margin-top:16px;">
+                  <div style="color:var(--theme-accent); font-weight:800; font-size:14px">JSONB — Esnek Veri Deposu</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:6px; line-height:1.6;">
+                    Her park farklı tesise sahip olabilir: biri kafe + oyun alanı, diğeri sadece otopark. Sütun sayısını artırmak yerine <code>JSONB</code> kullanılır:<br><br>
+                    <code style="color:#fff; font-size:11px;">ozellikler → {"tesis": ["kafe", "otopark"], "engelli_erisim": true}</code><br><br>
+                    Konya CBS'de tüm park, durak ve yapı nitelikleri bu şekilde tek sütunda tutulur; <code>-&gt;&gt;</code> operatörüyle sorgulanır.
                   </div>
                 </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; color:var(--theme-yellow); margin-bottom:10px;">Tarih ve Zaman Tipleri</div>
+                <ul class="bullet-list" style="margin-bottom:20px; font-size:14px; line-height:1.6;">
+                  <li><b>DATE:</b> Yalnızca gün, ay, yıl bilgisi tutar. (Örn: <code>2024-05-19</code>)</li>
+                  <li><b>TIME:</b> Yalnızca saat bilgisini tutar.</li>
+                  <li><b>TIMESTAMP:</b> Tarih + Saat. (Örn: <code>2024-05-19 14:30:00</code>)</li>
+                  <li><b>TIMESTAMPTZ:</b> Tarih + Saat + Saat Dilimi (Timezone). Uluslararası ve web projelerinde <i>kesinlikle</i> önerilendir.</li>
+                </ul>
 
-                <div class="reveal-box" id="a03">
-                  <div class="reveal-trigger" onclick="document.getElementById('a03').classList.toggle('open')">
-                    Görev: Personel Tablosu Tasarla <span>▼</span>
+                <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; color:var(--theme-blue); margin-bottom:10px;">Mantıksal ve Özel Tipler</div>
+                <ul class="bullet-list" style="margin-bottom:0; font-size:14px; line-height:1.6;">
+                  <li><b>BOOLEAN:</b> Sadece <code>TRUE</code>, <code>FALSE</code> veya <code>NULL</code> alır. Aktif/pasif durumları için idealdir.</li>
+                  <li><b>ARRAY:</b> Dizi şeklinde birden fazla değeri aynı satırda tutar. (Örn: <code>INTEGER[]</code> veya <code>TEXT[]</code>)</li>
+                  <li><b>UUID:</b> Evrensel benzersiz tanımlayıcı. Merkezi olmayan veri sistemlerinde (Cloud kaynaklı) ID olarak kullanılır.</li>
+                  <li><b>GEOMETRY / GEOGRAPHY:</b> PostGIS ile sunulan mekansal vektör ve coğrafi veriler. (Örn: <code>geometry(Point, 4326)</code>)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 6: 0.3.3 VERİ TİPLERİ UYGULAMA -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.3.3 — Veri Tipleri: Örnek Uygulama</div>
+              <div class="slide-header-num">07 / 15</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Uygulama <span>Zamanı</span></div>
+                <div class="s-text-tech">Gördüğümüz veri tiplerini kullanarak personel veya proje veritabanı oluşturalım.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- Personel tablosu oluşturuluyor
+CREATE TABLE konya.personel (
+    id SERIAL PRIMARY KEY,             -- Otomatik artan tamsayı
+    tc_kimlik VARCHAR(11) NOT NULL,    -- 11 karakter metin
+    ad_soyad TEXT,                     -- Sınırsız metin
+    maas NUMERIC(12, 2),               -- Kesin kesirli (kuruş için)
+    ise_giris DATE,                    -- Tarih
+    aktif_mi BOOLEAN DEFAULT true,     -- Varsayılan olarak True (Aktif)
+    ek_bilgiler JSONB                  -- Özgeçmiş, iletişim vs. özellikler için
+);
+
+-- Tabloya veri ekleme
+INSERT INTO konya.personel 
+    (tc_kimlik, ad_soyad, maas, ise_giris, ek_bilgiler) 
+VALUES 
+    ('12345678901', 'Ahmet Yılmaz', 45000.50, '2022-01-15', 
+     '{"telefon": "05551234567", "departman": "CBS"}'::jsonb);
+</div>
+
+                <div class="reveal-box" id="q03c">
+                  <div class="reveal-trigger" onclick="document.getElementById('q03c').classList.toggle('open')">
+                    Görev: Kendi Tablonuzu Tasarlayın <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Ad (TEXT), Maas (NUMERIC), Giris_Tarihi (DATE) ve aktif mi (BOOLEAN) sütunlarını içeren bir tablo şeması hayal edin.
+                    Bütçesi (NUMERIC), oluşturulma zamanı (TIMESTAMPTZ), adı (TEXT) ve proje kodları listesi (TEXT[]) olan bir "projeler" tablosu (CREATE TABLE) yazın.
                   </div>
                 </div>
               </div>
@@ -236,7 +392,7 @@ docker-compose up -d
                 </div>
               </div>
               <div class="slide-header-title">0.4 — SELECT ve Sütun Seçimi</div>
-              <div class="slide-header-num">05 / 12</div>
+              <div class="slide-header-num">08 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -292,48 +448,66 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
                 </div>
               </div>
               <div class="slide-header-title">0.5 — WHERE ile Filtreleme</div>
-              <div class="slide-header-num">06 / 12</div>
+              <div class="slide-header-num">09 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Hedefe Gitmek: <span>WHERE</span></div>
-                <div class="s-text-tech">
-                  Mantıksal bağlaçlarla aradığınız veriyi süzersiniz:
-                  <ul style="font-size:13px; margin-top:12px; color:#ccc; line-height:1.6">
-                    <li><b>Eşitlik:</b> =, !=, &lt;&gt;, IN</li>
-                    <li><b>Kıyas:</b> &lt;, &gt;, &lt;=, &gt;=, BETWEEN</li>
-                    <li><b>Metin:</b> LIKE, ILIKE</li>
-                    <li><b>Bağlaç:</b> AND, OR, NOT</li>
-                  </ul>
+                <div class="s-headline-tech">Filtrelerin <span>Dili</span></div>
+                <div class="s-text-tech">WHERE, bir satırın sonuca dahil edilip edilmeyeceğini belirler. SQL'in en çok kullanılan bileşenidir.</div>
+
+                <div style="margin-top:20px;">
+                  <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--theme-yellow); margin-bottom:4px;">Karşılaştırma</div>
+                  <div style="font-size:13px; line-height:1.7; margin-bottom:12px;"><code>=</code> &nbsp;<code>!=</code> &nbsp;<code>&lt;&gt;</code> &nbsp;<code>&lt;</code> &nbsp;<code>&gt;</code> &nbsp;<code>&lt;=</code> &nbsp;<code>&gt;=</code></div>
+
+                  <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--theme-yellow); margin-bottom:4px;">Aralık & Liste</div>
+                  <div style="font-size:13px; line-height:1.7; margin-bottom:12px;"><code>BETWEEN 50000 AND 300000</code> &nbsp;·&nbsp; <code>IN ('Selçuklu','Meram')</code> &nbsp;·&nbsp; <code>NOT IN (...)</code></div>
+
+                  <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--theme-yellow); margin-bottom:4px;">Metin Eşleştirme</div>
+                  <div style="font-size:13px; line-height:1.7; margin-bottom:12px;"><code>LIKE 'Yeni%'</code> (duyarlı) &nbsp;·&nbsp; <code>ILIKE '%yeni%'</code> (duyarsız)<br><code>%</code> = herhangi metin &nbsp;·&nbsp; <code>_</code> = tek karakter</div>
+
+                  <div style="font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--theme-yellow); margin-bottom:4px;">NULL & Mantıksal</div>
+                  <div style="font-size:13px; line-height:1.7;"><code>IS NULL</code> &nbsp;·&nbsp; <code>IS NOT NULL</code> &nbsp;·&nbsp; <code>AND</code> &nbsp;·&nbsp; <code>OR</code> &nbsp;·&nbsp; <code>NOT</code> &nbsp;·&nbsp; <code>( )</code></div>
                 </div>
-                
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Önemli Avantaj</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Veritabanı indeksi olan bir WHERE komutunu çalıştırdığında, tüm satırları okumaz, sadece ağaç yapısından ilgili sayfayı çağırır.</div>
+
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:20px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:13px;">İndeks Avantajı</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px; line-height:1.5;">WHERE koşulu indeksli sütuna uygulandığında veritabanı tüm tabloyu okumaz; B-tree ağacından doğrudan ilgili sayfaya atlar.</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad, nufus 
-FROM konya.ilce_sinirlari   -- Tablo seçimi
-WHERE nufus >= 50000        -- Sayısal kıyaslama
-  AND ad LIKE '%şehir'     -- Metin eşleştirme
-  AND ad != 'Akşehir';      -- Eşit değildir</div>
-                
+                <div class="code-block" style="margin-bottom:16px; font-size:11.5px; line-height:1.55;">-- 1) Sayısal kıyaslama + BETWEEN
+SELECT ad, soyad, maas
+FROM egitim.personel
+WHERE maas BETWEEN 40000 AND 70000
+  AND aktif = true;
+
+-- 2) IN + IS NOT NULL
+SELECT ad, ilce
+FROM konya.mahalleler
+WHERE ilce IN ('Selçuklu', 'Karatay', 'Meram')
+  AND geom IS NOT NULL;
+
+-- 3) ILIKE + OR + parantez
+SELECT ad, ilce
+FROM konya.mahalleler
+WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
+  AND ilce != 'Akşehir';</div>
+
                 <div class="reveal-box" id="q05">
                   <div class="reveal-trigger" onclick="document.getElementById('q05').classList.toggle('open')">
-                    Kritik Soru: LIKE ile ILIKE farkı? <span>▼</span>
+                    Kritik Soru: AND ile OR birlikte kullanılınca ne olur? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    LIKE büyük/küçük harf duyarlıdır. ILIKE ise duyarsızdır. 'Konya' LIKE 'konya' FALSE dönerken, ILIKE ile TRUE döner.
+                    AND, OR'dan önce değerlendirilir. <code>A OR B AND C</code> aslında <code>A OR (B AND C)</code> demektir. Kastettiğiniz <code>(A OR B) AND C</code> ise mutlaka parantez kullanın — 3. örnekteki gibi.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="a05">
                   <div class="reveal-trigger" onclick="document.getElementById('a05').classList.toggle('open')">
-                    Görev: Karatay Mahallelerini Bul <span>▼</span>
+                    Görev: Seçuklu'nun 5.000–15.000 Nüfuslu Mahalleleri <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT * FROM konya.mahalleler WHERE ilce = 'Karatay' AND nufus > 10000;</code>
+                    <code>SELECT ad, nufus FROM konya.mahalleler WHERE ilce = 'Selçuklu' AND nufus BETWEEN 5000 AND 15000 ORDER BY nufus DESC;</code>
                   </div>
                 </div>
               </div>
@@ -361,7 +535,7 @@ WHERE nufus >= 50000        -- Sayısal kıyaslama
                 </div>
               </div>
               <div class="slide-header-title">0.6 — ORDER BY ve LIMIT</div>
-              <div class="slide-header-num">07 / 12</div>
+              <div class="slide-header-num">10 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -416,7 +590,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
                 </div>
               </div>
               <div class="slide-header-title">0.7 — Toplama Fonksiyonları</div>
-              <div class="slide-header-num">08 / 12</div>
+              <div class="slide-header-num">11 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -465,7 +639,7 @@ FROM konya.ilce_sinirlari;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.8 — GROUP BY ve HAVING</div>
-              <div class="slide-header-num">09 / 12</div>
+              <div class="slide-header-num">12 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -521,7 +695,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
                 </div>
               </div>
               <div class="slide-header-title">0.9 — JOIN ve Tablo İlişkileri</div>
-              <div class="slide-header-num">10 / 12</div>
+              <div class="slide-header-num">13 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -581,7 +755,7 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.10 — Veri Yönetimi (DML)</div>
-              <div class="slide-header-num">11 / 12</div>
+              <div class="slide-header-num">14 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -655,7 +829,7 @@ WHERE ad = 'Yeni Mahalle';</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 12</div>
+    <div class="nav-status" id="navStatus">1 / 15</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\cooksoft postgis eğitimi\\\\dokuman\\\\app\\\\postgis-akademi\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "PowerShell(Head -30)"
+    ]
+  }
+}
