@@ -619,23 +619,32 @@ WHERE schemaname = 'konya'
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.4 — EXPLAIN ANALYZE Giriş</div>
+              <div class="slide-header-title">2.4 — EXPLAIN ANALYZE Okuma Sanatı</div>
               <div class="slide-header-num">13 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Sorgunun <span>Röntgeni</span></div>
-                <div class="s-text-tech">Sorgunun gerçek çalışma maliyetini ve sürelerini analiz etmek.</div>
+                <div class="s-headline-tech">Plan <span>Okuma</span></div>
+                <div class="s-text-tech">Artık komutu yazmayı biliyorsunuz. Peki PostgreSQL'in döndürdüğü o karmaşık teknik metin ne anlama geliyor?</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">EXPLAIN ANALYZE SELECT * FROM binalar WHERE ... -- Sorgu planını ve süresini analiz et</div>
+                <div class="code-block" style="font-size:11px; line-height:1.4; color:#a8ff60;">-- ÖRNEK BİR ÇIKTININ ANATOMİSİ:
+Index Scan using idx_poi_geom on poi  (cost=0.15..8.17 rows=100 width=25) 
+  (actual time=0.041..0.043 rows=3 loops=1)
+
+<span style="color:#fff;">-- 1) Index Scan / Seq Scan: Seçilen yöntem (İndeks mi kullandı, tabloyu baştan mı taradı?)
+-- 2) cost=0.15..8.17: Planlayıcının "Tahmini" maliyeti (Başlangıç maliyeti .. Bitiş maliyeti)
+-- 3) rows=100: "Tahmin" ettiği eşleşecek satır sayısı
+-- 4) actual time=0.041..0.043: "Gerçekte" ilk satırı bulma süresi .. Son işlemi bitirme süresi (ms)
+-- 5) actual rows=3: "Gerçekte" dönen satır sayısı
+-- 6) loops=1: Bu işlemin kaç defa tekrarlandığı (Nested Loop'larda artar)</span></div>
                 <div class="reveal-box" id="q211">
-                  <div class="reveal-trigger" onclick="document.getElementById('q211').classList.toggle('open')">Kritik Soru: Tahmin vs Gerçek? <span>▼</span></div>
-                  <div class="reveal-content">EXPLAIN tahminleri, ANALYZE gerçek süreleri gösterir. İkisi arasındaki büyük fark indeks bozulmasına işarettir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q211').classList.toggle('open')">Kritik Soru: Tahmin (rows) ve Gerçek (actual rows) uyuşmuyorsa? <span>▼</span></div>
+                  <div class="reveal-content">Eğer çıktıda <code>rows=10000</code> ama <code>actual rows=5</code> görüyorsanız, PostgreSQL'in haritası (istatistikleri) çok eskimiş demektir. Yanlış tahmin yüzünden yanlış bir strateji (örn. Index yerine Seq Scan) seçmiş olabilir. Çözüm: Hemen bir <code>ANALYZE tablo_adi;</code> patlatın!</div>
                 </div>
                 <div class="reveal-box" id="g211">
-                  <div class="reveal-trigger" onclick="document.getElementById('g211').classList.toggle('open')">Görev: Plan Çıkart <span>▼</span></div>
-                  <div class="reveal-content">Herhangi bir mekansal sorgunun önüne <code>EXPLAIN ANALYZE</code> ekleyerek "Actual Time" değerini not edin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g211').classList.toggle('open')">Görev: Röntgen Çek <span>▼</span></div>
+                  <div class="reveal-content">Önceki slaytlardaki büyük bir mekansal sorguyu çalıştırıp DBeaver'da dönen metne bakın. <strong>Execution Time</strong>'ı ve PostgreSQL'in <strong>Scan</strong> tipini (Seq mi Index mi) yakalamaya çalışın.</div>
                 </div>
               </div>
             </div>
