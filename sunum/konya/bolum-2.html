@@ -371,7 +371,15 @@ LIMIT 1;</div>
                 </div>
                 <div class="reveal-box" id="g26">
                   <div class="reveal-trigger" onclick="document.getElementById('g26').classList.toggle('open')">Görev: En Yakın Yola Dikme <span>▼</span></div>
-                  <div class="reveal-content">Bir binanın merkezinden en yakın yolun üzerine düşen dik mesafeyi <code>ST_ShortestLine</code> ile çizin ve <code>::geography</code> ile metreye çevirin.</div>
+                  <div class="reveal-content">
+                    Bir binanın merkezinden en yakın yolun üzerine düşen dik mesafeyi <code>ST_ShortestLine</code> ile çizin ve <code>::geography</code> ile metreye çevirin.
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
+WITH bina AS (SELECT ST_SetSRID(ST_Point(32.5920, 37.827), 4326) AS p)
+SELECT ST_AsText(ST_ShortestLine(y.geom, b.p)) AS dik_cizgi,
+       ROUND(ST_Length(ST_ShortestLine(y.geom, b.p)::geography)::numeric, 2) || ' m' AS dik_mesafe
+FROM konya.osm_yollar y, bina b
+ORDER BY y.geom &lt;-&gt; b.p LIMIT 1;</div>
+                  </div>
                 </div>
               </div>
             </div>
