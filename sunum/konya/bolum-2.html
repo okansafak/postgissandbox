@@ -857,7 +857,7 @@ VACUUM ANALYZE konya.mahalleler;</div>
                 <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1. ANA DOLAP (Parent Table): İçinde veri tutmaz, sadece yönlendiricidir.
 CREATE TABLE konya.binalar_bolunmus (
   id    SERIAL,
-  geom  GEOMETRY(POLYGON, 4326),
+  geom  GEOMETRY(MULTIPOLYGON, 4326),
   ilce  TEXT NOT NULL
 ) PARTITION BY LIST (ilce);
 
