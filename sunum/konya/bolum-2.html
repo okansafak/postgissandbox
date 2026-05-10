@@ -473,9 +473,17 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
                   <div class="reveal-trigger" onclick="document.getElementById('g29').classList.toggle('open')">Görev: Kutu Sorgusu Yap <span>▼</span></div>
                   <div class="reveal-content">
                     Kendi belirlediğiniz bir X,Y aralığındaki binaları (<code>konya.osm_binalar</code>) sadece <code>&amp;&amp;</code> ile sorgulayıp hızını test edin.
-                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP: İkisini de EXPLAIN ANALYZE ile çalıştırıp "Execution Time" farkına bakın!
+
+-- 1. YÖNTEM: Sadece Bounding Box kesişimi (ÇOK HIZLI - Sadece İndeks)
+EXPLAIN ANALYZE 
 SELECT id FROM konya.osm_binalar 
-WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);</div>
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
+
+-- 2. YÖNTEM: Gerçek poligon kesişimi (DAHA YAVAŞ - İndeks + Matematik)
+EXPLAIN ANALYZE 
+SELECT id FROM konya.osm_binalar 
+WHERE ST_Intersects(geom, ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326));</div>
                   </div>
                 </div>
               </div>
