@@ -356,7 +356,7 @@ SELECT degrees(ST_Azimuth(
 
 -- CLOSEST POINT + ShortestLine: Bina → en yakın yol analizi
 WITH bina AS (
-  SELECT ST_SetSRID(ST_Point(32.4920, 37.8727), 4326) AS p
+  SELECT ST_SetSRID(ST_Point(32.5920, 37.827), 4326) AS p
 )
 SELECT y.id,
   -- DBeaver'da Bina noktasını, Yolu ve aralarındaki Dik Çizgiyi tek seferde görelim
