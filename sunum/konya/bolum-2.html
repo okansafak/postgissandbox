@@ -866,10 +866,14 @@ CREATE TABLE konya.binalar_selcuklu PARTITION OF konya.binalar_bolunmus FOR VALU
 CREATE TABLE konya.binalar_meram    PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Meram');
 CREATE TABLE konya.binalar_karatay  PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Karatay');
 
--- 3. TEST EDELİM: Veriyi her zaman Ana Dolaba ekleriz.
--- PostgreSQL 'ilce' kolonuna bakar ve bunu otomatik olarak 'binalar_meram' tablosuna kaydırır!
+-- 3. TEST EDELİM: GERÇEK VERİ DOLDURUYORUZ (Mekansal Kesişim ile)
+-- İlçe sınırlarından "Meram" poligonunu bulur, içindeki tüm binaları keser (ST_Intersects)
+-- ve Ana Dolaba ekleriz. PostgreSQL bunu otomatik olarak 'binalar_meram' çekmecesine koyar!
 INSERT INTO konya.binalar_bolunmus (geom, ilce)
-VALUES (ST_MakeEnvelope(32.40, 37.80, 32.41, 37.81, 4326), 'Meram');</div>
+SELECT b.geom, 'Meram'
+FROM konya.osm_binalar b
+JOIN konya.ilce_sinirlari i ON ST_Intersects(b.geom, i.geom)
+WHERE i.ad = 'Meram';</div>
                 <div class="reveal-box" id="q216">
                   <div class="reveal-trigger" onclick="document.getElementById('q216').classList.toggle('open')">Kritik Soru: İlçe bazlı Partitioning neden efsanedir? <span>▼</span></div>
                   <div class="reveal-content">Siz kodunuzda tek bir tabloymuş gibi (<code>SELECT * FROM binalar_bolunmus WHERE ilce='Selçuklu'</code>) sorgu atarsınız. PostgreSQL arka planda sadece Selçuklu çekmecesini açar, Meram ve Karatay dosyalarına <strong>hiç dokunmaz</strong> (Buna Partition Pruning denir). Ayrıca her çekmecenin indeksi kendine ait ve ufak olduğu için aramalar ışık hızında gerçekleşir.</div>
