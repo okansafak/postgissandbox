@@ -297,13 +297,15 @@ FROM konya.il_sinirlari;</div>
                 <div class="s-text-tech">Hat üzerinde yüzde (%) veya mesafe bazlı konum bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px; line-height:1.4;">-- Verilen noktanın hat (ID:30135) üzerindeki yerini hem % hem de METRE olarak bulur
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- DBeaver'da hem hattı hem noktayı görmek için ST_Collect kullanıyoruz
 SELECT id, 
-   -- 1) Yüzde (%) cinsinden konumu
+   ST_Collect(ST_GeometryN(geom, 1), ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) AS harita,
+   
+   -- 1) Yüzdelik konum
    ROUND((ST_LineLocatePoint(ST_GeometryN(geom, 1), 
-         ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) * 100)::numeric, 1) || '%' AS yuzdelik_konum,
+         ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) * 100)::numeric, 1) || '%' AS oran_yuzde,
          
-   -- 2) Metre cinsinden başlangıca olan mesafesi (Oran * Toplam Uzunluk)
+   -- 2) Başlangıca olan metraj
    ROUND((ST_LineLocatePoint(ST_GeometryN(geom, 1), 
          ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) * 
          ST_Length(ST_GeometryN(geom, 1)::geography))::numeric, 1) || ' m' AS mesafe_metre
