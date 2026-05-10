@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
@@ -69,14 +69,26 @@
                 <div class="s-text-tech">Nüfus verileri gibi büyük tabloları saniyeler içinde yükleme.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">COPY konya.nufus_staging FROM 'data/nufus.csv' WITH (FORMAT text); -- CSV dosyasını hızlıca içeri al</div>
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- 1. Tablo yoksa hata verir, önce oluşturun:
+CREATE TABLE IF NOT EXISTS konya.nufus_copy (
+    yil INT,
+    il VARCHAR(50),
+    ilce VARCHAR(100),
+    ilce_id INT,
+    nufus INT
+);
+
+-- 2. CSV dosyasını psql üzerinden içeri aktarma
+-- İPUCU: Yerel bilgisayarınızdaki dosya için sunucu komutu olan COPY değil, psql komutu olan \copy kullanmalısınız:
+-- NOT: Türkçe karakter bozulmasını engellemek için ENCODING 'UTF8' parametresi eklenmiştir.
+\copy konya.nufus_copy FROM 'D:\nufus_copy.csv' WITH (FORMAT csv, HEADER, ENCODING 'UTF8')</div>
                 <div class="reveal-box" id="q21">
                   <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">Kritik Soru: COPY neden INSERT'ten hızlıdır? <span>▼</span></div>
                   <div class="reveal-content">COPY, SQL parser'ı ve transaction loglarını atlayarak veriyi doğrudan disk sayfalarına yazar.</div>
                 </div>
                 <div class="reveal-box" id="g21">
                   <div class="reveal-trigger" onclick="document.getElementById('g21').classList.toggle('open')">Görev: Nüfus Verisini İncele <span>▼</span></div>
-                  <div class="reveal-content"><code>data/nufus.csv</code> dosyasındaki kirli yapıyı <code>SELECT * FROM nufus_staging LIMIT 10;</code> ile görün.</div>
+                  <div class="reveal-content"><code>data/nufus.csv</code> dosyasındaki kirli yapıyı <code>SELECT * FROM nufus_copy LIMIT 10;</code> ile görün.</div>
                 </div>
               </div>
             </div>
@@ -157,7 +169,7 @@ ogr2ogr -f "PostgreSQL" \
                 <div class="s-text-tech">Kirli metinlerden düzenli sütunlar oluşturma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT (regexp_matches(raw_satir, '\((.*?)\)'))[1] FROM nufus_staging; -- Regex ile metin ayıkla</div>
+                <div class="code-block">SELECT (regexp_matches(raw_satir, '\((.*?)\)'))[1] FROM nufus_copy; -- Regex ile metin ayıkla</div>
                 <div class="reveal-box" id="q22">
                   <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Regex neden PostGIS'te önemlidir? <span>▼</span></div>
                   <div class="reveal-content">Dışarıdan gelen veriler (CAD, Excel) genelde standart dışıdır. Regex ile koordinat veya isim ayıklamak hayati önem taşır.</div>
