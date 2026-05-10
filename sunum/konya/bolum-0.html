@@ -84,7 +84,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.1 — Kurulum Seçenekleri</div>
-              <div class="slide-header-num">02 / 21</div>
+              <div class="slide-header-num">02 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -134,7 +134,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.1.1 — Veri Setinin Yüklenmesi</div>
-              <div class="slide-header-num">03 / 21</div>
+              <div class="slide-header-num">03 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -194,7 +194,7 @@
                 </div>
               </div>
               <div class="slide-header-title">0.2 — Veritabanı Nedir?</div>
-              <div class="slide-header-num">04 / 21</div>
+              <div class="slide-header-num">04 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -209,13 +209,13 @@
                 <div class="code-block" style="margin-bottom:16px;"><span style="color:#888">-- PostgreSQL: ilişkisel veri + güçlü SQL motoru
 -- PostGIS: mekansal sorgulama yeteneği kazandırır</span>
 
-SELECT count(*), ilce
-FROM parceller
-WHERE alan_m2 > 1000
+SELECT ilce, count(*) AS mahalle_sayisi
+FROM konya.mahalleler
+WHERE nufus &gt; 5000
 GROUP BY ilce
-ORDER BY count(*) DESC;
+ORDER BY mahalle_sayisi DESC;
 
-<span style="color:#888">-- Konya'nın tüm büyük parselleri ilçe bazında,
+<span style="color:#888">-- Konya'nın 5.000+ nüfuslu mahalleleri ilçe bazında,
 -- yüz binlerce satır — saniyeler içinde.</span></div>
 
                 <div class="reveal-box" id="q01">
@@ -255,7 +255,7 @@ ORDER BY count(*) DESC;
                 </div>
               </div>
               <div class="slide-header-title">0.3 — Cluster, Database ve Schema</div>
-              <div class="slide-header-num">05 / 21</div>
+              <div class="slide-header-num">05 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -312,7 +312,7 @@ ORDER BY nspname;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.4.1 — Veri Tipleri (Sayı & Metin)</div>
-              <div class="slide-header-num">06 / 21</div>
+              <div class="slide-header-num">06 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -357,7 +357,7 @@ ORDER BY nspname;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.4.2 — Tarih, Mantık ve Gelişmiş Tipler</div>
-              <div class="slide-header-num">07 / 21</div>
+              <div class="slide-header-num">07 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -408,7 +408,7 @@ ORDER BY nspname;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.4.3 — Veri Tipleri: Örnek Uygulama</div>
-              <div class="slide-header-num">08 / 21</div>
+              <div class="slide-header-num">08 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -418,21 +418,23 @@ ORDER BY nspname;</div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- Personel tablosu oluşturuluyor
 CREATE TABLE konya.personel (
-    id SERIAL PRIMARY KEY,             -- Otomatik artan tamsayı
-    tc_kimlik VARCHAR(11) NOT NULL,    -- 11 karakter metin
-    ad_soyad TEXT,                     -- Sınırsız metin
-    maas NUMERIC(12, 2),               -- Kesin kesirli (kuruş için)
-    ise_giris DATE,                    -- Tarih
-    aktif_mi BOOLEAN DEFAULT true,     -- Varsayılan olarak True (Aktif)
-    ek_bilgiler JSONB                  -- Özgeçmiş, iletişim vs. özellikler için
+    id          SERIAL PRIMARY KEY,            -- Otomatik artan tamsayı
+    tc_kimlik   VARCHAR(11) NOT NULL UNIQUE,   -- 11 karakter, biricik
+    ad          TEXT NOT NULL,                 -- Ad
+    soyad       TEXT NOT NULL,                 -- Soyad
+    birim       TEXT,                          -- Çalıştığı birim (CBS, İmar vb.)
+    maas        NUMERIC(12, 2) CHECK (maas &gt;= 0),  -- Kesin kesirli, negatif olamaz
+    ise_giris   DATE,                          -- Tarih
+    aktif       BOOLEAN DEFAULT true,          -- Varsayılan True (Aktif)
+    ek_bilgiler JSONB                          -- Esnek nitelikler
 );
 
 -- Tabloya veri ekleme
 INSERT INTO konya.personel
-    (tc_kimlik, ad_soyad, maas, ise_giris, ek_bilgiler)
+    (tc_kimlik, ad, soyad, birim, maas, ise_giris, ek_bilgiler)
 VALUES
-    ('12345678901', 'Ahmet Yılmaz', 45000.50, '2022-01-15',
-     '{"telefon": "05551234567", "departman": "CBS"}'::jsonb);
+    ('12345678901', 'Ahmet', 'Yılmaz', 'CBS', 45000.50, '2022-01-15',
+     '{"telefon": "05551234567"}'::jsonb);
 </div>
 
                 <div class="reveal-box" id="q03c">
@@ -449,7 +451,79 @@ VALUES
         </div>
       </div>
 
-      <!-- SLAYT 9: SELECT VE SÜTUN SEÇİMİ -->
+      <!-- SLAYT 9: 0.4.4 CONSTRAINTS (VERİ BÜTÜNLÜĞÜ) -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.4.4 — Constraints (Veri Bütünlüğü)</div>
+              <div class="slide-header-num">09 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veri <span>Bütünlüğü</span></div>
+                <div class="s-text-tech">Veritabanı, kötü veriyi <i>kabul etmemelidir</i>. Constraints (kısıtlar) bu güvenlik kemeridir; yanlış girişi daha veriyi yazmadan engeller.</div>
+
+                <div class="card-tech" style="margin-top:20px;">
+                  <div class="card-tech-title">Belediye Bağlamı</div>
+                  <div class="card-tech-text">Hastane kaydı geçersiz <code>mahalle_id</code> ile girilirse harita üzerinde boşa düşer ve raporlama bozulur. <b>FOREIGN KEY</b> bunu en başta engeller — uygulama koduna güvenmeye gerek kalmaz.</div>
+                </div>
+
+                <ul class="bullet-list" style="margin-top:16px; font-size:13px; line-height:1.7;">
+                  <li><b>PRIMARY KEY:</b> Satırı biricik tanımlar. NOT NULL + UNIQUE bileşimi.</li>
+                  <li><b>FOREIGN KEY:</b> Başka tabloya referans. JOIN'in zemini.</li>
+                  <li><b>NOT NULL:</b> Boş bırakılamaz.</li>
+                  <li><b>UNIQUE:</b> Tekrar edemez (TC kimlik, plaka vb.).</li>
+                  <li><b>CHECK:</b> Mantıksal kural (yatak_sayisi &gt; 0).</li>
+                </ul>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Hastaneler tablosu — tüm constraint tipleriyle
+CREATE TABLE konya.hastaneler (
+    id           SERIAL PRIMARY KEY,
+    ad           TEXT NOT NULL,
+    yatak_sayisi INT CHECK (yatak_sayisi &gt; 0),
+    kodu         VARCHAR(10) UNIQUE,
+    mahalle_id   INT REFERENCES konya.mahalleler(id)
+);
+
+-- Geçersiz mahalle ID girişi → ENGELLENECEK
+INSERT INTO konya.hastaneler (ad, yatak_sayisi, kodu, mahalle_id)
+VALUES ('Test Hastane', 50, 'TST01', 999999);
+-- ERROR: foreign key constraint "hastaneler_mahalle_id_fkey"</div>
+
+                <div class="reveal-box" id="qcons">
+                  <div class="reveal-trigger" onclick="document.getElementById('qcons').classList.toggle('open')">
+                    Kritik Soru: FOREIGN KEY olmadan JOIN yapılamaz mı? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Yapılır — JOIN sadece sütun değerlerini eşler, FK olmasını şart koşmaz. Ama FK olmadan tabloya geçersiz <code>mahalle_id</code> girişi engellenmez. <b>FK referans bütünlüğünü korur</b>; JOIN ise sorgu zamanı işlemidir.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="acons">
+                  <div class="reveal-trigger" onclick="document.getElementById('acons').classList.toggle('open')">
+                    Görev: Mevcut Constraint'leri Listele <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT conname, contype FROM pg_constraint WHERE conrelid = 'konya.personel'::regclass;</code><br><br>
+                    <code>contype</code> değerleri: <code>p</code>=PRIMARY KEY, <code>f</code>=FOREIGN KEY, <code>u</code>=UNIQUE, <code>c</code>=CHECK.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 10: SELECT VE SÜTUN SEÇİMİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -462,7 +536,7 @@ VALUES
                 </div>
               </div>
               <div class="slide-header-title">0.5 — SELECT ve Sütun Seçimi</div>
-              <div class="slide-header-num">09 / 21</div>
+              <div class="slide-header-num">10 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -499,7 +573,7 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
         </div>
       </div>
 
-      <!-- SLAYT 10: WHERE İLE FİLTRELEME -->
+      <!-- SLAYT 11: WHERE İLE FİLTRELEME -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -518,7 +592,7 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
                 </div>
               </div>
               <div class="slide-header-title">0.6 — WHERE ile Filtreleme</div>
-              <div class="slide-header-num">10 / 21</div>
+              <div class="slide-header-num">11 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -547,7 +621,7 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px; font-size:11.5px; line-height:1.55;">-- 1) Sayısal kıyaslama + BETWEEN
 SELECT ad, soyad, maas
-FROM egitim.personel
+FROM konya.personel
 WHERE maas BETWEEN 40000 AND 70000
   AND aktif = true;
 
@@ -586,7 +660,7 @@ WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
         </div>
       </div>
 
-      <!-- SLAYT 11: ORDER BY VE LIMIT -->
+      <!-- SLAYT 12: ORDER BY VE LIMIT -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -605,7 +679,7 @@ WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
                 </div>
               </div>
               <div class="slide-header-title">0.7 — ORDER BY ve LIMIT</div>
-              <div class="slide-header-num">11 / 21</div>
+              <div class="slide-header-num">12 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -647,7 +721,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
         </div>
       </div>
 
-      <!-- SLAYT 12: TOPLAMA FONKSİYONLARI -->
+      <!-- SLAYT 13: TOPLAMA FONKSİYONLARI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -660,7 +734,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
                 </div>
               </div>
               <div class="slide-header-title">0.8 — Toplama Fonksiyonları</div>
-              <div class="slide-header-num">12 / 21</div>
+              <div class="slide-header-num">13 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -696,7 +770,7 @@ FROM konya.ilce_sinirlari;</div>
         </div>
       </div>
 
-      <!-- SLAYT 13: GROUP BY VE HAVING -->
+      <!-- SLAYT 14: GROUP BY VE HAVING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -709,7 +783,7 @@ FROM konya.ilce_sinirlari;</div>
                 </div>
               </div>
               <div class="slide-header-title">0.9 — GROUP BY ve HAVING</div>
-              <div class="slide-header-num">13 / 21</div>
+              <div class="slide-header-num">14 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -737,7 +811,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
                     Görev: Birimlere Göre Toplam Maaş <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT birim, SUM(maas) FROM egitim.personel GROUP BY birim ORDER BY SUM(maas) DESC;</code>
+                    <code>SELECT birim, SUM(maas) FROM konya.personel GROUP BY birim ORDER BY SUM(maas) DESC;</code>
                   </div>
                 </div>
               </div>
@@ -746,7 +820,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
         </div>
       </div>
 
-      <!-- SLAYT 14: JOIN VE TABLO İLİŞKİLERİ -->
+      <!-- SLAYT 15: JOIN VE TABLO İLİŞKİLERİ -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -765,7 +839,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
                 </div>
               </div>
               <div class="slide-header-title">0.10 — JOIN ve Tablo İlişkileri</div>
-              <div class="slide-header-num">14 / 21</div>
+              <div class="slide-header-num">15 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -806,7 +880,76 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
         </div>
       </div>
 
-      <!-- SLAYT 15: VERİ YÖNETİMİ (DML) -->
+      <!-- SLAYT 16: 0.11 İNDEKS YÖNETİMİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.11 — İndeks Yönetimi</div>
+              <div class="slide-header-num">16 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Sorguyu <span>Hızlandırmak</span></div>
+                <div class="s-text-tech">İndeks, tablonun "arama dizini"dir. <code>WHERE</code> ve <code>JOIN</code> koşullarında kullanılan sütunlara eklendiğinde sorgu süresi binde bire iner — milyonlarca satırda fark hayatidir.</div>
+
+                <div class="card-tech" style="margin-top:20px;">
+                  <div class="card-tech-title">Hangi İndeks Tipi?</div>
+                  <div class="card-tech-text">
+                    <b>B-tree</b> (varsayılan): Sayı, metin, tarih — tüm eşitlik/aralık sorguları.<br>
+                    <b>GIN</b>: JSONB içinde anahtar arama, dizi (array) içinde değer arama, tam metin arama.<br>
+                    <b>GiST</b>: <i>Mekansal sorgular</i> — Bölüm 2'de detaylı.
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Sık WHERE/JOIN kullanılan sütunlara indeks
+CREATE INDEX idx_personel_birim
+  ON konya.personel(birim);
+
+CREATE INDEX idx_mahalleler_ilce
+  ON konya.mahalleler(ilce);
+
+-- Şema bazında indeks listesi
+SELECT tablename, indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'konya'
+ORDER BY tablename;
+
+-- Gereksiz indeksi kaldır
+DROP INDEX konya.idx_personel_birim;</div>
+
+                <div class="reveal-box" id="qidx">
+                  <div class="reveal-trigger" onclick="document.getElementById('qidx').classList.toggle('open')">
+                    Kritik Soru: Her sütuna indeks ekleyelim mi? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Hayır. Her INSERT/UPDATE indeksi de günceller — aşırı indeks <b>yazmayı yavaşlatır</b> ve diski şişirir. Sadece sık aranan/birleştirilen sütunlara ekleyin. <code>pg_stat_user_indexes</code> ile hiç kullanılmayan indeksleri tespit edin.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="aidx">
+                  <div class="reveal-trigger" onclick="document.getElementById('aidx').classList.toggle('open')">
+                    Görev: İndeksin Etkisini Gör <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Önce <code>EXPLAIN SELECT * FROM konya.mahalleler WHERE ilce = 'Selçuklu';</code> çalıştırın (Seq Scan görünür). Sonra <code>CREATE INDEX</code> ile indeks ekleyip aynı sorguyu tekrar EXPLAIN edin — Index Scan'a düşer.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 17: VERİ YÖNETİMİ (DML) -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -824,8 +967,8 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.11 — Veri Yönetimi (DML)</div>
-              <div class="slide-header-num">15 / 21</div>
+              <div class="slide-header-title">0.12 — Veri Yönetimi (DML)</div>
+              <div class="slide-header-num">17 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -873,7 +1016,7 @@ WHERE ad = 'Yeni Mahalle';</div>
         </div>
       </div>
 
-      <!-- SLAYT 16: MVCC VE TRANSACTION -->
+      <!-- SLAYT 18: MVCC VE TRANSACTION -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -885,8 +1028,8 @@ WHERE ad = 'Yeni Mahalle';</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.12 — MVCC ve Transaction Yapısı</div>
-              <div class="slide-header-num">16 / 21</div>
+              <div class="slide-header-title">0.13 — MVCC ve Transaction Yapısı</div>
+              <div class="slide-header-num">18 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -931,7 +1074,7 @@ COMMIT;    -- Başarılıysa kalıcı yap
         </div>
       </div>
 
-      <!-- SLAYT 17: ISOLATION LEVELS VE LOCK -->
+      <!-- SLAYT 19: ISOLATION LEVELS VE LOCK -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -943,8 +1086,8 @@ COMMIT;    -- Başarılıysa kalıcı yap
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.13 — Isolation Levels ve Lock Mekanizması</div>
-              <div class="slide-header-num">17 / 21</div>
+              <div class="slide-header-title">0.14 — Isolation Levels ve Lock Mekanizması</div>
+              <div class="slide-header-num">19 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -993,7 +1136,7 @@ WHERE wait_event_type = 'Lock';</div>
         </div>
       </div>
 
-      <!-- SLAYT 18: VACUUM ANALYZE AUTOVACUUM -->
+      <!-- SLAYT 20: VACUUM ANALYZE AUTOVACUUM -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -1005,8 +1148,8 @@ WHERE wait_event_type = 'Lock';</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.14 — VACUUM, ANALYZE ve Autovacuum</div>
-              <div class="slide-header-num">18 / 21</div>
+              <div class="slide-header-title">0.15 — VACUUM, ANALYZE ve Autovacuum</div>
+              <div class="slide-header-num">20 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1052,7 +1195,7 @@ ANALYZE konya.mahalleler;      -- İstatistik güncelle</div>
         </div>
       </div>
 
-      <!-- SLAYT 19: pg_stat_activity VE PERFORMANS TAKİBİ -->
+      <!-- SLAYT 21: pg_stat_activity VE PERFORMANS TAKİBİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -1064,8 +1207,8 @@ ANALYZE konya.mahalleler;      -- İstatistik güncelle</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.15 — pg_stat_activity ve Performans Takibi</div>
-              <div class="slide-header-num">19 / 21</div>
+              <div class="slide-header-title">0.16 — pg_stat_activity ve Performans Takibi</div>
+              <div class="slide-header-num">21 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1112,7 +1255,7 @@ WHERE state = 'active'
         </div>
       </div>
 
-      <!-- SLAYT 20: TABLESPACE MANTIĞI -->
+      <!-- SLAYT 22: TABLESPACE MANTIĞI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -1124,8 +1267,8 @@ WHERE state = 'active'
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.16 — Tablespace Mantığı</div>
-              <div class="slide-header-num">20 / 21</div>
+              <div class="slide-header-title">0.17 — Tablespace Mantığı</div>
+              <div class="slide-header-num">22 / 23</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1169,7 +1312,7 @@ ALTER TABLE konya.mahalleler SET TABLESPACE ssd_fast;</div>
         </div>
       </div>
 
-      <!-- SLAYT 21: KAPANIŞ -->
+      <!-- SLAYT 23: KAPANIŞ -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -1195,7 +1338,7 @@ ALTER TABLE konya.mahalleler SET TABLESPACE ssd_fast;</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 21</div>
+    <div class="nav-status" id="navStatus">1 / 23</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 
