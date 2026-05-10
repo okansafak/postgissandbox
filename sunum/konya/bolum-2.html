@@ -297,22 +297,22 @@ FROM konya.il_sinirlari;</div>
                 <div class="s-text-tech">Hat üzerinde yüzde (%) veya mesafe bazlı konum bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- DİKKAT: osm_yollar verimiz MULTILINESTRING, ancak fonksiyon LINESTRING ister.
--- Bu yüzden ST_GeometryN(geom, 1) ile ana çizgiyi seçiyoruz.
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- 30135 ID'li yolun (MULTILINESTRING) ana çizgisini (LINESTRING) alır.
+-- Verdiğimiz noktanın bu hat üzerindeki oransal (%0-1 arası) yerini bulur.
 SELECT id, 
        ST_LineLocatePoint(
            ST_GeometryN(geom, 1), 
-           ST_GeomFromText('POINT(32.50 37.80)', 4326)
+           ST_GeomFromText('POINT(32.498179 37.894507)', 4326)
        ) AS hat_uzerindeki_oran
 FROM konya.osm_yollar 
-LIMIT 5;</div>
+WHERE id = 30135;</div>
                 <div class="reveal-box" id="q25">
                   <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: M Koordinatı nedir? <span>▼</span></div>
                   <div class="reveal-content">Measure (Ölçü) koordinatıdır. Metraj veya zaman bilgisi burada saklanır (Z koordinatından farklıdır).</div>
                 </div>
                 <div class="reveal-box" id="g25">
                   <div class="reveal-trigger" onclick="document.getElementById('g25').classList.toggle('open')">Görev: Orta Nokta Bul <span>▼</span></div>
-                  <div class="reveal-content"><code>ST_LineInterpolatePoint</code> ile bir yolun tam %50'sine bir nokta atayın.</div>
+                  <div class="reveal-content"><code>ST_LineInterpolatePoint</code> fonksiyonunu kullanarak <strong>30135 ID'li</strong> yolun tam ortasındaki (%50 yani 0.5) koordinatı (Point) bulan sorguyu yazın.</div>
                 </div>
               </div>
             </div>
