@@ -891,7 +891,7 @@ WHERE i.ad ILIKE 'selçuklu';</div>
         </div>
       </div>
 
-      <!-- SLAYT 17: 2.5 PARTITION PRUNING -->
+      <!-- SLAYT 19: 2.5 PARTITION PRUNING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -900,26 +900,32 @@ WHERE i.ad ILIKE 'selçuklu';</div>
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.5 — Partition Pruning</div>
+              <div class="slide-header-title">2.5 — Partition Pruning (Ayıklama)</div>
               <div class="slide-header-num">19 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Akıllı <span>Okuma</span></div>
-                <div class="s-text-tech">WHERE koşuluna göre sadece ilgili partition'ların okunması. Gereksiz partition'lar hiç diske bile uğramaz.</div>
+                <div class="s-headline-tech">Gereksizi <span>Ayıkla</span></div>
+                <div class="s-text-tech">Partition Pruning (Bölüm Ayıklama): PostgreSQL'in aranan veri için sadece ilgili çekmeceyi açıp, ilgisiz çekmecelere diskte hiç dokunmaması sanatıdır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SET enable_partition_pruning = on; -- Bölüm ayıklamayı (pruning) aktif et
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1. PostgreSQL'de bu harika özellik genelde açıktır, emin olmak için:
+SET enable_partition_pruning = on;
 
--- Selçuklu sorgusunda Meram/Karatay partition'ları atlanır:
-EXPLAIN SELECT * FROM binalar WHERE ilce = 'Selçuklu';</div>
+-- 2. Ana dolaba (binalar_bolunmus) Selçuklu'yu soralım:
+EXPLAIN ANALYZE 
+SELECT * FROM konya.binalar_bolunmus 
+WHERE ilce = 'Selçuklu';
+
+-- Çıktıda sadece "binalar_selcuklu" tablosunun okunduğunu, 
+-- "binalar_meram" ve "binalar_karatay"ın tamamen es geçildiğini göreceksiniz.</div>
                 <div class="reveal-box" id="q217">
-                  <div class="reveal-trigger" onclick="document.getElementById('q217').classList.toggle('open')">Kritik Soru: Pruning olmadan ne olur? <span>▼</span></div>
-                  <div class="reveal-content">Tüm partition'lar taranır. 10 ilçeli bir partition'da sadece 1 ilçe sorgulanıyorsa %90 gereksiz disk okuma yapılır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q217').classList.toggle('open')">Kritik Soru: Pruning olmazsa ne kaybederiz? <span>▼</span></div>
+                  <div class="reveal-content">Düşünün ki 31 ilçesi olan Konya'nın tüm bina verilerini parçaladınız. Sadece Selçuklu'yu sorguladığınızda PostgreSQL gidip diğer 30 ilçenin çekmecesini de açıp incelerse, diski %97 oranında <strong>boşu boşuna</strong> yormuş olursunuz. Pruning mekanizması, PostgreSQL'e "Sadece aradığım çekmeceyi aç, diğerlerinin yüzüne bile bakma!" emrini verir.</div>
                 </div>
                 <div class="reveal-box" id="g217">
-                  <div class="reveal-trigger" onclick="document.getElementById('g217').classList.toggle('open')">Görev: Pruning Kontrolü <span>▼</span></div>
-                  <div class="reveal-content">Sorgunuzun sadece ilgili partition'ı taradığını <code>EXPLAIN</code> çıktısındaki tablo isimlerinden teyit edin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g217').classList.toggle('open')">Görev: Çekmeceyi Gözlemle <span>▼</span></div>
+                  <div class="reveal-content">Yukarıdaki <code>EXPLAIN ANALYZE</code> sorgusunu çalıştırın ve DBeaver'da çıkan metne bakın. Okunan tablo listesinde Meram veya Karatay geçiyor mu? Sistemin doğrudan <code>konya.binalar_selcuklu</code> hedefine kilitlendiğini kanıtlayın.</div>
                 </div>
               </div>
             </div>
