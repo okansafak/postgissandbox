@@ -850,39 +850,31 @@ VACUUM ANALYZE konya.mahalleler;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Büyük <span>Veri</span> Mimarisi</div>
-                <div class="s-text-tech">Veriyi fiziksel olarak mantıklı parçalara ayırmak.</div>
+                <div class="s-headline-tech">Çekmece <span>Mantığı</span></div>
+                <div class="s-text-tech">Milyonlarca veriyi tek bir devasa tabloda tutmak yerine, arka planda mantıksal çekmecelere (Partition) bölme sanatı.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px;">-- 1. ÜST tablo — partition key'i tanımla (LIST partitioning)
-CREATE TABLE konya.binalar (
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1. ANA DOLAP (Parent Table): İçinde veri tutmaz, sadece yönlendiricidir.
+CREATE TABLE konya.binalar_bolunmus (
   id    SERIAL,
   geom  GEOMETRY(POLYGON, 4326),
   ilce  TEXT NOT NULL
 ) PARTITION BY LIST (ilce);
 
--- 2. Her ilçe için ayrı PARTITION oluştur
-CREATE TABLE konya.binalar_selcuklu
-  PARTITION OF konya.binalar FOR VALUES IN ('Selçuklu');
-CREATE TABLE konya.binalar_meram
-  PARTITION OF konya.binalar FOR VALUES IN ('Meram');
-CREATE TABLE konya.binalar_karatay
-  PARTITION OF konya.binalar FOR VALUES IN ('Karatay');
+-- 2. ÇEKMECELER (Partitions): Verinin fiziksel olarak yazıldığı gerçek alt tablolar.
+CREATE TABLE konya.binalar_selcuklu PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Selçuklu');
+CREATE TABLE konya.binalar_meram    PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Meram');
+CREATE TABLE konya.binalar_karatay  PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Karatay');
 
--- 3. INSERT üst tabloya yapılır — uygun partition'a otomatik gider
-INSERT INTO konya.binalar (geom, ilce)
-SELECT geom, 'Selçuklu' FROM konya.osm_binalar WHERE ...;
-
--- 4. Her partition'a ayrı GIST indeks (zorunlu — parent indekslenmez)
-CREATE INDEX idx_bs_geom ON konya.binalar_selcuklu USING GIST(geom);
-CREATE INDEX idx_bm_geom ON konya.binalar_meram   USING GIST(geom);</div>
+-- NOT: INSERT işlemini ana dolaba (binalar_bolunmus) yaparsınız. 
+-- O ilçe adına bakıp veriyi otomatik olarak doğru çekmeceye atar!</div>
                 <div class="reveal-box" id="q216">
-                  <div class="reveal-trigger" onclick="document.getElementById('q216').classList.toggle('open')">Kritik Soru: İlçe bazlı partitioning neden avantajlıdır? <span>▼</span></div>
-                  <div class="reveal-content">Sadece Selçuklu sorgulanırken Meram/Karatay partition'ları diske <strong>hiç uğramaz</strong> (Partition Pruning). Ayrıca her partition daha küçük olduğu için GIST indeks de sığ ve hızlıdır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q216').classList.toggle('open')">Kritik Soru: İlçe bazlı Partitioning neden efsanedir? <span>▼</span></div>
+                  <div class="reveal-content">Siz kodunuzda tek bir tabloymuş gibi (<code>SELECT * FROM binalar_bolunmus WHERE ilce='Selçuklu'</code>) sorgu atarsınız. PostgreSQL arka planda sadece Selçuklu çekmecesini açar, Meram ve Karatay dosyalarına <strong>hiç dokunmaz</strong> (Buna Partition Pruning denir). Ayrıca her çekmecenin indeksi kendine ait ve ufak olduğu için aramalar ışık hızında gerçekleşir.</div>
                 </div>
                 <div class="reveal-box" id="g216">
-                  <div class="reveal-trigger" onclick="document.getElementById('g216').classList.toggle('open')">Görev: RANGE Partition Tasarla <span>▼</span></div>
-                  <div class="reveal-content">Tarih bazlı log tablosu için <code>PARTITION BY RANGE (created_at)</code> kullanarak aylık partition'lara nasıl ayıracağınızı planlayın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g216').classList.toggle('open')">Görev: Çekmeceyi Doldur <span>▼</span></div>
+                  <div class="reveal-content">Yukarıdaki kodları çalıştırarak parçalı tablonuzu kurun. Ardından kendi oluşturduğunuz Point verilerini veya mevcut ilçelerdeki binaları bu ana tabloya (<code>INSERT</code>) edin ve verilerin doğru alt tablolara gidip gitmediğini DBeaver'dan kontrol edin!</div>
                 </div>
               </div>
             </div>
