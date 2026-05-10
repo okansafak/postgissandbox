@@ -297,7 +297,15 @@ FROM konya.il_sinirlari;</div>
                 <div class="s-text-tech">Hat üzerinde yüzde (%) veya mesafe bazlı konum bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_LineLocatePoint(geom, 'POINT(32.5 37.8)') FROM osm_yollar; -- Hat üzerindeki konumu bul</div>
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- DİKKAT: osm_yollar verimiz MULTILINESTRING, ancak fonksiyon LINESTRING ister.
+-- Bu yüzden ST_GeometryN(geom, 1) ile ana çizgiyi seçiyoruz.
+SELECT id, 
+       ST_LineLocatePoint(
+           ST_GeometryN(geom, 1), 
+           ST_GeomFromText('POINT(32.50 37.80)', 4326)
+       ) AS hat_uzerindeki_oran
+FROM konya.osm_yollar 
+LIMIT 5;</div>
                 <div class="reveal-box" id="q25">
                   <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: M Koordinatı nedir? <span>▼</span></div>
                   <div class="reveal-content">Measure (Ölçü) koordinatıdır. Metraj veya zaman bilgisi burada saklanır (Z koordinatından farklıdır).</div>
