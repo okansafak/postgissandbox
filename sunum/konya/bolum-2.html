@@ -152,7 +152,7 @@ ogr2ogr -f "PostgreSQL" ^
   -nln mahalleler_secili ^
   -lco SCHEMA=konya ^
   -nlt PROMOTE_TO_MULTI ^
-  -sql "SELECT id, ad, nufus FROM mahalleler" ^
+  -sql "SELECT id, text AS mahalle_adi, source_d_1 AS ilce_adi FROM mahalleler" ^
   -t_srs EPSG:4326 ^
   -overwrite ^
   -progress
