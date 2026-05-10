@@ -863,14 +863,17 @@ SELECT ST_Distance(
             </div>
             <div style="display:flex; gap:20px; padding:20px 40px; height:calc(100% - 76px); overflow:hidden;">
               <div style="width:190px; flex-shrink:0; display:flex; flex-direction:column; gap:14px;">
-                <div class="s-headline-tech" style="font-size:32px; line-height:1.1;">Aynı Mesafe — <span>6</span> Farklı Sonuç</div>
-                <div class="s-text-tech" style="font-size:12px;">0.05° hareket 3 yönde ve 6 farklı CRS'de hesaplanıyor. <strong>Web Mercator</strong> ölçüm için kullanılmamalı.</div>
+                <div class="s-headline-tech" style="font-size:32px; line-height:1.1;">Aynı Mesafe — <span>7</span> Farklı Sonuç</div>
+                <div class="s-text-tech" style="font-size:12px;">0.05° hareket 3 yönde ve 7 farklı yöntemle hesaplanıyor. <strong>Web Mercator</strong> ölçüm için kullanılmamalı.</div>
                 <div class="card-tech" style="background:#222; border-color:var(--theme-blue); padding:12px;">
-                  <div style="color:var(--theme-blue); font-weight:800; font-size:12px; margin-bottom:6px;">Pratik Kural</div>
-                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:10px; line-height:1.8;">
-                    <li><code style="color:#fff">geography</code> — en doğru</li>
-                    <li><code style="color:#fff">5255</code> TM33 — Konya</li>
-                    <li><code style="color:#fff">32636</code> UTM — Türkiye</li>
+                  <div style="color:var(--theme-blue); font-weight:800; font-size:12px; margin-bottom:6px;">7 Yöntem</div>
+                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:9.5px; line-height:1.75;">
+                    <li><code style="color:#fff">DistanceSphere</code> — Küre (sabit R)</li>
+                    <li><code style="color:#fff">Haversine</code> — El formülü</li>
+                    <li><code style="color:#fff">geography</code> — Jeodezik</li>
+                    <li><code style="color:#fff">DistanceSpheroid</code> — WGS84</li>
+                    <li><code style="color:#fff">32636</code> UTM 6° — Türkiye</li>
+                    <li><code style="color:#fff">5255</code> TM33 3° — Konya</li>
                     <li><code style="color:#f66">3857</code> Web — sadece görsel</li>
                   </ul>
                 </div>
@@ -884,41 +887,46 @@ SELECT ST_Distance(
                 </div>
               </div>
               <div style="flex:1; overflow:hidden; display:flex; flex-direction:column; gap:8px;">
-                <div class="code-block" style="flex:1; overflow-y:auto; font-size:8.5px; line-height:1.4; margin:0; white-space:pre;">WITH geom AS (
+                <div class="code-block" style="flex:1; overflow-y:auto; font-size:7.5px; line-height:1.4; margin:0; white-space:pre-wrap; word-break:break-word;">WITH geom AS (
   SELECT
     ST_SetSRID(ST_Point(32.4846, 37.8719), 4326) AS p0,
-    ST_SetSRID(ST_Point(32.4846 + 0.05,   37.8719),        4326) AS p_east,  -- YATAY
-    ST_SetSRID(ST_Point(32.4846,           37.8719 + 0.05), 4326) AS p_north, -- DÜŞEY
+    ST_SetSRID(ST_Point(32.4846 + 0.05, 37.8719), 4326) AS p_east,   -- YATAY
+    ST_SetSRID(ST_Point(32.4846, 37.8719 + 0.05), 4326) AS p_north,  -- DÜŞEY
     ST_SetSRID(ST_Point(32.4846 - 0.035355, 37.8719 + 0.035355), 4326) AS p_nw -- ÇAPRAZ
 )
 SELECT 'YATAY (DOĞU)' AS yon,
-  ROUND(ST_DistanceSphere(p0, p_east)::numeric, 2)::text                                              AS sphere_m,
-  ROUND(ST_Distance(p0::geography, p_east::geography)::numeric, 2)::text                             AS geography_m,
+  ROUND(ST_DistanceSphere(p0, p_east)::numeric, 2)::text AS pg_sphere_m,
+  ROUND((6371000*2*ASIN(SQRT(POWER(SIN(RADIANS(ST_Y(p_east)-ST_Y(p0))/2),2)+COS(RADIANS(ST_Y(p0)))*COS(RADIANS(ST_Y(p_east)))*POWER(SIN(RADIANS(ST_X(p_east)-ST_X(p0))/2),2))))::numeric,2)::text AS math_haversine_m,
+  ROUND(ST_Distance(p0::geography, p_east::geography)::numeric, 2)::text AS geography_m,
   ROUND(ST_DistanceSpheroid(p0, p_east, 'SPHEROID["WGS 84",6378137,298.257223563]')::numeric, 2)::text AS spheroid_m,
-  ROUND(ST_Distance(ST_Transform(p0,32636), ST_Transform(p_east,32636))::numeric, 2)::text           AS utm6_m,
-  ROUND(ST_Distance(ST_Transform(p0, 5255), ST_Transform(p_east, 5255))::numeric, 2)::text           AS tm33_m,
-  ROUND(ST_Distance(ST_Transform(p0, 3857), ST_Transform(p_east, 3857))::numeric, 2)::text           AS web_m
+  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_east, 32636))::numeric, 2)::text AS utm6_m,
+  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_east, 5255))::numeric, 2)::text AS itrf3_m,
+  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_east, 3857))::numeric, 2)::text AS web_mercator_m
 FROM geom
 UNION ALL
 SELECT 'DÜŞEY (KUZEY)',
   ROUND(ST_DistanceSphere(p0, p_north)::numeric, 2)::text,
+  ROUND((6371000*2*ASIN(SQRT(POWER(SIN(RADIANS(ST_Y(p_north)-ST_Y(p0))/2),2)+COS(RADIANS(ST_Y(p0)))*COS(RADIANS(ST_Y(p_north)))*POWER(SIN(RADIANS(ST_X(p_north)-ST_X(p0))/2),2))))::numeric,2)::text,
   ROUND(ST_Distance(p0::geography, p_north::geography)::numeric, 2)::text,
   ROUND(ST_DistanceSpheroid(p0, p_north, 'SPHEROID["WGS 84",6378137,298.257223563]')::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0,32636), ST_Transform(p_north,32636))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 5255), ST_Transform(p_north, 5255))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 3857), ST_Transform(p_north, 3857))::numeric, 2)::text
+  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_north, 32636))::numeric, 2)::text,
+  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_north, 5255))::numeric, 2)::text,
+  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_north, 3857))::numeric, 2)::text
 FROM geom
 UNION ALL
 SELECT 'ÇAPRAZ (HİPOTENÜS)',
   ROUND(ST_DistanceSphere(p0, p_nw)::numeric, 2)::text,
+  ROUND((6371000*2*ASIN(SQRT(POWER(SIN(RADIANS(ST_Y(p_nw)-ST_Y(p0))/2),2)+COS(RADIANS(ST_Y(p0)))*COS(RADIANS(ST_Y(p_nw)))*POWER(SIN(RADIANS(ST_X(p_nw)-ST_X(p0))/2),2))))::numeric,2)::text,
   ROUND(ST_Distance(p0::geography, p_nw::geography)::numeric, 2)::text,
   ROUND(ST_DistanceSpheroid(p0, p_nw, 'SPHEROID["WGS 84",6378137,298.257223563]')::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0,32636), ST_Transform(p_nw,32636))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 5255), ST_Transform(p_nw, 5255))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 3857), ST_Transform(p_nw, 3857))::numeric, 2)::text
+  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_nw, 32636))::numeric, 2)::text,
+  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_nw, 5255))::numeric, 2)::text,
+  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_nw, 3857))::numeric, 2)::text
 FROM geom
 UNION ALL
-SELECT 'BİLGİ', 'Küre Sabit R', 'Hassas Jeodezik', 'WGS84 Spheroid', 'UTM (6°)', 'TM33 (3°)', 'Web Mercator';</div>
+SELECT 'BİLGİ',
+  'Küre Sabit R', 'Trig Haversine', 'Hassas Jeodezik',
+  'WGS84 Spheroid', 'UTM (6 derece)', 'ITRF (3 derece)', 'Web Mercator (Hatalı)';</div>
               </div>
             </div>
           </div>
