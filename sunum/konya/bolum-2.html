@@ -427,7 +427,7 @@ CREATE INDEX idx_poi_spgist ON konya.poi USING SPGIST(geom);
 
 -- 3. Hızı EXPLAIN ANALYZE ile test edin
 EXPLAIN ANALYZE 
-SELECT id, fclass 
+SELECT id, ad, kategori 
 FROM konya.poi 
 WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
                   </div>
