@@ -316,7 +316,13 @@ FROM konya.osm_yollar WHERE id = 30135;</div>
                 </div>
                 <div class="reveal-box" id="g25">
                   <div class="reveal-trigger" onclick="document.getElementById('g25').classList.toggle('open')">Görev: Orta Nokta Bul <span>▼</span></div>
-                  <div class="reveal-content"><code>ST_LineInterpolatePoint</code> fonksiyonunu kullanarak <strong>30135 ID'li</strong> yolun tam ortasındaki (%50 yani 0.5) koordinatı (Point) bulan sorguyu yazın.</div>
+                  <div class="reveal-content">
+                    <code>ST_LineInterpolatePoint</code> fonksiyonunu kullanarak <strong>30135 ID'li</strong> yolun tam ortasındaki (%50 yani 0.5) koordinatı (Point) bulan sorguyu yazın.
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
+SELECT ST_LineInterpolatePoint(ST_GeometryN(geom, 1), 0.5) AS orta_nokta
+FROM konya.osm_yollar 
+WHERE id = 30135;</div>
+                  </div>
                 </div>
               </div>
             </div>
