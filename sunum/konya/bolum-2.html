@@ -354,13 +354,14 @@ SELECT degrees(ST_Azimuth(
   ST_SetSRID(ST_Point(32.5040, 37.8710), 4326)   -- Mevlana Müzesi
 )) AS bearing_derece;
 
--- CLOSEST POINT + ShortestLine: bina → en yakın yol mesafesi
+-- CLOSEST POINT + ShortestLine: Bina → en yakın yol analizi
 WITH bina AS (
   SELECT ST_SetSRID(ST_Point(32.4920, 37.8727), 4326) AS p
 )
 SELECT y.id,
-  ST_AsText(ST_ClosestPoint(y.geom, b.p))                AS en_yakin_nokta,
-  ROUND(ST_Length(ST_ShortestLine(y.geom, b.p)::geography)::numeric, 1) AS metre
+  -- DBeaver'da Bina noktasını, Yolu ve aralarındaki Dik Çizgiyi tek seferde görelim
+  ST_Collect(ARRAY[b.p, y.geom, ST_ShortestLine(y.geom, b.p)]) AS harita,
+  ROUND(ST_Length(ST_ShortestLine(y.geom, b.p)::geography)::numeric, 1) || ' m' AS uzaklik_metre
 FROM konya.osm_yollar y, bina b
 ORDER BY y.geom &lt;-&gt; b.p   -- KNN — en yakın 1 yol
 LIMIT 1;</div>
