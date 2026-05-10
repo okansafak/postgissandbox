@@ -401,18 +401,22 @@ ORDER BY y.geom &lt;-&gt; b.p LIMIT 1;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>İndeks</span> Gücü</div>
-                <div class="s-text-tech">GiST ve çakışmayan veriler için SP-GIST farkı.</div>
+                <div class="s-headline-tech">Mekansal <span>İndeks</span></div>
+                <div class="s-text-tech">Hangi geometri tipinde hangi indeksi kullanmalıyız? GiST ve SP-GiST arasındaki temel fark nedir?</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE INDEX idx_gist ON tablo USING GIST(geom); -- Mekansal (GiST) indeks oluştur</div>
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) GiST (R-Tree): Poligon ve Çizgiler için mecburidir. (İç içe geçen kutular mantığı)
+CREATE INDEX IF NOT EXISTS idx_binalar_gist ON konya.osm_binalar USING GIST(geom);
+
+-- 2) SP-GiST (Quad-tree): Birbiriyle kesişemeyen Noktalar (POI, Adres) için çok daha hızlıdır!
+CREATE INDEX IF NOT EXISTS idx_poi_spgist ON konya.poi USING SPGIST(geom);</div>
                 <div class="reveal-box" id="q27">
-                  <div class="reveal-trigger" onclick="document.getElementById('q27').classList.toggle('open')">Kritik Soru: SP-GIST ne zaman hızlanır? <span>▼</span></div>
-                  <div class="reveal-content">Nokta verileri (Adresler) gibi üst üste binmeyen, seyrek ama geniş alana yayılan verilerde GiST'ten hızlıdır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q27').classList.toggle('open')">Kritik Soru: Neden her şeye sadece GiST kurup geçmiyoruz? <span>▼</span></div>
+                  <div class="reveal-content">GiST, objeleri kapsayan 'Bounding Box'ları üst üste binebilen klasörler gibi tutar; geniş poligonlar için mecburidir. SP-GiST ise mekanı satranç tahtası gibi kesişmeyen hücrelere böler. Milyonlarca <strong>POI (Nokta)</strong> verisinde SP-GiST kullanmak ağaç derinliğini azalttığı için çok daha hızlı arama sağlar.</div>
                 </div>
                 <div class="reveal-box" id="g27">
-                  <div class="reveal-trigger" onclick="document.getElementById('g27').classList.toggle('open')">Görev: İndeks Oluştur <span>▼</span></div>
-                  <div class="reveal-content"><code>osm_binalar</code> tablosunda GIST indeksi yoksa hemen oluşturun ve sorgu süresini ölçün.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g27').classList.toggle('open')">Görev: İndeks Kapışması (Performance Test) <span>▼</span></div>
+                  <div class="reveal-content"><code>konya.poi</code> tablosundaki mevcut GiST indeksini (<code>idx_poi_geom</code>) silin. Yerine <code>SPGIST</code> indeksi kurarak geniş bir alanda nokta sorgusu (ST_Contains vb.) çalıştırın ve <code>EXPLAIN ANALYZE</code> ile süreyi kıyaslayın.</div>
                 </div>
               </div>
             </div>
