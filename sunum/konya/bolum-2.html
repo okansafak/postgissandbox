@@ -535,7 +535,7 @@ CREATE INDEX idx_bina_merkez ON konya.osm_binalar USING GIST(ST_Centroid(geom));
         </div>
       </div>
 
-      <!-- SLAYT 12: 2.3 ANALYZE VE İNDEKS TAKİBİ -->
+      <!-- SLAYT 12: 2.3 ANALYZE -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -544,50 +544,65 @@ CREATE INDEX idx_bina_merkez ON konya.osm_binalar USING GIST(ST_Centroid(geom));
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.3 — ANALYZE ve İndeks Takibi</div>
+              <div class="slide-header-title">2.3 — ANALYZE: Veritabanının Pusulası</div>
               <div class="slide-header-num">12 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">İstatistik <span>Toplama</span></div>
-                <div class="s-text-tech" style="margin-bottom:18px;"><strong>ANALYZE</strong> planlayıcının kullandığı satır sayısı, dağılım ve en sık değer istatistiklerini günceller. <strong>pg_stat_user_indexes</strong> ile hangi indeksin gerçekten kullanıldığını izleyebilirsiniz.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow);">
-                  <div class="card-tech-title">Önemli Sistem Görünümleri</div>
-                  <div class="card-tech-text" style="color:#aaa;"><code>pg_stat_user_indexes</code> — indeks kullanımı<br><code>pg_stat_user_tables</code> — tablo seq/index oranı<br><code>pg_stats</code> — dağılım histogramları</div>
-                </div>
+                <div class="s-headline-tech">Yol <span>Haritası</span></div>
+                <div class="s-text-tech">Sorgu Planlayıcısı (Query Planner) kararlarını haritaya bakarak verir. Haritayı güncel tutmak şarttır!</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px;">-- 1. İstatistikleri güncelle (büyük yüklemeden sonra şart)
-ANALYZE konya.mahalleler;
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- Tablodaki verilerin yoğunluk haritasını ve istatistiklerini çıkarır
+-- Saniyeler sürer ama performansı kalıcı olarak artırır.
 ANALYZE konya.osm_binalar;
-
--- 2. İndekslerin gerçek kullanımını gör
-SELECT
-  indexrelname  AS indeks,
-  idx_scan      AS okuma_sayisi,
-  idx_tup_read  AS okunan_satir,
-  pg_size_pretty(pg_relation_size(indexrelid)) AS boyut
-FROM pg_stat_user_indexes
-WHERE schemaname = 'konya'
-ORDER BY idx_scan DESC;
-
--- 3. HİÇ kullanılmayan indeksleri tespit et (silmeyi düşün)
-SELECT indexrelname, pg_size_pretty(pg_relation_size(indexrelid)) AS bos_yere_yer
-FROM pg_stat_user_indexes
-WHERE schemaname = 'konya' AND idx_scan = 0;
-
--- 4. Tablo bazlı seq/index okuma oranı
-SELECT relname,
-  seq_scan, idx_scan,
-  ROUND(100.0 * idx_scan / NULLIF(seq_scan + idx_scan, 0), 1) AS indeks_yuzde
-FROM pg_stat_user_tables WHERE schemaname = 'konya';</div>
-                <div class="reveal-box" id="q2an">
-                  <div class="reveal-trigger" onclick="document.getElementById('q2an').classList.toggle('open')">Kritik Soru: ANALYZE'ı ne sıklıkla çalıştırmalıyım? <span>▼</span></div>
-                  <div class="reveal-content">Autovacuum çoğu durumda otomatik yapar. Ama büyük bir <code>COPY</code>, toplu <code>UPDATE</code> ya da <code>CREATE INDEX</code>'ten <strong>hemen sonra</strong> manuel çalıştırın — yoksa planlayıcı eski istatistiklere göre yanlış plan üretebilir.</div>
+ANALYZE konya.mahalleler;</div>
+                <div class="reveal-box" id="q31">
+                  <div class="reveal-trigger" onclick="document.getElementById('q31').classList.toggle('open')">Kritik Soru: ANALYZE yapmazsam ne olur? <span>▼</span></div>
+                  <div class="reveal-content">Veritabanına bir anda 1 milyon veri yüklerseniz, veritabanının bundan anında haberi olmaz. Hala eski (boş) tablonun kurallarına göre işlem yapmaya çalışır ve sorgular felç olur. Yeni veri yüklendiğinde veya büyük silinmeler yaşandığında PostgreSQL'e <strong>"Haritayı Güncelle!"</strong> demek için <code>ANALYZE</code> komutu kullanılır.</div>
                 </div>
-                <div class="reveal-box" id="g2an">
-                  <div class="reveal-trigger" onclick="document.getElementById('g2an').classList.toggle('open')">Görev: Ölü İndeks Avı <span>▼</span></div>
-                  <div class="reveal-content">Yukarıdaki #3 sorgusunu çalıştırıp <code>idx_scan = 0</code> olan indeks varsa toplam ne kadar yer kapladığını hesaplayın. Test ortamında DROP INDEX ile silmeyi deneyin.</div>
+                <div class="reveal-box" id="g31">
+                  <div class="reveal-trigger" onclick="document.getElementById('g31').classList.toggle('open')">Görev: Haritayı Güncelle <span>▼</span></div>
+                  <div class="reveal-content">DBeaver üzerinden <code>konya.poi</code> tablosuna sağ tıklayıp "Analyze" seçeneğini bulun veya doğrudan SQL konsoluna <code>ANALYZE konya.poi;</code> yazıp çalıştırarak ne kadar hızlı bittiğini görün.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 12-B: 2.3 İNDEKS DEDEKTİFLİĞİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — İndeks Takibi (Dedektiflik)</div>
+              <div class="slide-header-num">12-B / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ölü <span>İndeks</span> Avı</div>
+                <div class="s-text-tech">Kurduğumuz indeksler gerçekten işe yarıyor mu? Diski boşuna mı dolduruyoruz?</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- HİÇ kullanılmamış (idx_scan = 0) "çöp" indeksleri bulalım
+SELECT 
+  indexrelname AS indeks_adi, 
+  pg_size_pretty(pg_relation_size(indexrelid)) AS bosuna_kapladigi_yer
+FROM pg_stat_user_indexes
+WHERE schemaname = 'konya' 
+  AND idx_scan = 0; -- Kritik filtre: okuma sayısı sıfır olanlar</div>
+                <div class="reveal-box" id="q32">
+                  <div class="reveal-trigger" onclick="document.getElementById('q32').classList.toggle('open')">Kritik Soru: Kullanılmayan indeks neden zararlıdır? <span>▼</span></div>
+                  <div class="reveal-content">Sadece diskte yer kaplamakla kalmaz! Tabloya her yeni veri (INSERT/UPDATE) geldiğinde PostgreSQL bu "işe yaramaz" indeksi de güncellemek zorunda kalır. Yani ölü indeksler kayıt ekleme işlemlerinizi yavaşlatır. Mümkün olan <strong>en az sayıda</strong> indeksle yola devam edilmelidir.</div>
+                </div>
+                <div class="reveal-box" id="g32">
+                  <div class="reveal-trigger" onclick="document.getElementById('g32').classList.toggle('open')">Görev: Çöpü Dışarı Çıkar <span>▼</span></div>
+                  <div class="reveal-content">Yukarıdaki SQL kodunu çalıştırın. Listede daha önce kurduğunuz ama testlerde hiç kullanılmadığını (idx_scan=0) gördüğünüz bir indeks çıkarsa, onu <code>DROP INDEX indeks_adi;</code> ile silip veritabanını rahatlatın.</div>
                 </div>
               </div>
             </div>
