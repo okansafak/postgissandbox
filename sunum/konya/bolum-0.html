@@ -71,59 +71,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 2: 0.1 VERİTABANI NEDİR? -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">0.1 — Veritabanı Nedir?</div>
-              <div class="slide-header-num">02 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Verinin <span>Kurumsal</span> Hafızası</div>
-                <div class="s-text-tech">Veritabanı, verilerin yapılandırılmış, güvenli ve hızlı erişilebilir şekilde saklandığı bir yönetim sistemidir.</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Neden Gereklidir?</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Excel sınırlıdır. Veritabanı ise milyonlarca satırı saniyeler içinde işler, eşzamanlı erişime izin verir ve veri bütünlüğünü korur.</div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- İlişkisel Veritabanı (RDBMS)
--- PostgreSQL: Dünyanın en gelişmiş açık kaynak veritabanı.
--- PostGIS: PostgreSQL'e 'mekan' yeteneği katan eklenti.</div>
-                
-                <div class="reveal-box" id="q01">
-                  <div class="reveal-trigger" onclick="document.getElementById('q01').classList.toggle('open')">
-                    Kritik Soru: Neden Excel yerine Veritabanı? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Excel'de aynı anda sadece bir kişi yazabilir ve veri boyutu arttıkça yavaşlar. Veritabanı binlerce eşzamanlı kullanıcıyı destekler ve indeksleme ile anlık sonuç verir.
-                  </div>
-                </div>
-
-                <div class="reveal-box" id="a01">
-                  <div class="reveal-trigger" onclick="document.getElementById('a01').classList.toggle('open')">
-                    Görev: Mevcut Bağlantıyı Kontrol Et <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>SELECT current_user, current_database();</code> komutunu çalıştırarak hangi yetkiyle hangi veritabanında olduğunuzu görün.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 3: 0.2 KURULUM VE VERİ SETİ -->
+      <!-- SLAYT 2: KURULUM SEÇENEKLERİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -135,14 +83,14 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.2 — Kurulum Seçenekleri</div>
-              <div class="slide-header-num">03 / 21</div>
+              <div class="slide-header-title">0.1 — Kurulum Seçenekleri</div>
+              <div class="slide-header-num">02 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech"><span>PostGIS</span> Kurulumu</div>
                 <div class="s-text-tech">Eğitim ortamı için PostgreSQL 16 ve PostGIS eklentisine ihtiyacımız var. İki farklı yöntemden birini seçebilirsiniz:</div>
-                
+
                 <div class="card-tech" style="background:#222; border-color:var(--theme-accent); margin-top:16px;">
                   <div style="color:var(--theme-accent); font-weight:800; font-size:14px">Seçenek A: Docker (Önerilen)</div>
                   <div style="color:#aaa; font-size:11px; margin-top:4px">
@@ -173,7 +121,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 0.2.1: VERİ SETİNİN YÜKLENMESİ -->
+      <!-- SLAYT 3: VERİ SETİNİN YÜKLENMESİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -185,14 +133,14 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.2.1 — Veri Setinin Yüklenmesi</div>
-              <div class="slide-header-num">04 / 21</div>
+              <div class="slide-header-title">0.1.1 — Veri Setinin Yüklenmesi</div>
+              <div class="slide-header-num">03 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Hazır Veriyi <span>İçe Aktarma</span></div>
                 <div class="s-text-tech">Eğitmen tarafından paylaşılan <b>konya_egitim_yedek.sql</b> dosyasını kendi ortamınıza yüklemek için gerekli komutlar.</div>
-                
+
                 <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Docker Kuranlar İçin (Seçenek A)</div>
                   <div style="color:#aaa; font-size:11px; margin-top:8px; line-height:1.7">
@@ -229,7 +177,68 @@
         </div>
       </div>
 
-      <!-- SLAYT 4: 0.3.1 VERİ TİPLERİ 1 -->
+      <!-- SLAYT 4: VERİTABANI NEDİR? -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.2 — Veritabanı Nedir?</div>
+              <div class="slide-header-num">04 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kurumun <span>Dijital</span> Belleği</div>
+                <div class="s-text-tech">Veritabanı; verilerin tablolar halinde düzenlendiği, birbirleriyle ilişkilendirilebildiği ve çok sayıda kullanıcının eş zamanlı olarak güvenle erişebildiği bir yönetim sistemidir.</div>
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediyelerde Neden Kritik?</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Parsel kayıtları, imar planları, yol ağı ve nüfus verileri birbirine bağlıdır. Bu ilişkili yapıyı yalnızca bir veritabanı sağlıklı yönetebilir — Excel bu ölçekte yetersiz kalır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;"><span style="color:#888">-- PostgreSQL: ilişkisel veri + güçlü SQL motoru
+-- PostGIS: mekansal sorgulama yeteneği kazandırır</span>
+
+SELECT count(*), ilce
+FROM parceller
+WHERE alan_m2 > 1000
+GROUP BY ilce
+ORDER BY count(*) DESC;
+
+<span style="color:#888">-- Konya'nın tüm büyük parselleri ilçe bazında,
+-- yüz binlerce satır — saniyeler içinde.</span></div>
+
+                <div class="reveal-box" id="q01">
+                  <div class="reveal-trigger" onclick="document.getElementById('q01').classList.toggle('open')">
+                    Tartışma: Belediyenizde veri nerede saklanıyor? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Excel dosyaları, paylaşımlı klasörler, CBS yazılımının kendi formatları... Bunların hangisi merkezi bir veritabanıyla karşılaştırıldığında eşzamanlı erişim, versiyon takibi ve ilişkisel sorgulama sunabilir?
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="a01">
+                  <div class="reveal-trigger" onclick="document.getElementById('a01').classList.toggle('open')">
+                    Görev: Bağlantıyı ve Sürümü Doğrula <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT current_user, current_database(), version();</code><br><br>
+                    Hangi kullanıcıyla, hangi veritabanına, hangi PostgreSQL sürümüyle bağlandığınızı görün. İlk çalıştırdığınız SQL satırı bu olacak.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: CLUSTER, DATABASE VE SCHEMA -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -241,8 +250,65 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.3.1 — Veri Tipleri (Sayı & Metin)</div>
+              <div class="slide-header-title">0.3 — Cluster, Database ve Schema</div>
               <div class="slide-header-num">05 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veri <span>Hiyerarşisi</span></div>
+                <div class="s-text-tech">PostgreSQL'de her şey bir sıra düzeni izler: Cluster (Servis) → Database → Schema → Table. Şemalar farklı birimlerin verilerini birbirinden izole eder.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediye Örneği</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya BB'de: <code>konya</code> veritabanı → <code>imar</code>, <code>ulasim</code>, <code>altyapi</code> şemaları → her birinde kendi tabloları. Şema olmadan binlerce tablo tek yerde birbirine karışır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Aktif bağlantı bilgisi
+SELECT current_database(),  -- Hangi veritabanında?
+       current_schema(),    -- Hangi şemada?
+       current_user;        -- Kim olarak?
+
+-- Tüm şemaları listele
+SELECT nspname AS sema_adi
+FROM pg_namespace
+WHERE nspname NOT LIKE 'pg_%'
+ORDER BY nspname;</div>
+                <div class="reveal-box" id="q011">
+                  <div class="reveal-trigger" onclick="document.getElementById('q011').classList.toggle('open')">
+                    Kritik Soru: Şema kullanımı neden şarttır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Verileri mantıksal olarak gruplar (İmar, Ulaşım, Altyapı vb.). Şema olmadan binlerce tablo arasında kaybolursunuz. <code>GRANT</code> yetkilerini şema düzeyinde vermek de çok daha kolaydır.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a011">
+                  <div class="reveal-trigger" onclick="document.getElementById('a011').classList.toggle('open')">
+                    Görev: Şema Oluştur <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>CREATE SCHEMA egitim;</code> komutuyla yeni bir şema oluşturun. Ardından <code>SET search_path = egitim;</code> ile o şemaya geçin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 6: VERİ TİPLERİ SAYI & METİN -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.4.1 — Veri Tipleri (Sayı & Metin)</div>
+              <div class="slide-header-num">06 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -274,7 +340,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 5: 0.3.2 VERİ TİPLERİ 2 -->
+      <!-- SLAYT 7: VERİ TİPLERİ TARİH, MANTIK, GELİŞMİŞ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -286,14 +352,14 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.3.2 — Tarih, Mantık ve Gelişmiş Tipler</div>
-              <div class="slide-header-num">06 / 21</div>
+              <div class="slide-header-title">0.4.2 — Tarih, Mantık ve Gelişmiş Tipler</div>
+              <div class="slide-header-num">07 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Gelişmiş <span>Veriler</span></div>
                 <div class="s-text-tech">Zamanı, mantıksal durumları depolamak ve yeni nesil modern uygulamalar için JSON, Array gibi yapılardan faydalanmak.</div>
-                
+
                 <div class="card-tech" style="background:#222; border-color:var(--theme-accent); margin-top:16px;">
                   <div style="color:var(--theme-accent); font-weight:800; font-size:14px">JSONB — Esnek Veri Deposu</div>
                   <div style="color:#aaa; font-size:12px; margin-top:6px; line-height:1.6;">
@@ -325,7 +391,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 6: 0.3.3 VERİ TİPLERİ UYGULAMA -->
+      <!-- SLAYT 8: VERİ TİPLERİ ÖRNEK UYGULAMA -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -337,8 +403,8 @@
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.3.3 — Veri Tipleri: Örnek Uygulama</div>
-              <div class="slide-header-num">07 / 21</div>
+              <div class="slide-header-title">0.4.3 — Veri Tipleri: Örnek Uygulama</div>
+              <div class="slide-header-num">08 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -358,10 +424,10 @@ CREATE TABLE konya.personel (
 );
 
 -- Tabloya veri ekleme
-INSERT INTO konya.personel 
-    (tc_kimlik, ad_soyad, maas, ise_giris, ek_bilgiler) 
-VALUES 
-    ('12345678901', 'Ahmet Yılmaz', 45000.50, '2022-01-15', 
+INSERT INTO konya.personel
+    (tc_kimlik, ad_soyad, maas, ise_giris, ek_bilgiler)
+VALUES
+    ('12345678901', 'Ahmet Yılmaz', 45000.50, '2022-01-15',
      '{"telefon": "05551234567", "departman": "CBS"}'::jsonb);
 </div>
 
@@ -379,7 +445,7 @@ VALUES
         </div>
       </div>
 
-      <!-- SLAYT 5: 0.4 SELECT VE SÜTUN SEÇİMİ -->
+      <!-- SLAYT 9: SELECT VE SÜTUN SEÇİMİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -391,8 +457,8 @@ VALUES
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.4 — SELECT ve Sütun Seçimi</div>
-              <div class="slide-header-num">08 / 21</div>
+              <div class="slide-header-title">0.5 — SELECT ve Sütun Seçimi</div>
+              <div class="slide-header-num">09 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -429,7 +495,7 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
         </div>
       </div>
 
-      <!-- SLAYT 5: 0.3 WHERE -->
+      <!-- SLAYT 10: WHERE İLE FİLTRELEME -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -447,8 +513,8 @@ FROM konya.ilce_sinirlari;               -- Veri kaynağı</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.5 — WHERE ile Filtreleme</div>
-              <div class="slide-header-num">09 / 21</div>
+              <div class="slide-header-title">0.6 — WHERE ile Filtreleme</div>
+              <div class="slide-header-num">10 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -516,7 +582,7 @@ WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
         </div>
       </div>
 
-      <!-- SLAYT 6: 0.4 SIRALAMA VE LIMIT -->
+      <!-- SLAYT 11: ORDER BY VE LIMIT -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -534,14 +600,14 @@ WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.6 — ORDER BY ve LIMIT</div>
-              <div class="slide-header-num">10 / 21</div>
+              <div class="slide-header-title">0.7 — ORDER BY ve LIMIT</div>
+              <div class="slide-header-num">11 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Düzen ve Limit: <span>ORDER BY</span></div>
                 <div class="s-text-tech">Sorgu sonuçlarını istenen değere göre sıralamak ve sadece ilk N satırı getirmek (LIMIT).</div>
-                
+
                 <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Endüstriyel Bağlam</div>
                   <div style="color:#aaa; font-size:12px; margin-top:4px">AFAD, deprem anında en yüksek nüfus yoğunluğuna sahip ilçeleri "ORDER BY yogunluk DESC LIMIT 10" ile çekerek otomatik kaynak önceliklendirmesi yapar.</div>
@@ -549,11 +615,11 @@ WHERE (ad ILIKE '%yeni%' OR ad ILIKE 'ata%')
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- Sıralama ve sınırlandırma
-SELECT ad, nufus 
-FROM konya.ilce_sinirlari 
+SELECT ad, nufus
+FROM konya.ilce_sinirlari
 ORDER BY nufus DESC      -- Büyükten küçüğe sırala
 LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
-                
+
                 <div class="reveal-box" id="q06">
                   <div class="reveal-trigger" onclick="document.getElementById('q06').classList.toggle('open')">
                     Kritik Soru: Neden LIMIT 1000000 yazmamalıyız? <span>▼</span>
@@ -577,7 +643,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
         </div>
       </div>
 
-      <!-- SLAYT 8: 0.7 TOPLAMA FONKSİYONLARI -->
+      <!-- SLAYT 12: TOPLAMA FONKSİYONLARI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -589,8 +655,8 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.7 — Toplama Fonksiyonları</div>
-              <div class="slide-header-num">11 / 21</div>
+              <div class="slide-header-title">0.8 — Toplama Fonksiyonları</div>
+              <div class="slide-header-num">12 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -599,7 +665,7 @@ LIMIT 5 OFFSET 0;        -- İlk 5 kaydı al (Sayfalama)</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- Toplama işlemleri
-SELECT COUNT(*) AS toplam_ilce, 
+SELECT COUNT(*) AS toplam_ilce,
        SUM(nufus) AS toplam_nufus
 FROM konya.ilce_sinirlari;</div>
 
@@ -626,7 +692,7 @@ FROM konya.ilce_sinirlari;</div>
         </div>
       </div>
 
-      <!-- SLAYT 9: 0.8 GROUP BY VE HAVING -->
+      <!-- SLAYT 13: GROUP BY VE HAVING -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -638,8 +704,8 @@ FROM konya.ilce_sinirlari;</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.8 — GROUP BY ve HAVING</div>
-              <div class="slide-header-num">12 / 21</div>
+              <div class="slide-header-title">0.9 — GROUP BY ve HAVING</div>
+              <div class="slide-header-num">13 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -648,8 +714,8 @@ FROM konya.ilce_sinirlari;</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- Gruplama ve filtreleme
-SELECT ilce, COUNT(*) 
-FROM konya.mahalleler 
+SELECT ilce, COUNT(*)
+FROM konya.mahalleler
 GROUP BY ilce         -- Belirli sütuna göre paketle
 HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
 
@@ -676,7 +742,7 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
         </div>
       </div>
 
-      <!-- SLAYT 8: 0.6 JOIN -->
+      <!-- SLAYT 14: JOIN VE TABLO İLİŞKİLERİ -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -694,14 +760,14 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.9 — JOIN ve Tablo İlişkileri</div>
-              <div class="slide-header-num">13 / 21</div>
+              <div class="slide-header-title">0.10 — JOIN ve Tablo İlişkileri</div>
+              <div class="slide-header-num">14 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">İlişkisel Güç: <span>JOIN</span></div>
                 <div class="s-text-tech">Dağınık tabloları ortak bir ID (veya PostGIS'te ortak bir mekan / kesişim) üzerinden tek bir tabloda birleştirmek.</div>
-                
+
                 <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">PostGIS ve JOIN</div>
                   <div style="color:#aaa; font-size:12px; margin-top:4px">Mekansal sorgularda JOIN koşulu genellikle ST_Intersects(a.geom, b.geom) gibi bir geometrik ilişki komutudur. İnanılmaz güçlüdür.</div>
@@ -709,10 +775,10 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- Tablo birleştirme
-SELECT m.ad AS mahalle, h.ad AS hastane 
-FROM konya.mahalleler m 
+SELECT m.ad AS mahalle, h.ad AS hastane
+FROM konya.mahalleler m
 JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
-                
+
                 <div class="reveal-box" id="q09">
                   <div class="reveal-trigger" onclick="document.getElementById('q09').classList.toggle('open')">
                     Kritik Soru: JOIN mi Mekansal Join mi? <span>▼</span>
@@ -736,7 +802,7 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
         </div>
       </div>
 
-      <!-- SLAYT 9: 0.7 DML -->
+      <!-- SLAYT 15: VERİ YÖNETİMİ (DML) -->
       <div class="slide-outer">
 
         <div class="slide-wrapper">
@@ -754,14 +820,14 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                   </div>
                 </div>
               </div>
-              <div class="slide-header-title">0.10 — Veri Yönetimi (DML)</div>
-              <div class="slide-header-num">14 / 21</div>
+              <div class="slide-header-title">0.11 — Veri Yönetimi (DML)</div>
+              <div class="slide-header-num">15 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Değişimi Yönetmek: <span>DML</span></div>
                 <div class="s-text-tech">INSERT ile ekle, UPDATE ile güncelle, DELETE ile sil. Fiziksel tablonun kaderini bu komutlar belirler.</div>
-                
+
                 <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Tehlikeli Sular</div>
                   <div style="color:#aaa; font-size:12px; margin-top:4px">Eğer UPDATE veya DELETE yaparken WHERE koşulu yazmayı unutursanız, tablodaki tüm satırlar etkilenir ve geri dönüşü yoktur.</div>
@@ -769,17 +835,17 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- INSERT: Yeni veri ekleme
-INSERT INTO konya.mahalleler(ad, nufus, ilce) 
+INSERT INTO konya.mahalleler(ad, nufus, ilce)
 VALUES ('Yeni Mahalle', 1500, 'Selçuklu');
 
 -- UPDATE: Mevcut veriyi güncelleme
-UPDATE konya.mahalleler SET nufus = 1250 
+UPDATE konya.mahalleler SET nufus = 1250
 WHERE ad = 'Yeni Mahalle';
 
 -- DELETE: Veriyi silme
-DELETE FROM konya.mahalleler 
+DELETE FROM konya.mahalleler
 WHERE ad = 'Yeni Mahalle';</div>
-                
+
                 <div class="reveal-box" id="q10">
                   <div class="reveal-trigger" onclick="document.getElementById('q10').classList.toggle('open')">
                     Kritik Soru: Neden silmek (DELETE) tehlikelidir? <span>▼</span>
@@ -803,7 +869,7 @@ WHERE ad = 'Yeni Mahalle';</div>
         </div>
       </div>
 
-      <!-- SLAYT 15: 0.11 CLUSTER – DATABASE – SCHEMA -->
+      <!-- SLAYT 16: MVCC VE TRANSACTION -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -815,122 +881,8 @@ WHERE ad = 'Yeni Mahalle';</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.11 — Cluster, Database ve Schema</div>
-              <div class="slide-header-num">15 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Veri <span>Hiyerarşisi</span></div>
-                <div class="s-text-tech">PostgreSQL'de her şey bir sıra düzeni izler: Cluster (Servis) → Database → Schema → Table. Şemalar farklı birimlerin verilerini birbirinden izole eder.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Belediye Örneği</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Konya BB'de: <code>konya</code> veritabanı → <code>imar</code>, <code>ulasim</code>, <code>altyapi</code> şemaları → her birinde kendi tabloları. Şema olmadan binlerce tablo tek yerde birbirine karışır.</div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Aktif bağlantı bilgisi
-SELECT current_database(),  -- Hangi veritabanında?
-       current_schema(),    -- Hangi şemada?
-       current_user;        -- Kim olarak?
-
--- Tüm şemaları listele
-SELECT nspname AS sema_adi
-FROM pg_namespace
-WHERE nspname NOT LIKE 'pg_%'
-ORDER BY nspname;</div>
-                <div class="reveal-box" id="q011">
-                  <div class="reveal-trigger" onclick="document.getElementById('q011').classList.toggle('open')">
-                    Kritik Soru: Şema kullanımı neden şarttır? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Verileri mantıksal olarak gruplar (İmar, Ulaşım, Altyapı vb.). Şema olmadan binlerce tablo arasında kaybolursunuz. <code>GRANT</code> yetkilerini şema düzeyinde vermek de çok daha kolaydır.
-                  </div>
-                </div>
-                <div class="reveal-box" id="a011">
-                  <div class="reveal-trigger" onclick="document.getElementById('a011').classList.toggle('open')">
-                    Görev: Şema Oluştur <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>CREATE SCHEMA egitim;</code> komutuyla yeni bir şema oluşturun. Ardından <code>SET search_path = egitim;</code> ile o şemaya geçin.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 16: 0.12 TABLESPACE MANTIĞI -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">0.12 — Tablespace Mantığı</div>
+              <div class="slide-header-title">0.12 — MVCC ve Transaction Yapısı</div>
               <div class="slide-header-num">16 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Fiziksel <span>Disk</span> Yönetimi</div>
-                <div class="s-text-tech">Tablespace, veritabanı nesnelerini (tablo, indeks) istediğiniz fiziksel disk konumuna yönlendirmenizi sağlar.</div>
-                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Gerçek Hayat Senaryosu</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Aktif CBS verisi → hızlı <b style="color:#fff">SSD</b> (<code>ssd_fast</code>). 10 yıllık arşiv → ucuz <b style="color:#fff">HDD</b> (<code>hdd_archive</code>). Hem hız hem maliyet dengesi.</div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Mevcut tablespace'leri listele
-SELECT spcname AS adi,
-       pg_tablespace_location(oid) AS konum
-FROM pg_tablespace;
-
--- Yeni tablespace oluştur
-CREATE TABLESPACE ssd_fast LOCATION '/mnt/ssd/pgdata';
-
--- Tabloyu farklı diske taşı
-ALTER TABLE konya.mahalleler SET TABLESPACE ssd_fast;</div>
-                <div class="reveal-box" id="q012">
-                  <div class="reveal-trigger" onclick="document.getElementById('q012').classList.toggle('open')">
-                    Kritik Soru: Tablespace nerede lazımdır? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Aktif veriyi hızlı SSD'ye, 10 yıllık arşiv verisini ucuz HDD diskine koyarak maliyet avantajı sağlarız. Büyük şehirlerin CBS sistemlerinde disk maliyeti ciddi bir kalemdir.
-                  </div>
-                </div>
-                <div class="reveal-box" id="a012">
-                  <div class="reveal-trigger" onclick="document.getElementById('a012').classList.toggle('open')">
-                    Görev: Tablespace Kontrol Et <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>SELECT * FROM pg_tablespace;</code> komutuyla sisteminizde tanımlı tablespace'leri görün. <code>pg_default</code> ve <code>pg_global</code> her kurulumda hazır gelir.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 17: 0.13 MVCC VE TRANSACTION -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">0.13 — MVCC ve Transaction Yapısı</div>
-              <div class="slide-header-num">17 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -975,7 +927,7 @@ COMMIT;    -- Başarılıysa kalıcı yap
         </div>
       </div>
 
-      <!-- SLAYT 18: 0.14 ISOLATION LEVELS VE LOCK -->
+      <!-- SLAYT 17: ISOLATION LEVELS VE LOCK -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -987,8 +939,8 @@ COMMIT;    -- Başarılıysa kalıcı yap
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.14 — Isolation Levels ve Lock Mekanizması</div>
-              <div class="slide-header-num">18 / 21</div>
+              <div class="slide-header-title">0.13 — Isolation Levels ve Lock Mekanizması</div>
+              <div class="slide-header-num">17 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1037,7 +989,7 @@ WHERE wait_event_type = 'Lock';</div>
         </div>
       </div>
 
-      <!-- SLAYT 19: 0.15 VACUUM ANALYZE AUTOVACUUM -->
+      <!-- SLAYT 18: VACUUM ANALYZE AUTOVACUUM -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -1049,8 +1001,8 @@ WHERE wait_event_type = 'Lock';</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.15 — VACUUM, ANALYZE ve Autovacuum</div>
-              <div class="slide-header-num">19 / 21</div>
+              <div class="slide-header-title">0.14 — VACUUM, ANALYZE ve Autovacuum</div>
+              <div class="slide-header-num">18 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1096,7 +1048,7 @@ ANALYZE konya.mahalleler;      -- İstatistik güncelle</div>
         </div>
       </div>
 
-      <!-- SLAYT 20: 0.16 pg_stat_activity -->
+      <!-- SLAYT 19: pg_stat_activity VE PERFORMANS TAKİBİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -1108,8 +1060,8 @@ ANALYZE konya.mahalleler;      -- İstatistik güncelle</div>
                   <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">0.16 — pg_stat_activity ve Performans Takibi</div>
-              <div class="slide-header-num">20 / 21</div>
+              <div class="slide-header-title">0.15 — pg_stat_activity ve Performans Takibi</div>
+              <div class="slide-header-num">19 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1148,6 +1100,63 @@ WHERE state = 'active'
                   </div>
                   <div class="reveal-content">
                     <code>SELECT pid, query, state FROM pg_stat_activity WHERE state != 'idle';</code> komutuyla veritabanınızda o an çalışan tüm sorguları listeleyin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 20: TABLESPACE MANTIĞI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">0.16 — Tablespace Mantığı</div>
+              <div class="slide-header-num">20 / 21</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Fiziksel <span>Disk</span> Yönetimi</div>
+                <div class="s-text-tech">Tablespace, veritabanı nesnelerini (tablo, indeks) istediğiniz fiziksel disk konumuna yönlendirmenizi sağlar.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Gerçek Hayat Senaryosu</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Aktif CBS verisi → hızlı <b style="color:#fff">SSD</b> (<code>ssd_fast</code>). 10 yıllık arşiv → ucuz <b style="color:#fff">HDD</b> (<code>hdd_archive</code>). Hem hız hem maliyet dengesi.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; line-height:1.6;">-- Mevcut tablespace'leri listele
+SELECT spcname AS adi,
+       pg_tablespace_location(oid) AS konum
+FROM pg_tablespace;
+
+-- Yeni tablespace oluştur
+CREATE TABLESPACE ssd_fast LOCATION '/mnt/ssd/pgdata';
+
+-- Tabloyu farklı diske taşı
+ALTER TABLE konya.mahalleler SET TABLESPACE ssd_fast;</div>
+                <div class="reveal-box" id="q012">
+                  <div class="reveal-trigger" onclick="document.getElementById('q012').classList.toggle('open')">
+                    Kritik Soru: Tablespace nerede lazımdır? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Aktif veriyi hızlı SSD'ye, 10 yıllık arşiv verisini ucuz HDD diskine koyarak maliyet avantajı sağlarız. Büyük şehirlerin CBS sistemlerinde disk maliyeti ciddi bir kalemdir.
+                  </div>
+                </div>
+                <div class="reveal-box" id="a012">
+                  <div class="reveal-trigger" onclick="document.getElementById('a012').classList.toggle('open')">
+                    Görev: Tablespace Kontrol Et <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT * FROM pg_tablespace;</code> komutuyla sisteminizde tanımlı tablespace'leri görün. <code>pg_default</code> ve <code>pg_global</code> her kurulumda hazır gelir.
                   </div>
                 </div>
               </div>
