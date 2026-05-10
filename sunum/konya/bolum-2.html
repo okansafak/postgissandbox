@@ -112,11 +112,17 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
               <div class="s-panel-left">
                 <div class="s-headline-tech">Format <span>Çevirici</span></div>
                 <div class="s-text-tech">GDAL'ın <strong>ogr2ogr</strong> aracı; Shapefile, GeoJSON, KML, DXF ve GDB'yi doğrudan PostGIS'e aktarır. <code>-t_srs</code> ile koordinat sistemi dönüşümünü tek komutta tamamlar.</div>
+                
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:15px; margin-bottom:15px; padding:12px;">
+                  <div class="card-tech-title" style="color:var(--theme-yellow); font-size:14px; margin-bottom:6px;">⚠️ Nasıl Çalıştırılır?</div>
+                  <div class="card-tech-text" style="color:#ccc; font-size:13px; line-height:1.4;">Bu araç <strong>QGIS</strong> ile birlikte gelir. Komutları Windows'ta başlat menüsünden <strong>OSGeo4W Shell</strong> uygulamasını açarak çalıştırmalısınız (psql içinde çalışmaz).</div>
+                </div>
+
                 <div class="s-text-tech" style="margin-top:14px; font-size:13px; opacity:0.8;">
                   <strong>Ne zaman ogr2ogr?</strong><br>
-                  Dış kaynaklı mekansal format (SHP, GeoJSON, KML) → PostGIS<br><br>
+                  Dış kaynaklı mekansal format (SHP, GeoJSON) → PostGIS<br><br>
                   <strong>Ne zaman COPY?</strong><br>
-                  Veri zaten PostgreSQL formatındaysa — COPY daha hızlı
+                  Veri düz metin/CSV formatındaysa — COPY çok daha hızlıdır
                 </div>
               </div>
               <div class="s-panel-right">
