@@ -862,9 +862,12 @@ CREATE TABLE konya.binalar_bolunmus (
 ) PARTITION BY LIST (ilce);
 
 -- 2. ÇEKMECELER (Partitions): Verinin fiziksel olarak yazıldığı gerçek alt tablolar.
-CREATE TABLE konya.binalar_selcuklu PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Selçuklu');
-CREATE TABLE konya.binalar_meram    PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Meram');
-CREATE TABLE konya.binalar_karatay  PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('Karatay');
+CREATE TABLE konya.binalar_selcuklu PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('SELÇUKLU', 'Selçuklu');
+CREATE TABLE konya.binalar_meram    PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('MERAM', 'Meram');
+CREATE TABLE konya.binalar_karatay  PARTITION OF konya.binalar_bolunmus FOR VALUES IN ('KARATAY', 'Karatay');
+
+-- HAYAT KURTARAN BİLGİ: Beklenmeyen bir ilçe gelirse sistem çökmesin diye "Diğer" çekmecesi açılır.
+CREATE TABLE konya.binalar_diger    PARTITION OF konya.binalar_bolunmus DEFAULT;
 
 -- 3. TEST EDELİM: GERÇEK VERİ DOLDURUYORUZ (Mekansal Kesişim ile)
 -- İlçe sınırlarından "Meram" poligonunu bulur, içindeki tüm binaları keser (ST_Intersects)
@@ -873,7 +876,7 @@ INSERT INTO konya.binalar_bolunmus (geom, ilce)
 SELECT b.geom, 'Meram'
 FROM konya.osm_binalar b
 JOIN konya.ilce_sinirlari i ON ST_Intersects(b.geom, i.geom)
-WHERE i.ad = 'Meram';</div>
+WHERE i.ad ILIKE 'meram';</div>
                 <div class="reveal-box" id="q216">
                   <div class="reveal-trigger" onclick="document.getElementById('q216').classList.toggle('open')">Kritik Soru: İlçe bazlı Partitioning neden efsanedir? <span>▼</span></div>
                   <div class="reveal-content">Siz kodunuzda tek bir tabloymuş gibi (<code>SELECT * FROM binalar_bolunmus WHERE ilce='Selçuklu'</code>) sorgu atarsınız. PostgreSQL arka planda sadece Selçuklu çekmecesini açar, Meram ve Karatay dosyalarına <strong>hiç dokunmaz</strong> (Buna Partition Pruning denir). Ayrıca her çekmecenin indeksi kendine ait ve ufak olduğu için aramalar ışık hızında gerçekleşir.</div>
