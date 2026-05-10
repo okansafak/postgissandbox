@@ -311,8 +311,8 @@ SELECT id,
          ST_Length(ST_GeometryN(geom, 1)::geography))::numeric, 1) || ' m' AS mesafe_metre
 FROM konya.osm_yollar WHERE id = 30135;</div>
                 <div class="reveal-box" id="q25">
-                  <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: M Koordinatı nedir? <span>▼</span></div>
-                  <div class="reveal-content">Measure (Ölçü) koordinatıdır. Metraj veya zaman bilgisi burada saklanır (Z koordinatından farklıdır).</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: Nokta tam çizginin üzerinde mi olmalı? <span>▼</span></div>
+                  <div class="reveal-content">Hayır. <code>ST_LineLocatePoint</code>, noktanın çizgiye olan <strong>en yakın izdüşümünü</strong> (dikmesini) bulur ve oranlamayı ona göre yapar. Kaza yapan araç yoldan 50 metre tarlaya uçsa bile, otoyoldaki tam kilometresini bulabilirsiniz.</div>
                 </div>
                 <div class="reveal-box" id="g25">
                   <div class="reveal-trigger" onclick="document.getElementById('g25').classList.toggle('open')">Görev: Orta Nokta Bul <span>▼</span></div>
