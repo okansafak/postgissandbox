@@ -416,7 +416,21 @@ CREATE INDEX IF NOT EXISTS idx_poi_spgist ON konya.poi USING SPGIST(geom);</div>
                 </div>
                 <div class="reveal-box" id="g27">
                   <div class="reveal-trigger" onclick="document.getElementById('g27').classList.toggle('open')">Görev: İndeks Kapışması (Performance Test) <span>▼</span></div>
-                  <div class="reveal-content"><code>konya.poi</code> tablosundaki mevcut GiST indeksini (<code>idx_poi_geom</code>) silin. Yerine <code>SPGIST</code> indeksi kurarak geniş bir alanda nokta sorgusu (ST_Contains vb.) çalıştırın ve <code>EXPLAIN ANALYZE</code> ile süreyi kıyaslayın.</div>
+                  <div class="reveal-content">
+                    <code>konya.poi</code> tablosundaki mevcut GiST indeksini (<code>idx_poi_geom</code>) silin. Yerine <code>SPGIST</code> indeksi kurarak geniş bir alanda nokta sorgusu çalıştırın ve <code>EXPLAIN ANALYZE</code> ile süreyi kıyaslayın.
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP (Sırayla Çalıştırın):
+-- 1. Mevcut GiST indeksini uçurun
+DROP INDEX IF EXISTS konya.idx_poi_geom;
+
+-- 2. Yerine SP-GiST kurun
+CREATE INDEX idx_poi_spgist ON konya.poi USING SPGIST(geom);
+
+-- 3. Hızı EXPLAIN ANALYZE ile test edin
+EXPLAIN ANALYZE 
+SELECT id, fclass 
+FROM konya.poi 
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
+                  </div>
                 </div>
               </div>
             </div>
