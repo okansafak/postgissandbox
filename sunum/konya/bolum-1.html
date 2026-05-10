@@ -204,7 +204,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.1 — Kuruluma ve Platforma Giriş</div>
-              <div class="slide-header-num">02 / 17</div>
+              <div class="slide-header-num">02 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -259,7 +259,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.2 — Geometri Tipleri</div>
-              <div class="slide-header-num">03 / 17</div>
+              <div class="slide-header-num">03 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -310,7 +310,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.3 — WKT, EWKT, WKB ve Metadata</div>
-              <div class="slide-header-num">04 / 17</div>
+              <div class="slide-header-num">04 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -353,59 +353,7 @@ SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
         </div>
       </div>
 
-      <!-- SLAYT 5: 1.4 GEÇERLİ VE GEÇERSİZ GEOMETRİ -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
-                <div class="logo-divider"></div>
-                <div class="logo-konya-box">
-                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
-                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
-                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
-                </div>
-              </div>
-              <div class="slide-header-title">1.4 — Geçerlilik (ST_IsValid)</div>
-              <div class="slide-header-num">05 / 17</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Geometri <span>Sağlığı</span></div>
-                <div class="s-text-tech">Kendi kendini kesen çizgiler (self-intersection) poligonu geçersiz kılar.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_IsValidReason(geom) -- Geometri geçersizse nedenini açıkla
-FROM konya.mahalleler
-WHERE ST_IsValid(geom) = false; -- Sadece geçersiz olanları süz</div>
-
-                <div class="reveal-box" id="q17">
-                  <div class="reveal-trigger" onclick="document.getElementById('q17').classList.toggle('open')">
-                    Kritik Soru: Neden geçersiz veri oluşur? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    Genellikle hatalı çizimlerden (kendi üzerine katlanan çizgiler) veya yanlış projeksiyon
-                    dönüşümlerinden kaynaklanır.
-                  </div>
-                </div>
-
-                <div class="reveal-box" id="a17">
-                  <div class="reveal-trigger" onclick="document.getElementById('a17').classList.toggle('open')">
-                    Görev: Hatalı Veriyi Onar <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    <code>ST_MakeValid(geom)</code> fonksiyonu bozuk geometriyi onarılmış olarak <b>geri döner</b> (tabloyu değiştirmez). Kalıcı onarım için şu şekilde kullanılır: <br>
-                    <code>UPDATE konya.mahalleler SET geom = ST_MakeValid(geom) WHERE ST_IsValid(geom) = false;</code>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 6: 1.5 SRID VE PROJEKSİYONLAR -->
+      <!-- SLAYT 5: 1.4 SRID VE PROJEKSİYONLAR -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -419,8 +367,8 @@ WHERE ST_IsValid(geom) = false; -- Sadece geçersiz olanları süz</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.5 — SRID ve Projeksiyonlar</div>
-              <div class="slide-header-num">06 / 17</div>
+              <div class="slide-header-title">1.4 — SRID ve Projeksiyonlar</div>
+              <div class="slide-header-num">05 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -463,7 +411,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 7: 1.6 GEOMETRY VS GEOGRAPHY -->
+      <!-- SLAYT 6: 1.5 GEOMETRY VS GEOGRAPHY -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -477,8 +425,8 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.6 — Geometry vs Geography Ayrımı</div>
-              <div class="slide-header-num">07 / 17</div>
+              <div class="slide-header-title">1.5 — Geometry vs Geography Ayrımı</div>
+              <div class="slide-header-num">06 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -517,7 +465,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 8: 1.7 SETSRID VS TRANSFORM VE TR SİSTEMLERİ -->
+      <!-- SLAYT 7: 1.6 SETSRID VS TRANSFORM VE TR SİSTEMLERİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -531,8 +479,8 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.7 — SetSRID != Transform ve Türkiye Sistemleri</div>
-              <div class="slide-header-num">08 / 17</div>
+              <div class="slide-header-title">1.6 — SetSRID != Transform ve Türkiye Sistemleri</div>
+              <div class="slide-header-num">07 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -545,10 +493,23 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                   <div style="color:#aaa; font-size:12px; margin-top:4px">ITRF96 / TM33 (EPSG:5255), UTM Zone 36N
                     (EPSG:32636). Konya genellikle TM33 veya WGS84 kullanır.</div>
                 </div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-blue); margin-top:12px;">
+                  <div style="color:var(--theme-blue); font-weight:800; font-size:13px; margin-bottom:8px;">WKT Parametreleri</div>
+                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:1.9;">
+                    <li><code style="color:#fff">GRS 1980</code> — Türkiye'nin kullandığı elipsoid</li>
+                    <li><code style="color:#fff">TOWGS84[0,0,0,0,0,0,0]</code> — WGS84 ile pratik fark yok</li>
+                    <li><code style="color:#fff">central_meridian: 33</code> — Konya bu zone içinde</li>
+                    <li><code style="color:#fff">false_easting: 500000</code> — Negatif X çıkmasın diye</li>
+                    <li><code style="color:#fff">UNIT["metre"]</code> — Birim: metre ✓</li>
+                  </ul>
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Transform(geom, 32636)) -- Geometriyi UTM 36N sistemine dönüştür
-FROM konya.mahalleler 
+                <div class="code-block" style="margin-bottom:16px;">-- TM33 sisteminin tam tanımını görün
+SELECT srtext FROM spatial_ref_sys WHERE srid = 5255;
+
+SELECT ST_AsText(ST_Transform(geom, 32636)) -- Geometriyi UTM 36N sistemine dönüştür
+FROM konya.mahalleler
 LIMIT 1;</div>
 
                 <div class="reveal-box" id="q110">
@@ -576,7 +537,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 9: 1.8 MEKANSAL İLİŞKİLER 1 -->
+      <!-- SLAYT 8: 1.7 MEKANSAL İLİŞKİLER 1 -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -590,8 +551,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.8 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
-              <div class="slide-header-num">09 / 17</div>
+              <div class="slide-header-title">1.7 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
+              <div class="slide-header-num">08 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -627,7 +588,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
         </div>
       </div>
 
-      <!-- SLAYT 10: 1.9 İLERİ İLİŞKİLER -->
+      <!-- SLAYT 9: 1.8 İLERİ İLİŞKİLER -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -641,8 +602,8 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.9 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
-              <div class="slide-header-num">10 / 17</div>
+              <div class="slide-header-title">1.8 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
+              <div class="slide-header-num">09 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -684,7 +645,7 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
         </div>
       </div>
 
-      <!-- SLAYT 11: 1.10 MEKANSAL JOIN MANTIĞI -->
+      <!-- SLAYT 10: 1.9 MEKANSAL JOIN MANTIĞI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -698,8 +659,8 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.10 — JOIN ile Mekansal İlişki</div>
-              <div class="slide-header-num">11 / 17</div>
+              <div class="slide-header-title">1.9 — JOIN ile Mekansal İlişki</div>
+              <div class="slide-header-num">10 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -738,7 +699,7 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
         </div>
       </div>
 
-      <!-- SLAYT 12: 1.11 ÖLÇÜM FONKSİYONLARI -->
+      <!-- SLAYT 11: 1.10 ÖLÇÜM FONKSİYONLARI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -752,8 +713,8 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.11 — Ölçüm (Distance, Area, Perimeter)</div>
-              <div class="slide-header-num">12 / 17</div>
+              <div class="slide-header-title">1.10 — Ölçüm (Distance, Area, Perimeter)</div>
+              <div class="slide-header-num">11 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -790,7 +751,7 @@ LIMIT 5;</div>
         </div>
       </div>
 
-      <!-- SLAYT 13: 1.12 CENTROID VS POINTONSURFACE -->
+      <!-- SLAYT 12: 1.11 CENTROID VS POINTONSURFACE -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -804,8 +765,8 @@ LIMIT 5;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.12 — Centroid vs PointOnSurface</div>
-              <div class="slide-header-num">13 / 17</div>
+              <div class="slide-header-title">1.11 — Centroid vs PointOnSurface</div>
+              <div class="slide-header-num">12 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -842,7 +803,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 14: 1.13 ANALİTİK FONKSİYONLAR -->
+      <!-- SLAYT 13: 1.12 ANALİTİK FONKSİYONLAR -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -856,8 +817,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.13 — Buffer, Union ve Intersection</div>
-              <div class="slide-header-num">14 / 17</div>
+              <div class="slide-header-title">1.12 — Buffer, Union ve Intersection</div>
+              <div class="slide-header-num">13 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -893,7 +854,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 15: 1.14 ENVELOPE VE CONVEXHULL -->
+      <!-- SLAYT 14: 1.13 ENVELOPE VE CONVEXHULL -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -907,8 +868,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.14 — Envelope ve ConvexHull</div>
-              <div class="slide-header-num">15 / 17</div>
+              <div class="slide-header-title">1.13 — Envelope ve ConvexHull</div>
+              <div class="slide-header-num">14 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -945,7 +906,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 16: 1.15 EN YAKIN N KOMŞU (KNN) -->
+      <!-- SLAYT 15: 1.14 EN YAKIN N KOMŞU (KNN) -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -959,8 +920,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.15 — En Yakın N Komşu (KNN)</div>
-              <div class="slide-header-num">16 / 17</div>
+              <div class="slide-header-title">1.14 — En Yakın N Komşu (KNN)</div>
+              <div class="slide-header-num">15 / 16</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -997,7 +958,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 17: KAPANIŞ -->
+      <!-- SLAYT 16: KAPANIŞ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-final">
