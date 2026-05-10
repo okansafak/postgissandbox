@@ -223,9 +223,11 @@ SELECT regexp_replace(mahalle_adi, ' Mah\.$', '') FROM konya.mahalleler_tkgm LIM
                 <div class="s-text-tech">Nokta azaltma ve görsel yumuşatma teknikleri.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- DİKKAT: SRID 4326'da ölçü birimi DERECEDİR. (0.001 derece ~111 metre)
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- DİKKAT: SRID 4326'da ölçü birimi DERECEDİR. (0.01 derece ~1.1 kilometre)
 -- 10.0 gibi bir değer verirseniz bütün şehri yutup yok eder!
-SELECT id, ST_SimplifyPreserveTopology(geom, 0.001) AS geom_sade 
+SELECT id, 
+       ST_SimplifyPreserveTopology(geom, 0.01) AS geom_sade,
+       geom AS geom_orjinal
 FROM konya.ilce_sinirlari LIMIT 5;</div>
                 <div class="reveal-box" id="q23">
                   <div class="reveal-trigger" onclick="document.getElementById('q23').classList.toggle('open')">Kritik Soru: Simplify komşu sınırları bozar mı? <span>▼</span></div>
