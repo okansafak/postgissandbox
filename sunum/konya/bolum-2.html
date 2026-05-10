@@ -122,6 +122,10 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px; line-height:1.6;">
 # Shapefile → PostGIS (koordinat dönüşümü ile)
+# -f         : Hedef Format (PostgreSQL vb.)
+# -nln       : Yeni Katman/Tablo Adı (New Layer Name)
+# -t_srs     : Hedef Koordinat Sistemi (Target SRS)
+# -overwrite : Tablo zaten varsa üzerine yaz
 ogr2ogr -f "PostgreSQL" \
   PG:"host=localhost dbname=konya user=postgres" \
   mahalleler.shp \
@@ -129,7 +133,7 @@ ogr2ogr -f "PostgreSQL" \
   -t_srs EPSG:4326 \
   -overwrite
 
-# Sadece belirli alanları aktar
+# Sadece belirli alanları aktar (-sql ile veriyi yoldayken filtrele)
 ogr2ogr -f "PostgreSQL" \
   PG:"host=localhost dbname=konya user=postgres" \
   mahalleler.shp \
