@@ -798,45 +798,36 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Tablo <span>Şişmesi</span> (Bloat)</div>
-                <div class="s-text-tech" style="margin-bottom:18px;">PostgreSQL <code>UPDATE</code> ve <code>DELETE</code>'lerde eski satırları silmez, "ölü" işaretler (MVCC). <strong>VACUUM</strong> bu ölü satırları temizler. <strong>VACUUM FULL</strong> diski geri kazandırır ama tabloyu kilitler.</div>
-                <div class="card-tech" style="border-color:#1a73e8;">
-                  <div class="card-tech-title" style="color:#1a73e8;">VACUUM (Standart)</div>
-                  <div class="card-tech-text">Kilit yok, paralel sorgular devam eder. Ölü satırları yeniden kullanılabilir yapar — ama disk küçülmez.</div>
+                <div class="s-headline-tech">Ölü <span>Satırlar</span> (Bloat)</div>
+                <div class="s-text-tech" style="margin-bottom:18px;">PostgreSQL'de bir satırı güncellediğinizde veya sildiğinizde o satır diskten silinmez! Sadece üstü kırmızı kalemle "ÖLÜ" diye çizilir (MVCC mantığı). <strong>VACUUM</strong> ise veritabanının temizlikçisidir; bu ölü satırları çöpe atıp yerine yeni verilerin gelmesini sağlar.</div>
+                <div class="card-tech" style="border-color:#1a73e8; margin-bottom:10px;">
+                  <div class="card-tech-title" style="color:#1a73e8;">VACUUM (Sessiz Temizlikçi)</div>
+                  <div class="card-tech-text">Arka planda sessizce çalışır, tabloyu kilitlemez. Ölü alanları yeni verilere hazır hale getirir ama tablonun diskteki boyutunu küçültmez.</div>
                 </div>
                 <div class="card-tech" style="border-color:#e53935;">
-                  <div class="card-tech-title" style="color:#e53935;">VACUUM FULL (Tam)</div>
-                  <div class="card-tech-text">Tabloyu kilitler ve yeniden yazar. Diski küçültür ama saatlerce sürebilir, üretimde dikkat!</div>
+                  <div class="card-tech-title" style="color:#e53935;">VACUUM FULL (Yıkım Ekibi)</div>
+                  <div class="card-tech-text">Tabloyu dışarıya kilitler ve sıfırdan yeniden yazar. Diskteki alanı kesin olarak küçültür ama saatlerce sürebilir, canlı sistemde asla gündüz yapılmaz!</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px;">-- 1. Standart vacuum + analiz: kilit yok, ölü satırları işaretle
-VACUUM ANALYZE konya.mahalleler;
-
--- 2. Tablo şişme oranını gör
-SELECT relname,
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1. Tablolarımızdaki "Ölü Satır" (Dead Tuple) miktarını görelim:
+SELECT relname AS tablo_adi,
   n_live_tup AS canli_satir,
   n_dead_tup AS olu_satir,
-  ROUND(100.0 * n_dead_tup / NULLIF(n_live_tup + n_dead_tup, 0), 1) AS olu_yuzde,
-  pg_size_pretty(pg_total_relation_size(relid)) AS toplam_boyut,
-  last_autovacuum
+  ROUND(100.0 * n_dead_tup / NULLIF(n_live_tup + n_dead_tup, 0), 1) AS olu_yuzde
 FROM pg_stat_user_tables
 WHERE schemaname = 'konya'
 ORDER BY olu_yuzde DESC NULLS LAST;
 
--- 3. Tablo bazlı autovacuum eşiğini sıkılaştır (yoğun UPDATE'li tablolar için)
-ALTER TABLE konya.osm_binalar
-  SET (autovacuum_vacuum_scale_factor = 0.05);  -- varsayılan 0.20
-
--- 4. DİKKAT: VACUUM FULL — tabloyu KİLİTLER, üretimde gece yap!
-VACUUM FULL konya.eski_log_tablosu;</div>
+-- 2. Standart temizlik yapıp, istatistikleri (ANALYZE) tazeleyelim:
+VACUUM ANALYZE konya.mahalleler;</div>
                 <div class="reveal-box" id="q2vac">
-                  <div class="reveal-trigger" onclick="document.getElementById('q2vac').classList.toggle('open')">Kritik Soru: Autovacuum yetmiyorsa? <span>▼</span></div>
-                  <div class="reveal-content">Yoğun UPDATE/DELETE'li tablolarda (örn: konum güncellemesi alan araç filosu) <strong>autovacuum_vacuum_scale_factor</strong>'u 0.05'e düşürmek gerekir. <code>n_dead_tup</code>'u izleyin — kalıcı %20'nin üzerindeyse parametre değiştirin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q2vac').classList.toggle('open')">Kritik Soru: Autovacuum zaten kendi kendine temizlemiyor mu? <span>▼</span></div>
+                  <div class="reveal-content">Evet! Normalde <strong>Autovacuum</strong> arkaplanda sessizce çalışır. Ancak saniyede yüzlerce konum verisi güncellenen bir araç filosu tablonuz varsa, Autovacuum hızınıza yetişemez ve tablonuz çılgınca şişer (Bloat). Böyle durumlarda manuel olarak veya ayarlarla oynayarak müdahale etmeniz gerekir.</div>
                 </div>
                 <div class="reveal-box" id="g2vac">
-                  <div class="reveal-trigger" onclick="document.getElementById('g2vac').classList.toggle('open')">Görev: Bloat Tespiti <span>▼</span></div>
-                  <div class="reveal-content">Yukarıdaki #2 sorgusunu çalıştırıp şişen tabloları bulun. <code>last_autovacuum</code> kolonu boşsa autovacuum çalışmamış demektir — manuel <code>VACUUM ANALYZE</code> çekin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g2vac').classList.toggle('open')">Görev: Ölüleri Say <span>▼</span></div>
+                  <div class="reveal-content">Yukarıdaki 1. SQL kodunu çalıştırın. Şemamızdaki hangi tablonun ne kadar ölü satır barındırdığını ve yüzde (%) olarak şişme oranını görün.</div>
                 </div>
               </div>
             </div>
