@@ -432,6 +432,10 @@ FROM konya.poi
 WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
                   </div>
                 </div>
+                <div class="reveal-box" id="q28">
+                  <div class="reveal-trigger" onclick="document.getElementById('q28').classList.toggle('open')">Dikkat: Neden "Seq Scan" Yaptı? <span>▼</span></div>
+                  <div class="reveal-content">Eğer analizde <strong>Index Scan</strong> yerine <strong>Seq Scan</strong> görüyorsanız hata yapmadınız! PostgreSQL, veri sayısı çok az olduğunda (örn. 1000 satır) indeks ağacını dolaşmanın maliyetli olduğunu bilir ve tabloyu baştan sona okur. İndeksin gücü milyonlarca veride ortaya çıkar. (Zorlamak için: <code>SET enable_seqscan = OFF;</code>)</div>
+                </div>
               </div>
             </div>
           </div>
