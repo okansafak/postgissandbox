@@ -715,21 +715,24 @@ WHERE ST_Intersects(geom,
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Hız <span>Kesiciler</span></div>
-                <div class="s-text-tech">İndeksi bozan sorgu alışkanlıklarından kurtulmak.</div>
+                <div class="s-headline-tech">Gizli <span>Tehlike</span></div>
+                <div class="s-text-tech">Sistemleri çökerten o meşhur "Mesafe Tuzağı" nedir ve ondan nasıl kaçınılır?</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Yavaş (Hesaplama gerektirir)
-WHERE ST_Distance(geom, p) < 500
--- Hızlı (İndeks kullanır)
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) YANLIŞ YÖNTEM: ST_Distance (Sistemi Yorar)
+-- Mantığı: "Konya'daki MİLYONLARCA bina ile aramdaki mesafeyi TEK TEK hesapla, sonra 500'den küçükleri getir."
+WHERE ST_Distance(geom, p) &lt; 500
+
+-- 2) DOĞRU YÖNTEM: ST_DWithin (İndeksi Uçurur)
+-- Mantığı: "Etrafıma anında 500 metrelik sanal bir Bounding Box çiz, kutu dışındakileri hesaplamadan çöpe at!"
 WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="reveal-box" id="q213">
-                  <div class="reveal-trigger" onclick="document.getElementById('q213').classList.toggle('open')">Kritik Soru: Neden DWithin? <span>▼</span></div>
-                  <div class="reveal-content">DWithin, mesafe filtresini <code>&&</code> operatörü ile optimize eder. Distance ise her satırı tek tek hesaplamak zorundadır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q213').classList.toggle('open')">Kritik Soru: İkisi de aynı sonucu veriyorsa neden ST_Distance yavaş? <span>▼</span></div>
+                  <div class="reveal-content">Çünkü <code>ST_Distance</code> komutu doğrudan matematik yapar, indeks kullanamaz! Mecburen tüm verilerin uzaklığını ölçmek için işlemciyi yorar (Seq Scan). <code>ST_DWithin</code> ise arka planda önce o sihirli <code>&amp;&amp;</code> (Kutu Kesişimi) operatörünü çalıştırır ve verilerin %99'unu hiç hesap yapmadan elediği için saliseler içinde sonuç verir (Index Scan).</div>
                 </div>
                 <div class="reveal-box" id="g213">
-                  <div class="reveal-trigger" onclick="document.getElementById('g213').classList.toggle('open')">Görev: Sorguyu Düzenle <span>▼</span></div>
-                  <div class="reveal-content">Eski bir <code>ST_Distance</code> sorgunuzu <code>ST_DWithin</code> ile değiştirip performans farkını <code>EXPLAIN</code> ile kanıtlayın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g213').classList.toggle('open')">Görev: Tuzağı Test Et <span>▼</span></div>
+                  <div class="reveal-content">DBeaver'da <code>konya.osm_binalar</code> tablosuna kendi belirlediğiniz bir noktadan (Point) mesafeyi sorgularken iki yöntemi de <code>EXPLAIN ANALYZE</code> ile uygulayın. <code>ST_Distance</code>'ın tüm tabloyu taradığını, <code>ST_DWithin</code>'in ise sadece indekse gittiğini fark edin!</div>
                 </div>
               </div>
             </div>
