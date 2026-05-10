@@ -648,6 +648,7 @@ EXPLAIN SELECT * FROM binalar WHERE ilce = 'Selçuklu';</div>
       let currentIndex = 0;
       function updateSlides() {
         track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        document.querySelector('.deck-viewport').scrollTop = 0;
         status.textContent = `${currentIndex + 1} / ${slides.length}`;
         prevBtn.disabled = currentIndex === 0;
         nextBtn.disabled = currentIndex === slides.length - 1;

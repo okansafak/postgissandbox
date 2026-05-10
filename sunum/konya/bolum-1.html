@@ -15,7 +15,7 @@
       background: var(--theme-black);
       display: grid;
       grid-template-columns: 1fr 420px;
-      height: 100%;
+      min-height: var(--slide-h);
     }
 
     .s1-left {
@@ -1196,6 +1196,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
       let currentIndex = 0;
       function updateSlides() {
         track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        document.querySelector('.deck-viewport').scrollTop = 0;
         status.textContent = `${currentIndex + 1} / ${slides.length}`;
         prevBtn.disabled = currentIndex === 0;
         nextBtn.disabled = currentIndex === slides.length - 1;
