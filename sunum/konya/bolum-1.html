@@ -204,7 +204,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.1 — Kuruluma ve Platforma Giriş</div>
-              <div class="slide-header-num">02 / 16</div>
+              <div class="slide-header-num">02 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -259,13 +259,23 @@
                 </div>
               </div>
               <div class="slide-header-title">1.2 — Geometri Tipleri</div>
-              <div class="slide-header-num">03 / 16</div>
+              <div class="slide-header-num">03 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Temel <span>ve</span> Çoklu Yapılar</div>
                 <div class="s-text-tech">POINT, LINESTRING, POLYGON ve bunların MULTI* versiyonları. GEOMETRYCOLLECTION
                   ile karma veri tipleri tek bir hücrede saklanabilir.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-blue); margin-top:24px;">
+                  <div style="color:var(--theme-blue); font-weight:800; font-size:13px; margin-bottom:8px;">Geometri İnşa Fonksiyonları</div>
+                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:1.9;">
+                    <li><code style="color:#fff">ST_MakePoint(x, y)</code> — en hızlı POINT (SRID'siz)</li>
+                    <li><code style="color:#fff">ST_Point(x, y)</code> — alternatif (SRID'siz)</li>
+                    <li><code style="color:#fff">ST_SetSRID(ST_Point(...), 4326)</code> — SRID'li POINT</li>
+                    <li><code style="color:#fff">ST_GeomFromText('WKT', 4326)</code> — WKT'den</li>
+                    <li><code style="color:#fff">ST_GeomFromEWKT('SRID=4326;...')</code> — EWKT'den</li>
+                  </ul>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">SELECT ST_GeomFromText('GEOMETRYCOLLECTION(POINT(0 0),LINESTRING(1 1,2 2))'); -- Farklı tiplerin koleksiyonu</div>
@@ -310,7 +320,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.3 — WKT, EWKT, WKB ve Metadata</div>
-              <div class="slide-header-num">04 / 16</div>
+              <div class="slide-header-num">04 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -319,11 +329,14 @@
                   <code>geometry_columns</code> görünümünde kayıtlıdır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT 
+                <div class="code-block" style="margin-bottom:16px;">SELECT
   ST_AsText(geom) AS wkt,     -- Well-Known Text (Metin)
   ST_AsBinary(geom) AS wkb,   -- Well-Known Binary (İkili)
   ST_AsEWKT(geom) AS ewkt     -- Extended WKT (SRID'li Metin)
 FROM konya.mahalleler LIMIT 1;
+
+-- EWKT (SRID'li metin formatı) ile geometri oluşturma
+SELECT 'SRID=4326;POINT(32.4920 37.8727)'::geometry AS alaaddin_tepesi;
 
 -- Metadata Görünümü:
 SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
@@ -368,7 +381,7 @@ SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
                 </div>
               </div>
               <div class="slide-header-title">1.4 — SRID ve Projeksiyonlar</div>
-              <div class="slide-header-num">05 / 16</div>
+              <div class="slide-header-num">05 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -426,7 +439,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="slide-header-title">1.5 — Geometry vs Geography Ayrımı</div>
-              <div class="slide-header-num">06 / 16</div>
+              <div class="slide-header-num">06 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -480,7 +493,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — SetSRID != Transform ve Türkiye Sistemleri</div>
-              <div class="slide-header-num">07 / 16</div>
+              <div class="slide-header-num">07 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -490,7 +503,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 <div class="card-tech"
                   style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
                   <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Türkiye Sistemleri</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">ITRF96 / TM33 (EPSG:5255), UTM Zone 36N
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">TUREF / TM33 (EPSG:5255), UTM Zone 36N
                     (EPSG:32636). Konya genellikle TM33 veya WGS84 kullanır.</div>
                 </div>
                 <div class="card-tech" style="background:#222; border-color:var(--theme-blue); margin-top:12px;">
@@ -552,7 +565,7 @@ LIMIT 1;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.7 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
-              <div class="slide-header-num">08 / 16</div>
+              <div class="slide-header-num">08 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -579,7 +592,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
                     Görev: Kesişen Alanları Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Intersects(m.geom, 'POLYGON(...)');</code>
+                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Intersects(m.geom, ST_GeomFromText('POLYGON((32.49 37.87, 32.51 37.87, 32.51 37.89, 32.49 37.89, 32.49 37.87))', 4326));</code>
                   </div>
                 </div>
               </div>
@@ -603,7 +616,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
                 </div>
               </div>
               <div class="slide-header-title">1.8 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
-              <div class="slide-header-num">09 / 16</div>
+              <div class="slide-header-num">09 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -636,7 +649,7 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
                     Görev: Kesişen Yolları Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT * FROM konya.osm_yollar WHERE ST_Crosses(geom, 'LINESTRING(...)');</code>
+                    <code>SELECT id FROM konya.osm_yollar WHERE ST_Crosses(geom, ST_GeomFromText('LINESTRING(32.48 37.86, 32.52 37.89)', 4326));</code>
                   </div>
                 </div>
               </div>
@@ -660,7 +673,7 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
                 </div>
               </div>
               <div class="slide-header-title">1.9 — JOIN ile Mekansal İlişki</div>
-              <div class="slide-header-num">10 / 16</div>
+              <div class="slide-header-num">10 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -699,7 +712,7 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
         </div>
       </div>
 
-      <!-- SLAYT 11: 1.10 ÖLÇÜM FONKSİYONLARI -->
+      <!-- SLAYT 11: 1.10 GiST MEKANSAL İNDEKS -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -713,8 +726,71 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.10 — Ölçüm (Distance, Area, Perimeter)</div>
-              <div class="slide-header-num">11 / 16</div>
+              <div class="slide-header-title">1.10 — GiST Mekansal İndeks</div>
+              <div class="slide-header-num">11 / 18</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Mekansal <span>Sorguyu</span> Hızlandırmak</div>
+                <div class="s-text-tech">B-tree mekansal sorgular için işe yaramaz. PostGIS bunun için <strong>GiST</strong> ağacını kullanır — geometriyi MBR (Minimum Bounding Rectangle) ile özetler. JOIN ve DWithin'in ışık hızı sırrı budur.</div>
+                <div class="card-tech"
+                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Hangi index?</div>
+                  <div style="color:#aaa; font-size:12px; margin-top:4px">Vector veriler için <strong>GiST</strong>. SP-GiST de mevcut ama ileri konu. Raster için ayrı bir mantık.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">-- Mekansal index oluşturma (GiST)
+CREATE INDEX idx_mahalleler_geom ON konya.mahalleler USING GIST (geom);
+CREATE INDEX idx_binalar_geom    ON konya.osm_binalar USING GIST (geom);
+
+-- ÖNEMLİ: index sonrası istatistikleri güncelle
+ANALYZE konya.mahalleler;
+
+-- Etkiyi gör (Index Scan vs Seq Scan)
+EXPLAIN ANALYZE
+SELECT * FROM konya.mahalleler
+WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
+
+                <div class="reveal-box" id="q1gist">
+                  <div class="reveal-trigger" onclick="document.getElementById('q1gist').classList.toggle('open')">
+                    Kritik Soru: ANALYZE neden gerekli? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    PostgreSQL planner index'i kullanmak için tablo istatistiklerine bakar. Yeni index sonrası ANALYZE çağırılmazsa eski plan kullanılabilir; index varmış gibi yapılmaz.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g1gist">
+                  <div class="reveal-trigger" onclick="document.getElementById('g1gist').classList.toggle('open')">
+                    Görev: İndeks Kullanımını Kontrol Et <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT indexname, idx_scan, idx_tup_read FROM pg_stat_user_indexes WHERE schemaname = 'konya';</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 12: 1.11 ÖLÇÜM FONKSİYONLARI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.11 — Ölçüm (Distance, Area, Perimeter, Length)</div>
+              <div class="slide-header-num">12 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -723,9 +799,19 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                   metredir, Geometry ise derece!</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Area(geom::geography) / 10000 AS hektar -- Alanı hesapla (m2 -> hektar)
-FROM konya.mahalleler 
-LIMIT 5;</div>
+                <div class="code-block" style="margin-bottom:16px;">-- 3 temel ölçüm fonksiyonu (geography ile metre cinsinden)
+SELECT
+  ad,
+  ST_Area(geom::geography)      AS alan_m2,    -- Alan
+  ST_Perimeter(geom::geography) AS cevre_m,    -- Çevre uzunluğu
+  ST_Length(ST_Boundary(geom)::geography) AS sinir_m -- Sınır uzunluğu
+FROM konya.mahalleler LIMIT 3;
+
+-- İki nokta arası mesafe (kuş uçuşu)
+SELECT ST_Distance(
+  ST_SetSRID(ST_Point(32.4920, 37.8727), 4326)::geography,
+  ST_SetSRID(ST_Point(32.5120, 37.8927), 4326)::geography
+) AS metre;</div>
 
                 <div class="reveal-box" id="q114">
                   <div class="reveal-trigger" onclick="document.getElementById('q114').classList.toggle('open')">
@@ -751,7 +837,7 @@ LIMIT 5;</div>
         </div>
       </div>
 
-      <!-- SLAYT 12: 1.11 CENTROID VS POINTONSURFACE -->
+      <!-- SLAYT 13: 1.12 MESAFE YÖNTEMLERİ KARŞILAŞTIRMASI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -765,8 +851,83 @@ LIMIT 5;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.11 — Centroid vs PointOnSurface</div>
-              <div class="slide-header-num">12 / 16</div>
+              <div class="slide-header-title">1.12 — Mesafe Yöntemleri Karşılaştırması</div>
+              <div class="slide-header-num">13 / 18</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Aynı Mesafe — <span>4</span> Farklı Sonuç</div>
+                <div class="s-text-tech">0.05° hareket farklı CRS'lerde <strong>farklı metre değerleri</strong> verir. Web Mercator özellikle hatalıdır — alan/mesafe hesabı için <strong>kullanılmamalı</strong>.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-blue); margin-top:24px;">
+                  <div style="color:var(--theme-blue); font-weight:800; font-size:13px; margin-bottom:8px;">Pratik Kural</div>
+                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:1.9;">
+                    <li><code style="color:#fff">geography</code> — en doğru (jeodezik)</li>
+                    <li><code style="color:#fff">EPSG:5255</code> (TM33) — Konya bölgesi</li>
+                    <li><code style="color:#fff">EPSG:32636</code> (UTM 36N) — Türkiye geneli</li>
+                    <li><code style="color:#fff">EPSG:3857</code> (Web Mercator) — sadece görsel, ölçüm DEĞİL</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">WITH p AS (
+  SELECT
+    ST_SetSRID(ST_Point(32.4846, 37.8719), 4326) AS p0,
+    ST_SetSRID(ST_Point(32.4846 + 0.05, 37.8719), 4326) AS p_dogu,
+    ST_SetSRID(ST_Point(32.4846 - 0.0354, 37.8719 + 0.0354), 4326) AS p_kb
+)
+SELECT 'YATAY (D)' AS yon,
+  ROUND(ST_Distance(p0::geography, p_dogu::geography)::numeric, 2) AS geography_m,
+  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_dogu, 5255))::numeric,  2) AS tm33_m,
+  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_dogu, 32636))::numeric, 2) AS utm36_m,
+  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_dogu, 3857))::numeric,  2) AS webmerc_m
+FROM p
+UNION ALL
+SELECT 'ÇAPRAZ (KB)',
+  ROUND(ST_Distance(p0::geography, p_kb::geography)::numeric, 2),
+  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_kb, 5255))::numeric,  2),
+  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_kb, 32636))::numeric, 2),
+  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_kb, 3857))::numeric,  2)
+FROM p;</div>
+
+                <div class="reveal-box" id="q1mes">
+                  <div class="reveal-trigger" onclick="document.getElementById('q1mes').classList.toggle('open')">
+                    Kritik Soru: Web Mercator neden hatalı? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Web Mercator, kutuplara yaklaştıkça alan ve mesafeyi şişirir. Konya enleminde (~37.9°) ~25-30% hata verir. Görsel için iyi, ölçüm için kötü — alan/uzunluk hesabında <strong>asla</strong> kullanmayın.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g1mes">
+                  <div class="reveal-trigger" onclick="document.getElementById('g1mes').classList.toggle('open')">
+                    Görev: 7 Yöntemi Karşılaştır <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    Sphere, Spheroid, Geography, UTM, TM33, Web Mercator, ham geometry — 7 yöntemin tümünü içeren tam karşılaştırma sorgusunu Playground'da çalıştırın. Yatay vs çapraz farklarını gözleyin.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 14: 1.13 CENTROID VS POINTONSURFACE -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.13 — Centroid vs PointOnSurface</div>
+              <div class="slide-header-num">14 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -803,7 +964,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 13: 1.12 ANALİTİK FONKSİYONLAR -->
+      <!-- SLAYT 15: 1.14 ANALİTİK FONKSİYONLAR -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -817,8 +978,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.12 — Buffer, Union ve Intersection</div>
-              <div class="slide-header-num">13 / 16</div>
+              <div class="slide-header-title">1.14 — Buffer, Union ve Intersection</div>
+              <div class="slide-header-num">15 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -854,7 +1015,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 14: 1.13 ENVELOPE VE CONVEXHULL -->
+      <!-- SLAYT 16: 1.15 ENVELOPE VE CONVEXHULL -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -868,8 +1029,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.13 — Envelope ve ConvexHull</div>
-              <div class="slide-header-num">14 / 16</div>
+              <div class="slide-header-title">1.15 — Envelope ve ConvexHull</div>
+              <div class="slide-header-num">16 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -906,7 +1067,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 15: 1.14 EN YAKIN N KOMŞU (KNN) -->
+      <!-- SLAYT 17: 1.16 EN YAKIN N KOMŞU (KNN) -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -920,8 +1081,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.14 — En Yakın N Komşu (KNN)</div>
-              <div class="slide-header-num">15 / 16</div>
+              <div class="slide-header-title">1.16 — En Yakın N Komşu (KNN)</div>
+              <div class="slide-header-num">17 / 18</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -949,7 +1110,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
                     Görev: En Yakın 5 Binayı Bul <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT id FROM konya.osm_binalar ORDER BY geom <-> 'POINT(...)' LIMIT 5;</code>
+                    <code>SELECT id FROM konya.osm_binalar ORDER BY geom <-> ST_SetSRID(ST_Point(32.4920, 37.8727), 4326) LIMIT 5;</code>
                   </div>
                 </div>
               </div>
@@ -958,7 +1119,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 16: KAPANIŞ -->
+      <!-- SLAYT 18: KAPANIŞ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-final">
@@ -997,7 +1158,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
       </svg></button>
-    <div class="nav-status" id="navStatus">1 / 17</div>
+    <div class="nav-status" id="navStatus">1 / 18</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
