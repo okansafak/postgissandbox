@@ -754,18 +754,29 @@ WHERE ST_DWithin(geom, p, 500)</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Veriyi <span>Görselleştir</span></div>
-                <div class="s-text-tech">Plan çıktılarını analiz araçlarına uygun hale getirmek.</div>
+                <div class="s-headline-tech">Görsel <span>Raporlar</span></div>
+                <div class="s-text-tech">Karmaşık sorguların analiz metinlerini okumak yorucudur. Çıktıyı JSON olarak alarak görselleştirebiliriz!</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">EXPLAIN (FORMAT JSON, ANALYZE) SELECT ... -- Analiz sonucunu JSON olarak al</div>
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- Sadece parantez içinde (FORMAT JSON) yazmamız yeterli:
+EXPLAIN (FORMAT JSON, ANALYZE) 
+SELECT id FROM konya.osm_binalar 
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
+
+-- Dönen Çıktı (Makine Okunabilir Format):
+-- [
+--   {
+--     "Plan": {
+--       "Node Type": "Index Scan",
+--       "Actual Total Time": 0.043,
+--       ...</div>
                 <div class="reveal-box" id="q214">
-                  <div class="reveal-trigger" onclick="document.getElementById('q214').classList.toggle('open')">Kritik Soru: Neden JSON/YAML? <span>▼</span></div>
-                  <div class="reveal-content">Otomatik analiz araçları (Örn: PEV2) bu formatları kullanarak sorgu darboğazını grafiksel olarak gösterir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q214').classList.toggle('open')">Kritik Soru: Bu JSON kodunu nerede kullanacağım? <span>▼</span></div>
+                  <div class="reveal-content">İnternette (Örn: <em>explain.dalibo.com</em>) harika araçlar vardır. DBeaver'dan kopyaladığınız JSON kodunu bu sitelere yapıştırdığınızda, size renkli bir akış şeması (Flowchart) çizer. Sorguyu asıl yavaşlatan tabloyu kırmızı ve büyük bir kutuyla anında belli eder!</div>
                 </div>
                 <div class="reveal-box" id="g214">
-                  <div class="reveal-trigger" onclick="document.getElementById('g214').classList.toggle('open')">Görev: YAML Çıktısı Al <span>▼</span></div>
-                  <div class="reveal-content">Daha okunaklı bir ağaç yapısı için <code>FORMAT YAML</code> kullanarak karmaşık bir join sorgusunu inceleyin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g214').classList.toggle('open')">Görev: Görsel Harita Çıkar <span>▼</span></div>
+                  <div class="reveal-content">Yukarıdaki kodu DBeaver'da çalıştırın. Dönen hücreye çift tıklayıp tüm JSON metnini kopyalayın. Tarayıcıda <strong>explain.dalibo.com</strong> adresine gidip metni yapıştırın ("Submit") ve PostgreSQL'in planını grafiksel olarak görün.</div>
                 </div>
               </div>
             </div>
