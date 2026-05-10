@@ -180,23 +180,24 @@ ogr2ogr -f "PostgreSQL" ^
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">2.1 — Staging ve Regex Temizliği</div>
+              <div class="slide-header-title">2.1 — Veri Temizliği (Regex ve UPDATE)</div>
               <div class="slide-header-num">04 / 21</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Veri <span>Rafinasyonu</span></div>
-                <div class="s-text-tech">Kirli metinlerden düzenli sütunlar oluşturma.</div>
+                <div class="s-text-tech">Tabloları birleştirmeden (JOIN) önce tutarsız metinleri temizleme.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT (regexp_matches(raw_satir, '\((.*?)\)'))[1] FROM nufus_copy; -- Regex ile metin ayıkla</div>
+                <div class="code-block" style="font-size:13px; line-height:1.4;">-- "Fakılar Mah." gibi isimlendirmelerdeki " Mah." ekini temizler
+SELECT regexp_replace(mahalle_adi, ' Mah\.$', '') FROM konya.mahalleler_tkgm LIMIT 5;</div>
                 <div class="reveal-box" id="q22">
                   <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Regex neden PostGIS'te önemlidir? <span>▼</span></div>
-                  <div class="reveal-content">Dışarıdan gelen veriler (CAD, Excel) genelde standart dışıdır. Regex ile koordinat veya isim ayıklamak hayati önem taşır.</div>
+                  <div class="reveal-content">Farklı kurumlardan gelen verilerde "Mah.", "Mahallesi", "Mh." gibi tutarsızlıklar tablolar arası eşleştirmeyi (JOIN) imkansız kılar. Regex ile veriyi standartlaştırmak hayati önem taşır.</div>
                 </div>
                 <div class="reveal-box" id="g22">
-                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Nüfusu Güncelle <span>▼</span></div>
-                  <div class="reveal-content">Staging'den temizlediğiniz nüfus verilerini <code>UPDATE ... FROM</code> ile ilçe sınırları tablosuna aktarın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Tabloyu Güncelle <span>▼</span></div>
+                  <div class="reveal-content"><code>mahalleler_tkgm</code> tablosundaki mahalle adlarını <code>UPDATE</code> ve <code>regexp_replace</code> kullanarak kalıcı olarak temizleyin.</div>
                 </div>
               </div>
             </div>
