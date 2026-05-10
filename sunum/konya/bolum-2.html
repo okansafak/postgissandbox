@@ -131,24 +131,27 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
 # -f         : Hedef Format (PostgreSQL vb.)
 # -nln       : Yeni Katman/Tablo Adı (New Layer Name)
 # -lco       : Katman Ayarları (Burada şema belirtir: SCHEMA=konya)
+# -nlt       : Geometri Tipi (PROMOTE_TO_MULTI Poligonları MultiPolygon yapar)
 # -t_srs     : Hedef Koordinat Sistemi (Target SRS)
 # -overwrite : Tablo zaten varsa üzerine yaz
 # -progress  : Yükleme ilerlemesini (%) gösterir
 ogr2ogr -f "PostgreSQL" ^
-  PG:"host=localhost dbname=konya user=postgres password=ŞİFRENİZ" ^
+  PG:"host=localhost dbname=konya_yeni_db user=postgres password=PASSWORD" ^
   D:\data\mahalleler.shp ^
-  -nln mahalleler ^
+  -nln mahalleler_tkgm ^
   -lco SCHEMA=konya ^
+  -nlt PROMOTE_TO_MULTI ^
   -t_srs EPSG:4326 ^
   -overwrite ^
   -progress
 
 # Sadece belirli alanları aktar (-sql ile veriyi yoldayken filtrele)
 ogr2ogr -f "PostgreSQL" ^
-  PG:"host=localhost dbname=konya user=postgres password=ŞİFRENİZ" ^
+  PG:"host=localhost dbname=konya_yeni_db user=postgres password=PASSWORD" ^
   D:\data\mahalleler.shp ^
-  -nln mahalleler ^
+  -nln mahalleler_secili ^
   -lco SCHEMA=konya ^
+  -nlt PROMOTE_TO_MULTI ^
   -sql "SELECT id, ad, nufus FROM mahalleler" ^
   -t_srs EPSG:4326 ^
   -overwrite ^
