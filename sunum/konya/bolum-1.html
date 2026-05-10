@@ -204,7 +204,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.1 — Kuruluma ve Platforma Giriş</div>
-              <div class="slide-header-num">02 / 18</div>
+              <div class="slide-header-num">02 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -259,7 +259,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.2 — Geometri Tipleri</div>
-              <div class="slide-header-num">03 / 18</div>
+              <div class="slide-header-num">03 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -320,7 +320,7 @@
                 </div>
               </div>
               <div class="slide-header-title">1.3 — WKT, EWKT, WKB ve Metadata</div>
-              <div class="slide-header-num">04 / 18</div>
+              <div class="slide-header-num">04 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -381,7 +381,7 @@ SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
                 </div>
               </div>
               <div class="slide-header-title">1.4 — SRID ve Projeksiyonlar</div>
-              <div class="slide-header-num">05 / 18</div>
+              <div class="slide-header-num">05 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -439,7 +439,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="slide-header-title">1.5 — Geometry vs Geography Ayrımı</div>
-              <div class="slide-header-num">06 / 18</div>
+              <div class="slide-header-num">06 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -493,7 +493,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="slide-header-title">1.6 — SetSRID != Transform ve Türkiye Sistemleri</div>
-              <div class="slide-header-num">07 / 18</div>
+              <div class="slide-header-num">07 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -572,7 +572,7 @@ FROM merkez;</div>
                 </div>
               </div>
               <div class="slide-header-title">1.7 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
-              <div class="slide-header-num">08 / 18</div>
+              <div class="slide-header-num">08 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -623,7 +623,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
                 </div>
               </div>
               <div class="slide-header-title">1.8 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
-              <div class="slide-header-num">09 / 18</div>
+              <div class="slide-header-num">09 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -680,7 +680,7 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
                 </div>
               </div>
               <div class="slide-header-title">1.9 — JOIN ile Mekansal İlişki</div>
-              <div class="slide-header-num">10 / 18</div>
+              <div class="slide-header-num">10 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -734,7 +734,7 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                 </div>
               </div>
               <div class="slide-header-title">1.10 — GiST Mekansal İndeks</div>
-              <div class="slide-header-num">11 / 18</div>
+              <div class="slide-header-num">11 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -797,7 +797,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
                 </div>
               </div>
               <div class="slide-header-title">1.11 — Ölçüm (Distance, Area, Perimeter, Length)</div>
-              <div class="slide-header-num">12 / 18</div>
+              <div class="slide-header-num">12 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -859,7 +859,7 @@ SELECT ST_Distance(
                 </div>
               </div>
               <div class="slide-header-title">1.12 — Mesafe Yöntemleri Karşılaştırması</div>
-              <div class="slide-header-num">13 / 18</div>
+              <div class="slide-header-num">13 / 19</div>
             </div>
             <div style="display:flex; gap:20px; padding:20px 40px; height:calc(100% - 76px); overflow:hidden;">
               <div style="width:190px; flex-shrink:0; display:flex; flex-direction:column; gap:14px;">
@@ -948,7 +948,7 @@ SELECT 'BİLGİ',
                 </div>
               </div>
               <div class="slide-header-title">1.13 — Centroid vs PointOnSurface</div>
-              <div class="slide-header-num">14 / 18</div>
+              <div class="slide-header-num">14 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -985,7 +985,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 15: 1.14 ANALİTİK FONKSİYONLAR -->
+      <!-- SLAYT 15: 1.14 BUFFER, INTERSECTION, UNION VE DIFFERENCE -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -999,35 +999,58 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.14 — Buffer, Union ve Intersection</div>
-              <div class="slide-header-num">15 / 18</div>
+              <div class="slide-header-title">1.14 — Buffer, Intersection, Union ve Difference</div>
+              <div class="slide-header-num">15 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>Küme</span> İşlemleri</div>
-                <div class="s-text-tech">Tampon bölge (Buffer) oluşturma, geometrileri birleştirme (Union) veya kesişim
-                  alanlarını (Intersection) alma.</div>
+                <div class="s-headline-tech">Mekansal <span>Overlay</span> İşlemleri</div>
+                <div class="s-text-tech" style="margin-bottom:20px;">İki geometri üzerinde küme mantığıyla çalışan temel 4 overlay fonksiyonu.</div>
+                <div class="card-tech" style="border-color:#1a73e8;">
+                  <div class="card-tech-title" style="color:#1a73e8;">Buffer (Tampon)</div>
+                  <div class="card-tech-text">Geometrinin çevresine verilen mesafede alan oluşturur. Sonuç her zaman <strong>poligon</strong>.</div>
+                </div>
+                <div class="card-tech" style="border-color:#e53935;">
+                  <div class="card-tech-title" style="color:#e53935;">Intersection / Union / Difference</div>
+                  <div class="card-tech-text"><strong>Intersection:</strong> ortak alan &nbsp;|&nbsp; <strong>Union:</strong> toplam alan &nbsp;|&nbsp; <strong>Difference:</strong> A eksi B alanı</div>
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Buffer(geom::geography, 100) -- 100m tampon bölge (buffer) oluştur
-FROM konya.osm_yollar 
-LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- TAMPON BÖLGE (Buffer) — 500m coğrafi tampon
+SELECT ST_Buffer(geom::geography, 500)::geometry AS tampon_500m
+FROM konya.osm_yollar LIMIT 1;
+
+-- KESİŞİM (Intersection) — iki geometrinin ortak alanı
+SELECT ST_Intersection(a.geom, b.geom) AS kesisim_alani
+FROM konya.mahalleler a
+JOIN konya.mahalleler b ON ST_Intersects(a.geom, b.geom)
+WHERE a.ad &lt;&gt; b.ad LIMIT 1;
+
+-- BİRLEŞİM (Union) — ilçe mahallelerini tek sınıra birleştir
+SELECT ST_Union(geom) AS selcuklu_siniri
+FROM konya.mahalleler WHERE ilce = 'Selçuklu';
+
+-- FARK (Difference) — A'dan B'yi çıkar
+SELECT ST_Difference(a.geom, b.geom) AS a_eksi_b
+FROM konya.mahalleler a
+JOIN konya.mahalleler b ON ST_Intersects(a.geom, b.geom)
+WHERE a.ad &lt;&gt; b.ad LIMIT 1;</div>
 
                 <div class="reveal-box" id="q116">
                   <div class="reveal-trigger" onclick="document.getElementById('q116').classList.toggle('open')">
-                    Kritik Soru: Buffer her zaman poligon mu döner? <span>▼</span>
+                    Kritik Soru: ST_SymDifference nedir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Evet. Noktadan da, çizgiden de buffer alsanız sonuç her zaman alanı olan bir poligondur.
+                    Her iki geometriden de yalnızca <strong>birinde</strong> olan alanlar — matematiksel XOR. <code>ST_SymDifference(A, B) = ST_Union(A,B) - ST_Intersection(A,B)</code>
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g116">
                   <div class="reveal-trigger" onclick="document.getElementById('g116').classList.toggle('open')">
-                    Görev: İki Mahalle Birleştir <span>▼</span>
+                    Görev: SymDifference Hesapla <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_Union(geom) FROM konya.mahalleler WHERE ad IN ('A', 'B');</code>
+                    <code>SELECT ST_AsText(ST_SymDifference(a.geom, b.geom)) FROM konya.mahalleler a, konya.mahalleler b WHERE ST_Intersects(a.geom, b.geom) AND a.ad &lt;&gt; b.ad LIMIT 1;</code>
                   </div>
                 </div>
               </div>
@@ -1036,7 +1059,7 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 16: 1.15 ENVELOPE VE CONVEXHULL -->
+      <!-- SLAYT 16: 1.15 DISSOLVE VE CLIP -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -1050,36 +1073,58 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.15 — Envelope ve ConvexHull</div>
-              <div class="slide-header-num">16 / 18</div>
+              <div class="slide-header-title">1.15 — Dissolve ve Clip</div>
+              <div class="slide-header-num">16 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Kapsayıcı <span>Geometriler</span></div>
-                <div class="s-text-tech"><strong>ST_Envelope:</strong> Sınırlayıcı kutu (Bounding Box).
-                  <strong>ST_ConvexHull:</strong> Geometriyi saran en dar dışbükey zarf (lastik bant etkisi).</div>
+                <div class="s-headline-tech">Birleştir &amp; <span>Kırp</span></div>
+                <div class="s-text-tech" style="margin-bottom:20px;"><strong>Dissolve:</strong> ortak özelliğe göre geometrileri eriterek tek sınır oluşturur. <strong>Clip:</strong> geometriyi verilen bir çerçeve veya maske ile kesmek.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow);">
+                  <div class="card-tech-title">Dissolve = GROUP BY + ST_Union</div>
+                  <div class="card-tech-text" style="color:#aaa;">PostGIS'te bağımsız bir Dissolve fonksiyonu yoktur. <code>GROUP BY ilce + ST_Union(geom)</code> aynı işi yapar.</div>
+                </div>
+                <div class="card-tech" style="background:#222; border-color:#4db6ac;">
+                  <div class="card-tech-title" style="color:#4db6ac;">Clip = ST_Intersection + ST_Intersects</div>
+                  <div class="card-tech-text" style="color:#aaa;">Kırpma maskesiyle önce <code>&&</code> veya <code>ST_Intersects</code> ile satırları filtrele, sonra <code>ST_Intersection</code> ile kes.</div>
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Envelope(geom) -- Geometriyi saran sınırlayıcı kutuyu bul
-FROM konya.mahalleler 
-LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- BÜTÜNLEŞTİR (Dissolve) — ilçe sınırlarını mahalleleri eriterek oluştur
+SELECT ilce,
+  ST_Union(geom)  AS ilce_sinir,
+  COUNT(*)        AS mahalle_sayisi,
+  ROUND(ST_Area(ST_Union(geom)::geography)::numeric / 1e6, 2) AS alan_km2
+FROM konya.mahalleler
+GROUP BY ilce
+ORDER BY alan_km2 DESC;
 
-                <div class="reveal-box" id="q117">
-                  <div class="reveal-trigger" onclick="document.getElementById('q117').classList.toggle('open')">
-                    Kritik Soru: Envelope vs ConvexHull? <span>▼</span>
+-- KIRPMA (Clip) — tanımlı kutu içinde kalan kısımları kes
+WITH clip_alani AS (
+  SELECT ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326) AS bbox
+)
+SELECT m.ad,
+  ST_Intersection(m.geom, c.bbox) AS kirpilmis_geom,
+  ROUND(ST_Area(ST_Intersection(m.geom, c.bbox)::geography)::numeric, 2) AS alan_m2
+FROM konya.mahalleler m, clip_alani c
+WHERE m.geom &amp;&amp; c.bbox          -- GiST ön filtre
+  AND ST_Intersects(m.geom, c.bbox);  -- kesin doğrulama</div>
+
+                <div class="reveal-box" id="q1dis">
+                  <div class="reveal-trigger" onclick="document.getElementById('q1dis').classList.toggle('open')">
+                    Kritik Soru: Dissolve ile ST_Union farkı? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Envelope her zaman dikdörtgendir. ConvexHull ise geometrinin şekline daha yakın ama dışbükey bir
-                    zarftır.
+                    Fark yoktur. "Dissolve" CBS terminolojisi, PostGIS karşılığı <code>GROUP BY + ST_Union</code>'dır. Clip için de bağımsız fonksiyon yoktur; <code>ST_Intersection + ST_Intersects</code> birlikte kullanılır.
                   </div>
                 </div>
 
-                <div class="reveal-box" id="g117">
-                  <div class="reveal-trigger" onclick="document.getElementById('g117').classList.toggle('open')">
-                    Görev: Mahalle Grubunu Sar <span>▼</span>
+                <div class="reveal-box" id="g1dis">
+                  <div class="reveal-trigger" onclick="document.getElementById('g1dis').classList.toggle('open')">
+                    Görev: İlçe Alanlarını Büyükten Küçüğe Sırala <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_ConvexHull(ST_Collect(geom)) FROM konya.mahalleler WHERE ilce = 'Selçuklu';</code>
+                    <code>SELECT ilce, ROUND(ST_Area(ST_Union(geom)::geography)::numeric/1e6, 2) AS km2 FROM konya.mahalleler GROUP BY ilce ORDER BY km2 DESC;</code>
                   </div>
                 </div>
               </div>
@@ -1088,7 +1133,92 @@ LIMIT 1;</div>
         </div>
       </div>
 
-      <!-- SLAYT 17: 1.16 EN YAKIN N KOMŞU (KNN) -->
+      <!-- SLAYT 17: 1.16 ENVELOPE VE CONVEXHULL -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span class="k-top">KONYA</span><span
+                      class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
+                </div>
+              </div>
+              <div class="slide-header-title">1.16 — Envelope ve ConvexHull</div>
+              <div class="slide-header-num">17 / 19</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kapsayıcı <span>Geometriler</span></div>
+                <div class="s-text-tech" style="margin-bottom:20px;"><strong>ST_Envelope:</strong> Sınırlayıcı dikdörtgen kutu (Bounding Box / BBox). <strong>ST_ConvexHull:</strong> Lastik bant etkisi — dışbükey minimum zarf. <strong>&amp;&amp; operatörü:</strong> BBox çakışma kontrolü — GiST indeksini doğrudan kullanır, çok hızlı ön filtre.</div>
+                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); padding:14px 18px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:12px; margin-bottom:8px;">BBox İşlemleri</div>
+                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:2;">
+                    <li><code style="color:#fff">ST_Envelope(geom)</code> — dikdörtgen BBox geometrisi</li>
+                    <li><code style="color:#fff">ST_Extent(geom)</code> — gruba göre toplu BBox</li>
+                    <li><code style="color:#fff">ST_MakeEnvelope(x1,y1,x2,y2,srid)</code> — BBox oluştur</li>
+                    <li><code style="color:#fff">ST_Expand(geom, delta)</code> — BBox'ı genişlet</li>
+                    <li><code style="color:#fff">geom &amp;&amp; bbox</code> — BBox çakışma (indeksli)</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; overflow-y:auto; max-height:340px;">-- 1. Tek geometrinin zarfı ve konveks zarfı
+SELECT
+  ST_AsText(ST_Envelope(geom))   AS bbox,
+  ST_AsText(ST_ConvexHull(geom)) AS konveks_zarf,
+  ST_NPoints(ST_Envelope(geom))  AS bbox_nokta_sayisi,
+  ST_NPoints(ST_ConvexHull(geom)) AS hull_nokta_sayisi
+FROM konya.mahalleler LIMIT 1;
+
+-- 2. İlçe bazlı toplam alan zarfı (aggregate)
+SELECT ilce,
+  ST_AsText(ST_Extent(geom)::geometry)        AS ilce_bbox,
+  ST_AsText(ST_ConvexHull(ST_Union(geom)))    AS ilce_konveks
+FROM konya.mahalleler
+GROUP BY ilce;
+
+-- 3. Manuel BBox + && hız filtresi
+WITH alan AS (
+  SELECT ST_MakeEnvelope(32.40, 37.82, 32.60, 37.95, 4326) AS bbox
+)
+SELECT m.ad
+FROM konya.mahalleler m, alan
+WHERE m.geom &amp;&amp; alan.bbox;  -- GiST indeksini kullanır
+
+-- 4. BBox'ı genişlet (buffer yerine hızlı yaklaşım)
+SELECT ST_AsText(
+  ST_Expand(ST_Envelope(geom), 0.01)
+) AS genisletilmis_bbox
+FROM konya.mahalleler LIMIT 1;</div>
+
+                <div class="reveal-box" id="q117">
+                  <div class="reveal-trigger" onclick="document.getElementById('q117').classList.toggle('open')">
+                    Kritik Soru: Envelope vs ConvexHull? <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <strong>Envelope</strong> her zaman 4 köşeli dikdörtgendir — hesaplaması O(1), çok hızlı. <strong>ConvexHull</strong> geometriye daha yakın, dışbükey bir poligondur — köşe sayısı geometriye göre değişir. <code>&amp;&amp;</code> operatörü Envelope'ları karşılaştırır; bu yüzden ST_Intersects'ten önce otomatik çalışır.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g117">
+                  <div class="reveal-trigger" onclick="document.getElementById('g117').classList.toggle('open')">
+                    Görev: Tüm Konya'nın Zarfı <span>▼</span>
+                  </div>
+                  <div class="reveal-content">
+                    <code>SELECT ST_AsText(ST_Extent(geom)::geometry) FROM konya.mahalleler;</code> — Konya'nın tüm mahallerini kapsayan tek BBox'ı döndürür.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 18: 1.17 EN YAKIN N KOMŞU (KNN) -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -1102,8 +1232,8 @@ LIMIT 1;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.16 — En Yakın N Komşu (KNN)</div>
-              <div class="slide-header-num">17 / 18</div>
+              <div class="slide-header-title">1.17 — En Yakın N Komşu (KNN)</div>
+              <div class="slide-header-num">18 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1140,7 +1270,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 18: KAPANIŞ -->
+      <!-- SLAYT 19: KAPANIŞ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-final">
@@ -1179,7 +1309,7 @@ LIMIT 3;                              -- En yakın 3 taneyi getir</div>
         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"></polyline>
       </svg></button>
-    <div class="nav-status" id="navStatus">1 / 18</div>
+    <div class="nav-status" id="navStatus">1 / 19</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
         stroke-linecap="round" stroke-linejoin="round">
         <polyline points="9 18 15 12 9 6"></polyline>
