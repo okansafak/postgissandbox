@@ -132,19 +132,19 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
 # -nln       : Yeni Katman/Tablo Adı (New Layer Name)
 # -t_srs     : Hedef Koordinat Sistemi (Target SRS)
 # -overwrite : Tablo zaten varsa üzerine yaz
-ogr2ogr -f "PostgreSQL" \
-  PG:"host=localhost dbname=konya user=postgres" \
-  D:\data\mahalleler.shp \
-  -nln konya.mahalleler \
-  -t_srs EPSG:4326 \
+ogr2ogr -f "PostgreSQL" ^
+  PG:"host=localhost dbname=konya user=postgres" ^
+  D:\data\mahalleler.shp ^
+  -nln konya.mahalleler ^
+  -t_srs EPSG:4326 ^
   -overwrite
 
 # Sadece belirli alanları aktar (-sql ile veriyi yoldayken filtrele)
-ogr2ogr -f "PostgreSQL" \
-  PG:"host=localhost dbname=konya user=postgres" \
-  D:\data\mahalleler.shp \
-  -nln konya.mahalleler \
-  -sql "SELECT id, ad, nufus FROM mahalleler" \
+ogr2ogr -f "PostgreSQL" ^
+  PG:"host=localhost dbname=konya user=postgres" ^
+  D:\data\mahalleler.shp ^
+  -nln konya.mahalleler ^
+  -sql "SELECT id, ad, nufus FROM mahalleler" ^
   -t_srs EPSG:4326
                 </div>
                 <div class="reveal-box" id="q21x">
