@@ -506,18 +506,28 @@ WHERE ST_Intersects(geom, ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326));</d
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Hafif <span>İndeksler</span></div>
-                <div class="s-text-tech">Sadece ihtiyacınız olan veriyi indeksleme sanatı.</div>
+                <div class="s-headline-tech">Akıllı <span>İndeksler</span></div>
+                <div class="s-text-tech">Tüm tabloyu şişirmek yerine sadece ihtiyacınız olan kısmı veya fonksiyon sonucunu indeksleme sanatı.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">CREATE INDEX idx ON binalar(geom) WHERE durum = 'Aktif'; -- Şartlı (Partial) indeks oluştur</div>
-                <div class="reveal-box" id="q29">
-                  <div class="reveal-trigger" onclick="document.getElementById('q29').classList.toggle('open')">Kritik Soru: Functional Index nedir? <span>▼</span></div>
-                  <div class="reveal-content">Bir fonksiyonun sonucunu (Örn: ST_Centroid) önceden hesaplayıp indekslemek, sorguda o fonksiyonu hızlandırır.</div>
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) PARTIAL INDEX (Kısmi İndeks): Sadece 'eczane' kategorisindeki POI'leri indeksler
+-- Ram ve diskten devasa tasarruf sağlar, indeks güncellemelerini (INSERT/UPDATE) yavaşlatmaz.
+CREATE INDEX idx_eczane_geom ON konya.poi USING SPGIST(geom) WHERE kategori = 'eczane';
+
+-- 2) FUNCTIONAL INDEX (Fonksiyonel): Binaların EPSG:3857 (Metre) dönüşümünü indeksler
+-- Sorgunuzda ST_Transform kullanırsanız, veritabanı bu hazır indeksi anında kullanır.
+CREATE INDEX idx_bina_3857 ON konya.osm_binalar USING GIST(ST_Transform(geom, 3857));</div>
+                <div class="reveal-box" id="q30">
+                  <div class="reveal-trigger" onclick="document.getElementById('q30').classList.toggle('open')">Kritik Soru: Partial İndeks veritabanını nasıl kurtarır? <span>▼</span></div>
+                  <div class="reveal-content">Milyonlarca POI kaydının sadece %1'i "Eczane" ise, haritada sadece eczaneleri arayan bir sorgu için tüm tabloyu indekslemek sistemi yorar. Partial indeks sadece o %1'lik küçük kısmı indeksler. Aramayı uçururken, alakasız yeni veriler eklendiğinde indeksi güncellemekle vakit kaybetmez.</div>
                 </div>
-                <div class="reveal-box" id="g29">
-                  <div class="reveal-trigger" onclick="document.getElementById('g29').classList.toggle('open')">Görev: Partial İndeks Kur <span>▼</span></div>
-                  <div class="reveal-content">Binalar tablosunda sadece "Okul" nitelikli olanları Partial olarak indeksleyin.</div>
+                <div class="reveal-box" id="g30">
+                  <div class="reveal-trigger" onclick="document.getElementById('g30').classList.toggle('open')">Görev: Fonksiyonel İndeksi Test Et <span>▼</span></div>
+                  <div class="reveal-content">
+                    <code>konya.osm_binalar</code> tablosundaki her binanın merkez noktasını (<code>ST_Centroid</code>) fonksiyonel olarak indeksleyen bir SQL yazın.
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
+CREATE INDEX idx_bina_merkez ON konya.osm_binalar USING GIST(ST_Centroid(geom));</div>
+                  </div>
                 </div>
               </div>
             </div>
