@@ -811,7 +811,8 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1. Tablolarımızdaki "Ölü Satır" (Dead Tuple) miktarını görelim:
-SELECT relname AS tablo_adi,
+SELECT schemaname AS sema_adi,
+  relname AS tablo_adi,
   n_live_tup AS canli_satir,
   n_dead_tup AS olu_satir,
   ROUND(100.0 * n_dead_tup / NULLIF(n_live_tup + n_dead_tup, 0), 1) AS olu_yuzde
