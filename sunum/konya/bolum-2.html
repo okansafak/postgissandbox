@@ -457,17 +457,27 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Kutu <span>Matematiği</span></div>
-                <div class="s-text-tech">&& operatörü ile milisaniyeler içinde kesişim tespiti.</div>
+                <div class="s-text-tech">&amp;&amp; operatörü ile milisaniyeler içinde Bounding Box (Sınırlayıcı Kutu) kesişimi tespiti.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM mahalleler WHERE geom && ST_MakeEnvelope(...); -- Kutu (Bounding Box) ile hızlı arama</div>
-                <div class="reveal-box" id="q28">
-                  <div class="reveal-trigger" onclick="document.getElementById('q28').classList.toggle('open')">Kritik Soru: && neden vazgeçilmezdir? <span>▼</span></div>
-                  <div class="reveal-content">İndeksler arka planda sadece && operatörünü anlar. Gerçek poligon kesişiminden (Intersects) 100 kat hızlıdır.</div>
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- ST_MakeEnvelope ile (MinX, MinY, MaxX, MaxY) bir kutu oluşturuyoruz.
+-- &amp;&amp; operatörü bu sanal kutu ile kesişen mahalleleri anında bulur.
+SELECT id, ad 
+FROM konya.mahalleler 
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
+                <div class="reveal-box" id="q29">
+                  <div class="reveal-trigger" onclick="document.getElementById('q29').classList.toggle('open')">Kritik Soru: &amp;&amp; neden vazgeçilmezdir? <span>▼</span></div>
+                  <div class="reveal-content">İndeksler (GiST) arka planda şekillerin kıvrımlarını değil, sadece bu <strong>Bounding Box</strong>'ları anlar. Gerçek poligon matematiği yapan <code>ST_Intersects</code> komutuna göre binlerce kat daha az yorar ve hızlı çalışır.</div>
                 </div>
-                <div class="reveal-box" id="g28">
-                  <div class="reveal-trigger" onclick="document.getElementById('g28').classList.toggle('open')">Görev: Kutu Sorgusu Yap <span>▼</span></div>
-                  <div class="reveal-content">Belirlediğiniz bir koordinatın etrafındaki binaları sadece <code>&&</code> ile sorgulayın.</div>
+                <div class="reveal-box" id="g29">
+                  <div class="reveal-trigger" onclick="document.getElementById('g29').classList.toggle('open')">Görev: Kutu Sorgusu Yap <span>▼</span></div>
+                  <div class="reveal-content">
+                    Kendi belirlediğiniz bir X,Y aralığındaki binaları (<code>konya.osm_binalar</code>) sadece <code>&amp;&amp;</code> ile sorgulayıp hızını test edin.
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
+SELECT id FROM konya.osm_binalar 
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);</div>
+                  </div>
+                </div>
                 </div>
               </div>
             </div>
