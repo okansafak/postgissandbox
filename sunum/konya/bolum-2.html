@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
 # -overwrite : Tablo zaten varsa üzerine yaz
 ogr2ogr -f "PostgreSQL" \
   PG:"host=localhost dbname=konya user=postgres" \
-  mahalleler.shp \
+  D:\data\mahalleler.shp \
   -nln konya.mahalleler \
   -t_srs EPSG:4326 \
   -overwrite
@@ -142,7 +142,7 @@ ogr2ogr -f "PostgreSQL" \
 # Sadece belirli alanları aktar (-sql ile veriyi yoldayken filtrele)
 ogr2ogr -f "PostgreSQL" \
   PG:"host=localhost dbname=konya user=postgres" \
-  mahalleler.shp \
+  D:\data\mahalleler.shp \
   -nln konya.mahalleler \
   -sql "SELECT id, ad, nufus FROM mahalleler" \
   -t_srs EPSG:4326
