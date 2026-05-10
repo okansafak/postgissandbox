@@ -518,30 +518,37 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- TM33 sisteminin tam tanımını görün
-SELECT srtext FROM spatial_ref_sys WHERE srid = 5255;
-
-SELECT ST_AsText(ST_Transform(geom, 32636)) -- Geometriyi UTM 36N sistemine dönüştür
-FROM konya.mahalleler
-LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px;">-- Aynı koordinat, farklı "etiket" → ST_Transform farklı yere gider
+WITH merkez AS (
+  SELECT
+    ST_SetSRID(ST_Point(450000, 4180000), 5255)  AS dogru_geom,  -- DOĞRU: TM33
+    ST_SetSRID(ST_Point(450000, 4180000), 32636) AS yanlis_geom  -- YANLIŞ: UTM36 sandı
+)
+SELECT 'DOGRU (5255 — TM33)' AS durum,
+  ST_AsText(ST_Transform(dogru_geom,  4326)) AS wgs84,
+  ST_SRID(dogru_geom) AS srid
+FROM merkez
+UNION ALL
+SELECT 'YANLIŞ (32636 SANDI)' AS durum,
+  ST_AsText(ST_Transform(yanlis_geom, 4326)) AS wgs84,
+  ST_SRID(yanlis_geom) AS srid
+FROM merkez;</div>
 
                 <div class="reveal-box" id="q110">
                   <div class="reveal-trigger" onclick="document.getElementById('q110').classList.toggle('open')">
                     Kritik Soru: Hangisi koordinatı değiştirir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    ST_Transform matematiksel işlem yapar ve koordinatı yeni sisteme taşır. ST_SetSRID ise sadece
-                    etiketi değiştirir, koordinat aynı kalır.
+                    Her iki sorgu da <code>ST_Point(450000, 4180000)</code> verisini kullanır. SRID sadece etikettir — ama ST_Transform bu etikete <strong>güvenerek</strong> koordinatı 4326'ya çevirir. Yanlış etiket → yanlış konum. Yüzlerce km sapma olabilir.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g110">
                   <div class="reveal-trigger" onclick="document.getElementById('g110').classList.toggle('open')">
-                    Görev: Web Mercator'a Çevir <span>▼</span>
+                    Görev: İki Sistemi Karşılaştır <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_Transform(geom, 3857) FROM konya.mahalleler LIMIT 1;</code> (Google Maps uyumlu
-                    format)
+                    <code>SELECT srtext FROM spatial_ref_sys WHERE srid IN (5255, 32636);</code> — TM33 ve UTM36N tanımlarını yan yana görün. central_meridian ve zone farklarına dikkat edin.
                   </div>
                 </div>
               </div>
