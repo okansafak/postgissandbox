@@ -257,18 +257,21 @@ FROM konya.ilce_sinirlari LIMIT 5;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Devasa <span>Veriyi</span> Parçala</div>
-                <div class="s-text-tech">Binlerce noktalı poligonları indeks-dostu parçalara bölmek.</div>
+                <div class="s-headline-tech">İndeks <span>Dostu</span> Geometri</div>
+                <div class="s-text-tech">Devasa ve karmaşık poligonların (örn: bütün bir il sınırı) uzamsal sorguları yavaşlatmasını önleyen en güçlü yöntem.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_SubDivide(geom, 255) FROM konya.ilce_sinirlari; -- Büyük geometriyi parçalara böl</div>
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- Çok noktalı büyük poligonları, maksimum 255 köşe taşıyacak 
+-- küçük ve indeks-dostu parçalara böler.
+SELECT id, ST_SubDivide(geom, 255) AS parcalanmis_geom 
+FROM konya.il_sinirlari;</div>
                 <div class="reveal-box" id="q24">
-                  <div class="reveal-trigger" onclick="document.getElementById('q24').classList.toggle('open')">Kritik Soru: Neden 255 nokta? <span>▼</span></div>
-                  <div class="reveal-content">255-512 arası nokta sayısı, GiST indeksi için en ideal "Bounding Box" boyutunu oluşturur.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q24').classList.toggle('open')">Kritik Soru: Parçalamak hızı nasıl 100x artırır? <span>▼</span></div>
+                  <div class="reveal-content">Büyük şekillerin <strong>Sınırlayıcı Kutusu (Bounding Box)</strong> çok geniş alan kaplar; bu yüzden GiST indeksi eleme yapamaz ve veritabanı on binlerce noktayı tek tek matematiksel hesaba sokar. <code>Subdivide</code> şekli küçük kutulara böler, indeks hedef kutuyu anında bulur ve sadece o minik parça içinde hesaplama yapar.</div>
                 </div>
                 <div class="reveal-box" id="g24">
-                  <div class="reveal-trigger" onclick="document.getElementById('g24').classList.toggle('open')">Görev: İl Sınırını Böl <span>▼</span></div>
-                  <div class="reveal-content">Konya il sınırını 100 nokta limitiyle subdivide edip kaç parça oluştuğunu <code>COUNT(*)</code> ile görün.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g24').classList.toggle('open')">Görev: Mantığı Kavra <span>▼</span></div>
+                  <div class="reveal-content"><code>konya.il_sinirlari</code> tablosunu 255 nokta limitiyle subdivide edip, çıkan sonucu QGIS gibi bir görselleştiricide açarak şeklin nasıl küçük ağlara (grid) bölündüğünü inceleyin.</div>
                 </div>
               </div>
             </div>
