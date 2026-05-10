@@ -130,22 +130,29 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
 # Shapefile → PostGIS (koordinat dönüşümü ile)
 # -f         : Hedef Format (PostgreSQL vb.)
 # -nln       : Yeni Katman/Tablo Adı (New Layer Name)
+# -lco       : Katman Ayarları (Burada şema belirtir: SCHEMA=konya)
 # -t_srs     : Hedef Koordinat Sistemi (Target SRS)
 # -overwrite : Tablo zaten varsa üzerine yaz
+# -progress  : Yükleme ilerlemesini (%) gösterir
 ogr2ogr -f "PostgreSQL" ^
-  PG:"host=localhost dbname=konya user=postgres" ^
+  PG:"host=localhost dbname=konya user=postgres password=ŞİFRENİZ" ^
   D:\data\mahalleler.shp ^
-  -nln konya.mahalleler ^
+  -nln mahalleler ^
+  -lco SCHEMA=konya ^
   -t_srs EPSG:4326 ^
-  -overwrite
+  -overwrite ^
+  -progress
 
 # Sadece belirli alanları aktar (-sql ile veriyi yoldayken filtrele)
 ogr2ogr -f "PostgreSQL" ^
-  PG:"host=localhost dbname=konya user=postgres" ^
+  PG:"host=localhost dbname=konya user=postgres password=ŞİFRENİZ" ^
   D:\data\mahalleler.shp ^
-  -nln konya.mahalleler ^
+  -nln mahalleler ^
+  -lco SCHEMA=konya ^
   -sql "SELECT id, ad, nufus FROM mahalleler" ^
-  -t_srs EPSG:4326
+  -t_srs EPSG:4326 ^
+  -overwrite ^
+  -progress
                 </div>
                 <div class="reveal-box" id="q21x">
                   <div class="reveal-trigger" onclick="document.getElementById('q21x').classList.toggle('open')">Kritik Soru: ogr2ogr ile COPY arasındaki fark ne zaman önemli? <span>▼</span></div>
