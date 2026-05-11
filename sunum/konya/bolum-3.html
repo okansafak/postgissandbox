@@ -240,7 +240,12 @@
                 <div class="s-text-tech">Kopuk çizgileri, çıkmaz sokakları ve üst üste binen geometrileri <code>pgr_analyzeGraph</code> ile bulma.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_analyzeGraph('konya.osm_yollar', 0.00001); -- Ağ hatalarını analiz et</div>
+                <div class="code-block">-- Varsayılan 'the_geom' yerine 'geom' kolonunu açıkça belirtmeliyiz
+SELECT pgr_analyzeGraph(
+  'konya.osm_yollar', 
+  0.00001, 
+  'geom', 'id', 'source', 'target'
+);</div>
                 <div class="reveal-box" id="q36">
                   <div class="reveal-trigger" onclick="document.getElementById('q36').classList.toggle('open')">Kritik Soru: Çıkmaz sokaklar rotayı bozar mı? <span>▼</span></div>
                   <div class="reveal-content">Hayır ama gereksiz işlem yükü oluşturur. Kopuk yollar ise "Yol bulunamadı" hatasına neden olur.</div>
