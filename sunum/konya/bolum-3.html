@@ -375,23 +375,25 @@ FROM pgr_TSP(
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.3 — PostGIS Topology: Veri Bütünlüğü</div>
+              <div class="slide-header-title">3.3 — PostGIS Topology: Komşuluk Hukuku</div>
               <div class="slide-header-num">11 / 25</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Hatasız <span>Sınırlar</span></div>
-                <div class="s-text-tech">Poligonlar arasındaki ortak sınırları (Edge) tek bir obje olarak yönetip boşlukları engellemek.</div>
+                <div class="s-headline-tech">Ortak <span>Duvar</span></div>
+                <div class="s-text-tech">Parsellerin üst üste binmesini veya aralarında boşluk kalmasını engellemek için, iki komşunun sınırını tek bir hat (Edge) olarak ele alma sanatıdır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT CreateTopology('konya_topoloji', 4326); -- Yeni topolojik şema oluştur</div>
+                <div class="code-block">-- PostGIS Topology altyapısını aktif et ve şema kur
+CREATE EXTENSION IF NOT EXISTS postgis_topology;
+SELECT topology.CreateTopology('konya_kadastro_topo', 5255);</div>
                 <div class="reveal-box" id="q310">
-                  <div class="reveal-trigger" onclick="document.getElementById('q310').classList.toggle('open')">Kritik Soru: Topoloji neden lükstür? <span>▼</span></div>
-                  <div class="reveal-content">Çünkü veri girişi daha zordur ama veri kalitesi %100'dür. CBS profesyonelleri için "Kutsal Kase"dir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q310').classList.toggle('open')">Kritik Soru: Normal poligon yapısından farkı ne? <span>▼</span></div>
+                  <div class="reveal-content">Normal poligonlar "bencilce" kendi dış çizgisini tutar, çizim hatasında üst üste biner (overlap). Topolojide ise "Ortak Duvar" paylaşıldığı için hata oluşması imkansızdır.</div>
                 </div>
                 <div class="reveal-box" id="g310">
                   <div class="reveal-trigger" onclick="document.getElementById('g310').classList.toggle('open')">Görev: Şemayı Kur <span>▼</span></div>
-                  <div class="reveal-content">Yeni bir topoloji şeması oluşturun ve içerisindeki `edge_data`, `face` ve `node` tablolarını inceleyin.</div>
+                  <div class="reveal-content">Yeni bir topoloji şeması oluşturun. Arkada otomatik üretilen `edge_data`, `face` (yüzey) ve `node` (düğüm) tablolarını inceleyin.</div>
                 </div>
               </div>
             </div>
@@ -408,23 +410,28 @@ FROM pgr_TSP(
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.3 — Topolojik Güncelleme Stratejileri</div>
+              <div class="slide-header-title">3.3 — Topolojik Güncelleme: Zincirleme Reaksiyon</div>
               <div class="slide-header-num">12 / 25</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Domino <span>Etkisi</span></div>
-                <div class="s-text-tech">Bir sınırı (Edge) oynattığınızda, o sınıra komşu olan tüm poligonların (Face) otomatik güncellenmesi.</div>
+                <div class="s-text-tech">Komşu iki mahallenin sınır çizgisini (Edge) kaydırdığınızda, her iki mahallenin alanı ve şekli aynı anda, hatasız güncellenir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_MoveIsoEdge('konya_topoloji', edge_id, new_geom); -- Ortak sınırı/kenarı taşı</div>
+                <div class="code-block">-- Ortak sınırı taşıyarak her iki parseli tek hamlede güncelle!
+SELECT topology.ST_MoveIsoEdge(
+  'konya_kadastro_topo', 
+  150,  -- Taşınacak Ortak Sınırın (Edge) ID'si
+  'LINESTRING(450000 4200000, 450100 4200100)'::geometry
+);</div>
                 <div class="reveal-box" id="q311">
-                  <div class="reveal-trigger" onclick="document.getElementById('q311').classList.toggle('open')">Kritik Soru: "Gap" ve "Overlap" nasıl önlenir? <span>▼</span></div>
-                  <div class="reveal-content">Topoloji sayesinde poligonlar sınırları paylaşır. Sınır tektir, bu yüzden arada boşluk kalması imkansızdır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q311').classList.toggle('open')">Kritik Soru: Neden iki poligonu ayrı ayrı güncellemiyoruz? <span>▼</span></div>
+                  <div class="reveal-content">Klasik yöntemde birini günceller diğerini unutursunuz, aralarında "Gap" (boşluk) oluşur. Topolojide sınır tektir, yüzeyler buna uymak zorundadır.</div>
                 </div>
                 <div class="reveal-box" id="g311">
-                  <div class="reveal-trigger" onclick="document.getElementById('g311').classList.toggle('open')">Görev: Sınırı Düzenle <span>▼</span></div>
-                  <div class="reveal-content">İki parsel arasındaki ortak kenarı <code>ST_ModEdgeSplit</code> ile ikiye bölüp topolojiyi güncelleyin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g311').classList.toggle('open')">Görev: İhtilaflı Kenarı Taşı <span>▼</span></div>
+                  <div class="reveal-content">İki parsel arasındaki ihtilaflı kenarı `ST_MoveIsoEdge` ile kaydırıp alanların otomatik olarak değiştiğini ve aralarında hiç boşluk kalmadığını ispatlayın.</div>
                 </div>
               </div>
             </div>
