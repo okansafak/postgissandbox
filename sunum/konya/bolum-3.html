@@ -68,7 +68,7 @@
                 <div class="s-text-tech">Noktaları birbirine en yakın "merkezlere" (K) göre gruplandırarak hizmet alanlarını optimize etmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id FROM konya.poi WHERE kategori = 'Durak'; -- 10 gruba ayır</div>
+                <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id , geom FROM konya.poi WHERE kategori = 'Durak'; -- 10 gruba ayır bu şekilde çalıştır ve qgiste categorik olarak renklendir nasıl olduğu daha iyi anlaşılsın</div>
                 <div class="reveal-box" id="q31">
                   <div class="reveal-trigger" onclick="document.getElementById('q31').classList.toggle('open')">Kritik Soru: K sayısı nasıl seçilir? <span>▼</span></div>
                   <div class="reveal-content">Verinin doğasına göre; örneğin 10 tane çöp kamyonunuz varsa K=10 seçerek her kamyona bir bölge atayabilirsiniz.</div>
@@ -101,14 +101,14 @@
                 <div class="s-text-tech">Belirli bir mesafe içinde (eps) en az N noktanın birleştiği "doğal" kümeleri tespit etmek.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_ClusterDBSCAN(geom, 0.01, 5) OVER() FROM konya.POI; -- Yoğunluk bazlı kümele</div>
+                <div class="code-block">SELECT ST_ClusterDBSCAN(ST_Transform(geom, 5255), 150, 5) OVER() AS cluster_id, geom FROM analiz.kazalar; -- 150 metre çapında en az 5 kaza olan noktaları QGIS'te kategorik renklendirip kara noktaları görselleştirin</div>
                 <div class="reveal-box" id="q32">
-                  <div class="reveal-trigger" onclick="document.getElementById('q32').classList.toggle('open')">Kritik Soru: DBSCAN neden "Isı Haritası"ndan iyidir? <span>▼</span></div>
-                  <div class="reveal-content">Sadece yoğunluğu değil, aykırı (noise) verileri de tespit eder ve kümelerin sınırlarını net çizer.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q32').classList.toggle('open')">Kritik Soru: Kazalarda neden DBSCAN kullanıyoruz? <span>▼</span></div>
+                  <div class="reveal-content">Kaç tane tehlikeli nokta (K) olduğunu önceden bilemeyiz. DBSCAN rastgele dağılan tekil kazaları (gürültü) eler, sadece kronikleşen odakları sınırlar.</div>
                 </div>
                 <div class="reveal-box" id="g32">
-                  <div class="reveal-trigger" onclick="document.getElementById('g32').classList.toggle('open')">Görev: Yoğunluk Tespiti <span>▼</span></div>
-                  <div class="reveal-content">Hastaneler etrafındaki eczane yoğunluğunu 100 metre mesafe ve 3 eczane sınırı ile analiz edin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g32').classList.toggle('open')">Görev: Trafik Kara Nokta Tespiti <span>▼</span></div>
+                  <div class="reveal-content">Son 1 yıldaki kazaları kullanarak, birbirine 150 metre mesafede en az 5 kazanın meydana geldiği tehlikeli kavşak (kara nokta) kümelerini haritalandırın.</div>
                 </div>
               </div>
             </div>
@@ -125,23 +125,27 @@
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.1 — Hexagonal Grid ile Isı Haritaları</div>
+              <div class="slide-header-title">3.1 — H3 Index ve Hexagonal Grid Haritaları</div>
               <div class="slide-header-num">04 / 25</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>Agregasyon</span></div>
-                <div class="s-text-tech">Düzensiz noktaları düzenli altıgenlere hapsederek istatistiksel kıyaslama yapmak.</div>
+                <div class="s-headline-tech">Uber H3 <span>Index</span></div>
+                <div class="s-text-tech">Uber'in geliştirdiği küresel ve hiyerarşik (iç içe geçen) altıgen ağ sistemi ile yüksek performanslı mekansal indeksleme yapmak.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_HexagonGrid(1000, geom) FROM konya.ilce_sinirlari WHERE ad = 'Selçuklu'; -- 1km'lik altıgen grid</div>
+                <div class="code-block">SELECT h3_cell_to_boundary_geometry(h3_lat_lng_to_cell(geom, 9)) AS h3_geom, COUNT(*) AS kaza_sayisi FROM analiz.kazalar GROUP BY h3_lat_lng_to_cell(geom, 9); -- QGIS'te altıgen poligonları kaza sayısına göre renklendirin</div>
                 <div class="reveal-box" id="q33">
-                  <div class="reveal-trigger" onclick="document.getElementById('q33').classList.toggle('open')">Kritik Soru: Neden kare grid değil? <span>▼</span></div>
-                  <div class="reveal-content">Altıgenler her komşusuyla eşit mesafededir. Karelerde ise köşegenler daha uzundur, bu da mesafe analizini bozar.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q33').classList.toggle('open')">Kritik Soru: H3'ün normal "ST_HexagonGrid"den farkı nedir? <span>▼</span></div>
+                  <div class="reveal-content">H3 hiyerarşiktir (Çözünürlük 8, 9'u kapsar) ve dinamik grid oluşturmak yerine mevcut küresel id'leri döndürdüğü için devasa verilerde çok daha hızlıdır.</div>
                 </div>
                 <div class="reveal-box" id="g33">
-                  <div class="reveal-trigger" onclick="document.getElementById('g33').classList.toggle('open')">Görev: Bina Yoğunluğu <span>▼</span></div>
-                  <div class="reveal-content">1 kilometrelik altıgenler içine düşen bina sayılarını sayıp en yoğun bölgeyi bulun.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g33').classList.toggle('open')">Görev: H3 Yoğunluk Haritası <span>▼</span></div>
+                  <div class="reveal-content">Kazaları H3 Çözünürlük 9 seviyesinde kümeleyerek, en çok kazanın yaşandığı top 5 altıgeni belirleyin.</div>
+                </div>
+                <div class="reveal-box" id="w33" style="border-left: 4px solid var(--theme-yellow);">
+                  <div class="reveal-trigger" onclick="document.getElementById('w33').classList.toggle('open')">💡 Windows (.exe) Kurulumları İçin İpucu <span>▼</span></div>
+                  <div class="reveal-content">PostgreSQL ve PostGIS'i Windows'a doğrudan <b>.exe (StackBuilder)</b> ile kurduysanız, <code>h3-pg</code> eklentisi varsayılan pakette yer almaz. H3 gibi gelişmiş eklentileri derleme derdi olmadan kullanabilmek için <b>Docker</b> veya <b>WSL2 (Linux)</b> tabanlı kurulum yapmanız önerilir.</div>
                 </div>
               </div>
             </div>
@@ -163,20 +167,21 @@
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Doğru <span>Analiz</span> Seçimi</div>
-                <div class="s-text-tech">KMeans (Hizmet Alanı), DBSCAN (Doğal Yoğunluk), Grid (İstatistik).</div>
+                <div class="s-headline-tech">Metod <span>Karşılaştırma</span></div>
+                <div class="s-text-tech"><b>KMeans:</b> Kaynak planlama (örn. 5 çöp kamyonuna bölge atama).<br><br><b>DBSCAN:</b> Sıcak nokta (Hotspot) tespiti (örn. trafik kaza sınırlarını çizme).<br><br><b>H3 (Hexagon):</b> Olay istatistikleri ve ısı haritaları (örn. tüm şehrin şikayet yoğunluğunu görme).</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Hangi yöntemi nerede kullanmalısınız?
--- KMeans: Bilinen merkez sayısı.
--- DBSCAN: Bilinmeyen küme yapısı.</div>
+                <div class="code-block">-- Hangi yöntemi nerede kullanmalıyız?
+-- KMeans => Belli K sayıda hedefin varsa (Kaynak opt.)
+-- DBSCAN => Veri düzensizse ve sadece "sorunlu" yerleri arıyorsan (Kara nokta)
+-- H3 => Tüm şehri standart bir tabloya oturtup kıyaslamak istiyorsan (Isı haritası)</div>
                 <div class="reveal-box" id="q34">
-                  <div class="reveal-trigger" onclick="document.getElementById('q34').classList.toggle('open')">Kritik Soru: Yanlış kümeleme neye yol açar? <span>▼</span></div>
-                  <div class="reveal-content">Maddi kayba ve operasyonel verimsizliğe. Örn: Çöp kamyonunun rotasının 10 km boş gitmesi.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q34').classList.toggle('open')">Kritik Soru: Veri tipine göre neyi seçerim? <span>▼</span></div>
+                  <div class="reveal-content">Milyonlarca satırlık çok büyük veride DBSCAN sunucuyu yorabilir, H3 ile sayım yapmak anında sonuç verir. Kesin sınırlar aranıyorsa KMeans veya DBSCAN zorunludur.</div>
                 </div>
                 <div class="reveal-box" id="g34">
-                  <div class="reveal-trigger" onclick="document.getElementById('g34').classList.toggle('open')">Görev: Analiz Senaryosu Kur <span>▼</span></div>
-                  <div class="reveal-content">Konya'daki ATM noktaları için hangi kümeleme yönteminin daha mantıklı olduğunu SQL ile kanıtlayın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g34').classList.toggle('open')">Görev: Senaryo Eşleştirme <span>▼</span></div>
+                  <div class="reveal-content">"Konya'da 11 itfaiye istasyonu yapılacak" ve "Zabıta şikayetlerinin en yoğun kavşakları" senaryolarında hangi yöntemlerin kullanılacağını tartışın.</div>
                 </div>
               </div>
             </div>
@@ -202,14 +207,14 @@
                 <div class="s-text-tech">Geometrileri düğüm (Node) ve kenar (Edge) yapısına dönüştüren <code>pgr_createTopology</code> fonksiyonu.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_createTopology('konya.osm_yollar', 0.00001); -- Ağ analizi topolojisi oluştur</div>
+                <div class="code-block">SELECT pgr_createTopology('konya.osm_yollar', 0.0001, 'geom', 'id'); -- Geometri kolonu 'geom' olarak belirtilmeli</div>
                 <div class="reveal-box" id="q35">
-                  <div class="reveal-trigger" onclick="document.getElementById('q35').classList.toggle('open')">Kritik Soru: Topology neden ayrı bir tabloda? <span>▼</span></div>
-                  <div class="reveal-content">Ağ analizi matematiktir. Geometriyi her seferinde okumak yerine, düğümler arası bağlantıları (ID'ler) okumak çok daha hızlıdır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q35').classList.toggle('open')">Kritik Soru: Neden the_geom hatası alıyoruz? <span>▼</span></div>
+                  <div class="reveal-content">pgRouting'in <code>pgr_createTopology</code> fonksiyonu varsayılan olarak geometri kolonunu <b>the_geom</b> arar. Eğer bizim tablomuzda kolon ismi <b>geom</b> ise, fonksiyona bunu mutlaka parametre olarak açıkça bildirmeliyiz. Ayrıça toleransı (örneğin 0.0001 = ~11 metre) doğru belirlemek yolların birleşmesi için oldukça önemlidir.</div>
                 </div>
                 <div class="reveal-box" id="g35">
                   <div class="reveal-trigger" onclick="document.getElementById('g35').classList.toggle('open')">Görev: Topoloji Hazırla <span>▼</span></div>
-                  <div class="reveal-content"><code>osm_yollar</code> tablonuzda düğüm tablosunu (`_vertices_pgr`) oluşturup içini inceleyin.</div>
+                  <div class="reveal-content">Uygun parametreleri kullanarak <code>osm_yollar</code> tablosu için topolojiyi kurun ve yeni oluşan <code>konya.osm_yollar_vertices_pgr</code> düğüm tablosunu inceleyin.</div>
                 </div>
               </div>
             </div>
@@ -292,23 +297,29 @@
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.2 — Servis Alanı: Ağ Üzerinde Erişim</div>
+              <div class="slide-header-title">3.2 — Servis Alanı: Ağ Üzerinde İlerlemek</div>
               <div class="slide-header-num">09 / 25</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Kritik <span>Erişim</span></div>
-                <div class="s-text-tech">Bir noktadan (itfaiye vb.) 5 dakikalık sürüş mesafesinde gidilebilen tüm yolları belirlemek.</div>
+                <div class="s-headline-tech">Pusula: <span>İzokron</span></div>
+                <div class="s-text-tech">Belirli bir merkezden (İtfaiye) başlangıç yapıp, tanımlı bir "Bütçe" (süre veya mesafe) ile gidebileceğiniz tüm yolları hesaplar.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pgr_drivingDistance('SELECT id, source, target, cost FROM yollar', 1, 500); -- Servis alanı hesabı</div>
+                <div class="code-block">-- 1250 numaralı kavşaktan çık, 1500 birim "uzunluk" bütçe ile nerelere gidebilirsin?
+SELECT seq, node, edge, cost, agg_cost
+FROM pgr_drivingDistance(
+  'SELECT id, source, target, length_m as cost FROM konya.osm_yollar',
+  1250,   -- Merkez Kavşak (Node)
+  1500    -- Bütçe Sınırı (Limit)
+);</div>
                 <div class="reveal-box" id="q38">
-                  <div class="reveal-trigger" onclick="document.getElementById('q38').classList.toggle('open')">Kritik Soru: Buffer (Tampon) analiziyle farkı nedir? <span>▼</span></div>
-                  <div class="reveal-content">Buffer kuş uçuşu (havadan) ölçer, Driving Distance gerçek sokak yolları üzerinden ölçer. Çok daha doğrudur.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q38').classList.toggle('open')">Kritik Soru: Buffer (Tampon) alanından farkı ne? <span>▼</span></div>
+                  <div class="reveal-content">Buffer havadan "kuş uçuşu" daire çizer, binaları delip geçer! Driving Distance ise tamamen gerçek sokakların (Edge) kısıtlamalarına ve mesafelerine dayanır.</div>
                 </div>
                 <div class="reveal-box" id="g38">
                   <div class="reveal-trigger" onclick="document.getElementById('g38').classList.toggle('open')">Görev: İtfaiye Kapsama Alanı <span>▼</span></div>
-                  <div class="reveal-content">Merkez itfaiyenin 3 dakikada ulaşabileceği tüm mahalleleri listeleyin.</div>
+                  <div class="reveal-content">Elde edeceğiniz kavşakları birleştirip, itfaiyenin 5 dakika içerisinde ulaşabileceği gerçek bir "Polygon" servis alanı oluşturun.</div>
                 </div>
               </div>
             </div>
@@ -330,18 +341,24 @@
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">En Verimli <span>Sıralama</span></div>
-                <div class="s-text-tech">N tane durağa en kısa toplam mesafeyle hangi sırayla uğranacağını hesaplamak.</div>
+                <div class="s-headline-tech">Gezgin <span>Satıcı</span></div>
+                <div class="s-text-tech">X tane durağınız var. "Bu durakların tamamına en kısa toplam mesafe veya süre ile hangi SIRAYLA gitmeliyim?" problemini çözer.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pgr_tsp('SELECT id, x, y FROM nodes', 1); -- Çoklu durak rotasını optimize et</div>
+                <div class="code-block">-- Seçili kavşaklar arasındaki en verimli ziyaret sırası
+SELECT seq, node, cost, agg_cost
+FROM pgr_TSP(
+  $$SELECT id, x, y FROM konya.osm_yollar_vertices_pgr 
+    WHERE id IN (100, 250, 400, 50)$$,
+  100   -- Başlangıç Durağı (Kavşak Node ID)
+);</div>
                 <div class="reveal-box" id="q39">
-                  <div class="reveal-trigger" onclick="document.getElementById('q39').classList.toggle('open')">Kritik Soru: Neden pgRouting TSP? <span>▼</span></div>
-                  <div class="reveal-content">Çünkü yolların yönünü, tek yön yasaklarını ve gerçek mesafeleri hesaba katar. Google Maps API'den çok daha maliyetsizdir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q39').classList.toggle('open')">Kritik Soru: Neden pgRouting TSP kullanalım? <span>▼</span></div>
+                  <div class="reveal-content">Dış servislerde (Google Maps vb.) API kotaları kısıtlı ve pahalıdır. Kendi sunucunuzda, kendi verinizle sınırsız optimizasyon yapmanızı sağlar.</div>
                 </div>
                 <div class="reveal-box" id="g39">
                   <div class="reveal-trigger" onclick="document.getElementById('g39').classList.toggle('open')">Görev: Çöp Toplama Rotası <span>▼</span></div>
-                  <div class="reveal-content">Belirlenen 5 çöp konteyneri için en kısa ziyaret sırasını bulan SQL sorgusunu yazın.</div>
+                  <div class="reveal-content">Konya'da atanan 5 çöp konteynerine (Kavşak ID'leri belli) aracı en az yoracak şekilde hangi sırayla uğranacağını bulan SQL sorgusunu yazın.</div>
                 </div>
               </div>
             </div>

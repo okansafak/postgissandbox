@@ -3,7 +3,14 @@
     "allow": [
       "Bash(Get-ChildItem -Path \"d:\\\\cooksoft postgis eğitimi\\\\dokuman\\\\app\\\\postgis-akademi\" -Force)",
       "Bash(Select-Object Name, PSIsContainer)",
-      "PowerShell(Head -30)"
+      "PowerShell(Head -30)",
+      "Bash(Get-ChildItem -Path \"d:\\\\cooksoft postgis eğitimi\\\\dokuman\\\\app\\\\postgis-akademi\\\\sunum\\\\konya\\\\\" -File | Select-Object Name, Length | Sort-Object Name)",
+      "Bash(Get-ChildItem -Path 'd:\\\\cooksoft postgis eğitimi\\\\dokuman\\\\' -Force)",
+      "Bash(Select-Object Name, Mode)",
+      "PowerShell(head -20)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
