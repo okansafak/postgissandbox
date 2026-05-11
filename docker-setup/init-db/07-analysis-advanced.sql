@@ -8,23 +8,19 @@
 -- ============================================================
 -- 1. pgRouting Topoloji Hazırlığı (Bölüm 3: Slayt 8-10)
 -- ============================================================
--- Maliyet hesabı: yol uzunluğu (metre)
-UPDATE konya.osm_yollar
-SET cost = ST_Length(geom::geography)
-WHERE cost IS NULL;
+-- NOT: Aşağıdaki pgRouting ön-hazırlığı BİLİNÇLİ olarak devre dışı bırakıldı.
+-- Bölüm 3.2 Slayt 8 (maliyet), Slayt 9 (topoloji), Slayt 10 (analyze) kursiye
+-- tarafından CANLI çalıştırılır. Docker setup sonrası osm_yollar.cost,
+-- source, target, reverse_cost = NULL gelir; osm_yollar_vertices_pgr tablosu
+-- da henüz yoktur — pgr_createTopology ilk çağrıda otomatik üretir.
 
--- Ters maliyet (çift yönlü yollar için)
-UPDATE konya.osm_yollar
-SET reverse_cost = CASE
-    WHEN one_way = 0 THEN cost     -- Çift yön: aynı maliyet
-    WHEN one_way = 1 THEN -1       -- Tek yön (ileri): ters geçiş yok
-    ELSE cost                       -- Tek yön (geri): maliyet geçerli
-END
-WHERE reverse_cost IS NULL;
-
--- Topoloji oluşturma (Node-Edge ağı)
--- pgr_createTopology çalışması için yolların birbirine bağlı olması gerekir.
-SELECT pgr_createTopology('konya.osm_yollar', 0.0001, 'geom', 'id');
+-- UPDATE konya.osm_yollar SET cost = ST_Length(geom::geography) WHERE cost IS NULL;
+-- UPDATE konya.osm_yollar SET reverse_cost = CASE
+--     WHEN one_way = 0 THEN cost
+--     WHEN one_way = 1 THEN -1
+--     ELSE cost
+-- END WHERE reverse_cost IS NULL;
+-- SELECT pgr_createTopology('konya.osm_yollar', 0.0001, 'geom', 'id');
 
 -- ============================================================
 -- 2. KÜMELEME GÖRÜNÜMLERİ (Bölüm 3: Slayt 3-5)
