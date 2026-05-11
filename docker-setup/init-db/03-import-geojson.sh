@@ -44,6 +44,9 @@ for f in /docker-entrypoint-initdb.d/data/*_yollar*.geojson; do
         -sql "SELECT $NAME_COL AS ad, 'Bilinmiyor' AS tip, '$ilce_adi' AS ilce, geometry FROM \"$layer_name\""
 done
 
+echo ">>>> Sıfır uzunluklu (hatalı) yollar temizleniyor..."
+psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "DELETE FROM konya.osm_yollar WHERE ST_Length(geom) = 0;"
+
 # 5. POI
 echo ">>> POI verileri aktarılıyor..."
 psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "TRUNCATE TABLE konya.poi;"
