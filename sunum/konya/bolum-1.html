@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -710,7 +710,7 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                     Görev: Hastane-Mahalle Join Yap <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT h.ad, m.ad FROM konya.hastaneler h JOIN konya.mahalleler m ON ST_Within(h.geom, m.geom);</code>
+                    <code>SELECT p.ad, m.ad FROM konya.poi p JOIN konya.mahalleler m ON ST_Within(p.geom, m.geom) WHERE p.kategori ILIKE '%hastane%';</code>
                   </div>
                 </div>
               </div>
@@ -1242,8 +1242,9 @@ FROM konya.mahalleler LIMIT 1;</div>
                   milisaniyeler içinde getirir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad                             -- Hastane adını seç
-FROM konya.hastaneler                 -- Tabloyu belirt
+                <div class="code-block" style="margin-bottom:16px;">SELECT ad                             -- POI adını seç
+FROM konya.poi                        -- Tabloyu belirt
+WHERE kategori ILIKE '%hastane%'      -- Sadece hastaneler
 ORDER BY geom <-> ST_SetSRID(ST_Point(32.49, 37.87), 4326) -- İndeksle en yakını bul
 LIMIT 3;                              -- En yakın 3 taneyi getir</div>
                 <div class="reveal-box" id="q118">

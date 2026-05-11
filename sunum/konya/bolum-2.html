@@ -61,7 +61,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — Veri Yükleme (CSV ve COPY)</div>
-              <div class="slide-header-num">02 / 21</div>
+              <div class="slide-header-num">02 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — ogr2ogr ile Veri Taşıma</div>
-              <div class="slide-header-num">03 / 21</div>
+              <div class="slide-header-num">03 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
 # -overwrite : Tablo zaten varsa üzerine yaz
 # -progress  : Yükleme ilerlemesini (%) gösterir
 ogr2ogr -f "PostgreSQL" ^
-  PG:"host=localhost dbname=konya_yeni_db user=postgres password=PASSWORD" ^
+  PG:"host=localhost port=5442 dbname=konya_egitim user=egitim password=egitim2024" ^
   D:\data\mahalleler.shp ^
   -nln mahalleler_tkgm ^
   -lco SCHEMA=konya ^
@@ -147,7 +147,7 @@ ogr2ogr -f "PostgreSQL" ^
 
 # Sadece belirli alanları aktar (-sql ile veriyi yoldayken filtrele)
 ogr2ogr -f "PostgreSQL" ^
-  PG:"host=localhost dbname=konya_yeni_db user=postgres password=PASSWORD" ^
+  PG:"host=localhost port=5442 dbname=konya_egitim user=egitim password=egitim2024" ^
   D:\data\mahalleler.shp ^
   -nln mahalleler_secili ^
   -lco SCHEMA=konya ^
@@ -181,7 +181,7 @@ ogr2ogr -f "PostgreSQL" ^
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — Veri Temizliği (Regex ve UPDATE)</div>
-              <div class="slide-header-num">04 / 21</div>
+              <div class="slide-header-num">04 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -215,7 +215,7 @@ SELECT regexp_replace(mahalle_adi, ' Mah\.$', '') FROM konya.mahalleler_tkgm LIM
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_Simplify ve ST_Smooth</div>
-              <div class="slide-header-num">05 / 21</div>
+              <div class="slide-header-num">05 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -253,7 +253,7 @@ FROM konya.ilce_sinirlari LIMIT 5;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_Subdivide: Performans Canavarı</div>
-              <div class="slide-header-num">06 / 21</div>
+              <div class="slide-header-num">06 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -289,7 +289,7 @@ FROM konya.il_sinirlari;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — Doğrusal Referanslama (Linear Referencing)</div>
-              <div class="slide-header-num">07 / 21</div>
+              <div class="slide-header-num">07 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -340,7 +340,7 @@ WHERE id = 30135;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_ClosestPoint ve ST_Azimuth</div>
-              <div class="slide-header-num">08 / 21</div>
+              <div class="slide-header-num">08 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -397,7 +397,7 @@ ORDER BY y.geom &lt;-&gt; b.p LIMIT 1;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — GiST ve SP-GIST İndeksleme</div>
-              <div class="slide-header-num">09 / 21</div>
+              <div class="slide-header-num">09 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -452,7 +452,7 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — Bounding Box Operatörleri (&&)</div>
-              <div class="slide-header-num">10 / 21</div>
+              <div class="slide-header-num">10 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -502,7 +502,7 @@ WHERE ST_Intersects(geom, ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326));</d
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — Partial ve Functional İndeksler</div>
-              <div class="slide-header-num">11 / 21</div>
+              <div class="slide-header-num">11 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -545,7 +545,7 @@ CREATE INDEX idx_bina_merkez ON konya.osm_binalar USING GIST(ST_Centroid(geom));
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — ANALYZE: Veritabanının Pusulası</div>
-              <div class="slide-header-num">12 / 21</div>
+              <div class="slide-header-num">12 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -581,7 +581,7 @@ ANALYZE konya.mahalleler;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.3 — İndeks Takibi (Dedektiflik)</div>
-              <div class="slide-header-num">12-B / 21</div>
+              <div class="slide-header-num">13 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -620,7 +620,7 @@ WHERE schemaname = 'konya'
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — EXPLAIN ANALYZE Okuma Sanatı</div>
-              <div class="slide-header-num">13 / 21</div>
+              <div class="slide-header-num">14 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -662,7 +662,7 @@ Index Scan using idx_poi_geom on poi  (cost=0.15..8.17 rows=100 width=25)
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — Seq Scan ve Index Scan Farkı</div>
-              <div class="slide-header-num">14 / 21</div>
+              <div class="slide-header-num">15 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -711,7 +711,7 @@ WHERE ST_Intersects(geom,
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — ST_Distance Anti-Pattern</div>
-              <div class="slide-header-num">15 / 21</div>
+              <div class="slide-header-num">16 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -750,7 +750,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — EXPLAIN FORMAT (JSON, YAML)</div>
-              <div class="slide-header-num">16 / 21</div>
+              <div class="slide-header-num">17 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -794,7 +794,7 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — VACUUM ve Bloat Yönetimi</div>
-              <div class="slide-header-num">17 / 21</div>
+              <div class="slide-header-num">18 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -846,7 +846,7 @@ VACUUM ANALYZE konya.mahalleler;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — Tablo Bölümleme (Partitioning)</div>
-              <div class="slide-header-num">18 / 21</div>
+              <div class="slide-header-num">19 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -901,7 +901,7 @@ WHERE i.ad ILIKE 'selçuklu';</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — Partition Pruning (Ayıklama)</div>
-              <div class="slide-header-num">19 / 21</div>
+              <div class="slide-header-num">20 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -943,7 +943,7 @@ WHERE ilce = 'Selçuklu';
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — Tablespace ile Disk Yönetimi</div>
-              <div class="slide-header-num">20 / 21</div>
+              <div class="slide-header-num">21 / 22</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -955,9 +955,10 @@ WHERE ilce = 'Selçuklu';
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px;">-- 1. Tablespace oluştur (PostgreSQL kullanıcısının yazma izni olmalı)
-CREATE TABLESPACE ts_hizli  LOCATION '/mnt/ssd/postgres';
-CREATE TABLESPACE ts_arsiv  LOCATION '/mnt/hdd/postgres';
+                <div class="code-block" style="font-size:11px;">-- 1. Tablespace oluştur (Klasör önceden oluşturulmuş olmalı)
+-- DİKKAT: Docker kullanıyorsanız bu yol konteyner içindeki bir yol olmalıdır.
+CREATE TABLESPACE ts_hizli  LOCATION '/var/lib/postgresql/data/ssd';
+CREATE TABLESPACE ts_arsiv  LOCATION '/var/lib/postgresql/data/hdd';
 
 -- 2. Mevcut tabloyu SSD'ye taşı (tablo süresince kilitlenir)
 ALTER TABLE konya.osm_binalar SET TABLESPACE ts_hizli;
@@ -1017,7 +1018,7 @@ FROM pg_tablespace;</div>
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 21</div>
+    <div class="nav-status" id="navStatus">1 / 22</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 

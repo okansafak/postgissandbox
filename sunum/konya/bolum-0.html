@@ -473,7 +473,7 @@ VALUES
 
                 <div class="card-tech" style="margin-top:20px;">
                   <div class="card-tech-title">Belediye Bağlamı</div>
-                  <div class="card-tech-text">Hastane kaydı geçersiz <code>mahalle_id</code> ile girilirse harita üzerinde boşa düşer ve raporlama bozulur. <b>FOREIGN KEY</b> bunu en başta engeller — uygulama koduna güvenmeye gerek kalmaz.</div>
+                  <div class="card-tech-text">Nesne kaydı geçersiz <code>mahalle_id</code> ile girilirse harita üzerinde boşa düşer ve raporlama bozulur. <b>FOREIGN KEY</b> bunu en başta engeller — uygulama koduna güvenmeye gerek kalmaz.</div>
                 </div>
 
                 <ul class="bullet-list" style="margin-top:16px; font-size:13px; line-height:1.7;">
@@ -495,9 +495,9 @@ CREATE TABLE konya.hastaneler (
 );
 
 -- Geçersiz mahalle ID girişi → ENGELLENECEK
-INSERT INTO konya.hastaneler (ad, yatak_sayisi, kodu, mahalle_id)
+INSERT INTO konya.poi_test (ad, yatak_sayisi, kodu, mahalle_id)
 VALUES ('Test Hastane', 50, 'TST01', 999999);
--- ERROR: foreign key constraint "hastaneler_mahalle_id_fkey"</div>
+-- ERROR: foreign key constraint "poi_test_mahalle_id_fkey"</div>
 
                 <div class="reveal-box" id="qcons">
                   <div class="reveal-trigger" onclick="document.getElementById('qcons').classList.toggle('open')">
@@ -853,9 +853,9 @@ HAVING COUNT(*) > 5;  -- Grup sonuçlarını filtrele</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="margin-bottom:16px;">-- Tablo birleştirme
-SELECT m.ad AS mahalle, h.ad AS hastane
+SELECT m.ad AS mahalle, p.ad AS yer_adi
 FROM konya.mahalleler m
-JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
+JOIN konya.poi p ON p.mahalle_id = m.id;</div>
 
                 <div class="reveal-box" id="q09">
                   <div class="reveal-trigger" onclick="document.getElementById('q09').classList.toggle('open')">
@@ -871,7 +871,7 @@ JOIN konya.hastaneler h ON h.mahalle_id = m.id;</div>
                     Görev: Hastanesi Olmayan Mahalleleri Listele <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT m.ad FROM konya.mahalleler m LEFT JOIN konya.hastaneler h ON h.mahalle_id = m.id WHERE h.id IS NULL;</code>
+                    <code>SELECT m.ad FROM konya.mahalleler m LEFT JOIN konya.poi p ON p.mahalle_id = m.id WHERE p.id IS NULL;</code>
                   </div>
                 </div>
               </div>

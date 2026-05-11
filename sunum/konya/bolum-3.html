@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
@@ -60,7 +60,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.1 — ST_ClusterKMeans ve Mekansal Gruplama</div>
-              <div class="slide-header-num">02 / 25</div>
+              <div class="slide-header-num">02 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -93,7 +93,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.1 — ST_ClusterDBSCAN ve Yoğunluk Analizi</div>
-              <div class="slide-header-num">03 / 25</div>
+              <div class="slide-header-num">03 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -126,7 +126,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.1 — H3 Index ve Hexagonal Grid Haritaları</div>
-              <div class="slide-header-num">04 / 25</div>
+              <div class="slide-header-num">04 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -163,7 +163,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.1 — Kümeleme Yöntemleri Karşılaştırma</div>
-              <div class="slide-header-num">05 / 25</div>
+              <div class="slide-header-num">05 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -189,7 +189,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 6: 3.2.1 pgROUTING GİRİŞ -->
+      <!-- SLAYT 6: 3.2.0 GRAF KAVRAMI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -198,23 +198,30 @@
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.2 — pgRouting: Ağ Analizi Temelleri</div>
-              <div class="slide-header-num">06 / 25</div>
+              <div class="slide-header-title">3.2 — Yol Ağı Nedir? Graf Teorisi Temelleri</div>
+              <div class="slide-header-num">06 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Yol <span>Ağını</span> Akıllandır</div>
-                <div class="s-text-tech">Geometrileri düğüm (Node) ve kenar (Edge) yapısına dönüştüren <code>pgr_createTopology</code> fonksiyonu.</div>
+                <div class="s-headline-tech">Şehri <span>Anlamak</span></div>
+                <div class="s-text-tech">Bir şehrin yol ağını veritabanında nasıl modelleriz? Cevap: <b>Graf Teorisi</b>. Google Maps, Yandex Navi ve tüm navigasyon uygulamaları bu mantığı kullanır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT pgr_createTopology('konya.osm_yollar', 0.0001, 'geom', 'id'); -- Geometri kolonu 'geom' olarak belirtilmeli</div>
-                <div class="reveal-box" id="q35">
-                  <div class="reveal-trigger" onclick="document.getElementById('q35').classList.toggle('open')">Kritik Soru: Neden the_geom hatası alıyoruz? <span>▼</span></div>
-                  <div class="reveal-content">pgRouting'in <code>pgr_createTopology</code> fonksiyonu varsayılan olarak geometri kolonunu <b>the_geom</b> arar. Eğer bizim tablomuzda kolon ismi <b>geom</b> ise, fonksiyona bunu mutlaka parametre olarak açıkça bildirmeliyiz. Ayrıça toleransı (örneğin 0.0001 = ~11 metre) doğru belirlemek yolların birleşmesi için oldukça önemlidir.</div>
+                <div class="card-tech">
+                  <div class="card-tech-title">🔵 Node (Düğüm) = Kavşak</div>
+                  <div class="card-tech-text">İki veya daha fazla sokağın birleştiği her nokta bir <b>Node</b>'dur. Her Node'un benzersiz bir ID numarası vardır.</div>
                 </div>
-                <div class="reveal-box" id="g35">
-                  <div class="reveal-trigger" onclick="document.getElementById('g35').classList.toggle('open')">Görev: Topoloji Hazırla <span>▼</span></div>
-                  <div class="reveal-content">Uygun parametreleri kullanarak <code>osm_yollar</code> tablosu için topolojiyi kurun ve yeni oluşan <code>konya.osm_yollar_vertices_pgr</code> düğüm tablosunu inceleyin.</div>
+                <div class="card-tech">
+                  <div class="card-tech-title">🟡 Edge (Kenar) = Sokak</div>
+                  <div class="card-tech-text">İki kavşağı birbirine bağlayan yol parçasıdır. Her Edge'in bir <b>Source</b> (nereden) ve <b>Target</b> (nereye) Node'u vardır.</div>
+                </div>
+                <div class="card-tech">
+                  <div class="card-tech-title">💰 Cost (Maliyet) = Bedel</div>
+                  <div class="card-tech-text">O sokaktan geçmenin bedeli. Mesafe (metre), süre (dakika) veya yakıt tüketimi olabilir. pgRouting en düşük toplam maliyetli rotayı bulur.</div>
+                </div>
+                <div class="reveal-box" id="qr0">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr0').classList.toggle('open')">Kritik Soru: pgRouting nedir? <span>▼</span></div>
+                  <div class="reveal-content">PostGIS'in üzerine kurulan bir <b>eklentidir</b> (Extension). Geometri çizgileri üzerinde rota hesabı, servis alanı analizi ve çoklu durak optimizasyonu yapar. Tüm işlemler SQL ile veritabanı içinde gerçekleşir — dış servis gerekmez.</div>
                 </div>
               </div>
             </div>
@@ -222,7 +229,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 7: 3.2.2 EDGE/NODE TEMİZLEME -->
+      <!-- SLAYT 7: 3.2.1 VERİ KEŞFİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -231,70 +238,180 @@
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.2 — Ham Geometride Temizleme (Dead Ends)</div>
-              <div class="slide-header-num">07 / 25</div>
+              <div class="slide-header-title">3.2 — Yol Verimizi Tanıyalım</div>
+              <div class="slide-header-num">07 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Bağlantı <span>Sorunları</span></div>
-                <div class="s-text-tech">Kopuk çizgileri, çıkmaz sokakları ve üst üste binen geometrileri <code>pgr_analyzeGraph</code> ile bulma.</div>
+                <div class="s-headline-tech">Veri <span>Keşfi</span></div>
+                <div class="s-text-tech">Rota hesabına başlamadan önce <code>konya.osm_yollar</code> tablosunu inceleyelim. Hangi kolonlar var? Veriler hazır mı?</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Varsayılan 'the_geom' yerine 'geom' kolonunu açıkça belirtmeliyiz
+                <div class="code-block" style="font-size:12px;">-- 1) Tablodaki toplam yol sayısı
+SELECT count(*) AS toplam_yol FROM konya.osm_yollar;
+
+-- 2) İlk 5 kaydı inceleyelim
+SELECT id, ad, tip, ilce, source, target, cost,
+       ROUND(ST_Length(geom::geography)::numeric, 1) AS uzunluk_m
+FROM konya.osm_yollar LIMIT 5;
+
+-- 3) Kritik kontrol: source/target dolu mu?
+SELECT count(*) FILTER (WHERE source IS NOT NULL) AS dolu,
+       count(*) FILTER (WHERE source IS NULL) AS bos
+FROM konya.osm_yollar;</div>
+                <div class="reveal-box" id="qr1">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr1').classList.toggle('open')">Kritik Soru: source ve target neden NULL? <span>▼</span></div>
+                  <div class="reveal-content">OSM'den indirilen ham yol verisinde kavşak bilgisi yoktur. Sadece geometriler (çizgiler) vardır. <b>source</b> ve <b>target</b> kolonları <code>pgr_createTopology</code> çalıştırıldığında otomatik doldurulur. Bu adım "Topoloji Oluşturma" slaytında yapılacak.</div>
+                </div>
+                <div class="reveal-box" id="gr1">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr1').classList.toggle('open')">Görev: Veri Kalitesini Ölç <span>▼</span></div>
+                  <div class="reveal-content">Kaç farklı <code>ilce</code> değeri var? Hangi ilçede en çok yol var? <code>GROUP BY ilce ORDER BY count(*) DESC</code> ile kontrol edin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 8: 3.2.2 MALİYET HESABI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.2 — Maliyet Hesabı: Yolun Bedeli</div>
+              <div class="slide-header-num">08 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Yolun <span>Bedeli</span></div>
+                <div class="s-text-tech">Her yol parçasının (Edge) bir <b>maliyeti</b> olmalı. Maliyet olmadan rota hesaplanamaz. En basit maliyet: yolun metre cinsinden uzunluğu.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:12px;">-- ADIM 1: İleri yön maliyeti (metre cinsinden uzunluk)
+UPDATE konya.osm_yollar
+SET cost = ST_Length(geom::geography)
+WHERE cost IS NULL;
+
+-- ADIM 2: Geri yön maliyeti (tek yön kuralı)
+UPDATE konya.osm_yollar
+SET reverse_cost = CASE
+  WHEN one_way = 0 THEN cost   -- Çift yön → aynı maliyet
+  WHEN one_way = 1 THEN -1     -- Tek yön → geri geçiş YOK
+  ELSE cost
+END
+WHERE reverse_cost IS NULL;
+
+-- Doğrulama: Maliyetler doldu mu?
+SELECT min(cost), avg(cost)::int, max(cost)
+FROM konya.osm_yollar;</div>
+                <div class="reveal-box" id="qr2">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr2').classList.toggle('open')">Kritik Soru: Cost sadece mesafe midir? <span>▼</span></div>
+                  <div class="reveal-content">Hayır! Maliyeti dilediğiniz gibi tasarlayabilirsiniz:<br><b>Mesafe:</b> <code>ST_Length(geom::geography)</code> → metre<br><b>Süre:</b> <code>ST_Length(geom::geography) / (hiz_limiti * 1000.0 / 3600)</code> → saniye<br><b>Yakıt:</b> Eğim + araç ağırlığı formülü. Maliyet ne kadar gerçekçi olursa rota o kadar doğru olur.</div>
+                </div>
+                <div class="reveal-box" id="gr2">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr2').classList.toggle('open')">Görev: Süre Bazlı Maliyet Hesapla <span>▼</span></div>
+                  <div class="reveal-content">Her yolun hız limitini (<code>hiz_limiti</code>) kullanarak <b>saniye cinsinden</b> bir <code>cost_sure</code> kolonu oluşturup dolduran SQL yazın. İpucu: <code>ALTER TABLE ... ADD COLUMN</code> ve ardından <code>UPDATE</code>.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 9: 3.2.3 TOPOLOJİ OLUŞTURMA -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.2 — Topoloji Oluşturma: Ağı Örmek</div>
+              <div class="slide-header-num">09 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ağı <span>Örmek</span></div>
+                <div class="s-text-tech">Şu an elimizde sadece bağımsız çizgiler var. <code>pgr_createTopology</code> bu çizgilerin uç noktalarını karşılaştırarak hangi yolun hangi yola bağlandığını (kavşakları) tespit eder.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:12px;">-- Tolerans: 0.0001 derece ≈ 11 metre
+-- Birbirine 11 metreden yakın uç noktalar
+-- aynı kavşak (Node) sayılır.
+SELECT pgr_createTopology(
+  'konya.osm_yollar',  -- Tablo adı
+  0.0001,              -- Tolerans (derece)
+  'geom',              -- Geometri kolonu
+  'id'                 -- PK kolonu
+);
+
+-- Ne oluştu? Yeni düğüm tablosunu incele:
+SELECT count(*) AS kavsaklar
+FROM konya.osm_yollar_vertices_pgr;
+
+-- source ve target artık dolu mu?
+SELECT id, source, target, cost
+FROM konya.osm_yollar
+WHERE source IS NOT NULL LIMIT 5;</div>
+                <div class="reveal-box" id="qr3">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr3').classList.toggle('open')">Kritik Soru: Neden 'the_geom' hatası alıyoruz? <span>▼</span></div>
+                  <div class="reveal-content"><code>pgr_createTopology</code> varsayılan olarak geometri kolonunu <b>the_geom</b> olarak arar. Bizim tablomuzda kolon adı <b>geom</b> olduğu için fonksiyona üçüncü parametre olarak <code>'geom'</code> yazmak zorunludur. Ayrıca tolerans değeri çok küçükse (0.00001) uç noktalar birleşemez, çok büyükse (0.01) farklı kavşaklar tek kavşak gibi algılanır.</div>
+                </div>
+                <div class="reveal-box" id="gr3">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr3').classList.toggle('open')">Görev: Vertices Tablosunu Keşfet <span>▼</span></div>
+                  <div class="reveal-content">Oluşan <code>konya.osm_yollar_vertices_pgr</code> tablosunu DBeaver veya QGIS'te açın. Kavşak noktalarının (Node) gerçekten yol birleşimlerinde olduğunu haritada doğrulayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 10: 3.2.4 GRAF ANALİZİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.2 — Graf Sağlık Kontrolü</div>
+              <div class="slide-header-num">10 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Sağlık <span>Taraması</span></div>
+                <div class="s-text-tech">Topoloji oluşturduk ama ağ sağlıklı mı? Kopuk yollar, çıkmaz sokaklar veya birleşmeyen uçlar "Rota bulunamadı" hatasına yol açar.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:12px;">-- Ağ sağlık raporu
 SELECT pgr_analyzeGraph(
-  'konya.osm_yollar', 
-  0.00001, 
+  'konya.osm_yollar',
+  0.00001,
   'geom', 'id', 'source', 'target'
 );</div>
-                <div class="reveal-box" id="r36">
-                  <div class="reveal-trigger" onclick="document.getElementById('r36').classList.toggle('open')">Çıktı Ne Anlama Geliyor? (NOTICE Mesajları) <span>▼</span></div>
-                  <div class="reveal-content" style="font-size: 0.9em;">
-                    <strong>Dead ends (Çıkmazlar):</strong> Doğal uç noktalar veya çıkmaz sokaklar.<br>
-                    <strong>Isolated segments (Kopuk Yollar):</strong> Ağın geri kalanına bağlanamayan, havada asılı parçalar.<br>
-                    <strong>Potential gaps (Boşluklar):</strong> Birbirine tam değmeyen (örn. 5cm) şüpheli çizim hataları.<br>
-                    <strong>Intersections (Kesişimler):</strong> Başarıyla oluşan kavşaklar (Node).
-                  </div>
+                <div class="info-box" style="margin-top:15px; background:rgba(245,197,24,0.08); padding:15px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.85em;">
+                  <div style="color:var(--theme-yellow-dark); margin-bottom:8px;"><strong>📊 NOTICE Mesajları Ne Anlama Gelir?</strong></div>
+                  <ul style="margin:0; padding-left:20px;">
+                    <li style="margin-bottom:4px;"><b>Dead ends (Çıkmazlar):</b> Yolun son bulduğu doğal uç noktalar. Sorun değil.</li>
+                    <li style="margin-bottom:4px;"><b>Isolated (Kopuk):</b> Ağa hiç bağlanmayan yollar. <b>Sorunlu!</b> Rota bu yolları kullanamaz.</li>
+                    <li style="margin-bottom:4px;"><b>Gaps (Boşluklar):</b> Birbirine çok yakın ama birleşmeyen uçlar. Toleransı artırarak çözülebilir.</li>
+                    <li><b>Intersections (Kesişimler):</b> Başarılı kavşak sayısı.</li>
+                  </ul>
                 </div>
-                <div class="reveal-box" id="q36">
-                  <div class="reveal-trigger" onclick="document.getElementById('q36').classList.toggle('open')">Kritik Soru: Çıkmaz sokaklar rotayı bozar mı? <span>▼</span></div>
-                  <div class="reveal-content">Hayır ama gereksiz işlem yükü oluşturur. Kopuk yollar ise "Yol bulunamadı" hatasına neden olur.</div>
+                <div class="reveal-box" id="qr4">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr4').classList.toggle('open')">Kritik Soru: Kopuk yollar rotayı bozar mı? <span>▼</span></div>
+                  <div class="reveal-content">Eğer başlangıç veya bitiş noktanız kopuk bir yol üzerindeyse pgRouting <b>"No path found"</b> hatası verir. Çıkmaz sokaklar sorun yaratmaz ama kopuk (isolated) yollar kesinlikle temizlenmelidir.</div>
                 </div>
-                <div class="reveal-box" id="g36">
-                  <div class="reveal-trigger" onclick="document.getElementById('g36').classList.toggle('open')">Görev: Graf Analizi <span>▼</span></div>
-                  <div class="reveal-content">Yol ağındaki kopuk noktaları (dead_ends) tespit edip bir tabloya raporlayın.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 8: 3.2.3 DIJKSTRA -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">3.2 — Dijkstra: En Kısa Yol SQL'i</div>
-              <div class="slide-header-num">08 / 25</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Rota <span>Hesabı</span></div>
-                <div class="s-text-tech">Başlangıç ve bitiş düğümleri (Node ID) arasında en düşük "maliyetli" rotayı çizmek.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block">SELECT * FROM pgr_dijkstra('SELECT id, source, target, cost FROM yollar', 1, 100); -- En kısa rotayı bul</div>
-                <div class="reveal-box" id="q37">
-                  <div class="reveal-trigger" onclick="document.getElementById('q37').classList.toggle('open')">Kritik Soru: "Cost" sadece mesafe midir? <span>▼</span></div>
-                  <div class="reveal-content">Hayır; trafik, yol eğimi veya tek yön kısıtlaması da maliyete (cost) eklenebilir.</div>
-                </div>
-                <div class="reveal-box" id="g37">
-                  <div class="reveal-trigger" onclick="document.getElementById('g37').classList.toggle('open')">Görev: Ambulans Rotası <span>▼</span></div>
-                  <div class="reveal-content">A noktasından en yakın hastaneye giden en kısa rotanın geometrisini <code>ST_Union</code> ile oluşturun.</div>
+                <div class="reveal-box" id="gr4">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr4').classList.toggle('open')">Görev: Kopuk Yolları Bul <span>▼</span></div>
+                  <div class="reveal-content"><code>konya.osm_yollar_vertices_pgr</code> tablosundaki <code>cnt</code> (bağlantı sayısı) kolonu 1 olan düğümleri listeleyin. Bu düğümler potansiyel sorunlu noktalardır.</div>
                 </div>
               </div>
             </div>
@@ -302,7 +419,8 @@ SELECT pgr_analyzeGraph(
         </div>
       </div>
 
-      <!-- SLAYT 9: 3.2.4 SERVIS ALANI -->
+
+      <!-- SLAYT 11: 3.2.5 KAVŞAK BULMA -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -311,29 +429,180 @@ SELECT pgr_analyzeGraph(
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.2 — Servis Alanı: Ağ Üzerinde İlerlemek</div>
-              <div class="slide-header-num">09 / 25</div>
+              <div class="slide-header-title">3.2 — Gerçek Adresten Kavşak ID Bulma</div>
+              <div class="slide-header-num">11 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Adres → <span>Kavşak</span></div>
+                <div class="s-text-tech">pgRouting sokak ismi veya adres anlamaz; sadece <b>Node ID</b> numaralarıyla çalışır. "Mevlana Müzesi'nden Alaaddin Tepesi'ne" demek yerine "Node 1842'den Node 5671'e" demelisiniz.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:12px;">-- Bir koordinata en yakın kavşağı (Node) bul
+-- KNN operatörü (<->) en yakını anında getirir
+SELECT id, the_geom,
+  ST_Distance(
+    the_geom::geography,
+    ST_SetSRID(ST_MakePoint(32.5040, 37.8710), 4326)::geography
+  )::int AS mesafe_m
+FROM konya.osm_yollar_vertices_pgr
+ORDER BY the_geom <-> ST_SetSRID(
+  ST_MakePoint(32.5040, 37.8710), 4326)  -- Mevlana Müzesi
+LIMIT 1;</div>
+                <div class="info-box" style="margin-top:15px; background:rgba(0,0,0,0.4); padding:15px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.85em;">
+                  <div style="color:var(--theme-yellow); margin-bottom:8px;"><strong>💡 İpucu: İki Nokta Arasında Rota İçin</strong></div>
+                  <div style="color:#ccc;">Yukarıdaki sorguyu iki kez çalıştırın: biri başlangıç koordinatınız, diğeri bitiş koordinatınız için. Dönen <code>id</code> değerlerini bir sonraki slayttaki Dijkstra sorgusuna yazacaksınız.</div>
+                </div>
+                <div class="reveal-box" id="qr5">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr5').classList.toggle('open')">Görev: Kendi Noktalarını Bul <span>▼</span></div>
+                  <div class="reveal-content">DBeaver'da veya QGIS'te Konya haritasından iki farklı konum seçin (örn. eviniz ve işyeriniz). Koordinatlarını alıp yukarıdaki sorguyu değiştirerek her iki konum için en yakın Node ID'yi bulun. Bu ID'leri bir kenara not edin!</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 12: 3.2.6 DIJKSTRA -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.2 — Dijkstra: En Kısa Yol Hesabı</div>
+              <div class="slide-header-num">12 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">İlk <span>Rota</span></div>
+                <div class="s-text-tech">Dijkstra algoritması başlangıç kavşağından bitiş kavşağına kadar <b>en düşük toplam maliyetli</b> yolu hesaplar. Çıktı, sırayla geçilecek kavşak ve sokak listesidir.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:12px;">-- Önceki slayttan bulduğunuz Node ID'lerini kullanın!
+SELECT seq, node, edge, cost, agg_cost
+FROM pgr_dijkstra(
+  'SELECT id, source, target, cost, reverse_cost
+   FROM konya.osm_yollar',
+  -- Başlangıç ve Bitiş Node ID'leri:
+  18599,   -- Örn: Mevlana Müzesi yakını
+  225281   -- Örn: Alaaddin Tepesi yakını
+);</div>
+                <div class="info-box" style="margin-top:15px; background:rgba(245,197,24,0.08); padding:15px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.85em;">
+                  <div style="margin-bottom:8px;"><strong>📊 Sonuç Sütunları:</strong></div>
+                  <ul style="margin:0; padding-left:20px;">
+                    <li><b>seq:</b> Adım sırası (1, 2, 3...)</li>
+                    <li><b>node:</b> O adımda bulunduğunuz kavşak ID'si</li>
+                    <li><b>edge:</b> Sonraki kavşağa gitmek için geçtiğiniz sokak ID'si (son satırda <b>-1</b>)</li>
+                    <li><b>cost:</b> Sadece o sokağın maliyeti (metre)</li>
+                    <li><b>agg_cost:</b> Başlangıçtan şu ana kadar biriken toplam maliyet</li>
+                  </ul>
+                </div>
+                <div class="reveal-box" id="qr6">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr6').classList.toggle('open')">Görev: İlk Rotanızı Hesaplayın <span>▼</span></div>
+                  <div class="reveal-content">Önceki slayttan bulduğunuz iki Node ID ile Dijkstra sorgusunu çalıştırın. Toplam kaç adım (sokak) geçiliyor? Son satırdaki <code>agg_cost</code> değerini 1000'e bölün — toplam kaç kilometre?</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 13: 3.2.7 ROTAYI HARİTADA ÇİZME -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.2 — Rotayı Haritada Görmek</div>
+              <div class="slide-header-num">13 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Çiz ve <span>Gör</span></div>
+                <div class="s-text-tech">Dijkstra bize sadece ID listesi verir, geometri vermez. Rotayı haritada çizebilmek için sonuçları <b>yol tablosuna JOIN</b> etmemiz gerekir.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:11px;">-- Dijkstra sonucunu geometri ile birleştir
+SELECT d.seq, d.node, d.edge, d.cost, d.agg_cost,
+       y.ad AS sokak_adi, y.geom
+FROM pgr_dijkstra(
+  'SELECT id, source, target, cost, reverse_cost
+   FROM konya.osm_yollar',
+  18599, 225281
+) AS d
+JOIN konya.osm_yollar y ON d.edge = y.id
+ORDER BY d.seq;
+
+-- Veya tüm rotayı TEK bir çizgi olarak birleştir:
+SELECT ST_Union(y.geom) AS rota_geometri
+FROM pgr_dijkstra(
+  'SELECT id, source, target, cost, reverse_cost
+   FROM konya.osm_yollar',
+  18599, 225281
+) AS d
+JOIN konya.osm_yollar y ON d.edge = y.id;</div>
+                <div class="reveal-box" id="qr7">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr7').classList.toggle('open')">Kritik Soru: Neden d.edge = y.id? <span>▼</span></div>
+                  <div class="reveal-content">Dijkstra'nın döndürdüğü <code>edge</code> sütunu, geçilen yolun <code>osm_yollar</code> tablosundaki <code>id</code> değeridir. Bu JOIN ile her adıma ait sokak adı ve geometriyi eklemiş oluyoruz. DBeaver'da geometri kolonuna tıklayarak harita üzerinde rotayı görebilirsiniz.</div>
+                </div>
+                <div class="reveal-box" id="gr7">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr7').classList.toggle('open')">Görev: Rotayı QGIS'te Çizin <span>▼</span></div>
+                  <div class="reveal-content">İlk sorguyu DBeaver'da çalıştırıp sonucu <b>CSV</b> olarak dışa aktarın veya QGIS'ten <b>DB Manager</b> ile doğrudan çalıştırıp harita katmanı olarak ekleyin. Rotanızın gerçek sokaklardan geçtiğini doğrulayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 14: 3.2.8 SERVİS ALANI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.2 — Servis Alanı: İzokron Haritası</div>
+              <div class="slide-header-num">14 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Pusula: <span>İzokron</span></div>
-                <div class="s-text-tech">Belirli bir merkezden (İtfaiye) başlangıç yapıp, tanımlı bir "Bütçe" (süre veya mesafe) ile gidebileceğiniz tüm yolları hesaplar.</div>
+                <div class="s-text-tech">"Bu itfaiye istasyonundan <b>1500 metre</b> içinde hangi sokaklara ulaşılabilir?" sorusunu cevaplar. Buffer (tampon) daire çizer ve binaları delip geçer. İzokron ise gerçek yol ağını kullanır.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- 1250 numaralı kavşaktan çık, 1500 birim "uzunluk" bütçe ile nerelere gidebilirsin?
-SELECT seq, node, edge, cost, agg_cost
+                <div class="code-block" style="font-size:12px;">-- Bir kavşaktan 1500m bütçeyle ulaşılabilen tüm kavşaklar
+SELECT v.id, v.the_geom, d.agg_cost
 FROM pgr_drivingDistance(
-  'SELECT id, source, target, length_m as cost FROM konya.osm_yollar',
-  1250,   -- Merkez Kavşak (Node)
-  1500    -- Bütçe Sınırı (Limit)
-);</div>
-                <div class="reveal-box" id="q38">
-                  <div class="reveal-trigger" onclick="document.getElementById('q38').classList.toggle('open')">Kritik Soru: Buffer (Tampon) alanından farkı ne? <span>▼</span></div>
-                  <div class="reveal-content">Buffer havadan "kuş uçuşu" daire çizer, binaları delip geçer! Driving Distance ise tamamen gerçek sokakların (Edge) kısıtlamalarına ve mesafelerine dayanır.</div>
+  'SELECT id, source, target, cost
+   FROM konya.osm_yollar',
+  1250,    -- Merkez Kavşak (Node ID)
+  1500     -- Maliyet bütçesi (metre)
+) AS d
+JOIN konya.osm_yollar_vertices_pgr v ON d.node = v.id;
+
+-- Ulaşılabilen kavşakları Polygon'a çevir (Servis Alanı)
+SELECT ST_ConvexHull(ST_Collect(v.the_geom)) AS servis_alani
+FROM pgr_drivingDistance(
+  'SELECT id, source, target, cost
+   FROM konya.osm_yollar', 1250, 1500
+) AS d
+JOIN konya.osm_yollar_vertices_pgr v ON d.node = v.id;</div>
+                <div class="reveal-box" id="qr8">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr8').classList.toggle('open')">Kritik Soru: Buffer'dan farkı ne? <span>▼</span></div>
+                  <div class="reveal-content"><code>ST_Buffer</code> havadan kuş uçuşu daire çizer — binaları, nehirleri, dağları delip geçer. <code>pgr_drivingDistance</code> ise gerçek sokak ağının kısıtlamalarına uyar. Tek yönlü caddeleri, kopuk yolları hesaba katar. Sonuç: gerçekçi erişilebilirlik haritası.</div>
                 </div>
-                <div class="reveal-box" id="g38">
-                  <div class="reveal-trigger" onclick="document.getElementById('g38').classList.toggle('open')">Görev: İtfaiye Kapsama Alanı <span>▼</span></div>
-                  <div class="reveal-content">Elde edeceğiniz kavşakları birleştirip, itfaiyenin 5 dakika içerisinde ulaşabileceği gerçek bir "Polygon" servis alanı oluşturun.</div>
+                <div class="reveal-box" id="gr8">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr8').classList.toggle('open')">Görev: İtfaiye Kapsama Analizi <span>▼</span></div>
+                  <div class="reveal-content">Konya'daki bir itfaiye istasyonuna en yakın kavşağı bulun (Slayt 11'deki yöntemle). O kavşaktan <b>3000 metre</b> bütçeyle ulaşılabilen alanı hesaplayın. Sonucu QGIS'te görselleştirip, alanın dışında kalan mahalleleri tespit edin.</div>
                 </div>
               </div>
             </div>
@@ -341,73 +610,39 @@ FROM pgr_drivingDistance(
         </div>
       </div>
 
-      <!-- SLAYT 10: 3.2.5 TSP (GEZGİN SATICI) -->
+      <!-- SLAYT 15: 3.2.9 TSP -->
       <div class="slide-outer">
         <div class="slide-wrapper">
-          <div class="s-tech-white">
+          <div class="s-tech-dark">
             <div class="slide-header">
               <div class="header-logo-area">
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.2 — TSP: Çoklu Durak Optimizasyonu</div>
-              <div class="slide-header-num">10 / 25</div>
+              <div class="slide-header-num">15 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Gezgin <span>Satıcı</span></div>
-                <div class="s-text-tech">X tane durağınız var. "Bu durakların tamamına en kısa toplam mesafe veya süre ile hangi SIRAYLA gitmeliyim?" problemini çözer.</div>
+                <div class="s-text-tech">5 çöp konteynerine uğraman gerekiyor. Hangi <b>sırayla</b> gidersen toplam yol en kısa olur? TSP (Travelling Salesman Problem) bu soruyu cevaplar.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Seçili kavşaklar arasındaki en verimli ziyaret sırası
+                <div class="code-block" style="font-size:12px;">-- Ziyaret edilecek kavşaklar arasında en verimli sıra
 SELECT seq, node, cost, agg_cost
 FROM pgr_TSP(
-  $$SELECT id, x, y FROM konya.osm_yollar_vertices_pgr 
-    WHERE id IN (100, 250, 400, 50)$$,
-  100   -- Başlangıç Durağı (Kavşak Node ID)
+  $$SELECT id, x, y
+    FROM konya.osm_yollar_vertices_pgr
+    WHERE id IN (100, 250, 400, 600, 800)$$,
+  100   -- Başlangıç Node ID
 );</div>
-                <div class="reveal-box" id="q39">
-                  <div class="reveal-trigger" onclick="document.getElementById('q39').classList.toggle('open')">Kritik Soru: Neden pgRouting TSP kullanalım? <span>▼</span></div>
-                  <div class="reveal-content">Dış servislerde (Google Maps vb.) API kotaları kısıtlı ve pahalıdır. Kendi sunucunuzda, kendi verinizle sınırsız optimizasyon yapmanızı sağlar.</div>
+                <div class="reveal-box" id="qr9">
+                  <div class="reveal-trigger" onclick="document.getElementById('qr9').classList.toggle('open')">Kritik Soru: Neden Google Maps API kullanmıyoruz? <span>▼</span></div>
+                  <div class="reveal-content"><b>Maliyet:</b> API kotaları sınırlı ve pahalıdır. <b>Gizlilik:</b> Belediye verisini üçüncü partiye göndermek güvenlik riski taşır. <b>Esneklik:</b> Kendi sunucunuzda, kendi kurallarınızla (ör: ağır araç yasağı olan sokakları çıkar) sınırsız optimizasyon yaparsınız.</div>
                 </div>
-                <div class="reveal-box" id="g39">
-                  <div class="reveal-trigger" onclick="document.getElementById('g39').classList.toggle('open')">Görev: Çöp Toplama Rotası <span>▼</span></div>
-                  <div class="reveal-content">Konya'da atanan 5 çöp konteynerine (Kavşak ID'leri belli) aracı en az yoracak şekilde hangi sırayla uğranacağını bulan SQL sorgusunu yazın.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 11: 3.3.1-2 TOPOLOGY GİRİŞ -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">3.3 — PostGIS Topology: Komşuluk Hukuku</div>
-              <div class="slide-header-num">11 / 25</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Ortak <span>Duvar</span></div>
-                <div class="s-text-tech">Parsellerin üst üste binmesini veya aralarında boşluk kalmasını engellemek için, iki komşunun sınırını tek bir hat (Edge) olarak ele alma sanatıdır.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block">-- PostGIS Topology altyapısını aktif et ve şema kur
-CREATE EXTENSION IF NOT EXISTS postgis_topology;
-SELECT topology.CreateTopology('konya_kadastro_topo', 5255);</div>
-                <div class="reveal-box" id="q310">
-                  <div class="reveal-trigger" onclick="document.getElementById('q310').classList.toggle('open')">Kritik Soru: Normal poligon yapısından farkı ne? <span>▼</span></div>
-                  <div class="reveal-content">Normal poligonlar "bencilce" kendi dış çizgisini tutar, çizim hatasında üst üste biner (overlap). Topolojide ise "Ortak Duvar" paylaşıldığı için hata oluşması imkansızdır.</div>
-                </div>
-                <div class="reveal-box" id="g310">
-                  <div class="reveal-trigger" onclick="document.getElementById('g310').classList.toggle('open')">Görev: Şemayı Kur <span>▼</span></div>
-                  <div class="reveal-content">Yeni bir topoloji şeması oluşturun. Arkada otomatik üretilen `edge_data`, `face` (yüzey) ve `node` (düğüm) tablolarını inceleyin.</div>
+                <div class="reveal-box" id="gr9">
+                  <div class="reveal-trigger" onclick="document.getElementById('gr9').classList.toggle('open')">Görev: Çöp Toplama Rotası <span>▼</span></div>
+                  <div class="reveal-content">Konya'da 5 farklı mahalledeki çöp konteynerlerine en yakın kavşak ID'lerini bulun (Slayt 11 yöntemiyle). Bu 5 ID'yi TSP sorgusuna yazarak en verimli ziyaret sırasını hesaplayın.</div>
                 </div>
               </div>
             </div>
@@ -415,7 +650,7 @@ SELECT topology.CreateTopology('konya_kadastro_topo', 5255);</div>
         </div>
       </div>
 
-      <!-- SLAYT 12: 3.3.3 TOPOLOJİK GÜNCELLEME -->
+      <!-- SLAYT 16: 3.3.1 TOPOLOJİ KAVRAMI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -424,8 +659,49 @@ SELECT topology.CreateTopology('konya_kadastro_topo', 5255);</div>
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
+              <div class="slide-header-title">3.3 — PostGIS Topology: Komşuluk Hukuku</div>
+              <div class="slide-header-num">16 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ortak <span>Duvar</span></div>
+                <div class="s-text-tech">Apartmandaki iki daire aynı duvarı paylaşır. Duvarda bir tuğlayı hareket ettirirseniz iki daire birden etkilenir. PostGIS Topology komşu parsellerin sınırlarını tam olarak böyle yönetir.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="card-tech">
+                  <div class="card-tech-title">Normal Poligon Problemi</div>
+                  <div class="card-tech-text">Her poligon kendi sınır çizgisini tutar. İki mahalle arasında 1mm bile olsa boşluk (gap) veya üst üste binme (overlap) olabilir.</div>
+                </div>
+                <div class="card-tech">
+                  <div class="card-tech-title">Topoloji Çözümü</div>
+                  <div class="card-tech-text">Sınır çizgisi (Edge) tek bir objedir ve iki mahalle ona referans verir. Sınırı kaydırdığınızda iki mahalle <b>otomatik olarak</b> güncellenir — boşluk/çakışma imkansızdır.</div>
+                </div>
+                <div class="code-block" style="margin-top:15px; font-size:12px;">-- Topology eklentisi (Docker'da zaten kurulu)
+CREATE EXTENSION IF NOT EXISTS postgis_topology;
+
+-- Yeni bir topoloji şeması oluştur
+SELECT topology.CreateTopology('konya_topo', 4326);</div>
+                <div class="reveal-box" id="qt1">
+                  <div class="reveal-trigger" onclick="document.getElementById('qt1').classList.toggle('open')">Kritik Soru: Normal poligondan farkı ne? <span>▼</span></div>
+                  <div class="reveal-content">Normal yapıda iki komşu mahalle sınırını ayrı ayrı tuttuğu için düzenleme sırasında senkronizasyon bozulur. Topolojide "ortak duvar" paylaşıldığı için veri bütünlüğü her zaman korunur. Kadastro, imar planı, mahalle sınırları gibi <b>komşuluk ilişkisi kritik</b> olan verilerde topoloji şarttır.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 17: 3.3.2 TOPOLOJİ ŞEMASI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
               <div class="slide-header-title">3.3 — Topolojik Güncelleme: Zincirleme Reaksiyon</div>
-              <div class="slide-header-num">12 / 25</div>
+              <div class="slide-header-num">17 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -433,25 +709,31 @@ SELECT topology.CreateTopology('konya_kadastro_topo', 5255);</div>
                 <div class="s-text-tech">Komşu iki mahallenin sınır çizgisini (Edge) kaydırdığınızda, her iki mahallenin alanı ve şekli aynı anda, hatasız güncellenir.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Ortak sınırı taşıyarak her iki parseli tek hamlede güncelle!
+                <div class="code-block" style="font-size:12px;">-- Topoloji şemasında otomatik oluşan tablolar:
+-- 1) konya_topo.edge_data → Sınır çizgileri
+-- 2) konya_topo.face      → Yüzeyler (mahalleler)
+-- 3) konya_topo.node      → Köşe noktaları
+
+-- Bir kenarı taşıyarak iki parseli tek hamlede güncelle
 SELECT topology.ST_MoveIsoEdge(
-  'konya_kadastro_topo', 
-  150,  -- Taşınacak Ortak Sınırın (Edge) ID'si
-  'LINESTRING(450000 4200000, 450100 4200100)'::geometry
+  'konya_topo',
+  150,  -- Taşınacak kenarın (Edge) ID'si
+  'LINESTRING(32.49 37.87, 32.50 37.88)'::geometry
 );</div>
-                <div class="reveal-box" id="q311">
-                  <div class="reveal-trigger" onclick="document.getElementById('q311').classList.toggle('open')">Kritik Soru: Neden iki poligonu ayrı ayrı güncellemiyoruz? <span>▼</span></div>
-                  <div class="reveal-content">Klasik yöntemde birini günceller diğerini unutursunuz, aralarında "Gap" (boşluk) oluşur. Topolojide sınır tektir, yüzeyler buna uymak zorundadır.</div>
+                <div class="reveal-box" id="qt2">
+                  <div class="reveal-trigger" onclick="document.getElementById('qt2').classList.toggle('open')">Kritik Soru: Neden iki poligonu ayrı güncellemiyoruz? <span>▼</span></div>
+                  <div class="reveal-content">Klasik yöntemde birini günceller diğerini unutursunuz, aralarında "Gap" (boşluk) veya "Overlap" (çakışma) oluşur. Topolojide sınır tektir ve yüzeyler buna uymak zorundadır — hata yapmanız fiziksel olarak imkansızdır.</div>
                 </div>
-                <div class="reveal-box" id="g311">
-                  <div class="reveal-trigger" onclick="document.getElementById('g311').classList.toggle('open')">Görev: İhtilaflı Kenarı Taşı <span>▼</span></div>
-                  <div class="reveal-content">İki parsel arasındaki ihtilaflı kenarı `ST_MoveIsoEdge` ile kaydırıp alanların otomatik olarak değiştiğini ve aralarında hiç boşluk kalmadığını ispatlayın.</div>
+                <div class="reveal-box" id="gt2">
+                  <div class="reveal-trigger" onclick="document.getElementById('gt2').classList.toggle('open')">Görev: Topoloji Tablolarını Keşfet <span>▼</span></div>
+                  <div class="reveal-content"><code>SELECT * FROM konya_topo.edge_data;</code> ve <code>SELECT * FROM konya_topo.face;</code> sorgularını çalıştırarak topoloji şemasının içyapısını inceleyin. Her edge'in hangi yüzeylere (face) ait olduğunu gözlemleyin.</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
 
       <!-- SLAYT 13: 3.4.1 ROL VE YETKİ -->
       <div class="slide-outer">
@@ -463,7 +745,7 @@ SELECT topology.ST_MoveIsoEdge(
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.4 — Kurumsal Yetki ve Rol Yönetimi</div>
-              <div class="slide-header-num">13 / 25</div>
+              <div class="slide-header-num">18 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -497,7 +779,7 @@ GRANT SELECT, INSERT ON TABLE konya.osm_binalar TO editor_role; -- Yetki ver</di
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.4 — Mekansal Row Level Security (RLS)</div>
-              <div class="slide-header-num">14 / 25</div>
+              <div class="slide-header-num">19 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -531,7 +813,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)')); -- Satır bazlı güvenlik (RLS)</d
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.4 — Salt-Okunur (Read-Only) Web Kullanıcısı</div>
-              <div class="slide-header-num">15 / 25</div>
+              <div class="slide-header-num">20 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -564,7 +846,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)')); -- Satır bazlı güvenlik (RLS)</d
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.5 — pg_dump ve pg_restore: Mekansal Yedekleme</div>
-              <div class="slide-header-num">16 / 25</div>
+              <div class="slide-header-num">21 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -597,7 +879,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)')); -- Satır bazlı güvenlik (RLS)</d
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.5 — Replikasyon: Streaming vs Logical</div>
-              <div class="slide-header-num">17 / 25</div>
+              <div class="slide-header-num">22 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -630,7 +912,7 @@ USING (ST_Intersects(geom, 'POLYGON(...)')); -- Satır bazlı güvenlik (RLS)</d
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.5 — PITR: Felaket Anında Zamanı Geri Al</div>
-              <div class="slide-header-num">18 / 25</div>
+              <div class="slide-header-num">23 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -664,7 +946,7 @@ recovery_target_time = '2024-05-03 14:32:00'</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">3.5 — PgBouncer: Bağlantı Havuzlama</div>
-              <div class="slide-header-num">19 / 25</div>
+              <div class="slide-header-num">24 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -687,7 +969,8 @@ recovery_target_time = '2024-05-03 14:32:00'</div>
         </div>
       </div>
 
-      <!-- SLAYT 20: 3.6 PROJE GÖREV 1-2 -->
+
+      <!-- SLAYT 25: 3.6 PROJE GİRİŞ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -696,25 +979,26 @@ recovery_target_time = '2024-05-03 14:32:00'</div>
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.6 — Proje: Konya Acil Durum Analizi (G1-G2)</div>
-              <div class="slide-header-num">20 / 25</div>
+              <div class="slide-header-title">3.6 — Büyük Proje: Konya Acil Durum Stratejisi</div>
+              <div class="slide-header-num">25 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Büyük <span>Sınav</span></div>
-                <div class="s-text-tech">Verinin hazırlanması ve mekansal zenginleştirme (Spatial Join).</div>
+                <div class="s-headline-tech">Gerçek <span>Senaryo</span></div>
+                <div class="s-text-tech">Konya'da büyük bir afet veya acil durum anında; binaların hastanelere olan gerçek erişim mesafelerini hesaplayacak ve en riskli bölgeleri (15 dakikadan uzak) tespit edeceksiniz.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Proje SQL Bloğu:
-UPDATE binalar b SET mahalle_id = m.id 
-FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom); -- Mekansal join ile güncelle</div>
-                <div class="reveal-box" id="q320">
-                  <div class="reveal-trigger" onclick="document.getElementById('q320').classList.toggle('open')">Kritik Soru: Neden Spatial Join? <span>▼</span></div>
-                  <div class="reveal-content">Çünkü ham veride mahalle adı olmayabilir. PostGIS koordinatlar üzerinden veriyi birleştirir.</div>
+                <div class="card-tech">
+                  <div class="card-tech-title">Adım 1: Veri Hazırlama</div>
+                  <div class="card-tech-text">Binaları mahallelerle eşleştirin ve yol ağının topolojisini kontrol edin.</div>
                 </div>
-                <div class="reveal-box" id="g320">
-                  <div class="reveal-trigger" onclick="document.getElementById('g320').classList.toggle('open')">Görev: Nüfus Analizi <span>▼</span></div>
-                  <div class="reveal-content">Hangi mahallenin 500m içinde toplanma alanı olmadığını tespit edin.</div>
+                <div class="card-tech">
+                  <div class="card-tech-title">Adım 2: Çoklu Rota Hesabı</div>
+                  <div class="card-tech-text">Her binadan en yakın hastaneye pgRouting ile gerçek yol mesafesini bulun.</div>
+                </div>
+                <div class="card-tech">
+                  <div class="card-tech-title">Adım 3: Karar Destek</div>
+                  <div class="card-tech-text">Riskli binaları renklendirin ve GeoJSON olarak kriz merkezine raporlayın.</div>
                 </div>
               </div>
             </div>
@@ -722,7 +1006,7 @@ FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom); -- Mekansal join ile gün
         </div>
       </div>
 
-      <!-- SLAYT 21: 3.6 PROJE GÖREV 3-4 -->
+      <!-- SLAYT 26: 3.6 PROJE ADIM 1 -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -731,23 +1015,28 @@ FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom); -- Mekansal join ile gün
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.6 — Proje: Erişim ve GeoJSON Export (G3-G4)</div>
-              <div class="slide-header-num">21 / 25</div>
+              <div class="slide-header-title">3.6 — Proje Adım 1: Mekansal Zenginleştirme</div>
+              <div class="slide-header-num">26 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Karar <span>Çıktısı</span></div>
-                <div class="s-text-tech">Analiz sonuçlarını web haritasına veya mobil uygulamaya hazır hale getirmek.</div>
+                <div class="s-headline-tech">Veriyi <span>Hazırla</span></div>
+                <div class="s-text-tech">Ham bina verisinde mahalle bilgisi yok. Önce her binanın hangi mahallede olduğunu <b>Spatial Join</b> ile bulup tabloya yazmalıyız.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">SELECT ST_AsGeoJSON(t.*) FROM analiz_sonuclari t; -- Veriyi GeoJSON olarak dışa aktar</div>
-                <div class="reveal-box" id="q321">
-                  <div class="reveal-trigger" onclick="document.getElementById('q321').classList.toggle('open')">Kritik Soru: Neden JSON export? <span>▼</span></div>
-                  <div class="reveal-content">Tüm modern web kütüphaneleri (Leaflet, MapLibre vb.) veriyi doğrudan JSON olarak okuyup haritada çizebilir.</div>
-                </div>
-                <div class="reveal-box" id="g321">
-                  <div class="reveal-trigger" onclick="document.getElementById('g321').classList.toggle('open')">Görev: Risk Raporu <span>▼</span></div>
-                  <div class="reveal-content">İtfaiyeye 10 dakikadan uzak binaları GeoJSON olarak dışa aktarın.</div>
+                <div class="code-block" style="font-size:12px;">-- Binalara mahalle ID'lerini ata
+UPDATE konya.osm_binalar b
+SET mahalle_id = m.id
+FROM konya.mahalleler m
+WHERE ST_Intersects(b.geom, m.geom)
+AND b.mahalle_id IS NULL;
+
+-- Eksik veri var mı kontrol et
+SELECT count(*) FROM konya.osm_binalar 
+WHERE mahalle_id IS NULL;</div>
+                <div class="reveal-box" id="qp1">
+                  <div class="reveal-trigger" onclick="document.getElementById('qp1').classList.toggle('open')">Kritik Soru: Neden bu adımı yapıyoruz? <span>▼</span></div>
+                  <div class="reveal-content">Analiz sonuçlarını "Mahalle bazlı" raporlayabilmek (örn: 'En riskli mahalle Selçuklu-Bosna Hersek') için bu ilişkiyi kurmak şarttır.</div>
                 </div>
               </div>
             </div>
@@ -755,7 +1044,7 @@ FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom); -- Mekansal join ile gün
         </div>
       </div>
 
-      <!-- SLAYT 22: 3.7 EXPERT CAPSTONE: MEKANSAL ANALİTİK -->
+      <!-- SLAYT 27: 3.6 PROJE ADIM 2 -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -764,64 +1053,70 @@ FROM mahalleler m WHERE ST_Intersects(b.geom, m.geom); -- Mekansal join ile gün
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.7 — Capstone: Konya Unified Mobility</div>
-              <div class="slide-header-num">22 / 25</div>
+              <div class="slide-header-title">3.6 — Proje Adım 2: Toplu Rota Hesabı</div>
+              <div class="slide-header-num">27 / 30</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ağ Analizi <span>Sınavı</span></div>
+                <div class="s-text-tech">Seçilen bir pilot bölgedeki 100 binanın, Konya'daki tüm hastanelere olan en kısa yol mesafelerini pgRouting ile topluca hesaplayacağız.</div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:11px;">-- Binaya en yakın kavşağı bulup rotayı hesaplayan 
+-- ileri seviye 'Many-to-Many' analizi
+SELECT start_vid, end_vid, agg_cost
+FROM pgr_dijkstra(
+  'SELECT id, source, target, cost FROM konya.osm_yollar',
+  (SELECT array_agg(id) FROM (SELECT id FROM konya.osm_yollar_vertices_pgr LIMIT 10) as t), -- Başlangıçlar
+  (SELECT array_agg(id) FROM (SELECT id FROM konya.osm_yollar_vertices_pgr WHERE id < 1000) as t), -- Hedefler
+  false
+) LIMIT 10;</div>
+                <div class="reveal-box" id="qp2">
+                  <div class="reveal-trigger" onclick="document.getElementById('qp2').classList.toggle('open')">Kritik Soru: pgr_dijkstra dizilerle çalışır mı? <span>▼</span></div>
+                  <div class="reveal-content">Evet! Tek bir başlangıç yerine, bir Node ID dizisi (Array) vererek yüzlerce rotayı tek komutla hesaplayabilirsiniz. Bu, kurumsal CBS sistemlerinin gücüdür.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 28: 3.7 CAPSTONE GİRİŞ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">3.7 — Capstone: Konya Akıllı Şehir Vizyonu</div>
+              <div class="slide-header-num">28 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Geleceğin <span>CBS</span>'si</div>
-                <div class="s-text-tech">Milyonlarca GPS verisinin canlı işlenmesi ve trafik tahmin modelleri.</div>
+                <div class="s-text-tech">Mekansal veri artık statik bir harita değil, yaşayan bir organizmadır. Python, Yapay Zeka ve PostGIS'in birleşimiyle Konya'yı nasıl daha akıllı yönetiriz?</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block">-- Python + PostGIS Entegrasyonu
-import psycopg2
-# GeoPandas ile veriyi çek ve işleyip geri yaz</div>
-                <div class="reveal-box" id="q322">
-                  <div class="reveal-trigger" onclick="document.getElementById('q322').classList.toggle('open')">Kritik Soru: Neden Python + SQL? <span>▼</span></div>
-                  <div class="reveal-content">SQL veriyi hızla filtreler, Python ise karmaşık makine öğrenmesi algoritmalarını çalıştırır. İkisi muhteşem bir ikilidir.</div>
+                <div class="card-tech">
+                  <div class="card-tech-title">🤖 GeoAI (Mekansal Yapay Zeka)</div>
+                  <div class="card-tech-text">Binaların enerji tüketimini veya gelecekteki trafik yoğunluğunu PostGIS verileriyle tahmin eden modeller.</div>
                 </div>
-                <div class="reveal-box" id="g322">
-                  <div class="reveal-trigger" onclick="document.getElementById('g322').classList.toggle('open')">Görev: Akış Planı <span>▼</span></div>
-                  <div class="reveal-content">Canlı trafik verisini PostGIS'e aktaran bir ETL pipeline şeması çizin.</div>
+                <div class="card-tech">
+                  <div class="card-tech-title">🚀 Real-time GIS</div>
+                  <div class="card-tech-text">Canlı otobüs konumları, doluluk oranları ve anlık trafik verilerinin saniyeler içinde analiz edilmesi.</div>
                 </div>
+                <div class="code-block" style="margin-top:10px; font-size:11px;">-- Python + PostGIS = Sınırsız Güç
+import geopandas as gpd
+df = gpd.read_postgis("SELECT * FROM analiz.kazalar", conn)
+# AI modelini burada çalıştır!</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- SLAYT 23: 3.7 HA, ETL VE OPTIMIZATION -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">3.7 — HA, ETL ve Real-time Optimizasyon</div>
-              <div class="slide-header-num">23 / 25</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Sıfır <span>Kesinti</span></div>
-                <div class="s-text-tech">Patroni veya Keepalived ile otomatik failover ve Dockerize edilmiş CBS mikroservisleri.</div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block">docker compose up -d --scale postgis=3 --no-recreate # Servisi 3 kopyaya çıkar (Load Balancing)</div>
-                <div class="reveal-box" id="q323">
-                  <div class="reveal-trigger" onclick="document.getElementById('q323').classList.toggle('open')">Kritik Soru: Real-time sistemlerde en büyük risk nedir? <span>▼</span></div>
-                  <div class="reveal-content">Veri birikmesi (Latency). Mekansal indeksler ve doğru partition stratejisi bu riski sıfırlar.</div>
-                </div>
-                <div class="reveal-box" id="g323">
-                  <div class="reveal-trigger" onclick="document.getElementById('g323').classList.toggle('open')">Görev: Mikroservis Planla <span>▼</span></div>
-                  <div class="reveal-content">Rota hesaplayan bir API'yi PostGIS ile nasıl konuşturacağınızı planlayın.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <!-- SLAYT 24: MEKANSAL ZEKA ÖZETİ (PREMIUM) -->
       <div class="slide-outer">
@@ -833,7 +1128,7 @@ import psycopg2
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title" style="color:var(--theme-yellow); letter-spacing: 0.1em;">EĞİTİM YOLCULUĞUNUN SONU</div>
-              <div class="slide-header-num">24 / 25</div>
+              <div class="slide-header-num">29 / 30</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -896,7 +1191,7 @@ import psycopg2
   <div class="nav-controls">
     <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
     <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-    <div class="nav-status" id="navStatus">1 / 25</div>
+    <div class="nav-status" id="navStatus">1 / 30</div>
     <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
   </div>
 
