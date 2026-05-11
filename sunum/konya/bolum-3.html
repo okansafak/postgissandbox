@@ -246,6 +246,15 @@ SELECT pgr_analyzeGraph(
   0.00001, 
   'geom', 'id', 'source', 'target'
 );</div>
+                <div class="reveal-box" id="r36">
+                  <div class="reveal-trigger" onclick="document.getElementById('r36').classList.toggle('open')">Çıktı Ne Anlama Geliyor? (NOTICE Mesajları) <span>▼</span></div>
+                  <div class="reveal-content" style="font-size: 0.9em;">
+                    <strong>Dead ends (Çıkmazlar):</strong> Doğal uç noktalar veya çıkmaz sokaklar.<br>
+                    <strong>Isolated segments (Kopuk Yollar):</strong> Ağın geri kalanına bağlanamayan, havada asılı parçalar.<br>
+                    <strong>Potential gaps (Boşluklar):</strong> Birbirine tam değmeyen (örn. 5cm) şüpheli çizim hataları.<br>
+                    <strong>Intersections (Kesişimler):</strong> Başarıyla oluşan kavşaklar (Node).
+                  </div>
+                </div>
                 <div class="reveal-box" id="q36">
                   <div class="reveal-trigger" onclick="document.getElementById('q36').classList.toggle('open')">Kritik Soru: Çıkmaz sokaklar rotayı bozar mı? <span>▼</span></div>
                   <div class="reveal-content">Hayır ama gereksiz işlem yükü oluşturur. Kopuk yollar ise "Yol bulunamadı" hatasına neden olur.</div>
