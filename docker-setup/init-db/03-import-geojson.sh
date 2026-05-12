@@ -32,16 +32,24 @@ ogr2ogr -f "PostgreSQL" "$DB_CONN" "/docker-entrypoint-initdb.d/data/mahalle_mak
 # 4. YOLLAR
 echo ">>> İlçe yolları aktarılıyor..."
 psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "TRUNCATE TABLE konya.osm_yollar;"
-for f in /docker-entrypoint-initdb.d/data/*_yollar*.geojson; do
+for f in /docker-entrypoint-initdb.d/data/*_yollar_osm.geojson; do
     [ -e "$f" ] || continue
     filename=$(basename "$f")
     layer_name="${filename%.geojson}"
     ilce_adi=$(echo "$filename" | cut -d'_' -f1)
     if [[ "$filename" == *"_maks"* ]]; then NAME_COL="text"; else NAME_COL="name"; fi
-    
+    # OSM dosyaları oneway ve highway kolonu taşır; maks dosyaları taşımaz
+    if [[ "$filename" == *"_osm"* ]]; then
+        ONEWAY_EXPR="CASE WHEN oneway = 'yes' THEN 1 WHEN oneway = 'no' THEN 0 ELSE 0 END"
+        TIP_EXPR="COALESCE(highway, 'Bilinmiyor')"
+    else
+        ONEWAY_EXPR="0"
+        TIP_EXPR="'Bilinmiyor'"
+    fi
+
     echo ">>>> $ilce_adi yolları yükleniyor ($layer_name) [$NAME_COL]..."
     ogr2ogr -f "PostgreSQL" "$DB_CONN" "$f" -nln konya.osm_yollar -append -nlt LINESTRING -explodecollections -lco GEOMETRY_NAME=geom -dialect SQLite \
-        -sql "SELECT $NAME_COL AS ad, 'Bilinmiyor' AS tip, '$ilce_adi' AS ilce, geometry FROM \"$layer_name\""
+        -sql "SELECT $NAME_COL AS ad, $TIP_EXPR AS tip, '$ilce_adi' AS ilce, $ONEWAY_EXPR AS one_way, geometry FROM \"$layer_name\""
 done
 
 echo ">>>> Sıfır uzunluklu (hatalı) yollar temizleniyor..."

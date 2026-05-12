@@ -251,21 +251,24 @@
 SELECT count(*) AS toplam_yol FROM konya.osm_yollar;
 
 -- 2) İlk 5 kaydı inceleyelim
-SELECT id, ad, tip, ilce, source, target, cost,
+SELECT id, ad, tip, ilce, one_way, source, target,
        ROUND(ST_Length(geom::geography)::numeric, 1) AS uzunluk_m
 FROM konya.osm_yollar LIMIT 5;
 
--- 3) Kritik kontrol: source/target dolu mu?
+-- 3) Tek yön dağılımı: kaç yol tek yönlü?
+SELECT one_way, count(*) AS yol_sayisi FROM konya.osm_yollar GROUP BY one_way;
+
+-- 4) Kritik kontrol: source/target dolu mu?
 SELECT count(*) FILTER (WHERE source IS NOT NULL) AS dolu,
        count(*) FILTER (WHERE source IS NULL) AS bos
 FROM konya.osm_yollar;</div>
                 <div class="reveal-box" id="qr1">
                   <div class="reveal-trigger" onclick="document.getElementById('qr1').classList.toggle('open')">Kritik Soru: source ve target neden NULL? <span>▼</span></div>
-                  <div class="reveal-content">OSM'den indirilen ham yol verisinde kavşak bilgisi yoktur. Sadece geometriler (çizgiler) vardır. <b>source</b> ve <b>target</b> kolonları <code>pgr_createTopology</code> çalıştırıldığında otomatik doldurulur. Bu adım "Topoloji Oluşturma" slaytında yapılacak.</div>
+                  <div class="reveal-content">OSM'den indirilen ham yol verisinde kavşak bilgisi yoktur. Sadece geometriler (çizgiler) vardır. <b>source</b> ve <b>target</b> kolonları <code>pgr_createTopology</code> çalıştırıldığında otomatik doldurulur. <b>one_way</b> ise GeoJSON'daki <code>oneway = 'yes'</code> değerinden dönüştürülerek import sırasında kaydedilir (1 = tek yön, 0 = çift yön).</div>
                 </div>
                 <div class="reveal-box" id="gr1">
                   <div class="reveal-trigger" onclick="document.getElementById('gr1').classList.toggle('open')">Görev: Veri Kalitesini Ölç <span>▼</span></div>
-                  <div class="reveal-content">Kaç farklı <code>ilce</code> değeri var? Hangi ilçede en çok yol var? <code>GROUP BY ilce ORDER BY count(*) DESC</code> ile kontrol edin.</div>
+                  <div class="reveal-content">Kaç farklı <code>ilce</code> değeri var? Hangi ilçede en çok yol var? <code>GROUP BY ilce ORDER BY count(*) DESC</code> ile kontrol edin. Ayrıca <code>tip</code> kolonuna bakın — OSM'deki <code>highway</code> sınıfları (trunk, primary, residential...) burada görünüyor.</div>
                 </div>
               </div>
             </div>
@@ -293,21 +296,24 @@ FROM konya.osm_yollar;</div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:12px;">-- ADIM 1: İleri yön maliyeti (metre cinsinden uzunluk)
 UPDATE konya.osm_yollar
-SET cost = ST_Length(geom::geography)
-WHERE cost IS NULL;
+SET cost = ST_Length(geom::geography);
 
 -- ADIM 2: Geri yön maliyeti (tek yön kuralı)
+-- OSM'deki oneway değerleri:
+--   "yes" → one_way=1 → geri yön KAPALI (-1)
+--   "no"  → one_way=0 → çift yön, geri yön açık
+--   boş   → one_way=0 → çift yön (varsayılan)
 UPDATE konya.osm_yollar
 SET reverse_cost = CASE
-  WHEN one_way = 0 THEN cost   -- Çift yön → aynı maliyet
-  WHEN one_way = 1 THEN -1     -- Tek yön → geri geçiş YOK
-  ELSE cost
-END
-WHERE reverse_cost IS NULL;
+  WHEN one_way = 1 THEN -1   -- Tek yön → geri geçiş YOK
+  ELSE cost                  -- Çift yön → aynı maliyet
+END;
 
--- Doğrulama: Maliyetler doldu mu?
-SELECT min(cost), avg(cost)::int, max(cost)
-FROM konya.osm_yollar;</div>
+-- Doğrulama: Tek yönlü yollarda reverse_cost = -1 mi?
+SELECT one_way, min(cost), avg(cost)::int, max(cost),
+       count(*) FILTER (WHERE reverse_cost = -1) AS tek_yon_sayisi
+FROM konya.osm_yollar
+GROUP BY one_way;</div>
                 <div class="reveal-box" id="qr2">
                   <div class="reveal-trigger" onclick="document.getElementById('qr2').classList.toggle('open')">Kritik Soru: Cost sadece mesafe midir? <span>▼</span></div>
                   <div class="reveal-content">Hayır! Maliyeti dilediğiniz gibi tasarlayabilirsiniz:<br><b>Mesafe:</b> <code>ST_Length(geom::geography)</code> → metre<br><b>Süre:</b> <code>ST_Length(geom::geography) / (hiz_limiti * 1000.0 / 3600)</code> → saniye<br><b>Yakıt:</b> Eğim + araç ağırlığı formülü. Maliyet ne kadar gerçekçi olursa rota o kadar doğru olur.</div>
@@ -337,34 +343,41 @@ FROM konya.osm_yollar;</div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Ağı <span>Örmek</span></div>
-                <div class="s-text-tech">Şu an elimizde sadece bağımsız çizgiler var. <code>pgr_createTopology</code> bu çizgilerin uç noktalarını karşılaştırarak hangi yolun hangi yola bağlandığını (kavşakları) tespit eder.</div>
+                <div class="s-text-tech">İki adım gerekli: önce kesişen ama uç noktada birleşmeyen yolları <b>kırıntılara ayır</b> (<code>pgr_nodeNetwork</code>), sonra bu temiz tablonun topolojisini kur (<code>pgr_createTopology</code>).</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px;">-- Tolerans: 0.0001 derece ≈ 11 metre
--- Birbirine 11 metreden yakın uç noktalar
--- aynı kavşak (Node) sayılır.
-SELECT pgr_createTopology(
-  'konya.osm_yollar',  -- Tablo adı
-  0.0001,              -- Tolerans (derece)
-  'geom',              -- Geometri kolonu
-  'id'                 -- PK kolonu
+                <div class="code-block" style="font-size:11px;">-- ADIM 1: Kesişen yolları kırıntılara ayır
+-- → konya.osm_yollar_noded tablosu oluşur
+--   (old_id kolonu → orijinal konya.osm_yollar.id'ye bağlantı)
+SELECT pgr_nodeNetwork(
+  'konya.osm_yollar',  -- Kaynak tablo
+  0.00001,             -- Tolerans (derece)
+  'id',                -- PK kolonu
+  'geom'               -- Geometri kolonu
 );
 
--- Ne oluştu? Yeni düğüm tablosunu incele:
-SELECT count(*) AS kavsaklar
-FROM konya.osm_yollar_vertices_pgr;
+-- ADIM 2: Noded tablonun topolojisini kur
+-- → konya.osm_yollar_noded_vertices_pgr oluşur
+SELECT pgr_createTopology(
+  'konya.osm_yollar_noded',
+  0.00001, 'geom', 'id'
+);
 
--- source ve target artık dolu mu?
-SELECT id, source, target, cost
-FROM konya.osm_yollar
+-- Doğrulama: Kaç kavşak oluştu?
+SELECT count(*) AS kavsaklar
+FROM konya.osm_yollar_noded_vertices_pgr;
+
+-- source/target doldu mu?
+SELECT id, old_id, source, target
+FROM konya.osm_yollar_noded
 WHERE source IS NOT NULL LIMIT 5;</div>
                 <div class="reveal-box" id="qr3">
-                  <div class="reveal-trigger" onclick="document.getElementById('qr3').classList.toggle('open')">Kritik Soru: Neden üçüncü parametre zorunlu? <span>▼</span></div>
-                  <div class="reveal-content"><code>pgr_createTopology</code> varsayılan olarak geometri kolonunu <b>the_geom</b> adıyla arar. Bizim tablomuzda kolon adı <b>geom</b> olduğu için üçüncü argüman olarak <code>'geom'</code> vermek zorunludur — aksi hâlde "column the_geom does not exist" hatası alırsınız. Tolerans değeri de kritiktir: çok küçükse (0.00001) uç noktalar birleşemez, çok büyükse (0.01) farklı kavşaklar tek kavşak gibi algılanır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('qr3').classList.toggle('open')">Kritik Soru: pgr_nodeNetwork neden gerekli? <span>▼</span></div>
+                  <div class="reveal-content">OSM verisinde iki yol geometrisi birbirini ortada kesebilir ama uç noktaları birleşmez. <code>pgr_createTopology</code> yalnızca uç noktaları birleştirir; ortada kesişen yolları göremez. <code>pgr_nodeNetwork</code> her kesişim noktasında yolları parçalara böler ve uç noktaları düzeltir — bunun ardından topoloji hatasız kurulur. Sonuç tablodaki <b>old_id</b> kolonu, orijinal yolun <code>id</code>'sini saklar; sokak adı gibi bilgiler buradan JOIN ile alınır.</div>
                 </div>
                 <div class="reveal-box" id="gr3">
-                  <div class="reveal-trigger" onclick="document.getElementById('gr3').classList.toggle('open')">Görev: Vertices Tablosunu Keşfet <span>▼</span></div>
-                  <div class="reveal-content">Oluşan <code>konya.osm_yollar_vertices_pgr</code> tablosunu DBeaver veya QGIS'te açın. Kavşak noktalarının (Node) gerçekten yol birleşimlerinde olduğunu haritada doğrulayın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('gr3').classList.toggle('open')">Görev: Noded Tabloyu Keşfet <span>▼</span></div>
+                  <div class="reveal-content">Oluşan <code>konya.osm_yollar_noded_vertices_pgr</code> tablosunu DBeaver veya QGIS'te açın. Orijinal tabloya kıyasla daha fazla yol parçası ve kavşak oluştuğunu gözlemleyin. <code>SELECT count(*) FROM konya.osm_yollar</code> ile <code>SELECT count(*) FROM konya.osm_yollar_noded</code> sonuçlarını karşılaştırın.</div>
                 </div>
               </div>
             </div>
@@ -390,9 +403,9 @@ WHERE source IS NOT NULL LIMIT 5;</div>
                 <div class="s-text-tech">Topoloji oluşturduk ama ağ sağlıklı mı? Kopuk yollar, çıkmaz sokaklar veya birleşmeyen uçlar "Rota bulunamadı" hatasına yol açar.</div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px;">-- Ağ sağlık raporu
+                <div class="code-block" style="font-size:12px;">-- Ağ sağlık raporu (noded tablo üzerinde çalıştır)
 SELECT pgr_analyzeGraph(
-  'konya.osm_yollar',
+  'konya.osm_yollar_noded',
   0.00001,
   'geom', 'id', 'source', 'target'
 );</div>
@@ -411,7 +424,7 @@ SELECT pgr_analyzeGraph(
                 </div>
                 <div class="reveal-box" id="gr4">
                   <div class="reveal-trigger" onclick="document.getElementById('gr4').classList.toggle('open')">Görev: Kopuk Yolları Bul <span>▼</span></div>
-                  <div class="reveal-content"><code>konya.osm_yollar_vertices_pgr</code> tablosundaki <code>cnt</code> (bağlantı sayısı) kolonu 1 olan düğümleri listeleyin. Bu düğümler potansiyel sorunlu noktalardır.</div>
+                  <div class="reveal-content"><code>konya.osm_yollar_noded_vertices_pgr</code> tablosundaki <code>cnt</code> (bağlantı sayısı) kolonu 1 olan düğümleri listeleyin. Bu düğümler potansiyel sorunlu noktalardır.</div>
                 </div>
               </div>
             </div>
@@ -440,31 +453,36 @@ SELECT pgr_analyzeGraph(
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px;">-- 1) Çıkmaz sokaklar (tek bağlantılı node'lar)
 SELECT count(*) AS cikmaz_sayisi
-FROM konya.osm_yollar_vertices_pgr
+FROM konya.osm_yollar_noded_vertices_pgr
 WHERE cnt = 1;
 
 -- 2) İzole bileşenler — büyük graftan kopuk alt graflar
---    (büyük dataset'te 10-30 saniye sürebilir)
 SELECT component, count(*) AS node_sayisi
 FROM pgr_connectedComponents(
-  'SELECT id, source, target, cost FROM konya.osm_yollar'
+  'SELECT id, source, target,
+     ST_Length(geom::geography) AS cost
+   FROM konya.osm_yollar_noded'
 )
 GROUP BY component
 ORDER BY node_sayisi DESC
 LIMIT 10;
 
--- 3) Ana bileşene ait olmayan yolları işaretle
+-- 3) Ana bileşene ait olmayan yolları say
 WITH ana AS (
   SELECT component
   FROM pgr_connectedComponents(
-    'SELECT id, source, target, cost FROM konya.osm_yollar')
+    'SELECT id, source, target,
+       ST_Length(geom::geography) AS cost
+     FROM konya.osm_yollar_noded')
   GROUP BY component ORDER BY count(*) DESC LIMIT 1
 )
 SELECT count(*) AS izole_yol
-FROM konya.osm_yollar y
+FROM konya.osm_yollar_noded n
 JOIN pgr_connectedComponents(
-  'SELECT id, source, target, cost FROM konya.osm_yollar') c
-  ON c.node = y.source
+  'SELECT id, source, target,
+     ST_Length(geom::geography) AS cost
+   FROM konya.osm_yollar_noded') c
+  ON c.node = n.source
 WHERE c.component != (SELECT component FROM ana);</div>
                 <div class="reveal-box" id="qd1">
                   <div class="reveal-trigger" onclick="document.getElementById('qd1').classList.toggle('open')">Kritik Soru: "No path found" hatasını nasıl önlerim? <span>▼</span></div>
@@ -505,7 +523,7 @@ SELECT id, the_geom,
     the_geom::geography,
     ST_SetSRID(ST_MakePoint(32.5040, 37.8710), 4326)::geography
   )::int AS mesafe_m
-FROM konya.osm_yollar_vertices_pgr
+FROM konya.osm_yollar_noded_vertices_pgr
 ORDER BY the_geom <-> ST_SetSRID(
   ST_MakePoint(32.5040, 37.8710), 4326)  -- Mevlana Müzesi
 LIMIT 1;</div>
@@ -543,21 +561,25 @@ LIMIT 1;</div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px;">-- CTE ile başlangıç/bitiş node'larını inline bul
 WITH baslangic AS (
-  SELECT id FROM konya.osm_yollar_vertices_pgr
+  SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
     ST_MakePoint(32.5040, 37.8710), 4326)   -- Mevlana
   LIMIT 1
 ),
 bitis AS (
-  SELECT id FROM konya.osm_yollar_vertices_pgr
+  SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
     ST_MakePoint(32.4946, 37.8718), 4326)   -- Alaaddin
   LIMIT 1
 )
 SELECT seq, node, edge, cost, agg_cost
 FROM pgr_dijkstra(
-  'SELECT id, source, target, cost, reverse_cost
-   FROM konya.osm_yollar',
+  'SELECT n.id, n.source, n.target,
+     ST_Length(n.geom::geography) AS cost,
+     CASE WHEN o.one_way = 1 THEN -1
+          ELSE ST_Length(n.geom::geography) END AS reverse_cost
+   FROM konya.osm_yollar_noded n
+   LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
   (SELECT id FROM baslangic),
   (SELECT id FROM bitis)
 );</div>
@@ -629,26 +651,29 @@ FROM pgr_dijkstra(
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:10.5px;">-- A* için yol geometrisinden başlangıç/bitiş koordinatları türet
 WITH baslangic AS (
-  SELECT id FROM konya.osm_yollar_vertices_pgr
+  SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
     ST_MakePoint(32.5040, 37.8710), 4326)   -- Mevlana
   LIMIT 1
 ),
 bitis AS (
-  SELECT id FROM konya.osm_yollar_vertices_pgr
+  SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
     ST_MakePoint(32.4946, 37.8718), 4326)   -- Alaaddin
   LIMIT 1
 )
 SELECT seq, node, edge, cost, agg_cost
 FROM pgr_astar(
-  'SELECT id, source, target, cost, reverse_cost,
-          ST_X(ST_StartPoint(geom)) AS x1,
-          ST_Y(ST_StartPoint(geom)) AS y1,
-          ST_X(ST_EndPoint(geom))   AS x2,
-          ST_Y(ST_EndPoint(geom))   AS y2
-   FROM konya.osm_yollar
-   WHERE geom IS NOT NULL',
+  'SELECT n.id, n.source, n.target,
+     ST_Length(n.geom::geography) AS cost,
+     CASE WHEN o.one_way = 1 THEN -1
+          ELSE ST_Length(n.geom::geography) END AS reverse_cost,
+     ST_X(ST_StartPoint(n.geom)) AS x1,
+     ST_Y(ST_StartPoint(n.geom)) AS y1,
+     ST_X(ST_EndPoint(n.geom))   AS x2,
+     ST_Y(ST_EndPoint(n.geom))   AS y2
+   FROM konya.osm_yollar_noded n
+   LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
   (SELECT id FROM baslangic),
   (SELECT id FROM bitis),
   directed := true,
@@ -690,30 +715,43 @@ FROM pgr_astar(
 WITH rota AS (
   SELECT d.seq, d.edge, d.cost, d.agg_cost
   FROM pgr_dijkstra(
-    'SELECT id, source, target, cost, reverse_cost
-     FROM konya.osm_yollar',
-    (SELECT id FROM konya.osm_yollar_vertices_pgr
+    'SELECT n.id, n.source, n.target,
+       ST_Length(n.geom::geography) AS cost,
+       CASE WHEN o.one_way = 1 THEN -1
+            ELSE ST_Length(n.geom::geography) END AS reverse_cost
+     FROM konya.osm_yollar_noded n
+     LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
+    (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
      ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.5040,37.8710),4326) LIMIT 1),
-    (SELECT id FROM konya.osm_yollar_vertices_pgr
+    (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
      ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.4946,37.8718),4326) LIMIT 1)
   ) AS d
 )
-SELECT r.seq, y.ad AS sokak_adi, y.geom, r.cost, r.agg_cost
+SELECT r.seq,
+       COALESCE(y.ad, 'İsimsiz Yol') AS sokak_adi,
+       ROUND(r.cost::numeric, 1) AS adim_metre,
+       ROUND(r.agg_cost::numeric, 1) AS toplam_metre,
+       n.geom AS rota_cizgisi
 FROM rota r
-JOIN konya.osm_yollar y ON r.edge = y.id
+JOIN konya.osm_yollar_noded n ON r.edge = n.id
+LEFT JOIN konya.osm_yollar y ON n.old_id = y.id  -- sokak adını orijinal tablodan al
 ORDER BY r.seq;
 
--- Tüm rotayı TEK sıralı LineString olarak birleştir
--- (ayrı sorgu; CTE'yi tekrar tanımlamak gerekir)
-SELECT ST_LineMerge(ST_Union(y.geom)) AS rota_geom
+-- Tüm rotayı TEK LineString olarak birleştir (harita için)
+SELECT ST_LineMerge(ST_Union(n.geom)) AS rota_geom
 FROM pgr_dijkstra(
-  'SELECT id, source, target, cost, reverse_cost FROM konya.osm_yollar',
-  (SELECT id FROM konya.osm_yollar_vertices_pgr
+  'SELECT n.id, n.source, n.target,
+     ST_Length(n.geom::geography) AS cost,
+     CASE WHEN o.one_way = 1 THEN -1
+          ELSE ST_Length(n.geom::geography) END AS reverse_cost
+   FROM konya.osm_yollar_noded n
+   LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
+  (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
    ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.5040,37.8710),4326) LIMIT 1),
-  (SELECT id FROM konya.osm_yollar_vertices_pgr
+  (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
    ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.4946,37.8718),4326) LIMIT 1)
 ) AS d
-JOIN konya.osm_yollar y ON d.edge = y.id;</div>
+JOIN konya.osm_yollar_noded n ON d.edge = n.id;</div>
                 <div class="reveal-box" id="qr7">
                   <div class="reveal-trigger" onclick="document.getElementById('qr7').classList.toggle('open')">Kritik Soru: Neden d.edge = y.id? <span>▼</span></div>
                   <div class="reveal-content">Dijkstra'nın döndürdüğü <code>edge</code> sütunu, geçilen yolun <code>osm_yollar</code> tablosundaki <code>id</code> değeridir. Bu JOIN ile her adıma ait sokak adı ve geometriyi eklemiş oluyoruz. DBeaver'da geometri kolonuna tıklayarak harita üzerinde rotayı görebilirsiniz.</div>
@@ -749,7 +787,7 @@ JOIN konya.osm_yollar y ON d.edge = y.id;</div>
                 <div class="code-block" style="font-size:11px;">-- Bir koordinatın yakınındaki kavşaktan 1500m bütçe ile
 -- ulaşılabilen tüm kavşakları bul (yön KISITSIZ)
 WITH merkez AS (
-  SELECT id FROM konya.osm_yollar_vertices_pgr
+  SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
     ST_MakePoint(32.5000, 37.8700), 4326)
   LIMIT 1
@@ -757,13 +795,14 @@ WITH merkez AS (
 ulasilabilir AS (
   SELECT v.id, v.the_geom, d.agg_cost
   FROM pgr_drivingDistance(
-    'SELECT id, source, target, cost, reverse_cost
-     FROM konya.osm_yollar',
+    'SELECT n.id, n.source, n.target,
+       ST_Length(n.geom::geography) AS cost
+     FROM konya.osm_yollar_noded n',
     (SELECT id FROM merkez),
     1500,
     directed := false   -- iki yönlü dolaş
   ) AS d
-  JOIN konya.osm_yollar_vertices_pgr v ON d.node = v.id
+  JOIN konya.osm_yollar_noded_vertices_pgr v ON d.node = v.id
 )
 -- Servis alanı poligonu (gerçek yol ağına uyumlu)
 SELECT ST_ConcaveHull(ST_Collect(the_geom), 0.85)
@@ -808,7 +847,7 @@ FROM pgr_TSPeuclidean(
   $$SELECT id,
            ST_X(the_geom) AS x,
            ST_Y(the_geom) AS y
-    FROM konya.osm_yollar_vertices_pgr
+    FROM konya.osm_yollar_noded_vertices_pgr
     WHERE id IN (100, 250, 400, 600, 800)$$,
   100   -- Başlangıç Node ID
 );
@@ -844,6 +883,15 @@ FROM pgr_TSPeuclidean(
               <div class="s-panel-left">
                 <div class="s-headline-tech">Ortak <span>Duvar</span></div>
                 <div class="s-text-tech">Apartmandaki iki daire aynı duvarı paylaşır. Duvarda bir tuğlayı hareket ettirirseniz iki daire birden etkilenir. PostGIS Topology komşu parsellerin sınırlarını tam olarak böyle yönetir.</div>
+                <div class="info-box" style="margin-top:16px; background:rgba(245,197,24,0.06); padding:14px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.82em;">
+                  <div style="color:var(--theme-yellow-dark); margin-bottom:6px;"><strong>Topoloji Şart Olan Veriler</strong></div>
+                  <ul style="margin:0; padding-left:18px; line-height:1.8;">
+                    <li>Kadastro / parsel sınırları</li>
+                    <li>İmar planı, zoning alanları</li>
+                    <li>İlçe / mahalle sınırları (bu eğitim!)</li>
+                    <li>Enerji veya su şebekesi ağları</li>
+                  </ul>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="card-tech">
@@ -857,11 +905,16 @@ FROM pgr_TSPeuclidean(
                 <div class="code-block" style="margin-top:15px; font-size:12px;">-- Topology eklentisi (Docker'da zaten kurulu)
 CREATE EXTENSION IF NOT EXISTS postgis_topology;
 
--- Yeni bir topoloji şeması oluştur
+-- Yeni bir topoloji şeması oluştur (SRID = 4326)
+-- 'konya_topo' adlı şema + 4 primitive tablo oluşur
 SELECT topology.CreateTopology('konya_topo', 4326);</div>
                 <div class="reveal-box" id="qt1">
                   <div class="reveal-trigger" onclick="document.getElementById('qt1').classList.toggle('open')">Kritik Soru: Normal poligondan farkı ne? <span>▼</span></div>
-                  <div class="reveal-content">Normal yapıda iki komşu mahalle sınırını ayrı ayrı tuttuğu için düzenleme sırasında senkronizasyon bozulur. Topolojide "ortak duvar" paylaşıldığı için veri bütünlüğü her zaman korunur. Kadastro, imar planı, mahalle sınırları gibi <b>komşuluk ilişkisi kritik</b> olan verilerde topoloji şarttır.</div>
+                  <div class="reveal-content">Normal yapıda iki komşu ilçe sınırını ayrı ayrı tuttuğu için düzenleme sırasında senkronizasyon bozulur. Topolojide "ortak duvar" paylaşıldığı için veri bütünlüğü her zaman korunur. Bir edge değiştiğinde, o edge'i çevreleyen her face'in <code>topo_geom::geometry</code> çıktısı otomatik değişir — "iki tabloyu ayrı güncelleme" hatası topolojide imkânsızdır.</div>
+                </div>
+                <div class="reveal-box" id="qt1b">
+                  <div class="reveal-trigger" onclick="document.getElementById('qt1b').classList.toggle('open')">Kritik Soru: CreateTopology ne üretir? <span>▼</span></div>
+                  <div class="reveal-content"><code>CreateTopology</code>, belirtilen adda yeni bir PostgreSQL şeması açar ve içine dört primitive tablo oluşturur: <b>node</b>, <b>edge_data</b>, <b>face</b>, <b>relation</b>. Ayrıca topoloji kaydını <code>topology.topology</code> kataloğuna yazar. Bu şema sonraki slaytlarda incelenecek.</div>
                 </div>
               </div>
             </div>
@@ -884,28 +937,60 @@ SELECT topology.CreateTopology('konya_topo', 4326);</div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Node, Edge, <span>Face</span></div>
-                <div class="s-text-tech"><code>CreateTopology</code> arka planda dört tablo açar. Bu tablolar henüz boş — bir sonraki adımda mevcut poligonları aktardığımızda dolacak.</div>
+                <div class="s-text-tech"><code>CreateTopology</code> arka planda dört primitive tablo açar. Her biri topolojinin farklı bir boyutunu temsil eder.</div>
+                <div class="info-box" style="margin-top:14px; background:rgba(0,0,0,0.35); padding:13px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.8em;">
+                  <table style="width:100%; border-collapse:collapse; color:#ccc;">
+                    <thead><tr style="border-bottom:1px solid rgba(255,203,5,0.3);">
+                      <th style="text-align:left; padding:3px 6px; color:var(--theme-yellow); font-size:11px;">Tablo</th>
+                      <th style="text-align:left; padding:3px 6px; color:var(--theme-yellow); font-size:11px;">Tutar</th>
+                    </tr></thead>
+                    <tbody>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <td style="padding:4px 6px; font-weight:bold;">node</td>
+                        <td style="padding:4px 6px;">Köşe / kavşak noktaları</td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <td style="padding:4px 6px; font-weight:bold;">edge_data</td>
+                        <td style="padding:4px 6px;">Yönlü çizgiler; <code>left_face</code> + <code>right_face</code></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                        <td style="padding:4px 6px; font-weight:bold;">face</td>
+                        <td style="padding:4px 6px;">Kapalı yüzeyler; <code>face_id=0</code> = evrensel dış alan</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:4px 6px; font-weight:bold;">relation</td>
+                        <td style="padding:4px 6px;">TopoGeometry ↔ primitive eşlemesi</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px;">-- konya_topo şemasındaki otomatik tablolar
 SELECT table_name FROM information_schema.tables
 WHERE table_schema = 'konya_topo'
 ORDER BY table_name;
--- node       : kavşak noktaları
--- edge_data  : sınır çizgileri (left_face, right_face)
--- face       : kapalı yüzeyler (mahalle/ilçe)
--- relation   : TopoGeometry ↔ edge/face eşlemeleri
 
--- Şu an boş bir özet (henüz veri aktarmadık)
+-- edge_data yapısını gör: yönlü kenar + komşu yüzeyler
+-- start_node → end_node yönüne göre sol/sağ belirlenir
+SELECT edge_id, start_node, end_node, left_face, right_face
+FROM konya_topo.edge_data LIMIT 3;
+-- Şu an boş — veri aktarımından sonra dolacak
+
+-- Kayıtlı katmanları gör (topology.layer metadata)
+SELECT layer_id, schema_name, table_name, feature_column, feature_type
+FROM topology.layer;
+
+-- Henüz boş özet (veri aktarmadan önce)
 SELECT * FROM topology.TopologySummary('konya_topo');
--- nodes: 0, edges: 0, faces: 0 dönmesi NORMAL.</div>
+-- Beklenen: 0 node, 0 edge, 1 face (face_id=0 = dış evren)</div>
                 <div class="reveal-box" id="qt2">
-                  <div class="reveal-trigger" onclick="document.getElementById('qt2').classList.toggle('open')">Kritik Soru: left_face ve right_face ne işe yarar? <span>▼</span></div>
-                  <div class="reveal-content">Her edge'in solunda ve sağında bir face vardır (yoksa <code>0</code> = sonsuz dış yüzey). İki ilçe arasındaki <b>paylaşılan sınır</b>, <code>left_face != right_face AND her ikisi de != 0</code> olan tek bir edge kaydıdır. Sınırı güncellediğinizde bu iki face de otomatik etkilenir — domino etkisi buradan gelir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('qt2').classList.toggle('open')">Kritik Soru: left_face / right_face ve face_id = 0 ne anlama gelir? <span>▼</span></div>
+                  <div class="reveal-content">Her edge yönlüdür (<code>start_node → end_node</code>). Bu yöne bakıldığında solundaki yüzey <code>left_face</code>, sağındaki <code>right_face</code>'tir. <b>face_id = 0</b> özel değerdir: her topolojide başlangıçta var olan "evrensel dış yüzey" (Universe Face). İki ilçenin paylaşılan sınır kenarında her iki face_id de 0 olmayan değerler taşır — bu edge'ler "iç sınır" olarak kolayca sorgulanabilir.</div>
                 </div>
                 <div class="reveal-box" id="gt2">
-                  <div class="reveal-trigger" onclick="document.getElementById('gt2').classList.toggle('open')">Görev: Tabloları Boş Hâlde Görün <span>▼</span></div>
-                  <div class="reveal-content">Yukarıdaki <code>information_schema</code> sorgusunu çalıştırıp dört tabloyu listeleyin. Ardından <code>SELECT count(*) FROM konya_topo.edge_data;</code> ile şu an sıfır kayıt olduğunu doğrulayın. Bir sonraki slaytta gerçek veri aktaracağız.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('gt2').classList.toggle('open')">Görev: Tabloları Boş Hâlde İncele <span>▼</span></div>
+                  <div class="reveal-content"><code>SELECT count(*) FROM konya_topo.edge_data;</code> ile 0 kayıt olduğunu doğrulayın. <code>topology.layer</code> tablosunu sorgulayın — veri aktarımından önce burası da boş olacak. Sonraki slaytta <code>AddTopoGeometryColumn</code> çalıştırdığımızda bu tablo dolacak.</div>
                 </div>
               </div>
             </div>
@@ -922,45 +1007,55 @@ SELECT * FROM topology.TopologySummary('konya_topo');
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.3 — TopoGeometry Aktarımı: İlçe Sınırlarını Topolojiye Taşı</div>
+              <div class="slide-header-title">3.3 — Veri Aktarımı ve Doğrulama</div>
               <div class="slide-header-num">20 / 34</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Aktar ve <span>Yapılandır</span></div>
-                <div class="s-text-tech">Mevcut <code>konya.ilce_sinirlari</code> poligonlarını topolojiye aktaralım. <code>toTopoGeom</code>: paylaşılan sınırları tek edge olarak böler, ortak köşeleri node yapar, her ilçeyi bir face hâline getirir.</div>
+                <div class="s-headline-tech">Aktar, Doğrula, <span>Sorgula</span></div>
+                <div class="s-text-tech">Mevcut <code>konya.ilce_sinirlari</code> poligonlarını topolojiye aktaralım. <code>toTopoGeom</code> paylaşılan sınırları tek edge olarak böler, ortak köşeleri node yapar, her ilçeyi bir face hâline getirir. <code>ValidateTopology</code> ile kalite kontrolü yapılır.</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px;">-- 1) Topology katman tanımı (tablo + kolon kaydı)
+-- Tip: 'POINT' | 'LINE' | 'POLYGON' | 'COLLECTION'
 SELECT topology.AddTopoGeometryColumn(
   'konya_topo',     -- topoloji adı
   'konya',          -- şema
   'ilce_sinirlari', -- tablo
   'topo_geom',      -- yeni kolon
-  'MULTIPOLYGON'    -- tip
+  'POLYGON'         -- tip (MULTI dahil alansal objeler için)
 );  -- DÖNÜŞ: layer_id (genelde 1)
 
--- 2) Geometriden TopoGeometry üret (snap = 1.0 m)
+-- 2) Geometriden TopoGeometry üret
+-- Tolerans EPSG:4326 biriminde derece: 0.0001 ≈ 11 metre
 UPDATE konya.ilce_sinirlari
-SET topo_geom = topology.toTopoGeom(geom, 'konya_topo', 1, 1.0);
+SET topo_geom = topology.toTopoGeom(geom, 'konya_topo', 1, 0.0001);
 -- 31 ilçe için birkaç saniye sürer.
 
--- 3) Sonuç: kaç node/edge/face üretildi?
+-- 3) Aktarım sonrası özet: kaç node/edge/face üretildi?
 SELECT * FROM topology.TopologySummary('konya_topo');
 
--- 4) Paylaşılan sınırlar (her iki tarafı da ilçe olan edge'ler)
+-- 4) Kalite kontrolü — boş sonuç = hatasız topoloji
+SELECT * FROM topology.ValidateTopology('konya_topo');
+-- Hata türleri: intersecting_edges, invalid_face_rings vb.
+
+-- 5) Paylaşılan sınırlar (her iki tarafı da ilçe olan edge'ler)
 SELECT edge_id, left_face, right_face,
        ST_Length(geom::geography)::int AS uzunluk_m
 FROM konya_topo.edge_data
 WHERE left_face != 0 AND right_face != 0
 ORDER BY uzunluk_m DESC LIMIT 5;</div>
                 <div class="reveal-box" id="qt3">
-                  <div class="reveal-trigger" onclick="document.getElementById('qt3').classList.toggle('open')">Kritik Soru: Snap toleransı (1.0) ne işe yarar? <span>▼</span></div>
-                  <div class="reveal-content"><code>toTopoGeom</code>'un dördüncü argümanı, birbirine çok yakın iki sınır noktasının "aynı node" sayılacağı eşik (metre). Çok küçük olursa neredeyse her köşe ayrı node olur ve gerçek paylaşılan sınırlar oluşmaz. Çok büyük olursa farklı ilçelerin sınırları yanlışlıkla birleşir. EPSG:4326 derece tabanlı olduğu için PostGIS bunu projeksiyona göre yorumlar — Konya için 1 metre güvenli bir başlangıç değeridir.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('qt3').classList.toggle('open')">Kritik Soru: Snap toleransı (0.0001) ne işe yarar? <span>▼</span></div>
+                  <div class="reveal-content"><code>toTopoGeom</code>'un dördüncü argümanı iki sınır noktasının "aynı node" sayılacağı eşiktir — ve <b>her zaman koordinat sisteminin birimiyle</b> ifade edilir. EPSG:4326 derece tabanlıdır; <code>1.0</code> derece ≈ 111 km olur, bütün köşeleri tek noktaya çökürtür. <code>0.0001</code> derece ≈ 11 metre Konya ölçeği için güvenli bir başlangıç değeridir. Çok küçük tolerans (0.000001) gerçek paylaşılan sınırları oluşturamaz; çok büyük tolerans (0.001+) farklı ilçe köşelerini yanlışlıkla birleştirir.</div>
+                </div>
+                <div class="reveal-box" id="qt3b">
+                  <div class="reveal-trigger" onclick="document.getElementById('qt3b').classList.toggle('open')">Kritik Soru: ValidateTopology hangi hataları bulur? <span>▼</span></div>
+                  <div class="reveal-content"><code>ValidateTopology</code> üç kategori hata döndürür: <b>intersecting_edges</b> — iki edge kesişiyor ama ortak node yok; <b>invalid_face_rings</b> — face sınırı kapalı bir ring oluşturmuyor; <b>face_no_cycles</b> — face, edge'ler tarafından tam çevrelenmemiş. Boş sonuç topolojinin matematiksel olarak tutarlı olduğu anlamına gelir.</div>
                 </div>
                 <div class="reveal-box" id="gt3">
-                  <div class="reveal-trigger" onclick="document.getElementById('gt3').classList.toggle('open')">Görev: Karatay–Selçuklu Sınırı <span>▼</span></div>
-                  <div class="reveal-content">Yukarıdaki dördüncü sorguya <code>JOIN konya.ilce_sinirlari i1 ON …</code> ekleyerek Karatay ile Selçuklu arasında paylaşılan edge'leri bulun. Toplam uzunluğu kaç kilometre?</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('gt3').classList.toggle('open')">Görev: İç Sınırları Say <span>▼</span></div>
+                  <div class="reveal-content">5. sorguda <code>LIMIT</code> kaldırıp toplam iç sınır edge sayısını öğrenin. Bu sayı ile <code>SELECT count(*) FROM konya_topo.edge_data</code>'yı karşılaştırın — dış sınır edge'leri kaç tanedir?</div>
                 </div>
               </div>
             </div>
@@ -968,7 +1063,7 @@ ORDER BY uzunluk_m DESC LIMIT 5;</div>
         </div>
       </div>
 
-      <!-- SLAYT 19: 3.3.4 CASCADE GÜNCELLEME DEMO -->
+      <!-- SLAYT 19: 3.3.4 KOMŞUluk ANALİZİ -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -977,44 +1072,47 @@ ORDER BY uzunluk_m DESC LIMIT 5;</div>
                 <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
-              <div class="slide-header-title">3.3 — Cascade Güncelleme: Tek Edge, İki Face</div>
+              <div class="slide-header-title">3.3 — Komşuluk Analizi: Paylaşılan Sınır Sorguları</div>
               <div class="slide-header-num">21 / 34</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Domino <span>Etkisi</span></div>
-                <div class="s-text-tech">Paylaşılan bir sınır edge'inin geometrisini değiştirdiğinizde, ona referans veren iki face (iki ilçe) <b>aynı anda</b> güncellenir — boşluk veya çakışma fiziksel olarak oluşamaz.</div>
+                <div class="s-headline-tech">Komşu <span>Sorgula</span></div>
+                <div class="s-text-tech"><code>topo_geom::geometry</code> cast'ı topolojiden <b>dinamik</b> olarak hesaplanır — saklı bir koordinat yoktur; o anki edge/face yapısından üretilir. Bu sayede komşuluk sorguları her zaman boşluksuz, çakışmasız geometriye karşı çalışır.</div>
+                <div class="info-box" style="margin-top:16px; background:rgba(0,0,0,0.35); padding:13px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.82em;">
+                  <div style="color:var(--theme-yellow); margin-bottom:6px;"><strong>Cascade Garantisi</strong></div>
+                  <div style="color:#ccc; line-height:1.6;">Bir edge'in geometrisi değiştirildiğinde (<code>ST_ChangeEdgeGeom</code>), o edge'i çevreleyen her face'in <code>topo_geom::geometry</code> çıktısı otomatik olarak güncellenir. <code>geom</code> kolonu bu garantiyi taşımaz — sadece <code>topo_geom</code> topolojiye bağlıdır.</div>
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:10px;">-- 1) Karatay-Selçuklu sınırından bir edge seç
-SELECT edge_id, ST_AsText(geom) AS mevcut_geom
-FROM konya_topo.edge_data
-WHERE left_face != 0 AND right_face != 0
-  AND left_face != right_face
-LIMIT 1;
+                <div class="code-block" style="font-size:10.5px;">-- 1) Selçuklu'nun tüm komşu ilçelerini bul
+SELECT DISTINCT i2.ad AS komsu_ilce
+FROM konya.ilce_sinirlari i1
+JOIN konya.ilce_sinirlari i2
+  ON ST_Touches(i1.topo_geom::geometry, i2.topo_geom::geometry)
+WHERE i1.ad = 'Selçuklu' AND i2.ad != 'Selçuklu'
+ORDER BY i2.ad;
 
--- 2) Etkilenen iki ilçenin mevcut alanını ölç
-SELECT ad, ROUND((ST_Area(geom::geography)/1e6)::numeric, 2) AS km2
-FROM konya.ilce_sinirlari WHERE ad IN ('Karatay','Selçuklu');
-
--- 3) O edge'in geometrisini hafifçe kaydır
---    (gerçek koordinatları 1. sorgudan kopyalayın)
-SELECT topology.ST_ChangeEdgeGeom(
-  'konya_topo',
-  <edge_id>,
-  ST_GeomFromText('LINESTRING(...)', 4326)
-);
-
--- 4) Aynı ilçeleri yeniden ölç: iki alan DA değişti!
-SELECT ad, ROUND((ST_Area(geom::geography)/1e6)::numeric, 2) AS km2
-FROM konya.ilce_sinirlari WHERE ad IN ('Karatay','Selçuklu');</div>
+-- 2) Her komşuyla paylaşılan sınır uzunluğunu ölç
+SELECT i2.ad AS komsu_ilce,
+  ROUND((ST_Length(
+    ST_Intersection(
+      i1.topo_geom::geometry::geography,
+      i2.topo_geom::geometry::geography
+    )
+  ) / 1000)::numeric, 2) AS ortak_sinir_km
+FROM konya.ilce_sinirlari i1
+JOIN konya.ilce_sinirlari i2
+  ON ST_Touches(i1.topo_geom::geometry, i2.topo_geom::geometry)
+WHERE i1.ad = 'Selçuklu' AND i2.ad != 'Selçuklu'
+ORDER BY ortak_sinir_km DESC;</div>
                 <div class="reveal-box" id="qt4">
-                  <div class="reveal-trigger" onclick="document.getElementById('qt4').classList.toggle('open')">Kritik Soru: Tek edge güncelleyince iki face neden güncellendi? <span>▼</span></div>
-                  <div class="reveal-content">PostGIS Topology'de face'in geometrisi <b>türetilmiştir</b> (derived) — face'in kendi sabit poligonu yoktur; çevresindeki edge'lerin oluşturduğu ring'lerden hesaplanır. Bir edge değiştiğinde o edge'i kullanan tüm face'lerin geometrisi yeniden hesaplanır. Bu yüzden "iki tabloyu ayrı güncelle" hatası imkansızdır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('qt4').classList.toggle('open')">Kritik Soru: ST_Touches neden topo_geom ile daha güvenilir? <span>▼</span></div>
+                  <div class="reveal-content">Normal <code>geom</code> kolonunda iki komşu ilçe arasında import kaynaklı 1mm'lik bir boşluk olsa <code>ST_Touches</code> false döner — komşu "kayıp" olur. <code>topo_geom::geometry</code> ise her zaman topolojik edge/face yapısından üretildiği için komşu ilçeler matematiksel olarak aynı node ve edge'i paylaşır; boşluk imkânsızdır. Bu nedenle komşuluk/kapsama analizlerinde <code>topo_geom</code> kullanmak çok daha sağlıklı sonuç verir.</div>
                 </div>
                 <div class="reveal-box" id="gt4">
-                  <div class="reveal-trigger" onclick="document.getElementById('gt4').classList.toggle('open')">Görev: Boşluk Oluşmadığını Doğrula <span>▼</span></div>
-                  <div class="reveal-content"><code>SELECT ST_Area(ST_SymDifference(i1.geom, i2.geom)::geography) FROM konya.ilce_sinirlari i1, konya.ilce_sinirlari i2 WHERE i1.ad='Karatay' AND i2.ad='Selçuklu';</code> ile iki ilçenin XOR alanını ölçün — yalnızca dış sınırlarda küçük bir değer olmalı, ortak sınırda <b>sıfır boşluk</b> bulunmalı.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('gt4').classList.toggle('open')">Görev: 20 km'den Uzun Ortak Sınır <span>▼</span></div>
+                  <div class="reveal-content">2. sorguyu <b>Karatay</b> için çalıştırın. Ortak sınırı 20 km'den uzun olan komşu ilçeler hangileri? Sorguya <code>WHERE ortak_sinir_km > 20</code> koşulunu ekleyin.</div>
                 </div>
               </div>
             </div>
