@@ -55,6 +55,13 @@ done
 echo ">>>> Sıfır uzunluklu (hatalı) yollar temizleniyor..."
 psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "DELETE FROM konya.osm_yollar WHERE ST_Length(geom) = 0;"
 
+echo ">>>> Geometrisi aynı (duplike) yollar temizleniyor..."
+psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "
+DELETE FROM konya.osm_yollar a
+USING konya.osm_yollar b
+WHERE a.id > b.id
+  AND ST_Equals(a.geom, b.geom);"
+
 # 5. POI
 echo ">>> POI verileri aktarılıyor..."
 psql -d "$POSTGRES_DB" -U "$POSTGRES_USER" -c "TRUNCATE TABLE konya.poi;"

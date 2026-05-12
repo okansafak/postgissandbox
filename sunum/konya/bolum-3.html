@@ -513,7 +513,7 @@ WHERE c.component != (SELECT component FROM ana);</div>
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Adres → <span>Kavşak</span></div>
-                <div class="s-text-tech">pgRouting sokak ismi veya adres anlamaz; sadece <b>Node ID</b> numaralarıyla çalışır. "Mevlana Müzesi'nden Alaaddin Tepesi'ne" demek yerine "Node 1842'den Node 5671'e" demelisiniz.</div>
+                <div class="s-text-tech">pgRouting sokak ismi veya adres anlamaz; sadece <b>Node ID</b> numaralarıyla çalışır. "Stadyum'dan Alaaddin Tepesi'ne" demek yerine "Node 1842'den Node 5671'e" demelisiniz.</div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:12px;">-- Bir koordinata en yakın kavşağı (Node) bul
@@ -521,11 +521,11 @@ WHERE c.component != (SELECT component FROM ana);</div>
 SELECT id, the_geom,
   ST_Distance(
     the_geom::geography,
-    ST_SetSRID(ST_MakePoint(32.5040, 37.8710), 4326)::geography
+    ST_SetSRID(ST_MakePoint(32.488560, 37.947955), 4326)::geography
   )::int AS mesafe_m
 FROM konya.osm_yollar_noded_vertices_pgr
 ORDER BY the_geom <-> ST_SetSRID(
-  ST_MakePoint(32.5040, 37.8710), 4326)  -- Mevlana Müzesi
+  ST_MakePoint(32.488560, 37.947955), 4326)  -- Stadyum
 LIMIT 1;</div>
                 <div class="info-box" style="margin-top:15px; background:rgba(0,0,0,0.4); padding:15px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.85em;">
                   <div style="color:var(--theme-yellow); margin-bottom:8px;"><strong>💡 İpucu: İki Nokta Arasında Rota İçin</strong></div>
@@ -563,13 +563,13 @@ LIMIT 1;</div>
 WITH baslangic AS (
   SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
-    ST_MakePoint(32.5040, 37.8710), 4326)   -- Mevlana
+    ST_MakePoint(32.488560, 37.947955), 4326)   -- Stadyum
   LIMIT 1
 ),
 bitis AS (
   SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
-    ST_MakePoint(32.4946, 37.8718), 4326)   -- Alaaddin
+    ST_MakePoint(32.491773, 37.873543), 4326)   -- Alaaddin
   LIMIT 1
 )
 SELECT seq, node, edge, cost, agg_cost
@@ -653,13 +653,13 @@ FROM pgr_dijkstra(
 WITH baslangic AS (
   SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
-    ST_MakePoint(32.5040, 37.8710), 4326)   -- Mevlana
+    ST_MakePoint(32.488560, 37.947955), 4326)   -- Stadyum
   LIMIT 1
 ),
 bitis AS (
   SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
-    ST_MakePoint(32.4946, 37.8718), 4326)   -- Alaaddin
+    ST_MakePoint(32.491773, 37.873543), 4326)   -- Alaaddin
   LIMIT 1
 )
 SELECT seq, node, edge, cost, agg_cost
@@ -722,9 +722,9 @@ WITH rota AS (
      FROM konya.osm_yollar_noded n
      LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
     (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
-     ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.5040,37.8710),4326) LIMIT 1),
+     ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.488560,37.947955),4326) LIMIT 1),
     (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
-     ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.4946,37.8718),4326) LIMIT 1)
+     ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.491773,37.873543),4326) LIMIT 1)
   ) AS d
 )
 SELECT r.seq,
@@ -747,9 +747,9 @@ FROM pgr_dijkstra(
    FROM konya.osm_yollar_noded n
    LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
   (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
-   ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.5040,37.8710),4326) LIMIT 1),
+   ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.488560,37.947955),4326) LIMIT 1),
   (SELECT id FROM konya.osm_yollar_noded_vertices_pgr
-   ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.4946,37.8718),4326) LIMIT 1)
+   ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.491773,37.873543),4326) LIMIT 1)
 ) AS d
 JOIN konya.osm_yollar_noded n ON d.edge = n.id;</div>
                 <div class="reveal-box" id="qr7">
@@ -789,7 +789,7 @@ JOIN konya.osm_yollar_noded n ON d.edge = n.id;</div>
 WITH merkez AS (
   SELECT id FROM konya.osm_yollar_noded_vertices_pgr
   ORDER BY the_geom <-> ST_SetSRID(
-    ST_MakePoint(32.5000, 37.8700), 4326)
+    ST_MakePoint(32.488560, 37.947955), 4326)  -- Stadyum
   LIMIT 1
 ),
 ulasilabilir AS (
