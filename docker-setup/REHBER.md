@@ -9,6 +9,10 @@ Eğitim veritabanını ayağa kaldırmak için terminalde `docker-setup` dizinin
 ```bash
 docker compose up -d --build
 ```
+ db yi sıfırlamak için 
+
+ cd /d "D:\cooksoft postgis eğitimi\dokuman\app\postgis-akademi\docker-setup"
+docker compose down -v && docker compose up --build -d && docker logs konya_postgis_db -f
 
 Bu komut:
 - **Dockerfile** üzerinden PostGIS, pgRouting ve GDAL (ogr2ogr) araçlarını içeren özel bir imaj derler.

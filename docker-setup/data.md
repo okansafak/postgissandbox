@@ -225,3 +225,14 @@ COPY konya.nufus_staging FROM '/docker-entrypoint-initdb.d/data/nufus.csv' WITH 
 - **Geometry Type**: Yol verileri `MULTILINESTRING` olarak tutulur. `ogr2ogr` aktarımında `-nlt MULTILINESTRING` kullanılması önerilir.
 - **SRID**: Tüm veriler varsayılan olarak `EPSG:4326` (WGS84) koordinat sistemindedir.
 - **Dizin Erişimi**: Docker içinde veriler `/docker-entrypoint-initdb.d/data/` yolunda bulunur. SQL komutlarında bu yol kullanılmalıdır.
+
+
+
+[out:json][timeout:25];
+area["name"="Karatay"]->.searchArea;
+(
+  way["highway"~"trunk|primary|secondary|tertiary|residential"](area.searchArea);
+);
+out body;
+>;
+out skel qt;
