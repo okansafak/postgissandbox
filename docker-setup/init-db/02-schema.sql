@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS konya.mahalleler (
     ad VARCHAR(100) NOT NULL,
     ilce VARCHAR(50) NOT NULL,
     nufus INTEGER,
+    erkek INTEGER,
+    kadin INTEGER,
     alan_m2 DOUBLE PRECISION,
     geom GEOMETRY(MULTIPOLYGON, 4326)
 );
@@ -91,6 +93,8 @@ CREATE TABLE IF NOT EXISTS konya.poi (
     ad VARCHAR(200),
     kategori VARCHAR(100),
     ilce VARCHAR(50),
+    mahalle_id INTEGER,
+    ilce_id INTEGER,
     geom GEOMETRY(POINT, 4326)
 );
 CREATE INDEX IF NOT EXISTS idx_poi_geom ON konya.poi USING GIST(geom);
