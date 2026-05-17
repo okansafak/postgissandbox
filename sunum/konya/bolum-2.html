@@ -317,23 +317,75 @@ WHERE ad LIKE '% Mah.';</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Geometri <span>Rafine</span> Etme</div>
-                <div class="s-text-tech">Nokta azaltma ve görsel yumuşatma teknikleri.</div>
+                <div class="s-headline-tech">Sadeleştir <span>ya da</span> Yumuşat</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Çok detaylı sınırlar haritayı yavaşlatır. İki çözüm: gereksiz noktaları at, ya da köşeleri yuvarla.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px;">
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1976d2;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">📉 ST_Simplify (Nokta Azalt)</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Şekli koruyarak gereksiz noktaları siler. Yunak ilçesi <strong>~%75 hafifler</strong>. Harita daha hızlı çizilir.</div>
+                  </div>
+
+                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #7b1fa2;">
+                    <div style="font-weight: bold; color: #4a148c; font-size: 13px;">🌊 ST_ChaikinSmoothing (Yumuşat)</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Sivri köşeleri yuvarlar — el çizimi gibi. Tam tersi etki: geometri <strong>büyür</strong>, detay artar.</div>
+                  </div>
+
+                  <div style="background: #ffebee; padding: 11px; border-radius: 4px; border-left: 4px solid #e53935;">
+                    <div style="font-weight: bold; color: #b71c1c; font-size: 13px;">⚠️ Tolerans = DERECE (4326'da)</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;"><code>0.01</code> ≈ 1.1 km. <code>10.0</code> verirsen koca şehri yutar! Metre istiyorsan önce 3857'ye çevir.</div>
+                  </div>
+                </div>
+
+                <div style="background: #fffbe6; padding: 10px; border-radius: 4px; margin-top: 13px; font-size: 11px; color: #6b5900; border-left: 4px solid #FFC107;">
+                  <strong>💡 Güvenli sürüm:</strong> <code>ST_SimplifyPreserveTopology</code> şekli yırtmaz, poligonu çökertmez. Düz <code>ST_Simplify</code> bazen NULL döndürebilir.
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- DİKKAT: SRID 4326'da ölçü birimi DERECEDİR. (0.01 derece ~1.1 kilometre)
--- 10.0 gibi bir değer verirseniz bütün şehri yutup yok eder!
-SELECT id, 
-       ST_SimplifyPreserveTopology(geom, 0.01) AS geom_sade,
-       geom AS geom_orjinal
-FROM konya.ilce_sinirlari LIMIT 5;</div>
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- 📉 1. SADELEŞTİR: Geometri ne kadar hafifledi?
+-- length(ST_AsText(...)) = geometrinin "ağırlığı" (karakter)
+SELECT ad,
+  length(ST_AsText(geom)) AS orjinal_agirlik,
+  length(ST_AsText(
+    ST_SimplifyPreserveTopology(geom, 0.01))) AS sade_agirlik
+FROM konya.ilce_sinirlari
+ORDER BY orjinal_agirlik DESC LIMIT 5;
+
+-- 📉 2. Haritada karşılaştır (orjinal + sade yan yana)
+SELECT ad,
+  geom AS orjinal,
+  ST_SimplifyPreserveTopology(geom, 0.01) AS sade
+FROM konya.ilce_sinirlari LIMIT 5;
+
+-- 🌊 3. YUMUŞAT: Köşeleri yuvarla, haritada gör
+SELECT ad,
+  geom AS orjinal,
+  ST_ChaikinSmoothing(geom, 2) AS yumusak
+FROM konya.ilce_sinirlari LIMIT 5;
+
+-- ⚠️ 4. DİKKAT: 4326'da tolerans derecedir!
+--    Metre istiyorsan: TR projeksiyonu 5255'e çevir,
+--    sadeleştir (1000 m), tekrar 4326'ya dön
+SELECT ad, geom,
+  ST_Transform(
+    ST_Simplify(ST_Transform(geom, 5255), 1000),
+  4326) AS metrik_1km
+FROM konya.ilce_sinirlari LIMIT 3;</div>
                 <div class="reveal-box" id="q23">
-                  <div class="reveal-trigger" onclick="document.getElementById('q23').classList.toggle('open')">Kritik Soru: Simplify komşu sınırları bozar mı? <span>▼</span></div>
-                  <div class="reveal-content">Evet, standart <code>ST_Simplify</code> poligonlar arasında boşluklar (sliver polygons) yaratır. <code>PreserveTopology</code> şekli korur ama ortak sınırların bozulmasını %100 engelleyemez (tam çözüm için PostGIS Topology gerekir).</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q23').classList.toggle('open')">Simplify mi Smoothing mi Ne Zaman? <span>▼</span></div>
+                  <div class="reveal-content">
+                    <strong>📉 Simplify:</strong> Harita yavaş, dosya büyük → noktayı azalt, performans kazan.<br><br>
+                    <strong>🌊 Smoothing:</strong> Sınırlar testere gibi tırtıklı → görsel olarak yumuşat (sunum/poster için).<br><br>
+                    <strong>Birlikte:</strong> Önce Simplify (hızlan), sonra Smoothing (güzelleş) yapılabilir.
+                  </div>
                 </div>
                 <div class="reveal-box" id="g23">
-                  <div class="reveal-trigger" onclick="document.getElementById('g23').classList.toggle('open')">Görev: Metrik Dönüşümle Simplify <span>▼</span></div>
-                  <div class="reveal-content"><code>ilce_sinirlari</code> tablosunu tam <strong>100 metre</strong> toleransla sadeleştirmek için; geometriyi <code>ST_Transform</code> ile 3857 (metre) projeksiyonuna çevirip sadeleştirin ve sonucu tekrar 4326'ya döndüren sorguyu yazın.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g23').classList.toggle('open')">Görev: Tolerans Deneyi <span>▼</span></div>
+                  <div class="reveal-content">
+                    <b>1)</b> 1. sorguyu çalıştır — <code>orjinal_agirlik</code> ~6300, <code>sade_agirlik</code> ~1600'e düşer (4 kat hafif).<br><br>
+                    <b>2)</b> Toleransı değiştir: <code>0.01</code> → <code>0.001</code> → <code>0.05</code>. Ağırlık nasıl değişiyor?<br><br>
+                    <b>3)</b> 2. sorguyu haritada aç — sade sürüm kabalaştı mı, sınır hâlâ tanınıyor mu?
+                  </div>
                 </div>
               </div>
             </div>
@@ -355,21 +407,69 @@ FROM konya.ilce_sinirlari LIMIT 5;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">İndeks <span>Dostu</span> Geometri</div>
-                <div class="s-text-tech">Devasa ve karmaşık poligonların (örn: bütün bir il sınırı) uzamsal sorguları yavaşlatmasını önleyen en güçlü yöntem.</div>
+                <div class="s-headline-tech">Devasa Poligonu <span>Dilimle</span></div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Koca bir il sınırı tek parça → indeks işe yaramaz, sorgular yavaş. Çözüm: pizzayı dilimle, malzeme aynı kalsın.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px;">
+                  <div style="background: #ffebee; padding: 11px; border-radius: 4px; border-left: 4px solid #e53935;">
+                    <div style="font-weight: bold; color: #b71c1c; font-size: 13px;">🐌 Sorun: Dev Kutu</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Konya tek parça — sınır kutusu tüm ili kaplar. GiST indeksi eleme yapamaz, her sorgu binlerce noktayı tarar.</div>
+                  </div>
+
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #43a047;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">🍕 Çözüm: ST_Subdivide</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">1 dev poligon → <strong>5 küçük parça</strong> (255 köşe limiti). Her parçanın kutusu minik, indeks anında doğru parçayı bulur.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #fb8c00;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 13px;">⚖️ Simplify'dan Farkı</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;"><strong>Simplify</strong> detay siler (sınır değişir). <strong>Subdivide</strong> hiç detay kaybetmez — sadece keser. Birleştirince orijinalin aynısı.</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; margin-top: 13px; font-size: 11px; color: #ccc; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Pratik:</strong> Subdivide edilmiş tabloya ayrıca GiST indeks kur → JOIN/Intersects sorguları katlarca hızlanır.
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- Çok noktalı büyük poligonları, maksimum 255 köşe taşıyacak 
--- küçük ve indeks-dostu parçalara böler.
-SELECT id, ST_SubDivide(geom, 255) AS parcalanmis_geom 
-FROM konya.il_sinirlari;</div>
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- 🍕 1. Konya'yı parçala — kaç parça çıkıyor?
+-- 255 = her parçada en fazla 255 köşe
+SELECT COUNT(*) AS parca_sayisi
+FROM (
+  SELECT ST_Subdivide(geom, 255) AS g
+  FROM konya.il_sinirlari
+  WHERE ad ILIKE '%konya%'
+) parcalar;
+
+-- 🗺️ 2. Parçaları haritada gör (her satır bir dilim)
+SELECT ST_Subdivide(geom, 255) AS parca
+FROM konya.il_sinirlari
+WHERE ad ILIKE '%konya%';
+
+-- ⚖️ 3. Detay korunuyor mu? Parçaları birleştir,
+--    orijinalle karşılaştır (alan AYNI olmalı)
+WITH p AS (
+  SELECT ST_Subdivide(geom, 255) AS g
+  FROM konya.il_sinirlari WHERE ad ILIKE '%konya%'
+)
+SELECT ROUND(ST_Area(ST_Union(g))::numeric, 6) AS parcali_alan,
+  (SELECT ROUND(ST_Area(geom)::numeric, 6)
+   FROM konya.il_sinirlari WHERE ad ILIKE '%konya%') AS orjinal_alan
+FROM p;</div>
                 <div class="reveal-box" id="q24">
-                  <div class="reveal-trigger" onclick="document.getElementById('q24').classList.toggle('open')">Kritik Soru: Parçalamak hızı nasıl 100x artırır? <span>▼</span></div>
-                  <div class="reveal-content">Büyük şekillerin <strong>Sınırlayıcı Kutusu (Bounding Box)</strong> çok geniş alan kaplar; bu yüzden GiST indeksi eleme yapamaz ve veritabanı on binlerce noktayı tek tek matematiksel hesaba sokar. <code>Subdivide</code> şekli küçük kutulara böler, indeks hedef kutuyu anında bulur ve sadece o minik parça içinde hesaplama yapar.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q24').classList.toggle('open')">Parçalamak Hızı Neden Artırır? <span>▼</span></div>
+                  <div class="reveal-content">
+                    Büyük şeklin <strong>sınırlayıcı kutusu</strong> kocaman → GiST indeksi "bu nokta bu ilde mi?" sorusunu eleyemez, binlerce köşeyi tek tek hesaplar.<br><br>
+                    Subdivide sonrası her parçanın kutusu minik. İndeks önce doğru parçayı saniyede bulur, sadece o küçük parçada hesap yapar. Az nokta = hızlı sorgu.
+                  </div>
                 </div>
                 <div class="reveal-box" id="g24">
-                  <div class="reveal-trigger" onclick="document.getElementById('g24').classList.toggle('open')">Görev: Mantığı Kavra <span>▼</span></div>
-                  <div class="reveal-content"><code>konya.il_sinirlari</code> tablosunu 255 nokta limitiyle subdivide edip, çıkan sonucu QGIS gibi bir görselleştiricide açarak şeklin nasıl küçük ağlara (grid) bölündüğünü inceleyin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g24').classList.toggle('open')">Görev: Detay Kaybı Var mı? <span>▼</span></div>
+                  <div class="reveal-content">
+                    <b>1)</b> 1. sorgu: Konya kaç parçaya bölündü? (5 bekleniyor)<br><br>
+                    <b>2)</b> 2. sorguyu haritada aç — il sınırının nasıl dikey/yatay kesildiğini gör.<br><br>
+                    <b>3)</b> 3. sorgu: <code>parcali_alan</code> ile <code>orjinal_alan</code> <strong>birebir aynı</strong> olmalı. Subdivide hiçbir detay kaybetmez — Simplify'dan en büyük farkı bu.
+                  </div>
                 </div>
               </div>
             </div>
@@ -391,35 +491,62 @@ FROM konya.il_sinirlari;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Yol <span>Üzeri</span> Metraj</div>
-                <div class="s-text-tech">Hat üzerinde yüzde (%) veya mesafe bazlı konum bulma.</div>
+                <div class="s-headline-tech">Yolu <span>Cetvel</span> Gibi Kullan</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Bir yol = metre cetveli. "Bu nokta yolun kaçıncı metresinde?" ya da "Yolun %50'si nerede?" — iki yön.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px;">
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1976d2;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">📍→📏 ST_LineLocatePoint</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Nokta ver → yolun kaçta kaçı (0–1) söylesin. "Bu kaza yolun %41'inde olmuş."</div>
+                  </div>
+
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #43a047;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">📏→📍 ST_LineInterpolatePoint</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Oran ver (0.5) → o noktanın koordinatını söylesin. "Yolun tam ortası şurası."</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #fb8c00;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 13px;">🎯 Nokta yolda olmak zorunda değil</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Araç yoldan 30 m tarlaya uçsa bile, en yakın <strong>izdüşümü</strong> alınır — yine doğru km bulunur.</div>
+                  </div>
+                </div>
+
+                <div style="background: #fffbe6; padding: 10px; border-radius: 4px; margin-top: 13px; font-size: 11px; color: #6b5900; border-left: 4px solid #FFC107;">
+                  <strong>💡 Metreye çevir:</strong> Oran (0–1) × <code>ST_Length(geom::geography)</code> = başlangıçtan kaç metre.
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px; line-height:1.4;">-- DBeaver'da hem hattı hem noktayı görmek için ST_Collect kullanıyoruz
-SELECT id, 
-   ST_Collect(ST_GeometryN(geom, 1), ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) AS harita,
-   
-   -- 1) Yüzdelik konum
-   ROUND((ST_LineLocatePoint(ST_GeometryN(geom, 1), 
-         ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) * 100)::numeric, 1) || '%' AS oran_yuzde,
-         
-   -- 2) Başlangıca olan metraj
-   ROUND((ST_LineLocatePoint(ST_GeometryN(geom, 1), 
-         ST_GeomFromText('POINT(32.498179 37.894507)', 4326)) * 
-         ST_Length(ST_GeometryN(geom, 1)::geography))::numeric, 1) || ' m' AS mesafe_metre
-FROM konya.osm_yollar WHERE id = 30135;</div>
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- Senaryo: Gülistan Caddesi'nde (id=6) bir kaza ihbarı
+-- GPS noktası: 32.5548, 37.9315 (yola tam oturmuyor)
+-- CTE ile noktayı bir kez tanımla, 3 yerde kullan
+WITH kaza AS (
+  SELECT ST_GeomFromText('POINT(32.5548 37.9315)', 4326) AS p
+)
+SELECT
+  y.id,
+  -- 1) Hattı + kaza noktasını birlikte haritada gör
+  ST_Collect(y.geom, k.p) AS harita,
+  -- 2) Yolun kaçta kaçında? (yüzde)
+  ROUND((ST_LineLocatePoint(y.geom, k.p) * 100)::numeric, 1) || '%' AS oran_yuzde,
+  -- 3) Başlangıçtan kaç metre?
+  ROUND((ST_LineLocatePoint(y.geom, k.p)
+    * ST_Length(y.geom::geography))::numeric, 1) || ' m' AS mesafe_metre
+FROM konya.osm_yollar y, kaza k
+WHERE y.id = 6;
+-- → %41.0 | 1044.6 m</div>
                 <div class="reveal-box" id="q25">
-                  <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Kritik Soru: Nokta tam çizginin üzerinde mi olmalı? <span>▼</span></div>
-                  <div class="reveal-content">Hayır. <code>ST_LineLocatePoint</code>, noktanın çizgiye olan <strong>en yakın izdüşümünü</strong> (dikmesini) bulur ve oranlamayı ona göre yapar. Kaza yapan araç yoldan 50 metre tarlaya uçsa bile, otoyoldaki tam kilometresini bulabilirsiniz.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q25').classList.toggle('open')">Nokta Tam Yolun Üzerinde mi Olmalı? <span>▼</span></div>
+                  <div class="reveal-content">Hayır. <code>ST_LineLocatePoint</code>, noktanın çizgiye en yakın <strong>izdüşümünü</strong> (dik inişini) bulur, oranı ona göre verir. Kaza yapan araç yoldan 30 m tarlaya uçsa bile otoyoldaki tam kilometresini bulabilirsin. Üstteki sorgu <strong>%41.0 / 1044.6 m</strong> döndürür.</div>
                 </div>
                 <div class="reveal-box" id="g25">
-                  <div class="reveal-trigger" onclick="document.getElementById('g25').classList.toggle('open')">Görev: Orta Nokta Bul <span>▼</span></div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g25').classList.toggle('open')">Görev: Yolun Tam Ortasını Bul <span>▼</span></div>
                   <div class="reveal-content">
-                    <code>ST_LineInterpolatePoint</code> fonksiyonunu kullanarak <strong>30135 ID'li</strong> yolun tam ortasındaki (%50 yani 0.5) koordinatı (Point) bulan sorguyu yazın.
-                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
-SELECT ST_LineInterpolatePoint(ST_GeometryN(geom, 1), 0.5) AS orta_nokta
-FROM konya.osm_yollar 
-WHERE id = 30135;</div>
+                    Ters yön: oran ver, koordinat al. Gülistan Caddesi'nin tam ortasını (0.5) bul ve haritada gör:
+                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">SELECT id,
+  ST_LineInterpolatePoint(geom, 0.5) AS orta_nokta
+FROM konya.osm_yollar
+WHERE id = 6;</div>
+                    <b>Dene:</b> 0.5 yerine 0.0 (başlangıç) ve 1.0 (son) ver — nokta yolun uçlarına gider.
                   </div>
                 </div>
               </div>
@@ -442,8 +569,29 @@ WHERE id = 30135;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mesafe <span>ve</span> Yön</div>
-                <div class="s-text-tech">En yakın koordinatı bulma ve iki nokta arası açı hesabı.</div>
+                <div class="s-headline-tech">Yön <span>ve</span> Dikme</div>
+                <div class="s-sub-tech">Bir noktadan yola dik mesafe ve iki nokta arası pusula açısı.</div>
+
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #4fc3f7;">
+                    <div style="font-weight: bold; color: #4fc3f7; font-size: 13px;">🧭 ST_Azimuth</div>
+                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">İki nokta arasındaki <strong>pusula yönü</strong>. Kuzey = 0°, Doğu = 90°. Sonuç radyan gelir — <code>degrees()</code> ile çevir.<br>Alaaddin → Mevlana: <strong>≈ 98°</strong> (neredeyse tam doğu)</div>
+                  </div>
+
+                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #a5d6a7;">
+                    <div style="font-weight: bold; color: #a5d6a7; font-size: 13px;">📐 ST_ShortestLine</div>
+                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">Bir noktadan en yakın yola çizilen <strong>dik çizgi</strong>. Noktanın yolun üzerinde olması şart değil — dikme otomatik bulunur.<br>Örnek: Bina → Gürsesler Sokak <strong>≈ 19.8 m</strong></div>
+                  </div>
+
+                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #ffcc80;">
+                    <div style="font-weight: bold; color: #ffcc80; font-size: 13px;">📌 ST_ClosestPoint</div>
+                    <div style="font-size: 11px; color: #ccc; margin-top:4px;"><code>ST_ShortestLine</code>'ın bitiş noktası = <strong>çizgi üzerindeki en yakın koordinat</strong>. Bina → yol kesişimi için kullanılır.</div>
+                  </div>
+
+                  <div style="background: rgba(255,193,7,0.12); padding: 9px; border-radius: 4px; border-left: 4px solid #FFC107; margin-top:4px;">
+                    <div style="font-size: 11px; color: #ffe082;">💡 <code>&lt;-&gt;</code> KNN operatörü, GiST indeksini kullanarak en yakın yolu <strong>tablonun tamamını taramadan</strong> buluyor. LIMIT 1 ile tek satır döndürülür.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px;">-- AZIMUTH: İki nokta arası bearing (kuzey=0°, doğu=90°)
@@ -451,10 +599,11 @@ SELECT degrees(ST_Azimuth(
   ST_SetSRID(ST_Point(32.4920, 37.8727), 4326),  -- Alaaddin Tepesi
   ST_SetSRID(ST_Point(32.5040, 37.8710), 4326)   -- Mevlana Müzesi
 )) AS bearing_derece;
+-- → 98.06°
 
 -- CLOSEST POINT + ShortestLine: Bina → en yakın yol analizi
 WITH bina AS (
-  SELECT ST_SetSRID(ST_Point(32.5920, 37.827), 4326) AS p
+  SELECT ST_SetSRID(ST_Point(32.5010, 37.8940), 4326) AS p
 )
 SELECT y.id,
   -- DBeaver'da Bina noktasını, Yolu ve aralarındaki Dik Çizgiyi tek seferde görelim
@@ -462,7 +611,8 @@ SELECT y.id,
   ROUND(ST_Length(ST_ShortestLine(y.geom, b.p)::geography)::numeric, 1) || ' m' AS uzaklik_metre
 FROM konya.osm_yollar y, bina b
 ORDER BY y.geom &lt;-&gt; b.p   -- KNN — en yakın 1 yol
-LIMIT 1;</div>
+LIMIT 1;
+-- → id=4423 | Gürsesler Sokak | 19.8 m</div>
                 <div class="reveal-box" id="q26">
                   <div class="reveal-trigger" onclick="document.getElementById('q26').classList.toggle('open')">Kritik Soru: Azimuth nerede kullanılır? <span>▼</span></div>
                   <div class="reveal-content">Parsel yönelim (cephe) analizlerinde, yoldaki tabelaların bakış yönünü hesaplamada, rüzgâr/güneş etüdünde kullanılır. <code>degrees()</code> ile radyan→derece dönüşümü unutulmamalı.</div>
@@ -472,7 +622,7 @@ LIMIT 1;</div>
                   <div class="reveal-content">
                     Bir binanın merkezinden en yakın yolun üzerine düşen dik mesafeyi <code>ST_ShortestLine</code> ile çizin ve <code>::geography</code> ile metreye çevirin.
                     <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
-WITH bina AS (SELECT ST_SetSRID(ST_Point(32.5920, 37.827), 4326) AS p)
+WITH bina AS (SELECT ST_SetSRID(ST_Point(32.5010, 37.8940), 4326) AS p)
 SELECT ST_AsText(ST_ShortestLine(y.geom, b.p)) AS dik_cizgi,
        ROUND(ST_Length(ST_ShortestLine(y.geom, b.p)::geography)::numeric, 2) || ' m' AS dik_mesafe
 FROM konya.osm_yollar y, bina b
@@ -499,8 +649,24 @@ ORDER BY y.geom &lt;-&gt; b.p LIMIT 1;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>İndeks</span></div>
-                <div class="s-text-tech">Hangi geometri tipinde hangi indeksi kullanmalıyız? GiST ve SP-GiST arasındaki temel fark nedir?</div>
+                <div class="s-headline-tech">GiST <span>vs</span> SP-GiST</div>
+                <div class="s-sub-tech">Her geometri tipi için doğru indeksi seç — ikisi de mekansal ama çalışma mantıkları farklı.</div>
+
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1565c0;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">📦 GiST (R-Tree) — Klasör Mantığı</div>
+                    <div style="font-size: 11px; color: #444; margin-top:4px;">Geometrileri kapsayan <strong>Bounding Box</strong>'ları ağaç şeklinde üst üste koyar. Kutular birbirinin içine girebilir (iç içe klasörler). Poligon ve LineString için <strong>zorunludur</strong>.</div>
+                  </div>
+
+                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #6a1b9a;">
+                    <div style="font-weight: bold; color: #4a148c; font-size: 13px;">🔲 SP-GiST (Quad-tree) — Satranç Tahtası</div>
+                    <div style="font-size: 11px; color: #444; margin-top:4px;">Mekanı <strong>kesişmeyen hücrelere</strong> böler (satranç tahtası gibi). Noktalar kesişmez → çok daha derin ağaç olmaz → <strong>Point (POI, adres)</strong> sorgularında GiST'ten hızlı olabilir.</div>
+                  </div>
+
+                  <div style="background: #fff8e1; padding: 10px; border-radius: 4px; border-left: 4px solid #f9a825;">
+                    <div style="font-size: 11px; color: #5d4037;"><strong>📏 Kural:</strong> Poligon/LineString → <code>GIST</code>&nbsp;|&nbsp;Point → <code>SPGIST</code><br>Az veri (binler) → PostgreSQL yine de Seq Scan seçebilir. İndeksin farkı milyonlarca satırda görülür.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) GiST (R-Tree): Poligon ve Çizgiler için mecburidir. (İç içe geçen kutular mantığı)
