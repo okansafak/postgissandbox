@@ -65,30 +65,60 @@
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Toplu Veri <span>Aktarımı</span></div>
-                <div class="s-text-tech">Nüfus verileri gibi büyük tabloları saniyeler içinde yükleme.</div>
+                <div class="s-headline-tech">CSV'yi <span>Tek Komutla</span> Yükle</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Excel/CSV dosyasındaki binlerce satırı tek tek INSERT yazmadan, saniyeler içinde tabloya aktar.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="background: #e8f5e9; padding: 12px; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 14px;">🚚 COPY = Nakliye Kamyonu</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">INSERT kutuları tek tek taşır. COPY hepsini <strong>tek seferde</strong> boşaltır — yüzlerce kat hızlı.</div>
+                  </div>
+
+                  <div style="background: #e3f2fd; padding: 12px; border-radius: 4px; border-left: 4px solid #1976d2;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 14px;">📁 \copy vs COPY</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;"><code>\copy</code> → dosya <strong>senin bilgisayarında</strong>. <code>COPY</code> → dosya <strong>sunucuda</strong>. Çoğu zaman <code>\copy</code> kullanırsın.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 12px; border-radius: 4px; border-left: 4px solid #e65100;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 14px;">🔤 ENCODING 'UTF8'</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">Türkçe karakterler (ğ, ş, ı, ç) bozulmasın diye şart. Unutursan "Ã§" gibi çöp görürsün.</div>
+                  </div>
+                </div>
+
+                <div style="background: #fffbe6; padding: 10px; border-radius: 4px; margin-top: 14px; font-size: 11px; color: #6b5900; border-left: 4px solid #FFC107;">
+                  <strong>💡 Sıra önemli:</strong> Önce tabloyu oluştur (sütunlar CSV ile aynı sırada), sonra veriyi yükle.
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- 1. Tablo yoksa hata verir, önce oluşturun:
+                <div class="code-block" style="font-size:12px; line-height:1.4;">-- 1️⃣ Önce hedef tabloyu oluştur
+-- Sütunlar CSV başlığıyla aynı sırada olmalı
 CREATE TABLE IF NOT EXISTS konya.nufus_copy (
-    yil INT,
-    il VARCHAR(50),
-    ilce VARCHAR(100),
-    ilce_id INT,
-    nufus INT
+    yil      INT,
+    il       VARCHAR(50),
+    ilce     VARCHAR(100),
+    ilce_id  INT,
+    nufus    INT
 );
 
--- 2. CSV dosyasını psql üzerinden içeri aktarma
--- İPUCU: Yerel bilgisayarınızdaki dosya için sunucu komutu olan COPY değil, psql komutu olan \copy kullanmalısınız:
--- NOT: Türkçe karakter bozulmasını engellemek için ENCODING 'UTF8' parametresi eklenmiştir.
-\copy konya.nufus_copy FROM 'D:\nufus_copy.csv' WITH (FORMAT csv, HEADER, ENCODING 'UTF8')</div>
+-- 2️⃣ CSV'yi yükle (\copy = senin bilgisayarındaki dosya)
+--    FORMAT csv  → virgülle ayrılmış dosya
+--    HEADER      → ilk satır başlık, atla
+--    ENCODING    → Türkçe karakterler için UTF8
+\copy konya.nufus_copy FROM 'D:\nufus_copy.csv' WITH (FORMAT csv, HEADER, ENCODING 'UTF8')
+
+-- 3️⃣ Geldi mi? Kontrol et
+SELECT * FROM konya.nufus_copy LIMIT 10;</div>
                 <div class="reveal-box" id="q21">
-                  <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">Kritik Soru: COPY neden INSERT'ten hızlıdır? <span>▼</span></div>
-                  <div class="reveal-content">COPY, SQL parser'ı ve transaction loglarını atlayarak veriyi doğrudan disk sayfalarına yazar.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q21').classList.toggle('open')">COPY Neden INSERT'ten Çok Hızlı? <span>▼</span></div>
+                  <div class="reveal-content">INSERT her satır için SQL'i ayrıştırır, kurallara bakar, log tutar — satır başına çok iş. COPY ise bu adımları toplu yapıp veriyi <strong>doğrudan diske</strong> yazar. 100.000 satır: INSERT ile dakikalar, COPY ile saniyeler.</div>
                 </div>
                 <div class="reveal-box" id="g21">
-                  <div class="reveal-trigger" onclick="document.getElementById('g21').classList.toggle('open')">Görev: Nüfus Verisini İncele <span>▼</span></div>
-                  <div class="reveal-content">İçeri aktardığınız veriyi <code>SELECT * FROM konya.nufus_copy LIMIT 10;</code> komutu ile sorgulayarak kolonların ve Türkçe karakterlerin doğru geldiğini teyit edin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g21').classList.toggle('open')">Görev: Türkçe Karakter Testi <span>▼</span></div>
+                  <div class="reveal-content">
+                    <b>1)</b> CSV'yi yükle ve kontrol et:<br>
+                    <code>SELECT * FROM konya.nufus_copy LIMIT 10;</code><br><br>
+                    <b>2)</b> İlçe adlarına bak — "Selçuklu", "Çumra" düzgün mü? Eğer "SelÃ§uklu" gibi görünüyorsa <code>ENCODING 'UTF8'</code> parametresini unutmuşsundur.
+                  </div>
                 </div>
               </div>
             </div>
@@ -110,19 +140,28 @@ CREATE TABLE IF NOT EXISTS konya.nufus_copy (
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Format <span>Çevirici</span></div>
-                <div class="s-text-tech">GDAL'ın <strong>ogr2ogr</strong> aracı; Shapefile, GeoJSON, KML, DXF ve GDB'yi doğrudan PostGIS'e aktarır. <code>-t_srs</code> ile koordinat sistemi dönüşümünü tek komutta tamamlar.</div>
-                
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); margin-top:15px; margin-bottom:15px; padding:12px;">
-                  <div class="card-tech-title" style="color:var(--theme-yellow); font-size:14px; margin-bottom:6px;">⚠️ Nasıl Çalıştırılır?</div>
-                  <div class="card-tech-text" style="color:#ccc; font-size:13px; line-height:1.4;">Bu araç aslında <strong>GDAL</strong> kütüphanesinin bir parçasıdır ve <strong>QGIS</strong> kurduğunuzda otomatik yüklenir. Komutları Windows'ta başlat menüsünden <strong>OSGeo4W Shell</strong> uygulamasını açarak çalıştırmalısınız (psql içinde çalışmaz).</div>
+                <div class="s-headline-tech">Harita Dosyası <span>Çevirici</span></div>
+                <div class="s-text-tech" style="margin-bottom:14px;"><strong>ogr2ogr</strong>, harita formatları arasında çeviri yapan evrensel tercüman. Shapefile, GeoJSON, KML, DXF → hepsini PostGIS'e taşır.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px;">
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #43a047;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">🔄 Format + Koordinat Çevirisi</div>
+                    <div style="font-size: 11px; color: #ccc; margin-top:3px;">Tek komutta hem formatı çevirir hem <code style="color:#a5d6a7;">-t_srs</code> ile koordinat sistemini dönüştürür.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #fb8c00;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 13px;">⚠️ Nerede Çalıştırılır?</div>
+                    <div style="font-size: 11px; color: #ccc; margin-top:3px;">QGIS kurunca <strong>GDAL</strong> ile gelir. Komutları <strong>OSGeo4W Shell</strong>'de çalıştır — <code style="color:#ffcc80;">psql içinde ÇALIŞMAZ</code>.</div>
+                  </div>
+
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1e88e5;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">🆚 ogr2ogr mu COPY mu?</div>
+                    <div style="font-size: 11px; color: #ccc; margin-top:3px;">Harita dosyası (SHP/GeoJSON) → <strong>ogr2ogr</strong>. Düz CSV → <strong>COPY</strong> (çok daha hızlı).</div>
+                  </div>
                 </div>
 
-                <div class="s-text-tech" style="margin-top:14px; font-size:13px; opacity:0.8;">
-                  <strong>Ne zaman ogr2ogr?</strong><br>
-                  Dış kaynaklı mekansal format (SHP, GeoJSON) → PostGIS<br><br>
-                  <strong>Ne zaman COPY?</strong><br>
-                  Veri düz metin/CSV formatındaysa — COPY çok daha hızlıdır
+                <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; margin-top: 13px; font-size: 11px; color: #ccc; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Windows ipucu:</strong> Komut çok satırlı; satır sonundaki <code style="color:#FFD54F;">^</code> işareti "komut devam ediyor" demek.
                 </div>
               </div>
               <div class="s-panel-right">
@@ -158,12 +197,21 @@ ogr2ogr -f "PostgreSQL" ^
   -progress
                 </div>
                 <div class="reveal-box" id="q21x">
-                  <div class="reveal-trigger" onclick="document.getElementById('q21x').classList.toggle('open')">Kritik Soru: ogr2ogr ile COPY arasındaki fark ne zaman önemli? <span>▼</span></div>
-                  <div class="reveal-content">ogr2ogr format çevirisi + projeksiyon dönüşümü yapar; kaynak zaten PostgreSQL uyumlu düz veri ise <code>COPY</code> çok daha hızlıdır çünkü SQL parser ve transaction log yükü yoktur.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q21x').classList.toggle('open')">Hangi Parametre Ne İşe Yarar? <span>▼</span></div>
+                  <div class="reveal-content">
+                    <code>-nln</code> → tablo adı &nbsp;|&nbsp; <code>-lco SCHEMA=konya</code> → hangi şemaya<br>
+                    <code>-t_srs EPSG:4326</code> → koordinatı 4326'ya çevir<br>
+                    <code>-nlt PROMOTE_TO_MULTI</code> → Polygon'u MultiPolygon yap (karışık geometrilerde hata önler)<br>
+                    <code>-overwrite</code> → tablo varsa sil baştan yaz
+                  </div>
                 </div>
                 <div class="reveal-box" id="a21x">
                   <div class="reveal-trigger" onclick="document.getElementById('a21x').classList.toggle('open')">Görev: ogr2ogr ile GeoJSON Yükle <span>▼</span></div>
-                  <div class="reveal-content">Eğitim klasöründeki <code>mahalleler.geojson</code> dosyasını <code>-t_srs EPSG:4326</code> ile <code>konya.mahalleler_test</code> tablosuna aktarın ve <code>SELECT COUNT(*) FROM konya.mahalleler_test;</code> ile doğrulayın.</div>
+                  <div class="reveal-content">
+                    <b>1)</b> OSGeo4W Shell'i aç (psql değil!).<br>
+                    <b>2)</b> Yukarıdaki ilk komutu kopyala, <code>.shp</code> yerine <code>mahalleler.geojson</code>, <code>-nln</code> değerini <code>mahalleler_test</code> yap.<br>
+                    <b>3)</b> Çalıştır, sonra psql'de doğrula: <code>SELECT COUNT(*) FROM konya.mahalleler_test;</code>
+                  </div>
                 </div>
               </div>
             </div>
@@ -185,19 +233,69 @@ ogr2ogr -f "PostgreSQL" ^
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Veri <span>Rafinasyonu</span></div>
-                <div class="s-text-tech">Tabloları birleştirmeden (JOIN) önce tutarsız metinleri temizleme.</div>
+                <div class="s-headline-tech">Metni <span>Standartlaştır</span></div>
+                <div class="s-text-tech" style="margin-bottom:14px;">"Fakılar Mah." mı "Fakılar Mahallesi" mi "Fakılar" mı? Aynı yer, üç farklı yazım — JOIN bunları eşleştiremez.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px;">
+                  <div style="background: #ffebee; padding: 11px; border-radius: 4px; border-left: 4px solid #e53935;">
+                    <div style="font-weight: bold; color: #b71c1c; font-size: 13px;">❌ Sorun: JOIN Patlıyor</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">İki tablo "Fakılar Mah." ≠ "Fakılar" yüzünden eşleşmez. Tek harf farkı bile JOIN'i boş döndürür.</div>
+                  </div>
+
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #43a047;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">🔍 Çözüm: regexp_replace</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;">Akıllı bul-değiştir. Bir <strong>kalıba</strong> uyan kısmı siler/değiştirir. " Mah." ekini hepsinden kırpar.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #fb8c00;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 13px;">⚠️ Önce SELECT, sonra UPDATE</div>
+                    <div style="font-size: 11px; color: #555; margin-top:3px;"><code>UPDATE</code> kalıcıdır, geri alınamaz. Her zaman <code>SELECT</code> ile sonucu gör, doğruysa <code>UPDATE</code> yap.</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; margin-top: 13px; font-size: 11px; color: #ccc; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Kalıp:</strong> <code style="color:#FFD54F;">' Mah\.$'</code> = boşluk + "Mah" + nokta, <strong>satır sonunda</strong> (<code>$</code> = son).
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="font-size:13px; line-height:1.4;">-- "Fakılar Mah." gibi isimlendirmelerdeki " Mah." ekini temizler
-SELECT regexp_replace(mahalle_adi, ' Mah\.$', '') FROM konya.mahalleler_tkgm LIMIT 5;</div>
+                <div class="code-block" style="font-size:12px; line-height:1.45;">-- 1️⃣ ÖNCE SELECT: Temizlenmiş hali nasıl görünüyor?
+-- ' Mah\.$' = sondaki " Mah." ekini bul, sil
+SELECT ad AS orjinal,
+       regexp_replace(ad, ' Mah\.$', '') AS temiz
+FROM konya.mahalleler
+LIMIT 5;
+
+-- 2️⃣ Baş/son boşlukları da temizle (TRIM)
+SELECT TRIM(regexp_replace(ad, ' Mah\.$', '')) AS temiz
+FROM konya.mahalleler
+LIMIT 5;
+
+-- 3️⃣ Asıl tabloyu bozmamak için bir KOPYA üzerinde çalış
+CREATE TABLE konya.mahalleler_temiz AS
+SELECT id, ad FROM konya.mahalleler;
+
+-- 4️⃣ Sonuç doğruysa kopyada UPDATE ile kalıcı yap
+UPDATE konya.mahalleler_temiz
+SET ad = TRIM(regexp_replace(ad, ' Mah\.$', ''));
+
+-- 5️⃣ Kontrol: artık " Mah." kalmadı mı? (boş dönmeli)
+SELECT ad FROM konya.mahalleler_temiz
+WHERE ad LIKE '% Mah.';</div>
                 <div class="reveal-box" id="q22">
-                  <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kritik Soru: Regex neden PostGIS'te önemlidir? <span>▼</span></div>
-                  <div class="reveal-content">Farklı kurumlardan gelen verilerde "Mah.", "Mahallesi", "Mh." gibi tutarsızlıklar tablolar arası eşleştirmeyi (JOIN) imkansız kılar. Regex ile veriyi standartlaştırmak hayati önem taşır.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('q22').classList.toggle('open')">Kalıptaki Sembolleri Çöz <span>▼</span></div>
+                  <div class="reveal-content">
+                    <code>$</code> → satırın <strong>sonu</strong> (sadece sondaki "Mah." gitsin, ortadaki kalsın)<br>
+                    <code>\.</code> → gerçek nokta karakteri (kaçış olmadan <code>.</code> "herhangi bir karakter" demek)<br>
+                    <code>''</code> → bulunanı <strong>boşlukla değil, hiçbir şeyle</strong> değiştir = sil
+                  </div>
                 </div>
                 <div class="reveal-box" id="g22">
-                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Tabloyu Güncelle <span>▼</span></div>
-                  <div class="reveal-content"><code>mahalleler_tkgm</code> tablosundaki mahalle adlarını <code>UPDATE</code> ve <code>regexp_replace</code> kullanarak kalıcı olarak temizleyin.</div>
+                  <div class="reveal-trigger" onclick="document.getElementById('g22').classList.toggle('open')">Görev: Güvenli Temizlik Akışı <span>▼</span></div>
+                  <div class="reveal-content">
+                    <b>1)</b> 1. sorguyu çalıştır — <code>orjinal</code> ve <code>temiz</code> sütunlarını yan yana karşılaştır.<br><br>
+                    <b>2)</b> Doğruysa 3. (kopya oluştur) ve 4. (UPDATE) sorguları sırayla çalıştır.<br><br>
+                    <b>3)</b> 5. sorgu <strong>boş dönmeli</strong> — boş dönüyorsa temizlik başarılı. Asıl <code>konya.mahalleler</code> tablosu hiç bozulmadı.
+                  </div>
                 </div>
               </div>
             </div>

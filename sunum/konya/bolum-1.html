@@ -209,33 +209,69 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Merhaba <span>ST_MakePoint(32.4920, 37.8727)</span></div>
-                <div class="s-text-tech">Mekansal dünyanın "Merhaba Dünya"sına, Konya'nın kalbi Alaaddin Tepesi'nden selam veriyoruz. PostGIS dünyasına girmek için artık sadece isimleri değil, X (Boylam) ve Y (Enlem) koordinatlarını kullanacağız.</div>
-                <div class="card-tech"
-                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Resmi Doküman</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Her zaman en doğru bilgi için:
-                    <strong>postgis.net</strong></div>
+                <div style="color:#aaa; font-size:12px; margin-top:6px; margin-bottom:16px;">PostGIS'te koordinat = konum. X: Boylam (longitude), Y: Enlem (latitude).</div>
+                <div class="s-text-tech">PostgreSQL güçlü bir veritabanıdır — ama geometri (nokta, çizgi, alan) saklamayı ve mekansal hesap yapmayı bilmez. <b>PostGIS</b> bu yeteneği ekler.</div>
+
+                <!-- PostgreSQL vs PostgreSQL + PostGIS karşılaştırması -->
+                <div style="margin-top:18px; display:flex; gap:8px;">
+
+                  <div style="flex:1; background:#1a1a1a; border:1px solid #555; border-radius:6px; padding:12px 10px;">
+                    <div style="color:#888; font-weight:700; font-size:11.5px; font-family:'IBM Plex Mono',monospace; margin-bottom:8px;">PostgreSQL<br>tek başına</div>
+                    <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:#aaa; line-height:1.8;">
+                      <li>✓ Sayı, metin, tarih</li>
+                      <li>✓ Standart veri tabanı işlemleri</li>
+                      <li style="color:#e06c75;">✗ Geometri saklama</li>
+                      <li style="color:#e06c75;">✗ "Bu bina hangi mahallede?"</li>
+                      <li style="color:#e06c75;">✗ Mesafe / kesişim hesabı</li>
+                    </ul>
+                  </div>
+
+                  <div style="flex:1; background:#2a2000; border:1px solid var(--theme-yellow); border-radius:6px; padding:12px 10px;">
+                    <div style="color:var(--theme-yellow); font-weight:700; font-size:11.5px; font-family:'IBM Plex Mono',monospace; margin-bottom:8px;">+ PostGIS<br>eklentisi</div>
+                    <ul style="list-style:none; padding:0; margin:0; font-size:11px; color:#aaa; line-height:1.8;">
+                      <li>✓ Nokta, çizgi, alan saklama</li>
+                      <li>✓ Mekansal indeks (GiST)</li>
+                      <li style="color:#4caf50;">✓ ST_Distance, ST_Intersects</li>
+                      <li style="color:#4caf50;">✓ "Bu bina hangi mahallede?"</li>
+                      <li style="color:#4caf50;">✓ Saniyeler içinde yanıt</li>
+                    </ul>
+                  </div>
+
+                </div>
+
+                <!-- Doküman kartı -->
+                <div class="card-tech" style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:14px;">
+                  <div style="color:var(--theme-yellow); font-weight:800; font-size:12px;">Resmi Dokümantasyon</div>
+                  <div style="color:#aaa; font-size:11px; margin-top:4px;">postgis.net — tüm PostGIS fonksiyonları, detaylı örnekler ve en güncel sürüm notları.</div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT postgis_full_version(); -- PostGIS ve tüm bağımlılıklarının detaylı sürüm bilgisi</div>
+                <div class="code-block" style="margin-bottom:14px; font-size:11px; line-height:1.7;">-- PostGIS kurulu mu? Sürümü nedir?
+SELECT postgis_version();
+-- Çıktı örneği: '3.3 USE_GEOS=1 USE_PROJ=1 ...'
+
+-- PostGIS "Merhaba Dünya": Konya Alaaddin Tepesi
+-- X = boylam (longitude), Y = enlem (latitude)
+SELECT ST_MakePoint(32.4920, 37.8727) AS konum;
+-- Çıktı: geometry türünde bir nokta — artık mekansal sorgulanabilir!</div>
 
                 <div class="reveal-box" id="q11">
                   <div class="reveal-trigger" onclick="document.getElementById('q11').classList.toggle('open')">
-                    Kritik Soru: PostgreSQL Tek Başına Yeterli mi? <span>▼</span>
+                    Soru: Neden PostgreSQL'e eklenti olarak geliyor? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    PostgreSQL standart veriler için mükemmeldir; ancak Konya gibi devasa bir şehir verisinde "mekansal zekaya" ihtiyaç duyarız. PostGIS olmadan iki mahallenin komşu olduğunu veya bir binanın hangi parselde kaldığını saniyeler içinde hesaplayamayız. Mekansal indeksleme (GiST) gücü sadece PostGIS ile gelir.
+                    PostgreSQL kendisi genel amaçlı bir veritabanıdır ve çoğu uygulamaya geometri gerekmez. PostGIS gibi eklenti, gerekli olan kişiler için mekansal veri tabanı özelliğini ekler — kurulumu opsiyonel kalır, performans cezası yaşanmaz.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g11">
                   <div class="reveal-trigger" onclick="document.getElementById('g11').classList.toggle('open')">
-                    Görev: Sürüm Kontrolü Yap <span>▼</span>
+                    Görev: Sürüm Kontrol + İlk Geometri <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT postgis_version();</code> komutunu çalıştırarak sisteminizdeki PostGIS sürümünü not
-                    edin.
+                    <b>1)</b> <code>SELECT postgis_version();</code> çalıştırın — sisteminizde hangi sürüm kurulu olduğunu görün<br><br>
+                    <b>2)</b> <code>SELECT ST_MakePoint(32.4920, 37.8727) AS konum;</code> çalıştırın — ilk geometry değerinizi oluşturun<br><br>
+                    <b>3)</b> Çıktı, ikili bir metin (POINT(...) gibi) olacak — bu artık PostGIS tarafından anlaşılabilir bir mekansal obje!
                   </div>
                 </div>
               </div>
@@ -263,40 +299,81 @@
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Temel <span>ve</span> Çoklu Yapılar</div>
-                <div class="s-text-tech">POINT, LINESTRING, POLYGON ve bunların MULTI* versiyonları. GEOMETRYCOLLECTION
-                  ile karma veri tipleri tek bir hücrede saklanabilir.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-blue); margin-top:24px;">
-                  <div style="color:var(--theme-blue); font-weight:800; font-size:13px; margin-bottom:8px;">Geometri İnşa Fonksiyonları</div>
-                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:1.9;">
-                    <li><code style="color:#fff">ST_MakePoint(x, y)</code> — en hızlı POINT (SRID'siz)</li>
-                    <li><code style="color:#fff">ST_Point(x, y)</code> — alternatif (SRID'siz)</li>
-                    <li><code style="color:#fff">ST_SetSRID(ST_Point(...), 4326)</code> — SRID'li POINT</li>
-                    <li><code style="color:#fff">ST_GeomFromText('WKT', 4326)</code> — WKT'den</li>
-                    <li><code style="color:#fff">ST_GeomFromEWKT('SRID=4326;...')</code> — EWKT'den</li>
-                  </ul>
+                <div class="s-headline-tech">3 Temel Şekil: <span>Her Veri</span> Bir Geometridir</div>
+                <div class="s-text-tech">Haritadaki her nesne üç temel şekilden biridir. PostGIS bu şekilleri sütun olarak saklar ve üzerinde sorgu yapmanıza izin verir.</div>
+
+                <!-- 3 geometri tipi kutusu -->
+                <div style="margin-top:18px; display:flex; flex-direction:column; gap:10px;">
+
+                  <div style="background:#1a1a2a; border:1px solid #7c9fd4; border-radius:6px; padding:11px 12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                      <span style="font-size:18px; color:#7c9fd4;">●</span>
+                      <code style="color:#7c9fd4; font-weight:700; font-size:12px;">POINT</code>
+                    </div>
+                    <div style="color:#aaa; font-size:11px; line-height:1.6;">Tek bir koordinat (X, Y)<br><span style="color:#888; font-size:10px;">Hastane, durak, ağaç, çöp konteyneri</span></div>
+                  </div>
+
+                  <div style="background:#2a1800; border:1px solid #e67e22; border-radius:6px; padding:11px 12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                      <span style="font-size:18px; color:#e67e22;">╌</span>
+                      <code style="color:#e67e22; font-weight:700; font-size:12px;">LINESTRING</code>
+                    </div>
+                    <div style="color:#aaa; font-size:11px; line-height:1.6;">Koordinat dizisi (baştan sona çizgi)<br><span style="color:#888; font-size:10px;">Yol, nehir, elektrik hattı, boru</span></div>
+                  </div>
+
+                  <div style="background:#0a2a0a; border:1px solid #4caf50; border-radius:6px; padding:11px 12px;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                      <span style="font-size:18px; color:#4caf50;">▭</span>
+                      <code style="color:#4caf50; font-weight:700; font-size:12px;">POLYGON</code>
+                    </div>
+                    <div style="color:#aaa; font-size:11px; line-height:1.6;">Kapalı alan (son nokta = ilk nokta)<br><span style="color:#888; font-size:10px;">Mahalle sınırı, bina, parsel, göl</span></div>
+                  </div>
+
+                </div>
+
+                <!-- MULTI* notu -->
+                <div style="margin-top:12px; background:#1a1a1a; border:1px solid #333; border-left:3px solid #888; border-radius:6px; padding:8px 12px;">
+                  <div style="color:#666; font-size:11px; line-height:1.6;">
+                    <b>MULTIPOINT, MULTILINESTRING, MULTIPOLYGON</b><br>Tek satırda birden fazla şekil. Örnek: İstanbul'un iki kara parçası = MultiPolygon.
+                  </div>
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_GeomFromText('GEOMETRYCOLLECTION(POINT(0 0),LINESTRING(1 1,2 2))'); -- Farklı tiplerin koleksiyonu</div>
+                <div class="code-block" style="margin-bottom:14px; font-size:11px; line-height:1.8;">-- POINT: Alaaddin Tepesi
+SELECT ST_AsText(ST_MakePoint(32.4920, 37.8727));
+-- Çıktı: POINT(32.492 37.8727)
+
+-- LINESTRING: Basit yol (3 koordinat)
+SELECT ST_AsText(
+  ST_GeomFromText('LINESTRING(32.49 37.87, 32.50 37.88, 32.51 37.87)')
+);
+-- Çıktı: LINESTRING(32.49 37.87, 32.5 37.88, 32.51 37.87)
+
+-- POLYGON: Küçük parsel (başladığı noktada biter!)
+SELECT ST_AsText(
+  ST_GeomFromText('POLYGON((32.49 37.87, 32.50 37.87, 32.50 37.88, 32.49 37.88, 32.49 37.87))')
+);
+-- Çıktı: POLYGON((...)) gibi</div>
 
                 <div class="reveal-box" id="q14">
                   <div class="reveal-trigger" onclick="document.getElementById('q14').classList.toggle('open')">
-                    Kritik Soru: POINT vs MULTIPOINT? <span>▼</span>
+                    Soru: MULTI* ne zaman kullanılır? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    POINT tek bir noktadır (elektrik direği). MULTIPOINT ise mantıksal olarak bir grup olan noktalar
-                    kümesidir (aynı parsele ait birden fazla kuyu).
+                    Bir tabloda mantıksal olarak "bir grup" olan ama fiziksel olarak ayrı parçalar olan veriler. Örnek: İstanbul (Avrupa tarafı + Asya tarafı) = MultiPolygon. Ya da bir şehrin tüm çöp konteynerlerinin tek bir satırda gruplanması = MultiPoint.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="a15">
                   <div class="reveal-trigger" onclick="document.getElementById('a15').classList.toggle('open')">
-                    Görev: Poligon Oluştur <span>▼</span>
+                    Görev: Nokta Oluştur ve ST_AsText ile Gör <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_GeomFromText('POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))');</code> (Not: Poligon mutlaka
-                    başladığı noktada bitmelidir!)
+                    <b>1)</b> <code>SELECT ST_MakePoint(32.49, 37.87);</code> çalıştırın — binary geometry döner (okunaklı değil)<br><br>
+                    <b>2)</b> Aynısını <code>ST_AsText()</code> ile sarın:<br>
+                    <code>SELECT ST_AsText(ST_MakePoint(32.49, 37.87));</code><br>
+                    Sonuç: <code>POINT(32.49 37.87)</code> — insan okunabilir WKT formatı!<br><br>
+                    <b>3)</b> Kendi belirlediğin bir koordinat (Konya haritasından seç) ile dene
                   </div>
                 </div>
               </div>
@@ -305,7 +382,7 @@
         </div>
       </div>
 
-      <!-- SLAYT 4: 1.3 VERİ FORMATLARI VE METADATA -->
+      <!-- SLAYT 4: 1.3 AYNI GEOMETRİ, ÜÇ DİL -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -319,45 +396,62 @@
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.3 — WKT, EWKT, WKB ve Metadata</div>
+              <div class="slide-header-title">1.3 — Aynı Geometri, Üç Dil</div>
               <div class="slide-header-num">04 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Formatların <span>Dili</span></div>
-                <div class="s-text-tech">WKT (Metin), WKB (Binary), EWKT (SRID içeren metin). Tüm mekansal sütunlar
-                  <code>geometry_columns</code> görünümünde kayıtlıdır.</div>
+                <div class="s-headline-tech">Bir Nokta, Üç <span>Forma</span></div>
+                <div class="s-text-tech">Aynı harita verisi, farklı şekillerde saklanıp gösterilir:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                  <div style="background: #e3f2fd; padding: 12px; border-radius: 4px; border-left: 4px solid #2196F3;">
+                    <div style="font-weight: bold; color: #1976D2; margin-bottom: 4px;">📝 WKT (Metin)</div>
+                    <div style="font-size: 12px; color: #424242;">İnsan okuyabileceği format. Veri görmek, yazı yazmak için kullan.</div>
+                  </div>
+                  <div style="background: #f3e5f5; padding: 12px; border-radius: 4px; border-left: 4px solid #9C27B0;">
+                    <div style="font-weight: bold; color: #6a1b9a; margin-bottom: 4px;">⚙️ WKB (İkili)</div>
+                    <div style="font-size: 12px; color: #424242;">Bilgisayarın depoladığı format. Çok daha hızlı ve hassas.</div>
+                  </div>
+                  <div style="background: #fce4ec; padding: 12px; border-radius: 4px; border-left: 4px solid #E91E63;">
+                    <div style="font-weight: bold; color: #c2185b; margin-bottom: 4px;">🗺️ EWKT (Metin + Konum Kodu)</div>
+                    <div style="font-size: 12px; color: #424242;">WKT'ye konum bilgisi eklenir. Slayt 1.4'te detaylı olacak.</div>
+                  </div>
+                </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT
-  ST_AsText(geom) AS wkt,     -- Well-Known Text (Metin)
-  ST_AsBinary(geom) AS wkb,   -- Well-Known Binary (İkili)
-  ST_AsEWKT(geom) AS ewkt     -- Extended WKT (SRID'li Metin)
+                <div class="code-block" style="margin-bottom:16px;">-- Bir POINT'i üç formatta görelim:
+SELECT
+  ST_AsText(geom) AS wkt_metin,
+  ST_AsBinary(geom) AS wkb_binary,
+  ST_AsEWKT(geom) AS ewkt_metin
 FROM konya.mahalleler LIMIT 1;
 
--- EWKT (SRID'li metin formatı) ile geometri oluşturma
-SELECT 'SRID=4326;POINT(32.4920 37.8727)'::geometry AS alaaddin_tepesi;
-
--- Metadata Görünümü:
-SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
+-- Sonuç örneği:
+-- wkt_metin:   POINT(32.4920 37.8727)
+-- wkb_binary:  01010000... (ikili sayılar)
+-- ewkt_metin:  SRID=4326;POINT(...)</div>
 
                 <div class="reveal-box" id="q16">
                   <div class="reveal-trigger" onclick="document.getElementById('q16').classList.toggle('open')">
-                    Kritik Soru: Binary (WKB) neden önemlidir? <span>▼</span>
+                    Neden WKB (Binary) saklanır? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Binary format, veriyi bilgisayarın anladığı dilde saklar. Metin dönüşümü gerektirmediği için
-                    okuma/yazma işlemlerinde çok daha hızlıdır ve hassasiyet kaybı yaşatmaz.
+                    Veri tabanı performans için verileri binary (ikili, sayı) formatta saklar. Çok daha hızlı okunur ve hiç hassasiyet kaybı olmaz. 📝 WKT ise size göstermek için dönüştürülür.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g16">
                   <div class="reveal-trigger" onclick="document.getElementById('g16').classList.toggle('open')">
-                    Görev: Geometriyi Metin Olarak Gör <span>▼</span>
+                    Görev: Mahalle Verilerini Görelim <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_AsText(geom) FROM konya.mahalleler LIMIT 1;</code> komutuyla binary veriyi
-                    okunabilir hale getirin.
+                    <b>1)</b> Çalıştırın:<br>
+                    <code>SELECT ST_AsText(geom) FROM konya.mahalleler WHERE id = 1;</code><br><br>
+                    <b>2)</b> Çıktı <code>POINT(...)</code> veya <code>POLYGON(...)</code> olacak — bu WKT formatı!<br><br>
+                    <b>3)</b> Şimdi <code>ST_AsEWKT</code>'ye değiştirin: <code>SELECT ST_AsEWKT(geom) FROM konya.mahalleler WHERE id = 1;</code><br><br>
+                    Sonuçta <code>SRID=...</code> kısmı görünüyor mu? (Sonraki slayta hazırlık!)
                   </div>
                 </div>
               </div>
@@ -366,7 +460,7 @@ SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
         </div>
       </div>
 
-      <!-- SLAYT 5: 1.4 SRID VE PROJEKSİYONLAR -->
+      <!-- SLAYT 5: 1.4 HARITA SİSTEMİ SEÇMEK -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -380,42 +474,63 @@ SELECT * FROM geometry_columns; -- Tüm mekansal sütun bilgileri</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.4 — SRID ve Projeksiyonlar</div>
+              <div class="slide-header-title">1.4 — Harita Sistemi Seçmek</div>
               <div class="slide-header-num">05 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Dünya <span>Yuvarlak</span> Ekran Düz</div>
-                <div class="s-text-tech">Kürenin düzleme aktarılmasına projeksiyon denir. Her sistem bir SRID (Spatial
-                  Reference ID) ile tanımlanır.</div>
-                <div class="card-tech"
-                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">spatial_ref_sys</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">PostGIS içindeki binlerce projeksiyonun
-                    parametreleri bu tabloda tutulur.</div>
+                <div class="s-headline-tech">Dünya Yuvarlak, Kağıt <span>Düz</span></div>
+                <div class="s-text-tech">Yerküreyi düz bir kağıda çizemezsin. Her çizim tarzı (projeksiyon) biraz eğip büküyor ama her birinin farklı amacı var. Her çizim tarzının kodu = <strong>SRID</strong></div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+                  <div style="background: #fff3e0; padding: 10px; border-radius: 4px; border-left: 4px solid #FF9800;">
+                    <div style="font-weight: bold; color: #E65100; font-size: 13px;">🌍 SRID 4326 (WGS84)</div>
+                    <div style="font-size: 11px; color: #424242;">Tüm dünyada standart. GPS ve uydudan koordinat buradan gelir.</div>
+                  </div>
+                  <div style="background: #e8f5e9; padding: 10px; border-radius: 4px; border-left: 4px solid #4CAF50;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">🗺️ SRID 5255 (Türkiye TM33)</div>
+                    <div style="font-size: 11px; color: #424242;">Türkiye'ye göre optimize edilmiş. Mesafe hesaplaması daha doğru.</div>
+                  </div>
+                  <div style="background: #e0f2f1; padding: 10px; border-radius: 4px; border-left: 4px solid #009688;">
+                    <div style="font-weight: bold; color: #004d40; font-size: 13px;">💻 SRID 3857 (Web Mercator)</div>
+                    <div style="font-size: 11px; color: #424242;">Google Maps, Leaflet kullanır. Web haritaları için standart.</div>
+                  </div>
                 </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM spatial_ref_sys 
-WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
+                <div class="code-block" style="margin-bottom:16px;">-- Veri setinde hangi sistem kullanılıyor?
+SELECT ST_AsEWKT(geom) FROM konya.mahalleler LIMIT 1;
+-- Sonuç: SRID=4326;POLYGON(...) şeklinde görünür
+
+-- Tüm sistemi görmek için:
+SELECT srtext FROM spatial_ref_sys WHERE srid = 4326;
+-- Detaylı parametre bilgileri çıkar (gözle)
+
+-- Konya'nın sistem numarası:
+SELECT srtext FROM spatial_ref_sys WHERE srid = 5255;
+-- Türkiye TM33 sisteminin tanımı</div>
 
                 <div class="reveal-box" id="q18">
                   <div class="reveal-trigger" onclick="document.getElementById('q18').classList.toggle('open')">
-                    Kritik Soru: EPSG nedir? <span>▼</span>
+                    SRID nedir? Basit Açıklama <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Projeksiyon sistemlerini standardize eden global koddur. Örn: 4326 (WGS84 - Küresel), 3857 (Web
-                    Mercator - Google Maps).
+                    SRID = Spatial Reference ID. Her harita sistemi (projeksiyon) bir numaraya sahiptir. 4326 = WGS84 diye dünyaca kabul edilen koddur. Koordinatlarını hangi sisteme göre okuyacağını söyler.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g18">
                   <div class="reveal-trigger" onclick="document.getElementById('g18').classList.toggle('open')">
-                    Görev: Projeksiyon Ara <span>▼</span>
+                    Görev: Sistemi İncele <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT srtext FROM spatial_ref_sys WHERE srid = 5255;</code> (Türkiye TM33 sistemi
-                    parametrelerini görün)
+                    <b>1)</b> Konya verilerini kontrol et:<br>
+                    <code>SELECT ST_AsEWKT(geom) FROM konya.mahalleler LIMIT 1;</code><br>
+                    Sonuç <code>SRID=...</code> ile başlıyor mu?<br><br>
+                    <b>2)</b> Sistem detaylarını görmek için:<br>
+                    <code>SELECT srtext FROM spatial_ref_sys WHERE srid = 4326;</code><br><br>
+                    <b>3)</b> İpucu: Sonuç çok uzun metin olacak — bu sistemin matematiksel tanımı!
                   </div>
                 </div>
               </div>
@@ -424,7 +539,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 6: 1.5 GEOMETRY VS GEOGRAPHY -->
+      <!-- SLAYT 6: 1.5 DÜZLEMDE Mİ KÜREDE Mİ HESAPLASAK? -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -438,38 +553,62 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.5 — Geometry vs Geography Ayrımı</div>
+              <div class="slide-header-title">1.5 — Düzlemde mi Kürede mi Hesaplasak?</div>
               <div class="slide-header-num">06 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Düzlem <span>mü</span> Küre mi?</div>
-                <div class="s-text-tech"><strong>Geometry:</strong> Kartezyen (düzlem) matematik kullanır. Birimi
-                  derecedir. <strong>Geography:</strong> Küresel matematik kullanır. Birimi metredir.</div>
+                <div class="s-headline-tech">İki Yöntemi <span>Karşılaştır</span></div>
+                <div class="s-text-tech">Mesafe hesaplamak için iki seçeneğin var. Hangisini seçeceğin amacına bağlı:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                  <div style="background: #3e2723; padding: 12px; border-radius: 4px; border-left: 4px solid #8D6E63;">
+                    <div style="font-weight: bold; color: #FFAB91; margin-bottom: 4px;">📋 GEOMETRY (Düzlem)</div>
+                    <div style="font-size: 12px; color: #bdbdbd; line-height: 1.6;">Kağıt harita gibi, düz çizim. Meter cinsinden doğru değer vermez ama çok hızlıdır. Yerel alanlar (şehir içi) için iyi.</div>
+                  </div>
+                  <div style="background: #1b5e20; padding: 12px; border-radius: 4px; border-left: 4px solid #81C784;">
+                    <div style="font-weight: bold; color: #A5D6A7; margin-bottom: 4px;">🌍 GEOGRAPHY (Küre)</div>
+                    <div style="font-size: 12px; color: #bdbdbd; line-height: 1.6;">Yerkürenin yuvarlak şekli dikkate alınır. Gerçek meter mesafesi verir ama yavaştır. Uzun mesafeler için gerekli.</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 14px; font-size: 12px; color: #bdbdbd; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Pratikte:</strong> Genelde GEOMETRY (hızlı) kullan. Uzun mesafe / hassas ölçüm gerekirse GEOGRAPHY dönüştür.
+                </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_Distance(
-  'POINT(32.49 37.87)'::geography, -- İlk nokta (geography tipi)
-  'POINT(32.50 37.88)'::geography  -- İkinci nokta (geography tipi)
-) AS metre_mesafe;                 -- Noktalar arası kuş uçuşu mesafe (metre)</div>
+                <div class="code-block" style="margin-bottom:16px;">-- GEOMETRY: Düzlem matematik (hızlı)
+SELECT ST_Distance(
+  ST_GeomFromText('POINT(32.49 37.87)'),
+  ST_GeomFromText('POINT(32.50 37.88)')
+) AS derece_mesafesi;  -- Sonuç: 0.01239... (dereceler!)
+
+-- GEOGRAPHY: Küre matematik (doğru)
+SELECT ST_Distance(
+  ST_GeomFromText('POINT(32.49 37.87)')::geography,
+  ST_GeomFromText('POINT(32.50 37.88)')::geography
+) AS metre_mesafesi;  -- Sonuç: 1377.6... (meter!)</div>
 
                 <div class="reveal-box" id="q19">
                   <div class="reveal-trigger" onclick="document.getElementById('q19').classList.toggle('open')">
-                    Kritik Soru: Neden her zaman Geography kullanmıyoruz? <span>▼</span>
+                    Neden GEOGRAPHY her zaman kullanmayız? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Geography'nin matematiği çok daha ağır ve yavaştır. Ayrıca bazı PostGIS fonksiyonları Geography
-                    tipini desteklemez.
+                    GEOGRAPHY'nin matematik çok daha ağır işler. Veri tabanı yavaşlar. Özellikle çok sayıda geometri ile çalışırken sorun olur. O yüzden genelde GEOMETRY ile başla, sadece uzun mesafeler için GEOGRAPHY kullan.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g19">
                   <div class="reveal-trigger" onclick="document.getElementById('g19').classList.toggle('open')">
-                    Görev: Alan Ölç <span>▼</span>
+                    Görev: İki Yöntemi Karşılaştır <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_Area(geom::geography) FROM konya.mahalleler LIMIT 1;</code> komutuyla bir mahallenin
-                    alanını metrekare cinsinden bulun.
+                    <b>1)</b> GEOMETRY ile test et:<br>
+                    <code>SELECT ST_Distance(ST_GeomFromText('POINT(32.49 37.87)'), ST_GeomFromText('POINT(32.50 37.88)')) AS geom_result;</code><br><br>
+                    <b>2)</b> GEOGRAPHY ile aynı noktaları ölç:<br>
+                    <code>SELECT ST_Distance(ST_GeomFromText('POINT(32.49 37.87)')::geography, ST_GeomFromText('POINT(32.50 37.88)')::geography) AS geog_result;</code><br><br>
+                    <b>3)</b> Sonuçları karşılaştır — neden farklı çıkıyor?
                   </div>
                 </div>
               </div>
@@ -478,7 +617,7 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
         </div>
       </div>
 
-      <!-- SLAYT 7: 1.6 SETSRID VS TRANSFORM VE TR SİSTEMLERİ -->
+      <!-- SLAYT 7: 1.6 ETİKET mİ ASLINDA TAŞI? -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -492,63 +631,64 @@ WHERE srid = 4326; -- WGS84 projeksiyon parametrelerini getir</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.6 — SetSRID != Transform ve Türkiye Sistemleri</div>
+              <div class="slide-header-title">1.6 — Etiket mi? Aslında Taşı?</div>
               <div class="slide-header-num">07 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Dönüştürme <span>Sanatı</span></div>
-                <div class="s-text-tech"><strong>ST_SetSRID:</strong> Etiket yapıştırır (koordinatı ellemez).
-                  <strong>ST_Transform:</strong> Koordinatları matematiksel olarak başka bir sisteme çevirir.</div>
-                <div class="card-tech"
-                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Türkiye Sistemleri</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">TUREF / TM33 (EPSG:5255), UTM Zone 36N
-                    (EPSG:32636). Konya genellikle TM33 veya WGS84 kullanır.</div>
+                <div class="s-headline-tech">Koordinat Değişir <span>mi</span>?</div>
+                <div class="s-text-tech">İki benzer ama çok farklı işlem var. Hangisini yanlış yapsan koordinat yer değiştirir:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                  <div style="background: #fff3e0; padding: 12px; border-radius: 4px; border-left: 4px solid #FF9800;">
+                    <div style="font-weight: bold; color: #E65100; margin-bottom: 4px;">🏷️ ST_SetSRID (Etiket Yapıştır)</div>
+                    <div style="font-size: 12px; color: #424242; line-height: 1.6;">Koordinat hiç değişmez! Sadece "bu sistem ne?" diye bir etiket eklersin. Kutunun yerini değiştirmezsin.</div>
+                  </div>
+                  <div style="background: #e3f2fd; padding: 12px; border-radius: 4px; border-left: 4px solid #2196F3;">
+                    <div style="font-weight: bold; color: #1565c0; margin-bottom: 4px;">🔄 ST_Transform (Gerçekten Taşı)</div>
+                    <div style="font-size: 12px; color: #424242; line-height: 1.6;">Koordinat değişir! Bir sistemdeki koordinatı başka sisteme çevirirsin. Kutunun yeri gerçekten değişir.</div>
+                  </div>
                 </div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-blue); margin-top:12px;">
-                  <div style="color:var(--theme-blue); font-weight:800; font-size:13px; margin-bottom:8px;">WKT Parametreleri</div>
-                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:1.9;">
-                    <li><code style="color:#fff">GRS 1980</code> — Türkiye'nin kullandığı elipsoid</li>
-                    <li><code style="color:#fff">TOWGS84[0,0,0,0,0,0,0]</code> — WGS84 ile pratik fark yok</li>
-                    <li><code style="color:#fff">central_meridian: 33</code> — Konya bu zone içinde</li>
-                    <li><code style="color:#fff">false_easting: 500000</code> — Negatif X çıkmasın diye</li>
-                    <li><code style="color:#fff">UNIT["metre"]</code> — Birim: metre ✓</li>
-                  </ul>
+
+                <div style="background: #ffebee; padding: 10px; border-radius: 4px; margin-top: 14px; font-size: 12px; color: #c62828; border-left: 4px solid #c62828;">
+                  <strong>⚠️ Hata Yapma:</strong> SetSRID ile yanlış sistem yazarsan, Transform çok yanlış yere taşıyor!
                 </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- Aynı koordinat, farklı "etiket" → ST_Transform farklı yere gider
-WITH merkez AS (
-  SELECT
-    ST_SetSRID(ST_Point(450000, 4180000), 5255)  AS dogru_geom,  -- DOĞRU: TM33
-    ST_SetSRID(ST_Point(450000, 4180000), 32636) AS yanlis_geom  -- YANLIŞ: UTM36 sandı
-)
-SELECT 'DOGRU (5255 — TM33)' AS durum,
-  ST_AsText(ST_Transform(dogru_geom,  4326)) AS wgs84,
-  ST_SRID(dogru_geom) AS srid
-FROM merkez
-UNION ALL
-SELECT 'YANLIŞ (32636 SANDI)' AS durum,
-  ST_AsText(ST_Transform(yanlis_geom, 4326)) AS wgs84,
-  ST_SRID(yanlis_geom) AS srid
-FROM merkez;</div>
+                <div class="code-block" style="margin-bottom:16px;">-- 1) SetSRID — etiket yapıştır, koordinat AYNI kalır
+SELECT ST_AsEWKT(ST_SetSRID(ST_Point(32.49, 37.87), 4326));
+-- Sonuç: SRID=4326;POINT(32.49 37.87) — sayılar aynı!
+
+-- 2) Transform — gerçekten başka sisteme çevir
+SELECT ST_AsEWKT(
+  ST_Transform(ST_Point(32.49, 37.87), 5255)
+);
+-- Sonuç: SRID=5255;POINT(650000 4180000) — sayılar DEĞİŞTİ!
+
+-- Türkiye için: Genelde 4326 (WGS84) ya da 5255 (TM33) kullanılır
+SELECT srid, srtext FROM spatial_ref_sys
+WHERE srid IN (4326, 5255) LIMIT 1;</div>
 
                 <div class="reveal-box" id="q110">
                   <div class="reveal-trigger" onclick="document.getElementById('q110').classList.toggle('open')">
-                    Kritik Soru: Hangisi koordinatı değiştirir? <span>▼</span>
+                    SetSRID Yanlışsa Ne Olur? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Her iki sorgu da <code>ST_Point(450000, 4180000)</code> verisini kullanır. SRID sadece etikettir — ama ST_Transform bu etikete <strong>güvenerek</strong> koordinatı 4326'ya çevirir. Yanlış etiket → yanlış konum. Yüzlerce km sapma olabilir.
+                    Veritabanı sizin etiketinize güvenir! "Bu TM33" yazsan da aslında WGS84 ise, Transform saat onu yanlış yere götürür. Yüzlerce km sapma olabilir. İlk satır her zaman doğru sistem belirtmen gerekir!
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g110">
                   <div class="reveal-trigger" onclick="document.getElementById('g110').classList.toggle('open')">
-                    Görev: İki Sistemi Karşılaştır <span>▼</span>
+                    Görev: Farkı Gözle <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT srtext FROM spatial_ref_sys WHERE srid IN (5255, 32636);</code> — TM33 ve UTM36N tanımlarını yan yana görün. central_meridian ve zone farklarına dikkat edin.
+                    <b>1)</b> SetSRID ile aynı noktaya etiket ekle:<br>
+                    <code>SELECT ST_AsEWKT(ST_SetSRID(ST_Point(32.49, 37.87), 4326)) AS setsrid_sonuc;</code><br><br>
+                    <b>2)</b> Transform ile aynı noktayı 5255'e çevir:<br>
+                    <code>SELECT ST_AsEWKT(ST_Transform(ST_Point(32.49, 37.87), 5255)) AS transform_sonuc;</code><br><br>
+                    <b>3)</b> Sayıları karşılaştır — birinci işlemde hiç değişmedi, ikincisinde tamamen farklı!
                   </div>
                 </div>
               </div>
@@ -557,7 +697,7 @@ FROM merkez;</div>
         </div>
       </div>
 
-      <!-- SLAYT 8: 1.7 MEKANSAL İLİŞKİLER 1 -->
+      <!-- SLAYT 8: 1.7 HARITADA KİM KİMİN İÇİNDE? -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -571,35 +711,68 @@ FROM merkez;</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.7 — Mekansal İlişkiler (Contains, Within, Intersects)</div>
+              <div class="slide-header-title">1.7 — Haritada Kim Kimin İçinde?</div>
               <div class="slide-header-num">08 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>Sorgu</span> Mantığı</div>
-                <div class="s-text-tech"><strong>ST_Contains:</strong> A, B'yi kapsar mı? <strong>ST_Within:</strong> A,
-                  B'nin içinde mi? <strong>ST_Intersects:</strong> Herhangi bir temas var mı?</div>
+                <div class="s-headline-tech">Üç Yaygın <span>İlişki</span></div>
+                <div class="s-text-tech">Harita verilerinde sık sorulan 3 soru:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 14px;">
+                  <div style="background: #1a237e; padding: 11px; border-radius: 4px; border-left: 4px solid #5C6BC0;">
+                    <div style="font-weight: bold; color: #B3E5FC; font-size: 13px;">📍 ST_Contains</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">Mahalle bu noktayı içeriyor mu? ✓ İçeriyor / ✗ İçermiyor</div>
+                  </div>
+                  <div style="background: #1b5e20; padding: 11px; border-radius: 4px; border-left: 4px solid #81C784;">
+                    <div style="font-weight: bold; color: #A5D6A7; font-size: 13px;">🎯 ST_Within</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">Bu nokta mahallenin içinde mi? ✓ İçinde / ✗ Dışında</div>
+                  </div>
+                  <div style="background: #4a148c; padding: 11px; border-radius: 4px; border-left: 4px solid #CE93D8;">
+                    <div style="font-weight: bold; color: #F8BBD0; font-size: 13px;">🔗 ST_Intersects</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">İki şekil herhangi bir yerde kesişiyor mu? ✓ Kesişiyor / ✗ Ayrı</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #bdbdbd; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Fark:</strong> Contains ↔ Within aynı sonuç, ama bakış açısı farklı. Intersects daha "gevşek" — herhangi temas yeter.
+                </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.mahalleler -- Mahalleler tablosundan seç
-WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen mahalleyi bul</div>
+                <div class="code-block" style="margin-bottom:16px;">-- 📍 ST_Contains: Mahalle noktayı kapsar mı?
+SELECT m.ad FROM konya.mahalleler m
+WHERE ST_Contains(m.geom, ST_Point(32.49, 37.87, 4326));
+
+-- 🎯 ST_Within: Nokta mahallenin içinde mi?
+SELECT m.ad FROM konya.mahalleler m
+WHERE ST_Within(ST_Point(32.49, 37.87, 4326), m.geom);
+
+-- 🔗 ST_Intersects: Dikdörtgen ile mahalleyi kesişir mi?
+SELECT m.ad FROM konya.mahalleler m
+WHERE ST_Intersects(m.geom, ST_GeomFromText(
+  'POLYGON((32.48 37.86, 32.52 37.86, 32.52 37.90, 32.48 37.90, 32.48 37.86))', 4326
+));</div>
 
                 <div class="reveal-box" id="q111">
                   <div class="reveal-trigger" onclick="document.getElementById('q111').classList.toggle('open')">
-                    Kritik Soru: Contains vs Within? <span>▼</span>
+                    ST_Contains vs ST_Within: Hangisi Hangisi? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Mahalle Bina'yı kapsar (Contains). Bina Mahalle'nin içindedir (Within). Mantık aynıdır, bakış açısı
-                    farklıdır.
+                    İkisi aynı sonucu verir! Contains: "Mahalle noktayı kapsar" vs Within: "Nokta mahalle içinde". Sadece kimin sorgulandığı farklı. Başında iki tarafı da karıştırmak normaldir. 👍
                   </div>
                 </div>
 
                 <div class="reveal-box" id="a21">
                   <div class="reveal-trigger" onclick="document.getElementById('a21').classList.toggle('open')">
-                    Görev: Kesişen Alanları Bul <span>▼</span>
+                    Görev: Üçünü Dene <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Intersects(m.geom, ST_GeomFromText('POLYGON((32.49 37.87, 32.51 37.87, 32.51 37.89, 32.49 37.89, 32.49 37.87))', 4326));</code>
+                    <b>1)</b> Konya'nın merkez noktası (32.4920, 37.8727) hangi mahallelerde?<br>
+                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Contains(m.geom, ST_Point(32.4920, 37.8727, 4326));</code><br><br>
+                    <b>2)</b> Aynısını ST_Within ile de yap — aynı sonucu verir:<br>
+                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Within(ST_Point(32.4920, 37.8727, 4326), m.geom);</code><br><br>
+                    <b>3)</b> İpucu: Kısaca ST_Contains daha yaygındır.
                   </div>
                 </div>
               </div>
@@ -608,7 +781,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
         </div>
       </div>
 
-      <!-- SLAYT 9: 1.8 İLERİ İLİŞKİLER -->
+      <!-- SLAYT 9: 1.8 KOMŞULUK VE ÇIZGILER -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -622,41 +795,69 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87)); -- Noktayla kesişen maha
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.8 — İleri İlişkiler (Touches, Crosses, DWithin)</div>
+              <div class="slide-header-title">1.8 — Komşuluk, Kesişme, Mesafe</div>
               <div class="slide-header-num">09 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Komşuluk <span>ve</span> Mesafe</div>
-                <div class="s-text-tech"><strong>ST_Touches:</strong> Sadece sınırdan temas (komşuluk).
-                  <strong>ST_DWithin:</strong> Belirli bir mesafe içindeki nesneler.</div>
-                <div class="card-tech"
-                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">ST_DWithin Neden Hızlı?</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">İndeks kullanarak tampon alan oluşturmadan
-                    (Buffer yapmadan) mesafe filtresi uygular.</div>
+                <div class="s-headline-tech">Üç Özel <span>Durum</span></div>
+                <div class="s-text-tech">WHERE koşulunda sınırdan temas, çizgi kesişmeleri ve mesafe bazlı sorgular:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 14px;">
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #FF9800;">
+                    <div style="font-weight: bold; color: #E65100; font-size: 13px;">🤝 ST_Touches</div>
+                    <div style="font-size: 11px; color: #424242;">Sadece sınırdan temas. (İki mahalle sınırda buluşmuş)</div>
+                  </div>
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #2196F3;">
+                    <div style="font-weight: bold; color: #1565c0; font-size: 13px;">✂️ ST_Crosses</div>
+                    <div style="font-size: 11px; color: #424242;">Çizgi yapıları kesişir. (Yol, nehir bir alanı geçer)</div>
+                  </div>
+                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #9C27B0;">
+                    <div style="font-weight: bold; color: #6a1b9a; font-size: 13px;">🎯 ST_DWithin</div>
+                    <div style="font-size: 11px; color: #424242;">Mesafe içinde mi? (500m yarıçapında neler var?)</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #424242; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #F57C00;">💡 Fark:</strong> Touches = sınır temas, Intersects = tüm temas (içinde de sayılır)
                 </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT * FROM konya.osm_binalar -- Binalar tablosundan seç
-WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m mesafe filtresi (index dostu)</div>
+                <div class="code-block" style="margin-bottom:16px;">-- 🤝 ST_Touches: Seçilen mahallenin komşu mahallelerini bul (JOIN ile)
+SELECT m2.ad FROM konya.mahalleler m1
+JOIN konya.mahalleler m2 ON ST_Touches(m1.geom, m2.geom)
+WHERE m1.id = 1;
+
+-- ✂️ ST_Crosses: Yol bu alanı geçiyor mu?
+SELECT COUNT(*) FROM konya.osm_yollar y
+WHERE ST_Crosses(y.geom, ST_GeomFromText(
+  'POLYGON((32.48 37.86, 32.52 37.86, 32.52 37.90, 32.48 37.90, 32.48 37.86))', 4326
+));
+
+-- 🎯 ST_DWithin: Konya merkezi etrafı 500m içindeki binalar
+SELECT COUNT(*) FROM konya.osm_binalar b
+WHERE ST_DWithin(b.geom::geography, ST_Point(32.4920, 37.8727, 4326)::geography, 500);</div>
 
                 <div class="reveal-box" id="q112">
                   <div class="reveal-trigger" onclick="document.getElementById('q112').classList.toggle('open')">
-                    Kritik Soru: ST_Touches neyi yakalamaz? <span>▼</span>
+                    ST_Touches vs ST_Intersects? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Eğer nesneler birbirinin üzerine biniyorsa (overlap) veya tamamen içindeyse ST_Touches FALSE döner.
-                    Sadece "yan yana" iseler TRUE döner.
+                    ST_Intersects iki şekil temas ediyorsa TRUE döner (sınırda, kesişme, hatta tamamen içinde). ST_Touches sadece sınırdan temas olduğunda TRUE döner. İçinde varsa ST_Touches FALSE döner! Daha katı bir testtir.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g112">
                   <div class="reveal-trigger" onclick="document.getElementById('g112').classList.toggle('open')">
-                    Görev: Kesişen Yolları Bul <span>▼</span>
+                    Görev: Üçünü Dene <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT id FROM konya.osm_yollar WHERE ST_Crosses(geom, ST_GeomFromText('LINESTRING(32.48 37.86, 32.52 37.89)', 4326));</code>
+                    <b>1)</b> Seçilen alanın sınırında mahalleler (Touches):<br>
+                    <code>SELECT m.ad FROM konya.mahalleler m WHERE ST_Touches(m.geom, ST_GeomFromText('POLYGON((32.48 37.86, 32.52 37.86, 32.52 37.90, 32.48 37.90, 32.48 37.86))', 4326));</code><br><br>
+                    <b>2)</b> Konya merkezi (32.4920, 37.8727) etrafı 1km içindeki binalar (DWithin):<br>
+                    <code>SELECT COUNT(*) FROM konya.osm_binalar WHERE ST_DWithin(geom::geography, ST_Point(32.4920, 37.8727, 4326)::geography, 1000);</code><br><br>
+                    <b>3)</b> İpucu: Slide 1.9'da aynı fonksiyonları JOIN ON şartında kullanacağız — fark sadece yazılış şekli!
                   </div>
                 </div>
               </div>
@@ -665,7 +866,7 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
         </div>
       </div>
 
-      <!-- SLAYT 10: 1.9 MEKANSAL JOIN MANTIĞI -->
+      <!-- SLAYT 10: 1.9 HER BINAYA KÖY ADINI YAZDIR -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -679,38 +880,71 @@ WHERE ST_DWithin(geom::geography, 'POINT(32.49 37.87)'::geography, 500); -- 500m
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.9 — JOIN ile Mekansal İlişki</div>
+              <div class="slide-header-title">1.9 — Harita Üzerinden Bağlama</div>
               <div class="slide-header-num">10 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Tabloları <span>Konumla</span> Bağlamak</div>
-                <div class="s-text-tech">ID alanına ihtiyaç duymadan, sadece haritadaki konumları üzerinden iki tabloyu
-                  birleştirmek.</div>
+                <div class="s-headline-tech">Mekansal <span>JOIN</span></div>
+                <div class="s-text-tech">ID numarası kullanmadan, sadece geometri karşılaştırarak iki tabloyu birleştir:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 14px;">
+                  <div style="background: rgba(255,255,255,0.1); padding: 11px; border-radius: 4px; border-left: 4px solid #FFC107;">
+                    <div style="font-weight: bold; color: #FFE082; font-size: 13px;">❌ Eski Yöntem (Normal JOIN)</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">Tablo 1: bina_id=123 → Tablo 2: neighborhood_id=123</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.1); padding: 11px; border-radius: 4px; border-left: 4px solid #4CAF50;">
+                    <div style="font-weight: bold; color: #81C784; font-size: 13px;">✅ Yeni Yöntem (Spatial JOIN)</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">Bu bina hangi mahallede? ST_Within(bina, mahalle) = TRUE</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #bdbdbd; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Mantık:</strong> ON şartında ST_Intersects, ST_Within gibi mekansal fonksiyon kullanıyoruz.
+                </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT b.id, m.ad               -- Bina ID ve mahalle adını seç
-FROM konya.osm_binalar b        -- Binalar tablosunu 'b' olarak al
-JOIN konya.mahalleler m         -- Mahalleler tablosunu 'm' olarak al
-  ON ST_Intersects(b.geom, m.geom) -- Mekansal olarak kesişenleri bağla
-LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
+                <div class="code-block" style="margin-bottom:16px;">-- 📍 Örnek 1: Her bina hangi mahallede?
+SELECT b.id, m.ad
+FROM konya.osm_binalar b
+JOIN konya.mahalleler m
+  ON ST_Within(b.geom, m.geom)
+LIMIT 5;
+
+-- 🔗 Örnek 2: Mahalleler ve komşu mahalleler
+SELECT m1.ad, m2.ad, m1.geom, m2.geom
+FROM konya.mahalleler m1
+JOIN konya.mahalleler m2
+  ON ST_Touches(m1.geom, m2.geom)
+WHERE m1.id = 1;
+
+-- 🏥 Örnek 3: Hastaneler hangi mahallede?
+SELECT p.ad, m.ad
+FROM konya.poi p
+JOIN konya.mahalleler m
+  ON ST_Within(p.geom, m.geom)
+WHERE p.kategori ILIKE '%hastane%'
+LIMIT 5;</div>
 
                 <div class="reveal-box" id="q113">
                   <div class="reveal-trigger" onclick="document.getElementById('q113').classList.toggle('open')">
-                    Kritik Soru: Mekansal Join neden pahalıdır? <span>▼</span>
+                    ON Şartı Nasıl Çalışır? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Çünkü her bina ile her mahalle geometrisini karşılaştırır. Bu yüzden GiST indeksleri mekansal
-                    join'in olmazsa olmazıdır.
+                    Normal JOIN'de `ON b.bina_id = m.mahalle_id` diye eşitlik yazarsın. Mekansal JOIN'de `ON ST_Within(b.geom, m.geom)` yazarsın. Geometriler uygunsa eşleşir — tam o kadar basit!
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g113">
                   <div class="reveal-trigger" onclick="document.getElementById('g113').classList.toggle('open')">
-                    Görev: Hastane-Mahalle Join Yap <span>▼</span>
+                    Görev: Üç Örneği Dene <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT p.ad, m.ad FROM konya.poi p JOIN konya.mahalleler m ON ST_Within(p.geom, m.geom) WHERE p.kategori ILIKE '%hastane%';</code>
+                    <b>1)</b> İlk kodu çalıştır — her binaya mahalle adı yapıştırılıyor<br><br>
+                    <b>2)</b> İkinci kodu çalıştır — 1 numaralı mahallenin komşularını göreceksin<br><br>
+                    <b>3)</b> Üçüncüsü: Hastaneleri mahalleler ile eşleştir<br><br>
+                    <b>İpucu:</b> Tüm örnekler aynı mantık: ON şartında mekansal fonksiyon → otomatik eşleşme!
                   </div>
                 </div>
               </div>
@@ -719,7 +953,7 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
         </div>
       </div>
 
-      <!-- SLAYT 11: 1.10 GiST MEKANSAL İNDEKS -->
+      <!-- SLAYT 11: 1.10 MEKANSAL SORGULARI HIZLANDIR -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -733,47 +967,67 @@ LIMIT 5;                        -- İlk 5 eşleşmeyi göster</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.10 — GiST Mekansal İndeks</div>
+              <div class="slide-header-title">1.10 — Mekansal Sorguları Hızlandır</div>
               <div class="slide-header-num">11 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>Sorguyu</span> Hızlandırmak</div>
-                <div class="s-text-tech">B-tree mekansal sorgular için işe yaramaz. PostGIS bunun için <strong>GiST</strong> ağacını kullanır — geometriyi MBR (Minimum Bounding Rectangle) ile özetler. JOIN ve DWithin'in ışık hızı sırrı budur.</div>
-                <div class="card-tech"
-                  style="background:var(--theme-black); border-color:var(--theme-yellow); margin-top:24px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:14px">Hangi index?</div>
-                  <div style="color:#aaa; font-size:12px; margin-top:4px">Vector veriler için <strong>GiST</strong>. SP-GiST de mevcut ama ileri konu. Raster için ayrı bir mantık.</div>
+                <div class="s-headline-tech">Şehri <span>Bölgelere</span> Ayırmak</div>
+                <div class="s-text-tech">Geometri tablosunda her satırı kontrol etmek çok yavaş olabilir. <strong>GiST index</strong> harita verilerini coğrafi bölgelere ayırarak sorguları <strong>10-1000x hızlandırır</strong>:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 14px;">
+                  <div style="background: #ffebee; padding: 11px; border-radius: 4px; border-left: 4px solid #c62828;">
+                    <div style="font-weight: bold; color: #c62828; font-size: 13px;">❌ Index Yok</div>
+                    <div style="font-size: 11px; color: #424242;">Her binayı kontrol et (1 milyon satır) → çok yavaş</div>
+                  </div>
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                    <div style="font-weight: bold; color: #2e7d32; font-size: 13px;">✅ GiST Index</div>
+                    <div style="font-size: 11px; color: #424242;">Sadece konum 32.49-32.50 arası sorgula (100 satır) → hızlı</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #424242; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #F57C00;">💡 Kütüphane Analojisi:</strong> Kitapları rastgele dizilişten coğrafya-fizik-matematik raflarına ayırmak gibi. Kitap aramak çok daha hızlı olur!
                 </div>
               </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- Mekansal index oluşturma (GiST)
-CREATE INDEX idx_mahalleler_geom ON konya.mahalleler USING GIST (geom);
-CREATE INDEX idx_binalar_geom    ON konya.osm_binalar USING GIST (geom);
 
--- ÖNEMLİ: index sonrası istatistikleri güncelle
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px;">-- 1️⃣ Index var mı kontrol et
+SELECT indexname FROM pg_indexes
+WHERE schemaname = 'konya' AND tablename = 'mahalleler'
+AND indexname LIKE '%geom%';
+
+-- 2️⃣ Eğer yok ise oluştur (zaten varsa bu satırı atla)
+CREATE INDEX IF NOT EXISTS idx_mahalleler_geom ON konya.mahalleler USING GIST (geom);
+
+-- 3️⃣ İstatistikleri güncelle (her zaman güvenli)
 ANALYZE konya.mahalleler;
 
--- Etkiyi gör (Index Scan vs Seq Scan)
-EXPLAIN ANALYZE
-SELECT * FROM konya.mahalleler
-WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
+-- 4️⃣ Index kullanılıyor mu görmek için:
+SELECT indexrelname, idx_scan FROM pg_stat_user_indexes
+WHERE schemaname = 'konya' ORDER BY idx_scan DESC;</div>
 
                 <div class="reveal-box" id="q1gist">
                   <div class="reveal-trigger" onclick="document.getElementById('q1gist').classList.toggle('open')">
-                    Kritik Soru: ANALYZE neden gerekli? <span>▼</span>
+                    Neden ANALYZE Gerekli? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    PostgreSQL planner index'i kullanmak için tablo istatistiklerine bakar. Yeni index sonrası ANALYZE çağırılmazsa eski plan kullanılabilir; index varmış gibi yapılmaz.
+                    PostgreSQL veritabanı index'i bilmek için. ANALYZE sonrasında, sorgu planlayıcısı index'i kullanmaya başlar. Olmazssa index varmış gibi davranmaz — istatistik yoktur.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g1gist">
                   <div class="reveal-trigger" onclick="document.getElementById('g1gist').classList.toggle('open')">
-                    Görev: İndeks Kullanımını Kontrol Et <span>▼</span>
+                    Görev: Index Oluştur <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT indexname, idx_scan, idx_tup_read FROM pg_stat_user_indexes WHERE schemaname = 'konya';</code>
+                    <b>1)</b> Eğer daha yapılmadıysa, bu komutu çalıştır:<br>
+                    <code>CREATE INDEX idx_konya_geom ON konya.mahalleler USING GIST (geom);</code><br><br>
+                    <b>2)</b> Sonra istatistikleri güncelle:<br>
+                    <code>ANALYZE konya.mahalleler;</code><br><br>
+                    <b>3)</b> Index kontrol et:<br>
+                    <code>SELECT indexname, idx_scan FROM pg_stat_user_indexes WHERE schemaname = 'konya';</code><br>
+                    idx_scan > 0 ise index kullanılıyor demektir! ✓
                   </div>
                 </div>
               </div>
@@ -782,7 +1036,7 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
         </div>
       </div>
 
-      <!-- SLAYT 12: 1.11 ÖLÇÜM FONKSİYONLARI -->
+      <!-- SLAYT 12: 1.11 HARITADA ÖLÇÜ AL -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-white">
@@ -796,46 +1050,75 @@ WHERE ST_Intersects(geom, ST_MakePoint(32.49, 37.87));</div>
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.11 — Ölçüm (Distance, Area, Perimeter, Length)</div>
+              <div class="slide-header-title">1.11 — Haritada Ölçü Al</div>
               <div class="slide-header-num">12 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Geometrik <span>Hesaplar</span></div>
-                <div class="s-text-tech">Mesafe, alan ve çevre uzunluğu hesaplamak. Unutmayın: Geography birimi
-                  metredir, Geometry ise derece!</div>
+                <div class="s-headline-tech">Dört Ölçüm <span>İşlemi</span></div>
+                <div class="s-text-tech">Harita verilerinde en yaygın 4 ölçüm:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 14px;">
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #FF9800;">
+                    <div style="font-weight: bold; color: #E65100; font-size: 13px;">📏 ST_Distance</div>
+                    <div style="font-size: 11px; color: #424242;">İki nokta arası kuş uçuşu mesafe (metre)</div>
+                  </div>
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                    <div style="font-weight: bold; color: #2e7d32; font-size: 13px;">📐 ST_Area</div>
+                    <div style="font-size: 11px; color: #424242;">Kapalı alan içinin alanı (m²)</div>
+                  </div>
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1565c0;">
+                    <div style="font-weight: bold; color: #1565c0; font-size: 13px;">🔄 ST_Perimeter</div>
+                    <div style="font-size: 11px; color: #424242;">Alanın sınırını dolaşırsan (metre)</div>
+                  </div>
+                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #6a1b9a;">
+                    <div style="font-weight: bold; color: #6a1b9a; font-size: 13px;">➖ ST_Length</div>
+                    <div style="font-size: 11px; color: #424242;">Çizgi veya yolun toplam uzunluğu (metre)</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #424242; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #F57C00;">💡 Önemli:</strong> Metre cinsinden sonuç için <code>::geography</code> eklemek gerek!
+                </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">-- 3 temel ölçüm fonksiyonu (geography ile metre cinsinden)
-SELECT
-  ad,
-  ST_Area(geom::geography)      AS alan_m2,    -- Alan
-  ST_Perimeter(geom::geography) AS cevre_m,    -- Çevre uzunluğu
-  ST_Length(ST_Boundary(geom)::geography) AS sinir_m -- Sınır uzunluğu
+                <div class="code-block" style="margin-bottom:16px;">-- 📏 İki nokta arası mesafe (Konya → Selçuk)
+SELECT ST_Distance(
+  ST_Point(32.4920, 37.8727, 4326)::geography,  -- Konya merkez
+  ST_Point(32.7631, 37.9279, 4326)::geography   -- Selçuk
+) AS metre;  -- ~30000 metre
+
+-- 📐 Her mahallenin alanı
+SELECT ad, ROUND(ST_Area(geom::geography)) AS m2
 FROM konya.mahalleler LIMIT 3;
 
--- İki nokta arası mesafe (kuş uçuşu)
-SELECT ST_Distance(
-  ST_SetSRID(ST_Point(32.4920, 37.8727), 4326)::geography,
-  ST_SetSRID(ST_Point(32.5120, 37.8927), 4326)::geography
-) AS metre;</div>
+-- 🔄 Her mahallenin çevresi
+SELECT ad, ROUND(ST_Perimeter(geom::geography)) AS metre
+FROM konya.mahalleler LIMIT 3;
+
+-- ➖ Yolların uzunluğu
+SELECT ROUND(ST_Length(geom::geography)::numeric, 2) AS metre
+FROM konya.osm_yollar LIMIT 5;</div>
 
                 <div class="reveal-box" id="q114">
                   <div class="reveal-trigger" onclick="document.getElementById('q114').classList.toggle('open')">
-                    Kritik Soru: ST_Length neden derecedir? <span>▼</span>
+                    Neden ::geography Eklenir? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Eğer SRID 4326 ise birim derecedir. Metre almak için <code>::geography</code> cast'i veya
-                    projeksiyon dönüşümü şarttır.
+                    Geometri derecelerle çalışır (çok küçük sayılar), geography metrelerle çalışır. Geography cast'ı koordinatları derece değil, dünya üzerindeki gerçek mesafe olarak ele alır. Sonuç metre cinsinden çıkar.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g114">
                   <div class="reveal-trigger" onclick="document.getElementById('g114').classList.toggle('open')">
-                    Görev: Yol Uzunluğu Ölç <span>▼</span>
+                    Görev: Dört İşlemi Dene <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_Length(geom::geography) FROM konya.osm_yollar LIMIT 5;</code>
+                    <b>1)</b> Konya merkezi ile Alaaddin Camii arasındaki mesafeyi ölçün (32 aralığında +0.02 = 32.52)<br><br>
+                    <b>2)</b> Mahallelerden birinin alanını bulun<br><br>
+                    <b>3)</b> Bir yolun uzunluğunu ölçün<br><br>
+                    <b>İpucu:</b> Sonuçlarda ROUND() kullanarak tam sayı çıkarabilirsiz.
                   </div>
                 </div>
               </div>
@@ -844,7 +1127,7 @@ SELECT ST_Distance(
         </div>
       </div>
 
-      <!-- SLAYT 13: 1.12 MESAFE YÖNTEMLERİ KARŞILAŞTIRMASI -->
+      <!-- SLAYT 13: 1.12 MESAFE YÖNTEMLERİ DETAYLI -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -861,79 +1144,97 @@ SELECT ST_Distance(
               <div class="slide-header-title">1.12 — Mesafe Yöntemleri Karşılaştırması</div>
               <div class="slide-header-num">13 / 19</div>
             </div>
-            <div style="display:flex; gap:20px; padding:20px 40px; height:calc(100% - 76px); overflow:hidden;">
-              <div style="width:190px; flex-shrink:0; display:flex; flex-direction:column; gap:14px;">
-                <div class="s-headline-tech" style="font-size:32px; line-height:1.1;">Aynı Mesafe — <span>7</span> Farklı Sonuç</div>
-                <div class="s-text-tech" style="font-size:12px;">0.05° hareket 3 yönde ve 7 farklı yöntemle hesaplanıyor. <strong>Web Mercator</strong> ölçüm için kullanılmamalı.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-blue); padding:12px;">
-                  <div style="color:var(--theme-blue); font-weight:800; font-size:12px; margin-bottom:6px;">7 Yöntem</div>
-                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:9.5px; line-height:1.75;">
-                    <li><code style="color:#fff">DistanceSphere</code> — Küre (sabit R)</li>
-                    <li><code style="color:#fff">Haversine</code> — El formülü</li>
-                    <li><code style="color:#fff">geography</code> — Jeodezik</li>
-                    <li><code style="color:#fff">DistanceSpheroid</code> — WGS84</li>
-                    <li><code style="color:#fff">32636</code> UTM 6° — Türkiye</li>
-                    <li><code style="color:#fff">5255</code> TM33 3° — Konya</li>
-                    <li><code style="color:#f66">3857</code> Web — sadece görsel</li>
-                  </ul>
-                </div>
-                <div class="reveal-box" id="q1mes" style="font-size:11px;">
-                  <div class="reveal-trigger" onclick="document.getElementById('q1mes').classList.toggle('open')" style="font-size:11px;">
-                    Web Mercator neden hatalı? <span>▼</span>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Neden <span>Farklı</span> Sonuçlar?</div>
+                <div class="s-text-tech">Dünya yuvarlak, ama matematiksel hesaplama yöntemleri farklı. Konya'da iki nokta arası ölçüm, hangi yöntemi seçersen ona göre değişir:</div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px; font-size: 11px;">
+                  <div style="background: #e8f5e9; padding: 10px; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                    <div style="font-weight: bold; color: #2e7d32;">🔷 DistanceSphere</div>
+                    <div style="font-size: 10px; color: #bdbdbd;">Basit küre formülü. Hızlı ama %0.5 hata.</div>
                   </div>
-                  <div class="reveal-content" style="font-size:11px;">
-                    Konya enleminde (~37.9°) ~25-30% hata verir. Görsel için iyi, ölçüm için kullanmayın.
+                  <div style="background: #fff3e0; padding: 10px; border-radius: 4px; border-left: 4px solid #FF9800;">
+                    <div style="font-weight: bold; color: #E65100;">📐 Haversine</div>
+                    <div style="font-size: 10px; color: #bdbdbd;">Trigonometri formülü. El hesabı için klasik.</div>
+                  </div>
+                  <div style="background: #e3f2fd; padding: 10px; border-radius: 4px; border-left: 4px solid #1976D2;">
+                    <div style="font-weight: bold; color: #1976D2;">✅ GEOGRAPHY</div>
+                    <div style="font-size: 10px; color: #bdbdbd;">En hassas, jeodezik hesaplama. Çoğu için ideal.</div>
+                  </div>
+                  <div style="background: #f3e5f5; padding: 10px; border-radius: 4px; border-left: 4px solid #6a1b9a;">
+                    <div style="font-weight: bold; color: #6a1b9a;">🗺️ Projeksiyon (5255, 32636)</div>
+                    <div style="font-size: 10px; color: #bdbdbd;">Türkiye'ye özel, coğrafi bölge için optimum.</div>
+                  </div>
+                  <div style="background: #ffebee; padding: 10px; border-radius: 4px; border-left: 4px solid #c62828;">
+                    <div style="font-weight: bold; color: #c62828;">❌ Web Mercator (3857)</div>
+                    <div style="font-size: 10px; color: #bdbdbd;">Google Maps görselinde %25-30 hata!</div>
                   </div>
                 </div>
               </div>
-              <div style="flex:1; overflow:hidden; display:flex; flex-direction:column; gap:8px;">
-                <div class="code-block" style="flex:1; overflow-y:auto; font-size:7.5px; line-height:1.4; margin:0; white-space:pre-wrap; word-break:break-word;">WITH geom AS (
-  SELECT
-    ST_SetSRID(ST_Point(32.4846, 37.8719), 4326) AS p0,
-    ST_SetSRID(ST_Point(32.4846 + 0.05, 37.8719), 4326) AS p_east,   -- YATAY
-    ST_SetSRID(ST_Point(32.4846, 37.8719 + 0.05), 4326) AS p_north,  -- DÜŞEY
-    ST_SetSRID(ST_Point(32.4846 - 0.035355, 37.8719 + 0.035355), 4326) AS p_nw -- ÇAPRAZ
-)
-SELECT 'YATAY (DOĞU)' AS yon,
-  ROUND(ST_DistanceSphere(p0, p_east)::numeric, 2)::text AS pg_sphere_m,
-  ROUND((6371000*2*ASIN(SQRT(POWER(SIN(RADIANS(ST_Y(p_east)-ST_Y(p0))/2),2)+COS(RADIANS(ST_Y(p0)))*COS(RADIANS(ST_Y(p_east)))*POWER(SIN(RADIANS(ST_X(p_east)-ST_X(p0))/2),2))))::numeric,2)::text AS math_haversine_m,
-  ROUND(ST_Distance(p0::geography, p_east::geography)::numeric, 2)::text AS geography_m,
-  ROUND(ST_DistanceSpheroid(p0, p_east, 'SPHEROID["WGS 84",6378137,298.257223563]')::numeric, 2)::text AS spheroid_m,
-  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_east, 32636))::numeric, 2)::text AS utm6_m,
-  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_east, 5255))::numeric, 2)::text AS itrf3_m,
-  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_east, 3857))::numeric, 2)::text AS web_mercator_m
-FROM geom
+
+              <div class="s-panel-right">
+                <div class="code-block" style="margin-bottom:16px; font-size: 9px;">-- Aynı iki nokta, farklı yöntemler (Konya merkez - Selçuk)
+SELECT 'DistanceSphere' AS yontem,
+  ROUND(ST_DistanceSphere(
+    ST_Point(32.4920, 37.8727),
+    ST_Point(32.7631, 37.9279))::numeric, 0) AS metre
 UNION ALL
-SELECT 'DÜŞEY (KUZEY)',
-  ROUND(ST_DistanceSphere(p0, p_north)::numeric, 2)::text,
-  ROUND((6371000*2*ASIN(SQRT(POWER(SIN(RADIANS(ST_Y(p_north)-ST_Y(p0))/2),2)+COS(RADIANS(ST_Y(p0)))*COS(RADIANS(ST_Y(p_north)))*POWER(SIN(RADIANS(ST_X(p_north)-ST_X(p0))/2),2))))::numeric,2)::text,
-  ROUND(ST_Distance(p0::geography, p_north::geography)::numeric, 2)::text,
-  ROUND(ST_DistanceSpheroid(p0, p_north, 'SPHEROID["WGS 84",6378137,298.257223563]')::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_north, 32636))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_north, 5255))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_north, 3857))::numeric, 2)::text
-FROM geom
+SELECT 'GEOGRAPHY',
+  ROUND(ST_Distance(
+    ST_Point(32.4920, 37.8727, 4326)::geography,
+    ST_Point(32.7631, 37.9279, 4326)::geography)::numeric, 0)
 UNION ALL
-SELECT 'ÇAPRAZ (HİPOTENÜS)',
-  ROUND(ST_DistanceSphere(p0, p_nw)::numeric, 2)::text,
-  ROUND((6371000*2*ASIN(SQRT(POWER(SIN(RADIANS(ST_Y(p_nw)-ST_Y(p0))/2),2)+COS(RADIANS(ST_Y(p0)))*COS(RADIANS(ST_Y(p_nw)))*POWER(SIN(RADIANS(ST_X(p_nw)-ST_X(p0))/2),2))))::numeric,2)::text,
-  ROUND(ST_Distance(p0::geography, p_nw::geography)::numeric, 2)::text,
-  ROUND(ST_DistanceSpheroid(p0, p_nw, 'SPHEROID["WGS 84",6378137,298.257223563]')::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 32636), ST_Transform(p_nw, 32636))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 5255),  ST_Transform(p_nw, 5255))::numeric, 2)::text,
-  ROUND(ST_Distance(ST_Transform(p0, 3857),  ST_Transform(p_nw, 3857))::numeric, 2)::text
-FROM geom
+SELECT 'Projeksiyon-UTM36',
+  ROUND(ST_Distance(
+    ST_Transform(ST_Point(32.4920, 37.8727, 4326), 32636),
+    ST_Transform(ST_Point(32.7631, 37.9279, 4326), 32636))::numeric, 0)
 UNION ALL
-SELECT 'BİLGİ',
-  'Küre Sabit R', 'Trig Haversine', 'Hassas Jeodezik',
-  'WGS84 Spheroid', 'UTM (6 derece)', 'ITRF (3 derece)', 'Web Mercator (Hatalı)';</div>
+SELECT 'Projeksiyon-TM33',
+  ROUND(ST_Distance(
+    ST_Transform(ST_Point(32.4920, 37.8727, 4326), 5255),
+    ST_Transform(ST_Point(32.7631, 37.9279, 4326), 5255))::numeric, 0)
+UNION ALL
+SELECT 'Web Mercator (YANLIŞ)',
+  ROUND(ST_Distance(
+    ST_Transform(ST_Point(32.4920, 37.8727, 4326), 3857),
+    ST_Transform(ST_Point(32.7631, 37.9279, 4326), 3857))::numeric, 0);
+
+-- Sonuç (Konya merkez - Selçuk):
+-- DistanceSphere     | 24566 m
+-- GEOGRAPHY          | 24618 m (en iyi, jeodezik)
+-- Projeksiyon-UTM36  | 24609 m (çok yakın)
+-- Projeksiyon-TM33   | 24619 m (en hassas Türkiye için)
+-- Web Mercator       | 31167 m (HATA! 26% yanlış!)</div>
+
+                <div class="reveal-box" id="q1mes" style="font-size:11px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('q1mes').classList.toggle('open')" style="font-size:11px;">
+                    Neden GEOGRAPHY ve Projeksiyon aynı sonuç verir? <span>▼</span>
+                  </div>
+                  <div class="reveal-content" style="font-size:11px;">
+                    GEOGRAPHY zaten WGS84 Ellipsoid kullanır (yerkürenin gerçek şekli). Türkiye projeksiyonları (5255 TM33) da aynı Ellipsoid'i temel alır. Bu yüzden sonuçlar çok yakın. Fark sadece hesaplama yöntemi farklılığından gelir — pratik ölçümde fark etmez.
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="g1mes" style="font-size:11px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('g1mes').classList.toggle('open')" style="font-size:11px;">
+                    Görev: Metodları Karşılaştır <span>▼</span>
+                  </div>
+                  <div class="reveal-content" style="font-size:11px;">
+                    <b>1)</b> Yukarıdaki sorguyu çalıştırıp sonuçları not et<br><br>
+                    <b>2)</b> Web Mercator sonucunun neden yanlış olduğunu gör<br><br>
+                    <b>3)</b> Kendi koordinatlarını koy:<br>
+                    <code>SELECT ... ST_Point(sen_lon, sen_lat, 4326)::geography ...</code><br><br>
+                    <b>4)</b> İpucu: GEOGRAPHY ve TM33 neredeyse aynı mı? Evet! O zaman neden TM33? Sadece Türkiye haritaları için.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- SLAYT 14: 1.13 CENTROID VS POINTONSURFACE -->
+      <!-- SLAYT 14: 1.13 MERKEZ NOKTA BULMAK -->
       <div class="slide-outer">
         <div class="slide-wrapper">
           <div class="s-tech-dark">
@@ -947,36 +1248,77 @@ SELECT 'BİLGİ',
                       class="k-mid">BÜYÜKŞEHİR</span><span class="k-bot">BELEDİYESİ</span></div>
                 </div>
               </div>
-              <div class="slide-header-title">1.13 — Centroid vs PointOnSurface</div>
+              <div class="slide-header-title">1.13 — Merkez Nokta: Centroid vs PointOnSurface</div>
               <div class="slide-header-num">14 / 19</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Ağırlık <span>Merkezi</span> Tuzağı</div>
-                <div class="s-text-tech"><strong>ST_Centroid:</strong> Matematiksel merkez (hilal gibi şekillerde dışarı
-                  taşabilir). <strong>ST_PointOnSurface:</strong> Garanti poligonun içinde bir nokta verir.</div>
+                <div class="s-headline-tech">İki Yöntem, <span>Farklı</span> Sonuç</div>
+                <div class="s-text-tech">Her mahalle için etiket veya simge koymak istiyorsan, merkez noktaya ihtiyacın var. Ama hangisini seçersen?</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px; margin-top: 14px;">
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #FF9800;">
+                    <div style="font-weight: bold; color: #E65100; font-size: 13px;">📍 ST_Centroid (Matematiksel)</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">Şeklin ağırlık merkezini hesapla. Hilal/C şeklinde: <strong>DIŞARI taşabilir!</strong></div>
+                  </div>
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                    <div style="font-weight: bold; color: #2e7d32; font-size: 13px;">✅ ST_PointOnSurface (Güvenli)</div>
+                    <div style="font-size: 11px; color: #bdbdbd;">Poligonun <strong>kesin içinde</strong> bir nokta bul. Şekil ne olursa olsun garantili.</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #bdbdbd; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Pratik Kural:</strong> Etiket koymak için PointOnSurface, matematik hesapları için Centroid.
+                </div>
               </div>
+
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ST_AsText(ST_Centroid(geom)) -- Ağırlık merkezini bul ve metne çevir
-FROM konya.mahalleler 
-LIMIT 1;</div>
+                <div class="code-block" style="margin-bottom:16px;">-- 📍 ST_Centroid: Matematiksel merkez
+-- Dezavantaj: C/hilal şekillerde dışarı taşabilir!
+SELECT m.ad,
+  m.geom AS polygon,
+  ST_Centroid(m.geom) AS centroid_nokta
+FROM konya.mahalleler m
+LIMIT 3;
+
+-- ✅ ST_PointOnSurface: Garanti içeride
+-- Avantaj: Her zaman poligon içinde!
+SELECT m.ad,
+  m.geom AS polygon,
+  ST_PointOnSurface(m.geom) AS iceride_nokta
+FROM konya.mahalleler m
+LIMIT 3;
+
+-- 📊 İkisini yan yana karşılaştır:
+SELECT m.ad,
+  m.geom AS polygon,
+  ST_Centroid(m.geom) AS centroid,
+  ST_PointOnSurface(m.geom) AS pointonsurface,
+  ROUND(ST_Distance(
+    ST_Centroid(m.geom)::geography,
+    ST_PointOnSurface(m.geom)::geography
+  )) AS araindaki_mesafe_metre
+FROM konya.mahalleler m
+LIMIT 10;</div>
 
                 <div class="reveal-box" id="q115">
                   <div class="reveal-trigger" onclick="document.getElementById('q115').classList.toggle('open')">
-                    Kritik Soru: Etiketleme için hangisi seçilmeli? <span>▼</span>
+                    Centroid Neden Dışarı Taşar? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Her zaman ST_PointOnSurface. Çünkü bir mahalle etiketinin komşu mahallenin üzerinde görünmesini
-                    istemeyiz.
+                    Matematiksel ağırlık merkezi (center of gravity) her zaman şeklin içinde olmak zorunda değildir. Hilal şekline bak: merkez, ortadaki boş alana düşer (dışında!). PointOnSurface ise şeklin kenarlı bölgesine bakarak, kesin içinde bir nokta bulur.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g115">
                   <div class="reveal-trigger" onclick="document.getElementById('g115').classList.toggle('open')">
-                    Görev: Yüzey Noktasını Bul <span>▼</span>
+                    Görev: Harita Üzerinde Görselleştir <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_AsText(ST_PointOnSurface(geom)) FROM konya.mahalleler LIMIT 1;</code>
+                    <b>1)</b> Harita'da polygon ve her iki merkez noktasını görmek için <b>3. sorguyu çalıştır</b> (en sonda: İkisini yan yana karşılaştır):<br>
+                    <code>SELECT ad, geom, ST_Centroid(geom), ST_PointOnSurface(geom) FROM konya.mahalleler LIMIT 5;</code><br><br>
+                    <b>2)</b> Harita sağ tarafta açılacak. Üç sütunu da göreceksin: polygon sınırı (koyu) + centroid noktaları (kırmızı) + pointonsurface noktaları (mavi).<br><br>
+                    <b>3)</b> Mesafeyi kontrol et: <code>araindaki_mesafe_metre</code> değeri gösterir —  Centroid ne kadar "dışarı çıkıyor" anlamına gelir.
                   </div>
                 </div>
               </div>
@@ -1004,53 +1346,83 @@ LIMIT 1;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Mekansal <span>Overlay</span> İşlemleri</div>
-                <div class="s-text-tech" style="margin-bottom:20px;">İki geometri üzerinde küme mantığıyla çalışan temel 4 overlay fonksiyonu.</div>
-                <div class="card-tech" style="border-color:#1a73e8;">
-                  <div class="card-tech-title" style="color:#1a73e8;">Buffer (Tampon)</div>
-                  <div class="card-tech-text">Geometrinin çevresine verilen mesafede alan oluşturur. Sonuç her zaman <strong>poligon</strong>.</div>
+                <div class="s-headline-tech">Şekilleri <span>Dönüştür</span> &amp; Birleştir</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Bir geometriyi genişletmek, kesişimini bulmak, birleştirmek ya da çıkarmak — dört temel işlem.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 11px;">
+                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1976d2;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">📍 Buffer (Çerçeve/Tampon)</div>
+                    <div style="font-size: 11px; color: #555;">Bir noktanın, çizginin veya alanın çevresine sabit mesafede genişletme. "X metre güvenlik bölgesi çiz" gibi.</div>
+                  </div>
+
+                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #7b1fa2;">
+                    <div style="font-weight: bold; color: #4a148c; font-size: 13px;">🎯 Intersection (Kesişim)</div>
+                    <div style="font-size: 11px; color: #555;">İki geometrinin <strong>ortak kısmı</strong>. İki dairenin üst üste gelen alanı gibi.</div>
+                  </div>
+
+                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #1b5e20;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">➕ Union (Birleştir)</div>
+                    <div style="font-size: 11px; color: #555;">İki geometriyi tek şekil haline getir. Hepsini kapsayan büyük alanı al.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #e65100;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 13px;">➖ Difference (Çıkarma)</div>
+                    <div style="font-size: 11px; color: #555;">A alanından B'yi çıkar. Kalan parça = A — B.</div>
+                  </div>
                 </div>
-                <div class="card-tech" style="border-color:#e53935;">
-                  <div class="card-tech-title" style="color:#e53935;">Intersection / Union / Difference</div>
-                  <div class="card-tech-text"><strong>Intersection:</strong> ortak alan &nbsp;|&nbsp; <strong>Union:</strong> toplam alan &nbsp;|&nbsp; <strong>Difference:</strong> A eksi B alanı</div>
+
+                <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px; color: #555; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FF9800;">💡 Kural:</strong> Buffer yeni poligon yaratır. Intersection/Union/Difference ise mevcut poligonları işler.
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- TAMPON BÖLGE (Buffer) — 500m coğrafi tampon
-SELECT ST_Buffer(geom::geography, 500)::geometry AS tampon_500m
-FROM konya.osm_yollar LIMIT 1;
+                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- 📍 BUFFER: Bir noktanın etrafı 500m tampon
+-- Fikir: Okulu çevreleyen 500m güvenlik bölgesi
+SELECT m.ad,
+  m.geom AS mahalle_orjinal,
+  ST_Buffer(m.geom::geography, 500)::geometry AS etraf_500m
+FROM konya.mahalleler m LIMIT 3;
 
--- KESİŞİM (Intersection) — iki geometrinin ortak alanı
-SELECT ST_Intersection(a.geom, b.geom) AS kesisim_alani
-FROM konya.mahalleler a
-JOIN konya.mahalleler b ON ST_Intersects(a.geom, b.geom)
-WHERE a.ad &lt;&gt; b.ad LIMIT 1;
+-- 🎯 INTERSECTION: Hangi mahallelerin sınırları kesişiyor?
+-- İki komşu mahallenin ortak alanını göster
+SELECT m1.ad AS mahalle_1,
+  m2.ad AS mahalle_2,
+  ST_Intersection(m1.geom, m2.geom) AS kesisim_alani
+FROM konya.mahalleler m1
+JOIN konya.mahalleler m2
+  ON ST_Intersects(m1.geom, m2.geom) AND m1.ad &lt; m2.ad
+LIMIT 3;
 
--- BİRLEŞİM (Union) — ilçe mahallelerini tek sınıra birleştir
-SELECT ST_Union(geom) AS selcuklu_siniri
-FROM konya.mahalleler WHERE ilce = 'Selçuklu';
+-- ➕ UNION: İlçenin tüm mahallelerini tek sınıra birleştir
+SELECT 'Tüm Konya' AS ilçe,
+  ST_Union(geom) AS birlestirilmis_sinir
+FROM konya.mahalleler;
 
--- FARK (Difference) — A'dan B'yi çıkar
-SELECT ST_Difference(a.geom, b.geom) AS a_eksi_b
-FROM konya.mahalleler a
-JOIN konya.mahalleler b ON ST_Intersects(a.geom, b.geom)
-WHERE a.ad &lt;&gt; b.ad LIMIT 1;</div>
+-- ➖ DIFFERENCE: İlçe sınırından mahalle çıkart
+-- İlçe sınırından her mahalle çıkar = o mahalleyi çevreleyen kalan alan
+SELECT m.ad AS mahalle,
+  i.ad AS ilce,
+  ST_Difference(m.geom, i.geom) AS ilce_eksi_mahalle
+FROM konya.ilce_sinirlari i, konya.mahalleler m
+WHERE i.ad = 'Selçuklu' AND m.ilce = 'Selçuklu';</div>
 
                 <div class="reveal-box" id="q116">
                   <div class="reveal-trigger" onclick="document.getElementById('q116').classList.toggle('open')">
-                    Kritik Soru: ST_SymDifference nedir? <span>▼</span>
+                    Buffer Sonucu Her Zaman Poligon mu? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Her iki geometriden de yalnızca <strong>birinde</strong> olan alanlar — matematiksel XOR. <code>ST_SymDifference(A, B) = ST_Union(A,B) - ST_Intersection(A,B)</code>
+                    Evet! <strong>POINT</strong>'ten buffer → POLYGON. <strong>LINESTRING</strong>'den buffer → POLYGON. <strong>POLYGON</strong>'dan buffer → daha büyük POLYGON. Buffer her zaman çoğul geometri (genellikle poligon) verir.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g116">
                   <div class="reveal-trigger" onclick="document.getElementById('g116').classList.toggle('open')">
-                    Görev: SymDifference Hesapla <span>▼</span>
+                    Görev: Mahalle Çevresine Koruma Alanı Çiz <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_AsText(ST_SymDifference(a.geom, b.geom)) FROM konya.mahalleler a, konya.mahalleler b WHERE ST_Intersects(a.geom, b.geom) AND a.ad &lt;&gt; b.ad LIMIT 1;</code>
+                    <b>Senaryo:</b> Seçilen bir mahallenin çevresine 1 km'lik tampon alan (buffer) çiz ve haritada göster.<br><br>
+                    <code>SELECT ad, geom, ST_Buffer(geom::geography, 1000)::geometry AS tampon_1km FROM konya.mahalleler WHERE ad = 'Selçuklu Merkez' LIMIT 1;</code><br><br>
+                    <b>Sonra:</b> Harita'da iki geometriyi göreceksin: orijinal mahalle sınırı + çevresi 1km tampon.
                   </div>
                 </div>
               </div>
@@ -1078,53 +1450,72 @@ WHERE a.ad &lt;&gt; b.ad LIMIT 1;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Birleştir &amp; <span>Kırp</span></div>
-                <div class="s-text-tech" style="margin-bottom:20px;"><strong>Dissolve:</strong> ortak özelliğe göre geometrileri eriterek tek sınır oluşturur. <strong>Clip:</strong> geometriyi verilen bir çerçeve veya maske ile kesmek.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow);">
-                  <div class="card-tech-title">Dissolve = GROUP BY + ST_Union</div>
-                  <div class="card-tech-text" style="color:#aaa;">PostGIS'te bağımsız bir Dissolve fonksiyonu yoktur. <code>GROUP BY ilce + ST_Union(geom)</code> aynı işi yapar.</div>
+                <div class="s-headline-tech">Eritip <span>Birleştir</span> &amp; Kalıpla Kes</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">İki klasik CBS işlemi: küçük parçaları tek parça yapmak (Dissolve) ve bir kalıba göre kesmek (Clip).</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="background: #fff8e1; padding: 12px; border-radius: 4px; border-left: 4px solid #FFC107;">
+                    <div style="font-weight: bold; color: #F57F17; font-size: 14px;">🫠 Dissolve (Erit & Birleştir)</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">Aynı gruba ait küçük parçaları <strong>tek büyük parça</strong> yap. Örnek: bir ilçenin tüm mahallelerini eritip tek ilçe sınırı elde et.</div>
+                    <div style="font-size: 11px; color: #F57F17; margin-top:6px; font-family: monospace;">= GROUP BY + ST_Union</div>
+                  </div>
+
+                  <div style="background: #e0f2f1; padding: 12px; border-radius: 4px; border-left: 4px solid #009688;">
+                    <div style="font-weight: bold; color: #00695C; font-size: 14px;">✂️ Clip (Kalıpla Kes)</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">Bir <strong>kalıp/maske</strong> ver, içinde kalan kısmı kes — kurabiye kalıbı gibi. Maske dışı atılır.</div>
+                    <div style="font-size: 11px; color: #00695C; margin-top:6px; font-family: monospace;">= ST_Intersection + filtre</div>
+                  </div>
                 </div>
-                <div class="card-tech" style="background:#222; border-color:#4db6ac;">
-                  <div class="card-tech-title" style="color:#4db6ac;">Clip = ST_Intersection + ST_Intersects</div>
-                  <div class="card-tech-text" style="color:#aaa;">Kırpma maskesiyle önce <code>&&</code> veya <code>ST_Intersects</code> ile satırları filtrele, sonra <code>ST_Intersection</code> ile kes.</div>
+
+                <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; margin-top: 14px; font-size: 11px; color: #ccc; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Not:</strong> PostGIS'te "Dissolve" ya da "Clip" diye hazır fonksiyon yok. İkisi de bildiğin fonksiyonların birleşimi.
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- BÜTÜNLEŞTİR (Dissolve) — ilçe sınırlarını mahalleleri eriterek oluştur
+                <div class="code-block" style="margin-bottom:16px; font-size:11px;">-- 🫠 DISSOLVE: Mahalleleri eritip ilçe sınırı yap
+-- "ilce" sütununa göre grupla, her grubu ST_Union ile birleştir
 SELECT ilce,
-  ST_Union(geom)  AS ilce_sinir,
-  COUNT(*)        AS mahalle_sayisi,
-  ROUND(ST_Area(ST_Union(geom)::geography)::numeric / 1e6, 2) AS alan_km2
+  COUNT(*)        AS kac_mahalle,
+  ST_Union(geom)  AS ilce_siniri
 FROM konya.mahalleler
-GROUP BY ilce
-ORDER BY alan_km2 DESC;
+GROUP BY ilce;
 
--- KIRPMA (Clip) — tanımlı kutu içinde kalan kısımları kes
-WITH clip_alani AS (
-  SELECT ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326) AS bbox
+-- 🫠 Tek ilçeye odaklan: Selçuklu'nun tüm mahalleleri tek sınır
+SELECT 'Selçuklu' AS ilce,
+  ST_Union(geom) AS birlesik_sinir
+FROM konya.mahalleler
+WHERE ilce = 'Selçuklu';
+
+-- ✂️ CLIP: Mahalleleri bir dikdörtgen kalıpla kes
+-- Adım 1: kalıbı tanımla (bbox)  Adım 2: kesişimi al
+WITH kalip AS (
+  SELECT ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326) AS kutu
 )
 SELECT m.ad,
-  ST_Intersection(m.geom, c.bbox) AS kirpilmis_geom,
-  ROUND(ST_Area(ST_Intersection(m.geom, c.bbox)::geography)::numeric, 2) AS alan_m2
-FROM konya.mahalleler m, clip_alani c
-WHERE m.geom &amp;&amp; c.bbox          -- GiST ön filtre
-  AND ST_Intersects(m.geom, c.bbox);  -- kesin doğrulama</div>
+  ST_Intersection(m.geom, k.kutu) AS kesilmis_parca
+FROM konya.mahalleler m, kalip k
+WHERE ST_Intersects(m.geom, k.kutu)   -- sadece kalıba değenler
+LIMIT 10;</div>
 
                 <div class="reveal-box" id="q1dis">
                   <div class="reveal-trigger" onclick="document.getElementById('q1dis').classList.toggle('open')">
-                    Kritik Soru: Dissolve ile ST_Union farkı? <span>▼</span>
+                    Neden GROUP BY Olmadan Dissolve Olmaz? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    Fark yoktur. "Dissolve" CBS terminolojisi, PostGIS karşılığı <code>GROUP BY + ST_Union</code>'dır. Clip için de bağımsız fonksiyon yoktur; <code>ST_Intersection + ST_Intersects</code> birlikte kullanılır.
+                    <code>ST_Union(geom)</code> tek başına <strong>hepsini</strong> tek parça yapar. <code>GROUP BY ilce</code> ekleyince her ilçe ayrı birleşir. Yani gruplama, "neyi neyle eriteceğini" belirler. Dissolve = hangi gruba aitse onunla eriit.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g1dis">
                   <div class="reveal-trigger" onclick="document.getElementById('g1dis').classList.toggle('open')">
-                    Görev: İlçe Alanlarını Büyükten Küçüğe Sırala <span>▼</span>
+                    Görev: Bir İlçeyi Dissolve Edip Haritada Gör <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ilce, ROUND(ST_Area(ST_Union(geom)::geography)::numeric/1e6, 2) AS km2 FROM konya.mahalleler GROUP BY ilce ORDER BY km2 DESC;</code>
+                    <b>1)</b> Önce mahalleleri ayrı ayrı gör (çok parça):<br>
+                    <code>SELECT ad, geom FROM konya.mahalleler WHERE ilce = 'Karatay';</code><br><br>
+                    <b>2)</b> Şimdi hepsini erit (tek parça):<br>
+                    <code>SELECT ST_Union(geom) FROM konya.mahalleler WHERE ilce = 'Karatay';</code><br><br>
+                    <b>3)</b> Harita'da farkı izle: önce onlarca küçük poligon → sonra tek bütün ilçe sınırı.
                   </div>
                 </div>
               </div>
@@ -1152,64 +1543,79 @@ WHERE m.geom &amp;&amp; c.bbox          -- GiST ön filtre
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Kapsayıcı <span>Geometriler</span></div>
-                <div class="s-text-tech" style="margin-bottom:20px;"><strong>ST_Envelope:</strong> Sınırlayıcı dikdörtgen kutu (Bounding Box / BBox). <strong>ST_ConvexHull:</strong> Lastik bant etkisi — dışbükey minimum zarf. <strong>&amp;&amp; operatörü:</strong> BBox çakışma kontrolü — GiST indeksini doğrudan kullanır, çok hızlı ön filtre.</div>
-                <div class="card-tech" style="background:#222; border-color:var(--theme-yellow); padding:14px 18px;">
-                  <div style="color:var(--theme-yellow); font-weight:800; font-size:12px; margin-bottom:8px;">BBox İşlemleri</div>
-                  <ul style="list-style:none; padding:0; margin:0; color:#aaa; font-size:11px; line-height:2;">
-                    <li><code style="color:#fff">ST_Envelope(geom)</code> — dikdörtgen BBox geometrisi</li>
-                    <li><code style="color:#fff">ST_Extent(geom)</code> — gruba göre toplu BBox</li>
-                    <li><code style="color:#fff">ST_MakeEnvelope(x1,y1,x2,y2,srid)</code> — BBox oluştur</li>
-                    <li><code style="color:#fff">ST_Expand(geom, delta)</code> — BBox'ı genişlet</li>
-                    <li><code style="color:#fff">geom &amp;&amp; bbox</code> — BBox çakışma (indeksli)</li>
-                  </ul>
+                <div class="s-headline-tech">Şekli <span>Kutula</span> ya da Lastikle Sar</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Karmaşık bir şekli basitleştirmenin iki yolu: kabaca bir kutuya koy, ya da etrafına lastik bant ger.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="background: #e3f2fd; padding: 12px; border-radius: 4px; border-left: 4px solid #1976d2;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 14px;">📦 Envelope (Kutu / BBox)</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">Şeklin etrafına <strong>en küçük dikdörtgen</strong>. Kargo kutusu gibi — hep 4 köşe, çok hızlı hesaplanır.</div>
+                  </div>
+
+                  <div style="background: #f3e5f5; padding: 12px; border-radius: 4px; border-left: 4px solid #7b1fa2;">
+                    <div style="font-weight: bold; color: #4a148c; font-size: 14px;">🎈 ConvexHull (Lastik Bant)</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">Tüm noktaların etrafına <strong>gerilmiş lastik bant</strong>. Şekle daha çok benzer, ama içbükey girinti yapmaz.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 12px; border-radius: 4px; border-left: 4px solid #e65100;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 14px;">⚡ &amp;&amp; (Kutular Çakışıyor mu?)</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">İki şeklin kutuları kesişiyor mu? Ölçüm yapmadan önceki <strong>hızlı kontrol</strong> — indeksi kullanır.</div>
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 4px; margin-top: 14px; font-size: 11px; color: #ccc; border-left: 4px solid #FFD54F;">
+                  <strong style="color: #FFD54F;">💡 Kural:</strong> Kutu = en hızlı ama en kaba. Lastik bant = biraz yavaş ama şekle yakın.
                 </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px; font-size:11px; overflow-y:auto; max-height:340px;">-- 1. Tek geometrinin zarfı ve konveks zarfı
-SELECT
-  ST_AsText(ST_Envelope(geom))   AS bbox,
-  ST_AsText(ST_ConvexHull(geom)) AS konveks_zarf,
-  ST_NPoints(ST_Envelope(geom))  AS bbox_nokta_sayisi,
-  ST_NPoints(ST_ConvexHull(geom)) AS hull_nokta_sayisi
-FROM konya.mahalleler LIMIT 1;
+                <div class="code-block" style="margin-bottom:16px; font-size:11px; overflow-y:auto; max-height:340px;">-- 📦 1. Mahallenin kendisi, kutusu ve lastik bandı
+-- Haritada üçünü yan yana gör: gerçek şekil + kutu + hull
+SELECT m.ad,
+  m.geom                  AS gercek_sekil,
+  ST_Envelope(m.geom)     AS kutu,
+  ST_ConvexHull(m.geom)   AS lastik_bant
+FROM konya.mahalleler m
+LIMIT 3;
 
--- 2. İlçe bazlı toplam alan zarfı (aggregate)
-SELECT ilce,
-  ST_AsText(ST_Extent(geom)::geometry)        AS ilce_bbox,
-  ST_AsText(ST_ConvexHull(ST_Union(geom)))    AS ilce_konveks
+-- 🎈 2. ConvexHull farkı: bir ilçenin tüm mahalleleri
+-- Dağınık mahalleleri tek bir lastik bantla sar
+SELECT 'Selçuklu' AS ilce,
+  ST_ConvexHull(ST_Union(geom)) AS lastik_bant
 FROM konya.mahalleler
-GROUP BY ilce;
+WHERE ilce = 'Selçuklu';
 
--- 3. Manuel BBox + && hız filtresi
-WITH alan AS (
-  SELECT ST_MakeEnvelope(32.40, 37.82, 32.60, 37.95, 4326) AS bbox
+-- 📐 3. ST_Extent: Tüm Konya'yı kapsayan tek kutu
+SELECT ST_Extent(geom)::geometry AS tum_konya_kutusu
+FROM konya.mahalleler;
+
+-- ⚡ 4. && operatörü: bir kutuya değen mahalleler (hızlı)
+WITH kalip AS (
+  SELECT ST_MakeEnvelope(32.40, 37.82, 32.60, 37.95, 4326) AS kutu
 )
 SELECT m.ad
-FROM konya.mahalleler m, alan
-WHERE m.geom &amp;&amp; alan.bbox;  -- GiST indeksini kullanır
-
--- 4. BBox'ı genişlet (buffer yerine hızlı yaklaşım)
-SELECT ST_AsText(
-  ST_Expand(ST_Envelope(geom), 0.01)
-) AS genisletilmis_bbox
-FROM konya.mahalleler LIMIT 1;</div>
+FROM konya.mahalleler m, kalip k
+WHERE m.geom &amp;&amp; k.kutu;   -- önce kutular çakışıyor mu?</div>
 
                 <div class="reveal-box" id="q117">
                   <div class="reveal-trigger" onclick="document.getElementById('q117').classList.toggle('open')">
-                    Kritik Soru: Envelope vs ConvexHull? <span>▼</span>
+                    Hangisini Ne Zaman Kullanırım? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <strong>Envelope</strong> her zaman 4 köşeli dikdörtgendir — hesaplaması O(1), çok hızlı. <strong>ConvexHull</strong> geometriye daha yakın, dışbükey bir poligondur — köşe sayısı geometriye göre değişir. <code>&amp;&amp;</code> operatörü Envelope'ları karşılaştırır; bu yüzden ST_Intersects'ten önce otomatik çalışır.
+                    <strong>📦 Envelope:</strong> "Bu şekil kabaca nerede?" — harita ekranını sığdırma, hızlı ön filtre. Her zaman 4 köşe.<br><br>
+                    <strong>🎈 ConvexHull:</strong> "Bu dağınık noktalar hangi alanı kaplıyor?" — örn. bir aracın gittiği bölgenin sınırı. Şekle yakın.<br><br>
+                    <strong>⚡ &amp;&amp;:</strong> İki şekil ölçülmeden önce "kutuları çakışıyor mu?" — çakışmıyorsa hiç uğraşma, çok hızlı.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g117">
                   <div class="reveal-trigger" onclick="document.getElementById('g117').classList.toggle('open')">
-                    Görev: Tüm Konya'nın Zarfı <span>▼</span>
+                    Görev: Kutu ile Lastik Bandı Karşılaştır <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT ST_AsText(ST_Extent(geom)::geometry) FROM konya.mahalleler;</code> — Konya'nın tüm mahallerini kapsayan tek BBox'ı döndürür.
+                    <b>1)</b> Bir mahallenin gerçek şeklini, kutusunu ve lastik bandını birlikte çek:<br>
+                    <code>SELECT geom, ST_Envelope(geom), ST_ConvexHull(geom) FROM konya.mahalleler LIMIT 1;</code><br><br>
+                    <b>2)</b> Harita'da üçünü üst üste gör: kutu en kaba (taşar), lastik bant şekle daha yapışık, geom gerçeği.<br><br>
+                    <b>3)</b> Sonra tüm Konya'nın kutusunu çek: <code>SELECT ST_Extent(geom)::geometry FROM konya.mahalleler;</code>
                   </div>
                 </div>
               </div>
@@ -1237,32 +1643,67 @@ FROM konya.mahalleler LIMIT 1;</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
-                <div class="s-headline-tech">Işık <span>Hızında</span> Mesafe</div>
-                <div class="s-text-tech"><code>&lt;-&gt;</code> operatörü, GiST indeksini kullanarak en yakın nesneleri
-                  milisaniyeler içinde getirir.</div>
+                <div class="s-headline-tech">"En Yakın <span>3 Tanesi</span> Hangisi?"</div>
+                <div class="s-text-tech" style="margin-bottom:14px;">Bir konuma en yakın hastane, durak veya bina — KNN (K-Nearest Neighbors) tam da bunu bulur.</div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="background: #e8f5e9; padding: 12px; border-radius: 4px; border-left: 4px solid #2e7d32;">
+                    <div style="font-weight: bold; color: #1b5e20; font-size: 14px;">🎯 &lt;-&gt; Operatörü (Mesafe Oku)</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">İki nokta arasındaki mesafeyi ölçer. Asıl gücü: <strong>indeksle birlikte</strong> çalışır.</div>
+                  </div>
+
+                  <div style="background: #e3f2fd; padding: 12px; border-radius: 4px; border-left: 4px solid #1976d2;">
+                    <div style="font-weight: bold; color: #0d47a1; font-size: 14px;">📋 ORDER BY + LIMIT Kalıbı</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;"><code>ORDER BY geom &lt;-&gt; nokta</code> ile sırala, <code>LIMIT 3</code> ile en yakın 3'ü al. İşte bu kadar.</div>
+                  </div>
+
+                  <div style="background: #fff3e0; padding: 12px; border-radius: 4px; border-left: 4px solid #e65100;">
+                    <div style="font-weight: bold; color: #e65100; font-size: 14px;">⚡ Neden Çok Hızlı?</div>
+                    <div style="font-size: 11.5px; color: #555; margin-top:4px;">GiST indeksi ağaçta gezerek doğrudan en yakını bulur — tüm tabloyu taramaz.</div>
+                  </div>
+                </div>
+
+                <div style="background: #fffbe6; padding: 10px; border-radius: 4px; margin-top: 14px; font-size: 11px; color: #6b5900; border-left: 4px solid #FFC107;">
+                  <strong>💡 Senaryo:</strong> Kaza ihbarı geldi → en yakın 3 hastaneyi anında bul, ekibi yönlendir.
+                </div>
               </div>
               <div class="s-panel-right">
-                <div class="code-block" style="margin-bottom:16px;">SELECT ad                             -- POI adını seç
-FROM konya.poi                        -- Tabloyu belirt
+                <div class="code-block" style="margin-bottom:16px;">-- 🎯 Bir kazaya en yakın 3 hastane
+SELECT ad,                            -- POI adı
+  geom                                -- Haritada göstermek için
+FROM konya.poi
 WHERE kategori ILIKE '%hastane%'      -- Sadece hastaneler
-ORDER BY geom <-> ST_SetSRID(ST_Point(32.49, 37.87), 4326) -- İndeksle en yakını bul
-LIMIT 3;                              -- En yakın 3 taneyi getir</div>
+ORDER BY geom <-> ST_SetSRID(ST_Point(32.49, 37.87), 4326)
+LIMIT 3;                              -- En yakın 3 tanesi
+
+-- 📏 Mesafeyi de metre olarak göster
+SELECT ad,
+  ROUND(
+    (geom::geography <-> ST_SetSRID(
+       ST_Point(32.49, 37.87), 4326)::geography)
+  ) AS mesafe_metre
+FROM konya.poi
+WHERE kategori ILIKE '%hastane%'
+ORDER BY mesafe_metre
+LIMIT 3;</div>
                 <div class="reveal-box" id="q118">
                   <div class="reveal-trigger" onclick="document.getElementById('q118').classList.toggle('open')">
-                    Kritik Soru: Neden ST_Distance kullanmıyoruz? <span>▼</span>
+                    ORDER BY içinde &lt;-&gt; Neden Şart? <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    ST_Distance tüm tabloyu hesaplayıp sıralar (çok yavaş). <-> operatörü ise indeks ağacında dolaşarak
-                      sadece en yakınları bulur (inanılmaz hızlı!).
+                    Sihir <code>ORDER BY geom &lt;-&gt; nokta</code> ifadesinde gizli. PostgreSQL bunu görünce GiST indeksini kullanıp tabloyu <strong>hiç taramadan</strong> en yakınları sırayla çeker. <code>WHERE</code> içinde değil, <code>ORDER BY</code> içinde olması bu yüzden önemli.
                   </div>
                 </div>
 
                 <div class="reveal-box" id="g118">
                   <div class="reveal-trigger" onclick="document.getElementById('g118').classList.toggle('open')">
-                    Görev: En Yakın 5 Binayı Bul <span>▼</span>
+                    Görev: Bir Noktaya En Yakın 5 Binayı Haritada Gör <span>▼</span>
                   </div>
                   <div class="reveal-content">
-                    <code>SELECT id FROM konya.osm_binalar ORDER BY geom <-> ST_SetSRID(ST_Point(32.4920, 37.8727), 4326) LIMIT 5;</code>
+                    <b>1)</b> En yakın 5 binayı çek (haritada görmek için <code>geom</code> seç):<br>
+                    <code>SELECT geom FROM konya.osm_binalar ORDER BY geom &lt;-&gt; ST_SetSRID(ST_Point(32.4920, 37.8727), 4326) LIMIT 5;</code><br><br>
+                    <b>2)</b> Sonra <code>LIMIT</code>'i değiştir (3 → 10 → 20) ve haritada kaç bina döndüğünü izle.<br><br>
+                    <b>3)</b> Aradığın nokta hep merkezde, en yakın binalar etrafında kümelenir.
                   </div>
                 </div>
               </div>
