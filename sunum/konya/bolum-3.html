@@ -604,16 +604,16 @@
                       <div
                         style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">
                         ▶ ADIM 2 — Vertices Tablosu</div>
-                      <div class="code-block" style="font-size:8.5px; margin-bottom:5px;">DROP TABLE IF EXISTS
-                        konya.osm_yollar_noded_vertices_pgr;
-                        CREATE TABLE konya.osm_yollar_noded_vertices_pgr AS
-                        WITH ep AS (
-                        SELECT ST_StartPoint(geom) AS the_geom FROM konya.osm_yollar_noded
-                        UNION SELECT ST_EndPoint(geom) FROM konya.osm_yollar_noded)
-                        SELECT (row_number() OVER ())::integer AS id, the_geom FROM ep;
-                        ALTER TABLE konya.osm_yollar_noded_vertices_pgr ADD PRIMARY KEY (id);
-                        ALTER TABLE konya.osm_yollar_noded_vertices_pgr ADD COLUMN cnt integer DEFAULT 0;
-                        CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
+                      <div class="code-block" style="font-size:8.5px; margin-bottom:5px;">DROP TABLE IF EXISTS konya.osm_yollar_noded_vertices_pgr;
+CREATE TABLE konya.osm_yollar_noded_vertices_pgr AS
+WITH ep AS (
+  SELECT ST_StartPoint(geom) AS the_geom FROM konya.osm_yollar_noded
+  UNION SELECT ST_EndPoint(geom) FROM konya.osm_yollar_noded)
+SELECT (row_number() OVER ())::integer AS id, the_geom FROM ep;
+
+ALTER TABLE konya.osm_yollar_noded_vertices_pgr ADD PRIMARY KEY (id);
+ALTER TABLE konya.osm_yollar_noded_vertices_pgr ADD COLUMN cnt integer DEFAULT 0;
+CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
                       <div
                         style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">
                         ▶ ADIM 3 — source / target / cnt Doldur</div>
