@@ -202,8 +202,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Veri <span>Kümeleme</span></div>
-                <div class="s-text-tech">Noktaları birbirine en yakın "merkezlere" (K) göre gruplandırarak hizmet
-                  alanlarını optimize etmek.</div>
+                <div class="s-text-tech">Noktaları K merkeze göre grupla — hizmet bölgesi planlamasının temeli.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📦 K-Means Mantığı</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">K adet merkez belirle, her noktayı en yakın merkeze ata, merkezleri ortalamayla güncelle — yakınsayana kadar tekrarla.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🚛 Analoji: Çöp Kamyonu Bölgeleri</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">10 kamyonunuz varsa K=10. Her mahalle en yakın depoya atanır — her kamyon eşit yüklü çalışır.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">⚙️ OVER() — Pencere Fonksiyonu</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>ST_ClusterKMeans(geom, K) OVER()</code> tüm satırlara tek sorguda <code>cluster_id</code> atar. JOIN gerekmez.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                    <div style="font-weight:bold; color:#880e4f; font-size:13px;">⚠️ K Önceden Bilinmeli</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Kaç bölge istediğinizi bilmiyorsanız DBSCAN daha uygundur — K'yı veriden kendisi çıkarır.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block">SELECT ST_ClusterKMeans(geom, 10) OVER() AS cluster_id , geom FROM konya.poi
@@ -244,8 +261,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Gürültüyü <span>Ayıkla</span></div>
-                <div class="s-text-tech">Belirli bir mesafe içinde (eps) en az N noktanın birleştiği "doğal" kümeleri
-                  tespit etmek.</div>
+                <div class="s-text-tech">Yoğun alanlardaki noktaları küme say, izole olanları gürültü olarak işaretle.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🔍 DBSCAN Mantığı</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Noktaları mesafe (eps) ve minimum sayı (minpoints) ile gruplar. K bilinmez — kümeler veriden kendiliğinden çıkar.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">📏 eps = Arama Yarıçapı</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Bir noktanın komşu sayacağı maksimum mesafe. Metre cinsinden (projeksiyon sonrası). Örnek: 150m yarıçap.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🔢 minpoints = Küme Eşiği</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Bir bölgede küme oluşması için gereken minimum nokta sayısı. Örnek: 5 kaza → kara nokta.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">🗑️ -1 = Gürültü Noktası</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>cluster_id = -1</code> dönen nokta hiçbir kümeye dahil değil. Rastgele oluşmuş, kronik değil.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block">SELECT ST_ClusterDBSCAN(ST_Transform(geom, 5255), 150, 5) OVER() AS cluster_id,
@@ -286,8 +320,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Uber H3 <span>Index</span></div>
-                <div class="s-text-tech">Uber'in geliştirdiği küresel ve hiyerarşik (iç içe geçen) altıgen ağ sistemi
-                  ile yüksek performanslı mekansal indeksleme yapmak.</div>
+                <div class="s-text-tech">Dünya yüzeyini eşit altıgenlere böl — her noktaya hücre ID'si ata.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🌐 H3 Nedir?</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Uber'in geliştirdiği küresel altıgen ızgara sistemi. Her koordinata benzersiz bir hücre kodu atar — karşılaştırma sadece string eşleşmesidir.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🔢 Çözünürlük: 0 → 15</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">0 = devasa kıta hücresi, 15 = 1m² hücre. Çözünürlük 9 ≈ 100×100m — şehir analizi için ideal seviye.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">⚡ Neden Hızlı?</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Geometri hesabı yapmaz — sadece hücre ID'lerini karşılaştırır. Milyonlarca noktayı saniyeler içinde gruplar.</div>
+                  </div>
+                  <div style="background:#f3e5f5; padding:11px; border-radius:4px; border-left:4px solid #6a1b9a;">
+                    <div style="font-weight:bold; color:#4a148c; font-size:13px;">🏗️ Hiyerarşi</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Çözünürlük 8 hücresi tam 7 adet Çözünürlük 9 hücresini kapsar. Yakınlaştır/uzaklaştır analizleri tek sorgu ile yapılır.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block">SELECT h3_cell_to_boundary_geometry(h3_lat_lng_to_cell(geom, 9)) AS h3_geom,
@@ -336,10 +387,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Metod <span>Karşılaştırma</span></div>
-                <div class="s-text-tech"><b>KMeans:</b> Kaynak planlama (örn. 5 çöp kamyonuna bölge
-                  atama).<br><br><b>DBSCAN:</b> Sıcak nokta (Hotspot) tespiti (örn. trafik kaza sınırlarını
-                  çizme).<br><br><b>H3 (Hexagon):</b> Olay istatistikleri ve ısı haritaları (örn. tüm şehrin şikayet
-                  yoğunluğunu görme).</div>
+                <div class="s-text-tech">Üç yöntem — üç farklı soru. Doğru soruya doğru araç.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🔵 K-Means — K BELLİ</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">"11 itfaiye istasyonu kurulacak, her birine bölge ata." K önceden belli → kaynak atama ve bölge planlama.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">🔴 DBSCAN — K BELİRSİZ</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">"Kaç tane kara nokta var?" K bilinmez → yoğun kaza odaklarını otomatik bul, izole noktaları ele.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🟡 H3 — TÜM ŞEHİR TARAMASI</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">"Hangi mahallede şikayet yoğun?" Tüm şehri standart hücrelere oturtur, sayım ve ısı haritası için ideal.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">⚖️ Seçim Rehberi</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">"Kaç bölge?" → K-Means &nbsp;|&nbsp; "Nerede sorun?" → DBSCAN &nbsp;|&nbsp; "Tüm şehri tara" → H3</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="code-block">-- Hangi yöntemi nerede kullanmalıyız?
@@ -381,8 +447,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Şehri <span>Anlamak</span></div>
-                <div class="s-text-tech">Bir şehrin yol ağını veritabanında nasıl modelleriz? Cevap: <b>Graf
-                    Teorisi</b>. Google Maps, Yandex Navi ve tüm navigasyon uygulamaları bu mantığı kullanır.</div>
+                <div class="s-text-tech">Google Maps, Yandex Navi — hepsi aynı mantık: Graf Teorisi.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🔵 Node (Düğüm) = Kavşak</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">İki sokağın birleştiği her nokta bir Node. Benzersiz ID taşır. pgRouting rotayı bu ID'ler arasında hesaplar.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🟡 Edge (Kenar) = Sokak</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">İki kavşağı bağlayan yol parçası. Her Edge'in <code>source</code> (nereden) ve <code>target</code> (nereye) Node'u var.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">💰 Cost (Maliyet) = Bedel</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">O sokaktan geçmenin bedeli: mesafe (m), süre (dk) veya yakıt. pgRouting toplam maliyeti en düşük yolu bulur.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                    <div style="font-weight:bold; color:#880e4f; font-size:13px;">🔄 reverse_cost = Geri Yön</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Tek yönlü sokakta geri yön maliyeti <code>-1</code> — pgRouting bu yolu tersine geçilemez sayar.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="card-tech">
@@ -431,8 +514,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Veri <span>Keşfi</span></div>
-                <div class="s-text-tech">Rota hesabına başlamadan önce <code>konya.osm_yollar</code> tablosunu
-                  inceleyelim. Hangi kolonlar var? Veriler hazır mı?</div>
+                <div class="s-text-tech">Rota hesabına başlamadan önce verimizi tanıyalım.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">📋 Tablo: konya.osm_yollar</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">OSM'den alınan yol geometrileri. Kolonlar: <code>id, ad, tip, ilce, one_way, source, target, cost, reverse_cost, geom</code></div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">❓ source/target Neden NULL?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Ham OSM verisi sadece geometri içerir, kavşak bilgisi yoktur. <code>source</code> ve <code>target</code> topoloji kurulurken doldurulur.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">↔️ one_way Değerleri</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>1</code> = tek yönlü, <code>0</code> = çift yönlü. OSM'deki <code>oneway=yes</code> import sırasında dönüştürülür.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">🎯 Hazırlık Adımları</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">1) Veri sayımı → 2) Kolon kontrolü → 3) one_way dağılımı → 4) source/target boşluk kontrolü.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="compat-badge">✓ pgRouting 3.x &amp; 4.x — Her İki Sürümde Çalışır</div>
@@ -492,8 +592,25 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Yolun <span>Bedeli</span></div>
-                <div class="s-text-tech">Her yol parçasının (Edge) bir <b>maliyeti</b> olmalı. Maliyet olmadan rota
-                  hesaplanamaz. En basit maliyet: yolun metre cinsinden uzunluğu.</div>
+                <div class="s-text-tech">Maliyet olmadan rota hesaplanamaz. En basit yöntem: metre cinsinden uzunluk.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">💰 cost = İleri Yön</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>ST_Length(geom::geography)</code> metre cinsinden uzunluk verir. Bu değer <code>cost</code> kolonuna yazılır.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🔄 reverse_cost = Geri Yön</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Tek yönlü yolda <code>reverse_cost = -1</code> (geçilemez). Çift yönlüde <code>cost</code> ile aynı değer.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">⏱️ Süre Bazlı Maliyet</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>uzunluk / (hiz_limiti × 1000/3600)</code> formülü saniye cinsinden süre verir. Gerçekçi rotalama için kullanılır.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                    <div style="font-weight:bold; color:#880e4f; font-size:13px;">🎯 Maliyet Ne Kadar Gerçekçi?</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Maliyet formülü ne kadar gerçeği yansıtırsa rota o kadar doğru olur. Yakıt, trafik, eğim eklenebilir.</div>
+                  </div>
+                </div>
               </div>
               <div class="s-panel-right">
                 <div class="compat-badge">✓ pgRouting 3.x &amp; 4.x — Her İki Sürümde Çalışır</div>
@@ -557,17 +674,24 @@
             <div class="s-body-grid">
               <div class="s-panel-left">
                 <div class="s-headline-tech">Ağı <span>Örmek</span></div>
-                <div class="s-text-tech">Kesişen ama uç noktada birleşmeyen yolları kırıntılara ayır, sonra topoloji
-                  kur.<br><br>
-                  <span
-                    style="display:inline-block; background:var(--theme-yellow); color:var(--theme-black); font-size:0.72em; font-weight:800; padding:2px 8px; border-radius:3px;">pgRouting
-                    4.x</span>&nbsp;
-                  <code>pgr_nodeNetwork</code> ve <code>pgr_createTopology</code> <b>kaldırıldı</b> — PostGIS
-                  <code>ST_Node</code> + manuel tablo oluşturma ile 3 adımda yapılır.<br><br>
-                  <span
-                    style="display:inline-block; background:#555; color:#fff; font-size:0.72em; font-weight:700; padding:2px 8px; border-radius:3px;">pgRouting
-                    3.x</span>&nbsp;
-                  <code>pgr_nodeNetwork</code> + <code>pgr_createTopology</code> — sadece 2 satır SQL.
+                <div class="s-text-tech">Kesişen ama birleşmeyen yolları kırıntılara ayır, kavşak tablasını oluştur.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🕸️ Topoloji Nedir?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">T-kavşakta iki yol geometrik olarak kesişir ama veritabanında ayrı çizgilerdir. Topoloji bu noktaları birbirine <b>bağlar</b>.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;"><span style="background:var(--theme-yellow); color:var(--theme-black); font-size:9px; padding:1px 6px; border-radius:2px; margin-right:4px;">4.x</span>3 Adım (Manuel)</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><b>ADIM 1</b>: <code>ST_Node</code> ile yolları kavşaklarda böl → <b>ADIM 2</b>: Vertices tablosu oluştur → <b>ADIM 3</b>: source/target doldur.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;"><span style="background:#555; color:#fff; font-size:9px; padding:1px 6px; border-radius:2px; margin-right:4px;">3.x</span>2 Satır SQL</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>pgr_nodeNetwork</code> + <code>pgr_createTopology</code> — her şeyi otomatik yapar. 4.x'te bu fonksiyonlar kaldırıldı.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">⚠️ Sonuç: Noded Tablo</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>osm_yollar_noded</code>: bölünmüş yollar. <code>osm_yollar_noded_vertices_pgr</code>: tüm kavşak noktaları ve ID'leri.</div>
+                  </div>
                 </div>
               </div>
               <div id="s09" class="s-panel-right">
@@ -638,22 +762,31 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
                   </div>
 
                   <div class="ver-block v3">
-                    <div class="code-block" style="font-size:10.5px;">-- ADIM 1: Ağı node et (kesişimlerde böl)
-                      -- → konya.osm_yollar_noded tablosu + old_id kolonu otomatik oluşur
+                    <div class="code-block" style="font-size:10.5px;">-- pgRouting 3.x: schema-qualified adlarda hata verir,
+                      -- search_path ile schema'yı aktif et
+                      SET search_path = konya, public;
+
+                      -- Önceki yarım çalışmadan kalan tabloları temizle (idempotent)
+                      DROP TABLE IF EXISTS osm_yollar_noded, osm_yollar_noded_vertices_pgr CASCADE;
+
+                      -- ADIM 1: Ağı node et (kesişimlerde böl)
+                      -- → osm_yollar_noded tablosu + old_id kolonu otomatik oluşur
                       SELECT pgr_nodeNetwork(
-                      'konya.osm_yollar',
-                      0.00001, -- tolerans (derece)
-                      'id', -- PK kolonu
-                      'geom' -- geometri kolonu
+                      'osm_yollar',   -- schema prefix OLMADAN
+                      0.00001,        -- tolerans (derece)
+                      'id',           -- PK kolonu
+                      'geom'          -- geometri kolonu
                       );
 
                       -- ADIM 2: Topoloji kur
-                      -- → konya.osm_yollar_noded_vertices_pgr otomatik oluşur
+                      -- → osm_yollar_noded_vertices_pgr otomatik oluşur
                       -- (id, the_geom, cnt, chk, ein, eout kolonları)
                       SELECT pgr_createTopology(
-                      'konya.osm_yollar_noded',
+                      'osm_yollar_noded',  -- schema prefix OLMADAN
                       0.00001, 'geom', 'id'
                       );
+
+                      RESET search_path;
 
                       -- Doğrulama
                       SELECT count(*) AS kavsaklar
@@ -705,8 +838,25 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Sağlık <span>Taraması</span></div>
-                  <div class="s-text-tech">Topoloji oluşturduk ama ağ sağlıklı mı? Kopuk yollar, çıkmaz sokaklar veya
-                    birleşmeyen uçlar "Rota bulunamadı" hatasına yol açar.</div>
+                  <div class="s-text-tech">Topoloji kuruldu ama ağ sağlıklı mı? Kopukluk var mı?</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🔚 Çıkmaz Sokak (cnt=1)</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Sadece bir yola bağlı kavşak. Doğal bir cadde sonu — sorun değil, rota hesabını etkilemez.</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">❌ Kopuk Bileşen (isolated)</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Ana ağdan tamamen ayrı adacık. Başlangıç veya bitiş bu adacıktaysa "No path found" hatası kesindir.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">✅ Sağlıklı Ağ Kriteri</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Ana bileşen node'larının %90+ oranı kapsamalı. Bileşen sayısı 1'e yakın ise ağ kullanıma hazır.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">🔧 pgRouting 4.x Farkı</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>pgr_analyzeGraph</code> kaldırıldı. Yerine <code>pgr_connectedComponents</code> + edge sayımı ile aynı bilgi alınır.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right" id="s10">
                   <div class="ver-tabs">
@@ -746,13 +896,15 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
                       );</div>
                   </div>
                   <div class="ver-block v3">
-                    <div class="code-block" style="font-size:11px;">-- Tek komutla tam ağ analizi
+                    <div class="code-block" style="font-size:11px;">-- Tek komutla tam ağ analizi (schema prefix OLMADAN)
+                      SET search_path = konya, public;
                       -- Sonuçlar NOTICE mesajlarında görünür
                       SELECT pgr_analyzeGraph(
-                      'konya.osm_yollar_noded',
+                      'osm_yollar_noded',
                       0.00001,
                       'geom', 'id', 'source', 'target'
                       );
+                      RESET search_path;
                       -- NOTICE'e bakın:
                       -- "Dead ends" → çıkmaz sokak (doğal, sorun yok)
                       -- "Isolated" → kopuk yollar (Sorunlu — rota bulunamaz!)
@@ -810,8 +962,25 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">"No Path <span>Found"</span></div>
-                  <div class="s-text-tech">Dijkstra başlangıç ve bitiş node'ları <b>aynı bağlı bileşende</b> değilse
-                    rota bulunamaz. Slayt 10'daki sağlık raporu özet verdi; şimdi bileşenleri TEK TEK ölçelim.</div>
+                  <div class="s-text-tech">Başlangıç ve bitiş aynı bileşende değilse rota bulunamaz.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🧩 Bileşen (Component) Nedir?</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Birbirine bağlı yollar kümesi. Büyük şehirde 1 ana bileşen + birkaç küçük adacık olabilir.</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">❌ Hata Nedeni</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Başlangıç node'u bileşen 1'de, bitiş bileşen 5'te ise aralarında yol yoktur. pgRouting hata verir.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🔧 Çözüm Yolu</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Sorgu 2 ile bileşen dağılımına bakın. Ana bileşen %90'ın altındaysa toleransı artırıp topolojiyi yeniden kurun.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">💡 Üretim İpucu</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>pgr_connectedComponents</code> sonucunu kalıcı kolonda saklayın — her sorguda yeniden hesaplamak gereksiz yük oluşturur.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div
@@ -890,8 +1059,24 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Adres → <span>Kavşak</span></div>
-                  <div class="s-text-tech">pgRouting sokak ismi veya adres anlamaz; sadece <b>Node ID</b> numaralarıyla
-                    çalışır. "Stadyum'dan Alaaddin Tepesi'ne" demek yerine "Node 1842'den Node 5671'e" demelisiniz.
+                  <div class="s-text-tech">pgRouting isim anlamaz — sadece Node ID'si ile konuşur.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">📍 Koordinat → Node ID</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">"Stadyum" adresini koordinata çevir (32.4885, 37.9479), ardından KNN operatörü (<code>&lt;-&gt;</code>) ile en yakın Node ID'yi bul.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">⚡ KNN: Neden Hızlı?</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>&lt;-&gt;</code> operatörü GiST indeksini kullanır — tüm tabloyu taramak yerine en yakın noktayı anında bulur.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🗺️ İki Nokta İçin İki Sorgu</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Başlangıç ve bitiş için ayrı ayrı Node ID bulun. Bu iki ID'yi Dijkstra sorgusuna yazacaksınız.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ce93d8;">
+                      <div style="font-weight:bold; color:#ce93d8; font-size:13px;">💡 CTE ile Tek Sorguda</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Sonraki slaytlarda başlangıç/bitiş CTE içinde hesaplanır — ayrıca not almanıza gerek kalmaz.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="s-panel-right">
@@ -947,37 +1132,54 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">İlk <span>Rota</span></div>
-                  <div class="s-text-tech">Dijkstra algoritması başlangıç kavşağından bitiş kavşağına kadar <b>en düşük
-                      toplam maliyetli</b> yolu hesaplar. Çıktı, sırayla geçilecek kavşak ve sokak listesidir.</div>
+                  <div class="s-text-tech">En düşük toplam maliyetli yolu adım adım bulur.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🧮 Algoritma Mantığı</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Başlangıç node'undan tüm komşulara yayıl, her adımda en düşük birikimli maliyetli yolu takip et — ta hedefe kadar.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📊 Çıktı Kolonları</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>seq</code> adım sırası · <code>node</code> kavşak ID · <code>edge</code> sokak ID · <code>cost</code> o adım metresi · <code>agg_cost</code> toplam metre</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">↔️ directed Parametresi</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>directed := false</code> → tüm sokaklar çift yönlü (basit/öğretim). <code>directed := true</code> + <code>reverse_cost</code> → tek yön kuralı uygulanır (gerçek trafik).</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">⚠️ Garanti: Her Zaman Optimal</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Dijkstra kesinlikle en kısa yolu bulur — ama büyük graflarda tüm ağı tarar. Hız gerekirse A* bakın.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div
                     style="font-size:9px; font-weight:700; color:#888; letter-spacing:0.08em; margin-bottom:4px; text-transform:uppercase;">
                     ✓ pgRouting 3.x &amp; 4.x — Her İki Sürümde Çalışır</div>
-                  <div class="code-block" style="font-size:11px;">-- CTE ile başlangıç/bitiş node'larını inline bul
-                    WITH baslangic AS (
-                    SELECT id FROM konya.osm_yollar_noded_vertices_pgr
-                    ORDER BY the_geom <-> ST_SetSRID(
-                      ST_MakePoint(32.488560, 37.947955), 4326) -- Stadyum
-                      LIMIT 1
-                      ),
-                      bitis AS (
-                      SELECT id FROM konya.osm_yollar_noded_vertices_pgr
-                      ORDER BY the_geom <-> ST_SetSRID(
-                        ST_MakePoint(32.491773, 37.873543), 4326) -- Alaaddin
-                        LIMIT 1
-                        )
-                        SELECT seq, node, edge, cost, agg_cost
-                        FROM pgr_dijkstra(
-                        'SELECT n.id, n.source, n.target,
-                        ST_Length(n.geom::geography) AS cost,
-                        CASE WHEN o.one_way = 1 THEN -1
-                        ELSE ST_Length(n.geom::geography) END AS reverse_cost
-                        FROM konya.osm_yollar_noded n
-                        LEFT JOIN konya.osm_yollar o ON n.old_id = o.id',
-                        (SELECT id FROM baslangic),
-                        (SELECT id FROM bitis)
-                        );</div>
+                  <div
+                    style="font-size:10px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:3px;">
+                    ▶ ADIM 1 — Başlangıç / bitiş kavşak ID'lerini bul</div>
+                  <div class="code-block" style="font-size:11px; margin-bottom:8px;">-- Stadyum'a en yakın kavşak
+SELECT id FROM konya.osm_yollar_noded_vertices_pgr
+ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.488560, 37.947955), 4326)
+LIMIT 1;   -- örn. 11570
+
+-- Alaaddin'e en yakın kavşak
+SELECT id FROM konya.osm_yollar_noded_vertices_pgr
+ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint(32.491773, 37.873543), 4326)
+LIMIT 1;   -- örn. 15414</div>
+                  <div
+                    style="font-size:10px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin:8px 0 3px;">
+                    ▶ ADIM 2 — En kısa yolu hesapla (ID'leri elle yaz)</div>
+                  <div class="code-block" style="font-size:11px;">SELECT seq, node, edge, cost, agg_cost
+FROM pgr_dijkstra(
+  'SELECT id, source, target,
+          ST_Length(geom::geography) AS cost
+   FROM konya.osm_yollar_noded',
+  11570,              -- ADIM 1 başlangıç ID
+  15414,              -- ADIM 1 bitiş ID
+  directed := false   -- sokaklar çift yönlü kabul edilir
+);</div>
                   <div class="info-box"
                     style="margin-top:15px; background:rgba(245,197,24,0.08); padding:15px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.85em;">
                     <div style="margin-bottom:8px;"><strong>📊 Sonuç Sütunları:</strong></div>
@@ -1020,9 +1222,17 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Daha <span>Hızlı</span></div>
-                  <div class="s-text-tech">A* (A-Star), Dijkstra'ya ek olarak <b>koordinat sezgisi</b> kullanır. Her
-                    adımda hedefe olan Haversine mesafesini hesaplar ve önce o yönü araştırır — büyük graflarda belirgin
-                    hız avantajı sağlar.</div>
+                  <div class="s-text-tech">Dijkstra + yön sezgisi = A*. Büyük graflarda 2–5× daha hızlı.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:12px;">🧭 Sezgi (Heuristic)</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">Her adımda hedefe kuş uçuşu mesafeyi hesaplar. Hedefe yaklaşan yolları önce araştırır, geri kalan ağa vakit harcamaz.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:12px;">📐 x1,y1,x2,y2 Neden Gerekli?</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">A* her yol segmentinin başlangıç/bitiş koordinatlarını bilmeli. <code>ST_StartPoint/EndPoint</code> ile geometriden çıkarılır.</div>
+                    </div>
+                  </div>
                   <div class="info-box"
                     style="margin-top:20px; background:rgba(245,197,24,0.06); padding:15px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.8em;">
                     <table style="width:100%; border-collapse:collapse; color:#ccc;">
@@ -1132,8 +1342,21 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Çiz ve <span>Gör</span></div>
-                  <div class="s-text-tech">Dijkstra bize sadece ID listesi verir, geometri vermez. Rotayı haritada
-                    çizebilmek için sonuçları <b>yol tablosuna JOIN</b> etmemiz gerekir.</div>
+                  <div class="s-text-tech">Dijkstra ID listesi verir, geometri vermez — JOIN ile sokak çizgisini ekle.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🔗 JOIN Mantığı</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>d.edge = n.id</code> → noded tablodaki sokak geometrisini getir. <code>n.old_id = y.id</code> → orijinal tablodaki sokak adını getir.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🗺️ Tek LineString</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>ST_LineMerge(ST_Union(geom))</code> tüm rota parçalarını tek çizgiye birleştirir — QGIS'te tek katman olarak görünür.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">📋 Her Adım Ayrı Satır</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">İlk sorgu her sokağı ayrı satırda listeler: sıra numarası, sokak adı, o adım ve birikimli metre bilgisi.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div
@@ -1220,9 +1443,25 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Pusula: <span>İzokron</span></div>
-                  <div class="s-text-tech">"Bu itfaiye istasyonundan <b>1500 metre</b> içinde hangi sokaklara
-                    ulaşılabilir?" sorusunu cevaplar. Buffer (tampon) daire çizer ve binaları delip geçer. İzokron ise
-                    gerçek yol ağını kullanır.</div>
+                  <div class="s-text-tech">"1500 metre içinde hangi sokaklara ulaşılabilir?" — gerçek yol ağıyla.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🔵 İzokron vs Buffer</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>ST_Buffer</code> kuş uçuşu daire çizer — duvarları, nehirleri delip geçer. İzokron gerçek sokak ağını kullanır.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📐 pgr_drivingDistance</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Bir başlangıç noktasından belirli maliyet bütçesiyle ulaşılabilen tüm kavşakları döndürür.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">🏠 Servis Alanı Poligonu</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>ST_ConcaveHull</code> ulaşılabilen kavşak noktalarından gerçekçi bir alan sınırı oluşturur.</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">🚒 Uygulama: İtfaiye Kapsama</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">"3 km içinde hangi mahalleler bu istasyondan hizmet alır?" Planlama kararları için kritik analiz.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div
@@ -1291,8 +1530,25 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Gezgin <span>Satıcı</span></div>
-                  <div class="s-text-tech">5 çöp konteynerine uğraman gerekiyor. Hangi <b>sırayla</b> gidersen toplam
-                    yol en kısa olur? TSP (Travelling Salesman Problem) bu soruyu cevaplar.</div>
+                  <div class="s-text-tech">5 durak, hangi sırayla gidersen toplam yol en kısa? TSP bunu çözer.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🗺️ TSP Nedir?</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">N durak arasında en kısa turu bulur. Çöp toplama, seyyar satıcı, saha müfettişi — her çoklu durak senaryosu.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">📐 pgr_TSPeuclidean</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Koordinat (x,y) tabanlı kuş uçuşu mesafeyle sıralar. Hızlı ama sokak gerçeğini yansıtmaz.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🧮 pgr_TSP + Maliyet Matrisi</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Gerçek yol mesafesiyle TSP için önce <code>pgr_dijkstraCostMatrix</code> ile mesafe matrisi üret, sonra <code>pgr_TSP</code>'a ver.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                      <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">⚠️ Optimal Değil, "İyi"</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Simulated Annealing sezgisel — iki çalıştırma %5 farklı sıra verebilir. Gerçek optimum hesaplanamaz (NP-zor).</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div
@@ -1353,9 +1609,21 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Ortak <span>Duvar</span></div>
-                  <div class="s-text-tech">Apartmandaki iki daire aynı duvarı paylaşır. Duvarda bir tuğlayı hareket
-                    ettirirseniz iki daire birden etkilenir. PostGIS Topology komşu parsellerin sınırlarını tam olarak
-                    böyle yönetir.</div>
+                  <div class="s-text-tech">Komşu parseller aynı sınır çizgisini paylaşır — birini değiştirince öteki de güncellenir.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px;">
+                    <div style="background:#e3f2fd; padding:10px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:12px;">🧱 Problem: İki Ayrı Sınır</div>
+                      <div style="font-size:10.5px; color:#444; margin-top:3px;">Normal poligonda iki mahalle kendi sınırını ayrı tutar → 1mm boşluk veya çakışma kaçınılmaz.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:10px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:12px;">✅ Çözüm: Paylaşılan Edge</div>
+                      <div style="font-size:10.5px; color:#444; margin-top:3px;">Topolojide sınır tek bir Edge objesedir. Her iki mahalle bu Edge'e referans verir — boşluk/çakışma imkansız.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:10px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:12px;">🔄 Otomatik Güncelleme</div>
+                      <div style="font-size:10.5px; color:#444; margin-top:3px;">Sınırı kaydırın — komşu iki mahallenin geometrisi otomatik değişir. "İki tabloyu ayrı güncelleme" hatası yok.</div>
+                    </div>
+                  </div>
                   <div class="info-box"
                     style="margin-top:16px; background:rgba(245,197,24,0.06); padding:14px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.82em;">
                     <div style="color:var(--theme-yellow-dark); margin-bottom:6px;"><strong>Topoloji Şart Olan
@@ -1429,8 +1697,25 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Node, Edge, <span>Face</span></div>
-                  <div class="s-text-tech"><code>CreateTopology</code> arka planda dört primitive tablo açar. Her biri
-                    topolojinin farklı bir boyutunu temsil eder.</div>
+                  <div class="s-text-tech"><code>CreateTopology</code> 4 primitive tablo açar — bunlar topolojinin iskeletidir.</div>
+                  <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:12px;">🔵 node — Köşe Noktaları</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">Her köşe/kavşak burada. Tüm edge'ler bu noktalarda başlar/biter.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:12px;">🟢 edge_data — Sınır Çizgileri</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">Yönlü çizgiler. Her edge solunda ve sağında hangi face olduğunu bilir (<code>left_face, right_face</code>).</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:12px;">🟡 face — Kapalı Alanlar</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">Kapalı edge döngülerinin oluşturduğu yüzeyler. <code>face_id=0</code> = evrensel dış alan.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #ce93d8;">
+                      <div style="font-weight:bold; color:#ce93d8; font-size:12px;">🔗 relation — Bağlantı Tablosu</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">TopoGeometry objeleri ile primitive elemanları eşleştirir — "bu mahalle şu edge'lerden oluşur."</div>
+                    </div>
+                  </div>
                   <div class="info-box"
                     style="margin-top:14px; background:rgba(0,0,0,0.35); padding:13px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.8em;">
                     <table style="width:100%; border-collapse:collapse; color:#ccc;">
@@ -1524,9 +1809,24 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Aktar, Doğrula, <span>Sorgula</span></div>
-                  <div class="s-text-tech">Mevcut <code>konya.ilce_sinirlari</code> poligonlarını topolojiye aktaralım.
-                    <code>toTopoGeom</code> paylaşılan sınırları tek edge olarak böler, ortak köşeleri node yapar, her
-                    ilçeyi bir face hâline getirir. <code>ValidateTopology</code> ile kalite kontrolü yapılır.
+                  <div class="s-text-tech">İlçe sınırlarını topolojiye aktar — sınırlar otomatik paylaşılır.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📥 toTopoGeom Mantığı</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Poligonu önce edge'lere parçalar. Komşu ilçeyle paylaşılan sınır varsa tek edge olur, iki ilçe bunu birlikte kullanır.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📐 Snap Toleransı: 0.0001°</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">≈ 11 metre. İki köşe bu mesafeden yakınsa aynı node sayılır. Çok küçük → sınırlar birleşmez; çok büyük → yanlış birleşir.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">✅ ValidateTopology</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Boş sonuç = hatasız topoloji. Hata türleri: <code>intersecting_edges</code>, <code>invalid_face_rings</code>.</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">🔍 İç Sınır Sorgusu</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>left_face != 0 AND right_face != 0</code> → her iki tarafı da ilçe olan edge'ler = gerçek ilçe sınırları.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="s-panel-right">
@@ -1608,9 +1908,21 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Komşu <span>Sorgula</span></div>
-                  <div class="s-text-tech"><code>topo_geom::geometry</code> cast'ı topolojiden <b>dinamik</b> olarak
-                    hesaplanır — saklı bir koordinat yoktur; o anki edge/face yapısından üretilir. Bu sayede komşuluk
-                    sorguları her zaman boşluksuz, çakışmasız geometriye karşı çalışır.</div>
+                  <div class="s-text-tech">Topoloji sorguları her zaman boşluksuz, çakışmasız geometriye karşı çalışır.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:12px;">🔄 topo_geom::geometry</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">Saklı koordinat yok — o anki edge/face yapısından dinamik üretilir. Sınır değişince geometri otomatik güncellenir.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:12px;">🤝 ST_Touches Güvenilirliği</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;">Normal geom'da 1mm boşluk varsa komşu "kaybolur". topo_geom'da aynı edge paylaşıldığı için komşuluk kesindir.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:10px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:12px;">📏 Ortak Sınır Uzunluğu</div>
+                      <div style="font-size:10.5px; color:#ccc; margin-top:3px;"><code>ST_Intersection</code> + <code>ST_Length</code> ile iki ilçenin kaç km ortak sınırı olduğunu ölç. Planlama kararlarında kritik.</div>
+                    </div>
+                  </div>
                   <div class="info-box"
                     style="margin-top:16px; background:rgba(0,0,0,0.35); padding:13px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.82em;">
                     <div style="color:var(--theme-yellow); margin-bottom:6px;"><strong>Cascade Garantisi</strong></div>
@@ -1684,8 +1996,21 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Güvenli <span>Erişim</span></div>
-                  <div class="s-text-tech">CBS personeli, veri girişi yapanlar ve sadece izleyenler için farklı SQL
-                    yetkileri (GRANT/REVOKE).</div>
+                  <div class="s-text-tech">Herkes her şeyi görmemeli — minimum yetki, maksimum güvenlik.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">👥 ROLE = Yetki Grubu</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Kullanıcılara tek tek yetki vermek yerine ROLE oluştur, ROLE'e yetki ver, kullanıcıları ROLE'e ekle.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔑 GRANT / REVOKE</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>GRANT SELECT, INSERT ON tablo TO rol</code> → sadece okuma+yazma. <code>DELETE, UPDATE, DROP</code> yok — kazara silme imkansız.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                      <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">⚠️ Neden SUPERUSER Kullanılmaz?</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Hatalı bir SQL tüm veritabanını silebilir. Her kullanıcı sadece ihtiyacı olan tabloya, sadece ihtiyacı olan işlem için yetkili olmalı.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div class="code-block">CREATE ROLE editor_role; -- Rol oluştur
@@ -1725,8 +2050,25 @@ CREATE INDEX ON konya.osm_yollar_noded_vertices_pgr USING gist(the_geom);</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Bölge <span>Bazlı</span> Kısıt</div>
-                  <div class="s-text-tech">Bir kullanıcının sadece kendi çalışma alanındaki (Örn: Meram) verileri
-                    görebilmesini sağlayan dinamik filtre.</div>
+                  <div class="s-text-tech">Meram personeli yalnızca Meram'ı görür — otomatik, şeffaf filtre.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🔒 RLS Nedir?</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Row Level Security — her kullanıcı sorgusuna otomatik WHERE koşulu eklenir. Kullanıcı filtre varlığından habersizdir.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🗺️ Mekansal RLS</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">USING koşuluna <code>ST_Intersects(geom, ilce_sinirlari)</code> yazılır. Kullanıcı sadece kendi ilçesindeki binaları görür.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">⚡ Performans Notu</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Her sorguda ST_Intersects çalışır — GiST indeksi zorunlu. İndeks varsa etki milisaniyeler düzeyindedir.</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">🧪 Test: SET ROLE</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>SET ROLE meram_calisani;</code> ile mevcut oturumda o kullanıcı gibi davran, satır sayısını kontrol et, sonra <code>RESET ROLE</code>.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — Rol + Yetki</div>
@@ -1787,8 +2129,21 @@ RESET ROLE;</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Web <span>Güvenliği</span></div>
-                  <div class="s-text-tech">GeoServer veya MapSrv gibi uygulamaların veritabanına sadece okuma yetkisiyle
-                    bağlanması.</div>
+                  <div class="s-text-tech">GeoServer sadece okusun, yazmasın — en basit güvenlik katmanı.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🌐 Neden Read-Only?</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Web uygulaması hacklense bile SELECT yetkisi var — veri değiştiremez, silemez. Hasar sıfır.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔒 default_transaction_read_only</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Kullanıcının her oturumu otomatik read-only başlar. INSERT/UPDATE/DELETE denemesi hata verir.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">📋 GRANT ON ALL TABLES</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Tek komutla şemadaki tüm tablolara SELECT yerir — yeni tablo eklenince <code>ALTER DEFAULT PRIVILEGES</code> ile otomatik kapsar.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — Kullanıcı Oluştur</div>
@@ -1845,7 +2200,17 @@ RESET ROLE;</div>
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Veri <span>Sigortası</span></div>
-                  <div class="s-text-tech">PostGIS uzantıları ve mekansal indekslerle birlikte hatasız yedek alma (Custom Format).</div>
+                  <div class="s-text-tech">PostGIS indeksleriyle birlikte eksiksiz yedek — geri yükleme saniyeler içinde.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px;">
+                    <div style="background:#e3f2fd; padding:10px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:12px;">💾 pg_dump -Fc (Custom)</div>
+                      <div style="font-size:10.5px; color:#444; margin-top:3px;">Binary sıkıştırılmış format. SQL'den küçük ve pg_restore ile sadece istediğiniz tabloyu geri alabilirsiniz.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:10px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:12px;">♻️ pg_restore --no-owner</div>
+                      <div style="font-size:10.5px; color:#444; margin-top:3px;">Farklı bir sunucuya geri yüklerken sahiplik (ownership) çakışmasını önler. Üretim ortamı geçişlerinde zorunlu.</div>
+                    </div>
+                  </div>
                   <div class="info-box" style="margin-top:14px; background:rgba(245,197,24,0.06); padding:12px; border-left:4px solid var(--theme-yellow); border-radius:4px; font-size:0.8em;">
                     <div style="color:var(--theme-yellow-dark); margin-bottom:6px;"><strong>⚠ Bu komutlar nerede çalışır?</strong></div>
                     <ul style="margin:0; padding-left:16px; line-height:1.8; color:#ccc;">
@@ -1909,7 +2274,20 @@ docker exec -i konya_postgis_db pg_restore \
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Veri <span>Senkronizasyonu</span></div>
-                  <div class="s-text-tech">Fiziksel kopyalama (Master-Slave) veya mantıksal tablo kopyalama farkları.
+                  <div class="s-text-tech">Ana sunucu değişince ikincil otomatik güncellenir.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">📡 Streaming Replication</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">WAL (Write-Ahead Log) akışı — tüm veritabanının byte-byte kopyası. Disaster recovery için. Replica sadece okur.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔀 Logical Replication</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Sadece seçili tablolar kopyalanır. Farklı PG versiyonları arası da çalışır. Mekansal veriler de dahildir.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">📋 PUBLICATION / SUBSCRIPTION</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Ana: <code>CREATE PUBLICATION</code> → hangi tablolar. İkincil: <code>CREATE SUBSCRIPTION</code> → bağlan ve senkronize ol.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="s-panel-right">
@@ -1950,8 +2328,21 @@ docker exec -i konya_postgis_db pg_restore \
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Hata <span>Kurtarma</span></div>
-                  <div class="s-text-tech">Point-In-Time Recovery ile veriyi hatanın yapıldığı saniyeden hemen öncesine
-                    döndürmek.</div>
+                  <div class="s-text-tech">"Dün saat 14:32'deki duruma geri dön" — saniyeler içinde.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">⏪ PITR Nedir?</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Point-In-Time Recovery. Yanlışlıkla yapılan DELETE veya hatalı bir migrasyon sonrası veritabanını tam o ana döndürür.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📜 WAL (Write-Ahead Log)</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Her işlem WAL'a yazılır. Full backup + WAL arşivi birlikte kullanılarak herhangi bir ana gidilebilir.</div>
+                    </div>
+                    <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                      <div style="font-weight:bold; color:#880e4f; font-size:13px;">⚠️ Ön Koşul</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">WAL arşivlemesi önceden aktif olmalı (<code>archive_mode = on</code>). Felaketten sonra etkinleştirmek çalışmaz.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div class="code-block">-- WAL loglarını kullanarak:
@@ -1991,8 +2382,21 @@ docker exec -i konya_postgis_db pg_restore \
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Yüksek <span>Trafik</span></div>
-                  <div class="s-text-tech">Binlerce harita istemcisinin (Web Client) sunucu RAM'ini tüketmesini
-                    PgBouncer ile engellemek.</div>
+                  <div class="s-text-tech">1000 web kullanıcısı var ama PostgreSQL'e sadece 20 bağlantı gider.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🎯 Problem</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Her PostgreSQL bağlantısı bir process açar ve RAM kullanır. 1000 bağlantı = sunucu çöker.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🏊 Havuzlama Mantığı</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">PgBouncer 20 bağlantılık havuz tutar. 1000 client sırayla bu 20'yi paylaşır — veritabanı sadece 20'yi görür.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">⚙️ pool_mode = transaction</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Her transaction bitince bağlantı havuza döner. CBS web uygulamaları için en verimli mod.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div class="code-block">-- PgBouncer pool_mode = transaction</div>
@@ -2032,9 +2436,21 @@ docker exec -i konya_postgis_db pg_restore \
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Gerçek <span>Senaryo</span></div>
-                  <div class="s-text-tech">Konya'da büyük bir afet veya acil durum anında; binaların hastanelere olan
-                    gerçek erişim mesafelerini hesaplayacak ve en riskli bölgeleri (15 dakikadan uzak) tespit
-                    edeceksiniz.</div>
+                  <div class="s-text-tech">Afet anında hangi binalar hastaneden 15 dakikadan uzak? Bunu bulacaksınız.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🏗️ Adım 1: Veri Hazırla</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Binaları mahallelerle eşleştir (Spatial Join). Yol ağı topolojisini kontrol et.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🗺️ Adım 2: Toplu Rota Hesabı</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Her binadan en yakın hastaneye gerçek yol mesafesini pgRouting ile hesapla.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">📊 Adım 3: Karar Destek</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Riskli binaları renklendiren GeoJSON raporu üret — kriz merkezine sunum hazır.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div class="card-tech">
@@ -2075,8 +2491,21 @@ docker exec -i konya_postgis_db pg_restore \
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Veriyi <span>Hazırla</span></div>
-                  <div class="s-text-tech">Ham bina verisinde mahalle bilgisi yok. Önce her binanın hangi mahallede
-                    olduğunu <b>Spatial Join</b> ile bulup tabloya yazmalıyız.</div>
+                  <div class="s-text-tech">Bina → Mahalle eşleştirmesini Spatial Join ile kalıcı olarak yaz.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                      <div style="font-weight:bold; color:#0d47a1; font-size:13px;">❓ Neden Gerekli?</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">"Selçuklu'daki riskli binalar" gibi mahalle bazlı raporlar için bina-mahalle ilişkisi tabloda olmalı.</div>
+                    </div>
+                    <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                      <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🔗 ST_Intersects ile UPDATE</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;">Bina geometrisi mahalleyle kesişiyorsa o mahallenin ID'sini bina kaydına yaz. Tek sorguda tüm tablo güncellenir.</div>
+                    </div>
+                    <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                      <div style="font-weight:bold; color:#bf360c; font-size:13px;">🔍 Kalite Kontrolü</div>
+                      <div style="font-size:11px; color:#444; margin-top:4px;"><code>WHERE mahalle_id IS NULL</code> → sınırda kalan veya eksik binaları bul. Sıfır sonuç = başarılı eşleştirme.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div class="code-block" style="font-size:12px;">-- Binalara mahalle ID'lerini ata
@@ -2118,8 +2547,21 @@ docker exec -i konya_postgis_db pg_restore \
               <div class="s-body-grid">
                 <div class="s-panel-left">
                   <div class="s-headline-tech">Ağ Analizi <span>Sınavı</span></div>
-                  <div class="s-text-tech">Seçilen bir pilot bölgedeki 100 binanın, Konya'daki tüm hastanelere olan en
-                    kısa yol mesafelerini pgRouting ile topluca hesaplayacağız.</div>
+                  <div class="s-text-tech">100 binadan tüm hastanelere tek komutla — Many-to-Many rota hesabı.</div>
+                  <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                      <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🔢 Dizi (Array) ile pgr_dijkstra</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Başlangıç ve bitiş olarak Node ID <b>dizisi</b> verilebilir. 100 başlangıç × 5 hastane = 500 rota tek sorguda.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                      <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">📊 Sonuç: Risk Skoru</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Her bina için minimum agg_cost → en yakın hastane mesafesi. 15 dk'dan uzak = yüksek risk kategorisi.</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                      <div style="font-weight:bold; color:#ffcc80; font-size:13px;">💡 CBS'nin Gücü</div>
+                      <div style="font-size:11px; color:#ccc; margin-top:4px;">Bu analizi klasik GIS yazılımında günler sürer. SQL + pgRouting ile dakikalar içinde tüm şehir kapsanır.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="s-panel-right">
                   <div class="code-block" style="font-size:11px;">-- Binaya en yakın kavşağı bulup rotayı hesaplayan
@@ -2160,8 +2602,21 @@ docker exec -i konya_postgis_db pg_restore \
                 <div class="s-body-grid">
                   <div class="s-panel-left">
                     <div class="s-headline-tech">Geleceğin <span>CBS</span>'si</div>
-                    <div class="s-text-tech">Mekansal veri artık statik bir harita değil, yaşayan bir organizmadır.
-                      Python, Yapay Zeka ve PostGIS'in birleşimiyle Konya'yı nasıl daha akıllı yönetiriz?</div>
+                    <div class="s-text-tech">PostGIS + Python + AI = yaşayan, tahmin eden, karar veren şehir.</div>
+                    <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                      <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                        <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🤖 GeoAI</div>
+                        <div style="font-size:11px; color:#444; margin-top:4px;">PostGIS verisiyle eğitilen modeller bina enerji tüketimini, trafik yoğunluğunu tahmin eder.</div>
+                      </div>
+                      <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                        <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🚀 Real-time GIS</div>
+                        <div style="font-size:11px; color:#444; margin-top:4px;">Canlı otobüs konumları, doluluk oranları — saniyeler içinde analiz, anında karar.</div>
+                      </div>
+                      <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                        <div style="font-weight:bold; color:#bf360c; font-size:13px;">🐍 GeoPandas + PostGIS</div>
+                        <div style="font-size:11px; color:#444; margin-top:4px;"><code>gpd.read_postgis()</code> ile veriyi Python'a al, ML modelini çalıştır, sonucu geri yaz. Sınırsız güç.</div>
+                      </div>
+                    </div>
                   </div>
                   <div class="s-panel-right">
                     <div class="card-tech">
