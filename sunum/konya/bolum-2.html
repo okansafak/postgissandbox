@@ -635,6 +635,219 @@ ORDER BY y.geom &lt;-&gt; b.p LIMIT 1;</div>
         </div>
       </div>
 
+      <!-- SLAYT 8-B: 2.3 TÜM İNDEKS TÜRLERİ GENEL BAKIŞ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — PostgreSQL: Tüm İndeks Türleri</div>
+              <div class="slide-header-num">2.3-A</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hangi İndeks <span>Ne Zaman?</span></div>
+                <div class="s-text-tech" style="margin-bottom:13px;">B-Tree her şeye değil — <strong>her veri tipi için farklı bir indeks motoru</strong> var. Yanlış seçim ya performansı düşürür ya indeksi hiç kullandırmaz.</div>
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:9px 12px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🌳 B-Tree — Genel Amaçlı</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:2px;">Sıralı ağaç, varsayılan. <code>=, &lt;, &gt;, BETWEEN, ORDER BY</code> için biçilmiş kaftan. Metin, sayı, tarih sütunlarının standart indeksi.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:9px 12px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔢 Hash — Anlık Eşitlik</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:2px;">Yalnızca <code>=</code> için. B-Tree'den daha küçük. Aralık sorgusu veya sıralama desteklenmez.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:9px 12px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">🗂️ GIN — İçerik Arama Motoru</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:2px;">JSONB anahtar/değer, array elemanı, full-text. "Bu JSON'da 'park' etiketi var mı?" sorusunu milisaniyede yanıtlar.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:9px 12px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🌊 BRIN — Dev Tablonun Kısa Yolu</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:2px;">Fiziksel sıralı büyük tablolarda sayfa min/max tutar. GPS log, sensör kaydı için ideal. Depolama maliyeti: 1/1000.</div>
+                  </div>
+                  <div style="background:rgba(255,193,7,0.10); padding:9px 12px; border-radius:4px; border-left:4px solid #FFC107;">
+                    <div style="font-size:11px; color:#ffe082;">💡 <strong>pg_trgm</strong>: <code>LIKE '%metin%'</code> için kurtuluş. <code>CREATE EXTENSION pg_trgm</code> sonra <code>USING GIN (kolon gin_trgm_ops)</code> yeterli.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="overflow-x:auto; margin-bottom:11px;">
+                  <table style="width:100%; font-size:11px; border-collapse:collapse; line-height:1.45;">
+                    <thead>
+                      <tr style="background:rgba(255,255,255,0.12);">
+                        <th style="padding:7px 9px; text-align:left; color:#fff; font-weight:700; border-bottom:2px solid rgba(255,255,255,0.2);">İndeks</th>
+                        <th style="padding:7px 9px; text-align:left; color:#fff; font-weight:700; border-bottom:2px solid rgba(255,255,255,0.2);">En İyi Kullanım</th>
+                        <th style="padding:7px 9px; text-align:left; color:#fff; font-weight:700; border-bottom:2px solid rgba(255,255,255,0.2);">Desteklenen Operatörler</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <td style="padding:5px 9px; color:#4fc3f7; font-weight:700;">B-Tree</td>
+                        <td style="padding:5px 9px; color:#ccc;">Genel filtre ve sıralama</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>= &lt; &gt; &lt;= &gt;= BETWEEN ORDER BY</code></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);">
+                        <td style="padding:5px 9px; color:#a5d6a7; font-weight:700;">Hash</td>
+                        <td style="padding:5px 9px; color:#ccc;">Sadece eşitlik</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>=</code></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <td style="padding:5px 9px; color:#ce93d8; font-weight:700;">GIN</td>
+                        <td style="padding:5px 9px; color:#ccc;">JSONB, array, full-text</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>@&gt; @@ &amp;&amp;</code></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);">
+                        <td style="padding:5px 9px; color:#ef9a9a; font-weight:700;">GiST</td>
+                        <td style="padding:5px 9px; color:#ccc;">PostGIS mekansal</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>&amp;&amp; @&gt; ST_DWithin</code></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <td style="padding:5px 9px; color:#80cbc4; font-weight:700;">SP-GiST</td>
+                        <td style="padding:5px 9px; color:#ccc;">Nokta / POI / adres</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>&amp;&amp; KNN (&lt;-&gt;)</code></td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03);">
+                        <td style="padding:5px 9px; color:#ffcc80; font-weight:700;">BRIN</td>
+                        <td style="padding:5px 9px; color:#ccc;">Çok büyük sıralı veri</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>= &lt; &gt;</code> (blok min/max)</td>
+                      </tr>
+                      <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                        <td style="padding:5px 9px; color:#b0bec5; font-weight:700;">Bloom</td>
+                        <td style="padding:5px 9px; color:#ccc;">Çok kolonlu eşitlik</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>= (çok sütun birlikte)</code></td>
+                      </tr>
+                      <tr>
+                        <td style="padding:5px 9px; color:#f48fb1; font-weight:700;">pg_trgm</td>
+                        <td style="padding:5px 9px; color:#ccc;">LIKE %metin% araması</td>
+                        <td style="padding:5px 9px; color:#aaa; font-size:10.5px;"><code>LIKE ILIKE ~ similarity()</code></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="code-block" style="font-size:11px; line-height:1.45;">-- Her indeks türü için örnek CREATE INDEX
+CREATE INDEX idx_poi_adi      ON konya.poi (ad);                 -- B-Tree (varsayılan)
+CREATE INDEX idx_poi_hash     ON konya.poi USING HASH(kategori); -- Hash (sadece =)
+CREATE INDEX idx_poi_gin      ON konya.poi USING GIN(tags);      -- GIN (JSONB/array)
+CREATE INDEX idx_poi_gist     ON konya.poi USING GIST(geom);     -- GiST (mekansal)
+CREATE INDEX idx_poi_spgist   ON konya.poi USING SPGIST(geom);   -- SP-GiST (nokta)
+CREATE INDEX idx_log_brin     ON konya.gps_log USING BRIN(zaman);-- BRIN (zaman serisi)
+-- pg_trgm için önce uzantıyı etkinleştir:
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX idx_poi_trgm     ON konya.poi USING GIN(ad gin_trgm_ops); -- %text%</div>
+                <div class="reveal-box" id="qIndTypes1">
+                  <div class="reveal-trigger" onclick="document.getElementById('qIndTypes1').classList.toggle('open')">Yanlış İndeks Seçimi Ne Kadar Zararlı? <span>▼</span></div>
+                  <div class="reveal-content">Yanlış indeks = indeks <strong>yok</strong> demektir. <code>LIKE '%sokak'</code> için B-Tree kurulursa PostgreSQL başındaki <code>%</code> yüzünden zaten Seq Scan seçer — indekse bakmaz bile. <code>pg_trgm</code> kurulunca anında Index Scan'e döner. Aynı şekilde <code>ST_DWithin</code> için B-Tree değil GiST gerekir. Her operatör-veri tipi çifti için doğru indeksi seçmek kritiktir.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 8-C: 2.3 B-TREE DERİNLEMESİNE + CBS ÖNERİLERİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">2.3 — B-Tree Derinlemesine + CBS Tavsiyeleri</div>
+              <div class="slide-header-num">2.3-B</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">B-Tree: Genelin <span>Efendisi</span></div>
+                <div class="s-text-tech" style="margin-bottom:12px;">PostGIS projelerinde GiST öne çıkar ama <strong>metin, tarih ve sayı alanları</strong> için B-Tree hâlâ vazgeçilmez — tek başına veya GiST ile birlikte.</div>
+
+                <div style="background:#e3f2fd; padding:11px 13px; border-radius:4px; border-left:4px solid #1565c0; margin-bottom:9px;">
+                  <div style="font-weight:bold; color:#0d47a1; font-size:13px; margin-bottom:6px;">✅ B-Tree Bunlarda Çok İyidir</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">=</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">&lt;</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">&gt;</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">&lt;=</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">&gt;=</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">BETWEEN</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">ORDER BY</span>
+                    <span style="background:#1565c0; color:#fff; padding:3px 9px; border-radius:3px; font-size:12px; font-family:monospace;">LIKE 'metin%'</span>
+                  </div>
+                </div>
+
+                <div style="background:#ffebee; padding:11px 13px; border-radius:4px; border-left:4px solid #c62828; margin-bottom:9px;">
+                  <div style="font-weight:bold; color:#b71c1c; font-size:13px; margin-bottom:5px;">❌ B-Tree Çalışmaz / Yavaşlar</div>
+                  <div style="font-size:11.5px; color:#555; line-height:1.7;">
+                    <code>LIKE '%metin%'</code> veya <code>LIKE '%metin'</code> → <strong>pg_trgm</strong> kullan<br>
+                    <code>&amp;&amp;</code>, <code>ST_DWithin</code>, <code>ST_Intersects</code> → <strong>GiST / SP-GiST</strong> kullan<br>
+                    <code>@&gt;</code> (JSONB içerik) → <strong>GIN</strong> kullan
+                  </div>
+                </div>
+
+                <div style="background:#e8f5e9; padding:11px 13px; border-radius:4px; border-left:4px solid #2e7d32;">
+                  <div style="font-weight:bold; color:#1b5e20; font-size:13px; margin-bottom:4px;">💡 İndeksler Birlikte Çalışır</div>
+                  <div style="font-size:11px; color:#444;">Aynı tabloda GiST (geom) + B-Tree (ilce) + GIN (tags) kurabilirsin. PostgreSQL birden fazla indeksi <strong>Bitmap AND</strong> ile birleştirir — hem mekansal hem metinsel filtreyi aynı anda hızlandırır.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:13px; font-weight:bold; color:var(--theme-black); margin-bottom:8px;">CBS Projelerinde İndeks Seçim Rehberi</div>
+                <table style="width:100%; font-size:11.5px; border-collapse:collapse; margin-bottom:12px; line-height:1.4;">
+                  <thead>
+                    <tr style="background:#f5f5f5;">
+                      <th style="padding:7px 10px; text-align:left; border-bottom:2px solid #ddd; color:#333; font-weight:700;">Sorgu Amacı</th>
+                      <th style="padding:7px 10px; text-align:left; border-bottom:2px solid #ddd; color:#333; font-weight:700;">Kullanılacak İndeks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="border-bottom:1px solid #eee;">
+                      <td style="padding:6px 10px; color:#444;">Mekansal sorgu (<code>&amp;&amp;</code>, Intersects)</td>
+                      <td style="padding:6px 10px;"><span style="background:#ef9a9a; color:#333; padding:2px 8px; border-radius:3px; font-weight:700; font-size:11px;">GiST</span></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #eee; background:#fafafa;">
+                      <td style="padding:6px 10px; color:#444;">Nokta / POI / adres sorgusu</td>
+                      <td style="padding:6px 10px;"><span style="background:#80cbc4; color:#fff; padding:2px 8px; border-radius:3px; font-weight:700; font-size:11px;">SP-GiST</span></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #eee;">
+                      <td style="padding:6px 10px; color:#444;">JSON özellik (<code>tags @&gt; '{"tip":"park"}'</code>)</td>
+                      <td style="padding:6px 10px;"><span style="background:#ce93d8; color:#fff; padding:2px 8px; border-radius:3px; font-weight:700; font-size:11px;">GIN</span></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #eee; background:#fafafa;">
+                      <td style="padding:6px 10px; color:#444;">Adres metin araması (<code>LIKE '%sokak%'</code>)</td>
+                      <td style="padding:6px 10px;"><span style="background:#f48fb1; color:#333; padding:2px 8px; border-radius:3px; font-weight:700; font-size:11px;">pg_trgm</span></td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #eee;">
+                      <td style="padding:6px 10px; color:#444;">GPS / sensör log zaman filtresi</td>
+                      <td style="padding:6px 10px;"><span style="background:#ffcc80; color:#333; padding:2px 8px; border-radius:3px; font-weight:700; font-size:11px;">BRIN</span></td>
+                    </tr>
+                    <tr>
+                      <td style="padding:6px 10px; color:#444;">İlçe / kategori / durum / tarih filtresi</td>
+                      <td style="padding:6px 10px;"><span style="background:#4fc3f7; color:#333; padding:2px 8px; border-radius:3px; font-weight:700; font-size:11px;">B-Tree</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div style="background:#fffde7; padding:11px 13px; border-radius:4px; border-left:4px solid #f9a825;">
+                  <div style="font-weight:bold; font-size:12px; color:#4e342e; margin-bottom:7px;">🤔 İndeks Seçmeden Önce Şunu Sor</div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; font-size:11px; color:#5d4037; line-height:1.5;">
+                    <div>▸ Veri tipi ne? (metin / geom / json)</div>
+                    <div>▸ ORDER BY var mı?</div>
+                    <div>▸ Sorgu operatörü ne? (=, &lt;, LIKE)</div>
+                    <div>▸ LIKE başta % içeriyor mu?</div>
+                    <div>▸ Tablo büyüklüğü ne kadar?</div>
+                    <div>▸ Mekansal operatör var mı?</div>
+                    <div>▸ Yazma mı okuma mı yoğun?</div>
+                    <div>▸ Veri fiziksel sıralı mı? (BRIN)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- SLAYT 9: 2.3 GIST/SP-GIST -->
       <div class="slide-outer">
         <div class="slide-wrapper">
@@ -888,7 +1101,10 @@ ANALYZE konya.mahalleler;</div>
                 </div>
                 <div class="reveal-box" id="g31">
                   <div class="reveal-trigger" onclick="document.getElementById('g31').classList.toggle('open')">Görev: Haritayı Güncelle <span>▼</span></div>
-                  <div class="reveal-content">DBeaver üzerinden <code>konya.poi</code> tablosuna sağ tıklayıp "Analyze" seçeneğini bulun veya doğrudan SQL konsoluna <code>ANALYZE konya.poi;</code> yazıp çalıştırarak ne kadar hızlı bittiğini görün.</div>
+                  <div class="reveal-content">DBeaver üzerinden <code>konya.poi</code> tablosuna sağ tıklayıp "Analyze" seçeneğini bulun veya doğrudan SQL konsoluna <code>ANALYZE konya.poi;</code> yazıp çalıştırarak ne kadar hızlı bittiğini görün.<br><br>
+                    <b>Bonus:</b> Ardından index kullanımını doğrulayın:<br>
+                    <code>SELECT indexrelname, idx_scan FROM pg_stat_user_indexes WHERE schemaname = 'konya' ORDER BY idx_scan DESC;</code><br>
+                    <code>idx_scan &gt; 0</code> ise index sorgu planlamasına dahil edilmiş demektir. ✓</div>
                 </div>
               </div>
             </div>
