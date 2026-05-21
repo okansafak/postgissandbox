@@ -1007,15 +1007,6 @@ ANALYZE konya.mahalleler;
 SELECT indexrelname, idx_scan FROM pg_stat_user_indexes
 WHERE schemaname = 'konya' ORDER BY idx_scan DESC;</div>
 
-                <div class="reveal-box" id="q1gist">
-                  <div class="reveal-trigger" onclick="document.getElementById('q1gist').classList.toggle('open')">
-                    Neden ANALYZE Gerekli? <span>▼</span>
-                  </div>
-                  <div class="reveal-content">
-                    PostgreSQL veritabanı index'i bilmek için. ANALYZE sonrasında, sorgu planlayıcısı index'i kullanmaya başlar. Olmazssa index varmış gibi davranmaz — istatistik yoktur.
-                  </div>
-                </div>
-
                 <div class="reveal-box" id="g1gist">
                   <div class="reveal-trigger" onclick="document.getElementById('g1gist').classList.toggle('open')">
                     Görev: Index Oluştur <span>▼</span>
