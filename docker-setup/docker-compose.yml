@@ -21,6 +21,7 @@ services:
         -c maintenance_work_mem=128MB
         -c max_parallel_workers_per_gather=2
         -c jit=off
+        -c wal_level=logical
 
 volumes:
   postgres_data:

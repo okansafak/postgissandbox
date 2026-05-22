@@ -12,6 +12,7 @@ CREATE EXTENSION IF NOT EXISTS pgrouting;
 CREATE EXTENSION IF NOT EXISTS h3;
 CREATE EXTENSION IF NOT EXISTS h3_postgis;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pg_dirtyread;  -- MVCC dead tuple recovery (Bölüm 4, Slayt 15)
 
 -- Doğrulama
 DO $$ BEGIN RAISE NOTICE 'PostGIS Sürümü: %', postgis_full_version(); END $$;

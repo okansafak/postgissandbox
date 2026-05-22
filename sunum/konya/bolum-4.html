@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostGIS Akademi — Bölüm 4: Production-Ready PostGIS (Konya BB)</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .s1 {
+      background: var(--theme-black);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      min-height: var(--slide-h);
+    }
+
+    .s1-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 56px 64px;
+    }
+
+    .s1-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .logo-benim {
+      border: 2px solid var(--theme-white);
+      padding: 10px 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--theme-white);
+      line-height: 1.1;
+    }
+
+    .logo-konya-box {
+      background: var(--theme-yellow);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-konya-box img {
+      height: 40px;
+    }
+
+    .logo-divider {
+      width: 3px;
+      height: 44px;
+      background: var(--theme-yellow);
+    }
+
+    .s1-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 72px;
+      color: var(--theme-white);
+      line-height: 0.9;
+    }
+
+    .s1-title span {
+      color: var(--theme-yellow);
+    }
+
+    .s1-right {
+      background: var(--theme-yellow);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .s1-right-number {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      font-size: 120px;
+      color: var(--theme-black);
+      opacity: 0.15;
+      position: absolute;
+      bottom: -20px;
+      right: -10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="deck-viewport">
+    <div class="deck-track" id="deckTrack">
+
+      <!-- SLAYT 1: KAPAK -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s1">
+            <div class="s1-left">
+              <div class="s1-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" />
+                  <div class="logo-konya-text"><span style="font-weight:900; font-size:14px;">KONYA</span><br><span
+                      style="font-weight:900; font-size:11px;">BÜYÜKŞEHİR</span></div>
+                </div>
+              </div>
+              <div class="s1-main">
+                <div class="s1-title">Production-Ready<br><span>PostGIS</span></div>
+                <div class="s1-subtitle" style="color:#aaa; font-size:20px; margin-top:20px;">Hız, Güvenlik, Kurtarma, Ölçek — Üretimde PostGIS'i Ayakta Tutmak.</div>
+              </div>
+            </div>
+            <div class="s1-right">
+              <span style="font-weight:900; letter-spacing:0.2em; color:var(--theme-black);">Bölüm Dört</span>
+              <div class="s1-right-number">04</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- BÖLÜM 4.1 — AKILLI İNDEKS STRATEJİLERİ                            -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+
+      <!-- SLAYT 2: 4.1.1 GiST vs SP-GiST -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.1.1 — GiST ve SP-GiST: Hangi Geometri Hangi İndeks?</div>
+              <div class="slide-header-num">02 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">GiST <span>vs</span> SP-GiST</div>
+                <div class="s-sub-tech">Her geometri tipi için doğru indeks. İkisi de mekansaldır, ama çalışma mantıkları farklıdır.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📦 GiST (R-Tree) — İç İçe Klasörler</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Her geometriyi kapsayan <strong>Bounding Box</strong>'ları ağaç şeklinde gruplar. Kutular birbirinin içine girebilir. <strong>Poligon ve LineString için zorunludur</strong>.</div>
+                  </div>
+                  <div style="background:#f3e5f5; padding:11px; border-radius:4px; border-left:4px solid #6a1b9a;">
+                    <div style="font-weight:bold; color:#4a148c; font-size:13px;">🔲 SP-GiST (Quad-Tree) — Satranç Tahtası</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Mekanı <strong>kesişmeyen hücrelere</strong> böler. Noktalar kesişmediğinden ağaç çok daha sığ olur → <strong>Point (POI, adres)</strong> sorgularında GiST'ten hızlıdır.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📏 Pratik Kural</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Poligon / LineString → <code>GIST</code><br>Point (POI, adres) → <code>SPGIST</code></div>
+                  </div>
+                  <div style="background:#fff8e1; padding:10px; border-radius:4px; border-left:4px solid #f9a825;">
+                    <div style="font-size:11px; color:#5d4037;"><strong>⚠️ Az veride etkisi yok:</strong> Birkaç bin satırda PostgreSQL <em>Seq Scan</em> seçer. İndeksin gücü <strong>milyonlarca satırda</strong> ortaya çıkar.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG diyagram: R-Tree vs Quad-Tree -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Görsel Karşılaştırma</div>
+                <svg width="100%" viewBox="0 0 320 130" style="display:block; background:#f7f9fc; border-radius:5px; margin-bottom:8px;">
+                  <!-- R-Tree (sol) -->
+                  <text x="10" y="14" font-size="9" font-weight="700" fill="#0d47a1">GiST (R-Tree) — iç içe kutular</text>
+                  <rect x="10" y="20" width="135" height="100" fill="none" stroke="#1565c0" stroke-width="2" rx="3"/>
+                  <rect x="18" y="28" width="60" height="42" fill="rgba(33,150,243,0.15)" stroke="#1565c0" stroke-width="1.2" rx="2"/>
+                  <rect x="22" y="33" width="20" height="14" fill="#1565c0" opacity="0.55"/>
+                  <rect x="46" y="40" width="22" height="20" fill="#1565c0" opacity="0.55"/>
+                  <rect x="82" y="35" width="58" height="50" fill="rgba(33,150,243,0.15)" stroke="#1565c0" stroke-width="1.2" rx="2"/>
+                  <rect x="88" y="42" width="18" height="14" fill="#1565c0" opacity="0.55"/>
+                  <rect x="110" y="48" width="24" height="28" fill="#1565c0" opacity="0.55"/>
+                  <rect x="20" y="82" width="55" height="32" fill="rgba(33,150,243,0.15)" stroke="#1565c0" stroke-width="1.2" rx="2"/>
+                  <rect x="26" y="88" width="16" height="20" fill="#1565c0" opacity="0.55"/>
+                  <rect x="48" y="92" width="22" height="14" fill="#1565c0" opacity="0.55"/>
+                  <!-- Quad-Tree (sağ) -->
+                  <text x="175" y="14" font-size="9" font-weight="700" fill="#4a148c">SP-GiST (Quad-Tree) — kesişmeyen hücreler</text>
+                  <rect x="175" y="20" width="135" height="100" fill="none" stroke="#6a1b9a" stroke-width="2" rx="3"/>
+                  <line x1="242.5" y1="20" x2="242.5" y2="120" stroke="#6a1b9a" stroke-width="1.5"/>
+                  <line x1="175" y1="70" x2="310" y2="70" stroke="#6a1b9a" stroke-width="1.5"/>
+                  <line x1="208" y1="20" x2="208" y2="70" stroke="#6a1b9a" stroke-width="0.8"/>
+                  <line x1="175" y1="45" x2="242.5" y2="45" stroke="#6a1b9a" stroke-width="0.8"/>
+                  <line x1="276" y1="70" x2="276" y2="120" stroke="#6a1b9a" stroke-width="0.8"/>
+                  <line x1="242.5" y1="95" x2="310" y2="95" stroke="#6a1b9a" stroke-width="0.8"/>
+                  <!-- Noktalar -->
+                  <circle cx="190" cy="32" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="220" cy="35" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="230" cy="60" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="255" cy="40" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="290" cy="50" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="195" cy="90" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="225" cy="105" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="260" cy="82" r="2.5" fill="#6a1b9a"/>
+                  <circle cx="290" cy="105" r="2.5" fill="#6a1b9a"/>
+                  <!-- Legend altı -->
+                  <text x="10" y="128" font-size="7.5" fill="#666">Poligon / Çizgi → R-tree iç içe geçer</text>
+                  <text x="175" y="128" font-size="7.5" fill="#666">Nokta → her nokta tek bir hücrede</text>
+                </svg>
+
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) GiST (R-Tree): Poligon ve Çizgiler için ZORUNLU
+CREATE INDEX IF NOT EXISTS idx_binalar_gist
+  ON konya.osm_binalar USING GIST(geom);
+
+-- 2) SP-GiST (Quad-Tree): Noktalar (POI, adres) için DAHA HIZLI
+CREATE INDEX IF NOT EXISTS idx_poi_spgist
+  ON konya.poi USING SPGIST(geom);
+
+-- Doğrulama: indeks gerçekten kullanılıyor mu?
+EXPLAIN ANALYZE
+SELECT id, ad FROM konya.poi
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);
+-- ✓ Beklenen plan: "Bitmap Index Scan on idx_poi_spgist"</div>
+                <div class="reveal-box" id="idx41a">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41a').classList.toggle('open')">Kritik Soru: Neden her şeye GiST kurmuyoruz? <span>▼</span></div>
+                  <div class="reveal-content">GiST, kapsayıcı kutuları iç içe geçen klasörler gibi tutar — bu poligon/çizgi için kaçınılmaz. Ama milyonlarca <strong>nokta</strong> için ağaç gereksiz derinleşir. SP-GiST satranç tahtası mantığıyla noktayı tek bir hücreye düşürür → ağaç düzleşir → arama hızlanır.</div>
+                </div>
+                <div class="reveal-box" id="idx41b">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41b').classList.toggle('open')">Görev: İndeks Kapışması <span>▼</span></div>
+                  <div class="reveal-content">
+                    <code>konya.poi</code> üzerinde mevcut GiST indeksini düşürüp yerine SP-GiST kurun, aynı sorguyu <code>EXPLAIN ANALYZE</code> ile çalıştırın.
+                    <div class="code-block" style="font-size:11px; margin-top:8px; padding:8px; line-height:1.4;">DROP INDEX IF EXISTS konya.idx_poi_geom;
+CREATE INDEX idx_poi_spgist ON konya.poi USING SPGIST(geom);
+
+EXPLAIN ANALYZE
+SELECT id, ad, kategori FROM konya.poi
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 3: 4.1.2 BOUNDING BOX VE && OPERATÖRÜ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.1.2 — Bounding Box ve &amp;&amp; Operatörü: İki Aşamalı Filtre</div>
+              <div class="slide-header-num">03 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Kutu <span>Matematiği</span></div>
+                <div class="s-sub-tech">Her geometrinin etrafına gerilmiş sanal dikdörtgen — GiST indeksinin anladığı tek dil.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">📦 Bounding Box (BBox) Nedir?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Geometriyi tam çevreleyen <strong>en küçük dikdörtgen</strong>. Kıvrımlı sınır veya dolambaçlı yol fark etmez — GiST içinde sadece bu kutu saklanır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">⚡ <code>&amp;&amp;</code> — Kutu Kesişimi</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">İki geometrinin <strong>kutularının</strong> kesişip kesişmediğini sorar. Şekil hesabı yapmaz, saf indeks operasyonudur — <code>ST_Intersects</code>'ten yüzlerce kat hızlı.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🗺️ ST_MakeEnvelope</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">(MinX, MinY, MaxX, MaxY) köşelerini vererek hazır kutu üretir. Ekran görünümü, bölge filtresi, harita penceresi için doğrudan kullanılır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">⚠️ Kutu ≠ Şekil</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>&amp;&amp;</code> kutu kesişimi onaylar, gerçek şekil kesişimini <strong>garanti etmez</strong>. Kesin sonuç için <code>&amp;&amp; + ST_Intersects</code> birlikte kullanılır — önce kutu eleyici, sonra hassas filtre.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: İki aşamalı filtre akışı -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">İki Aşamalı Filtre Akışı</div>
+                <svg width="100%" viewBox="0 0 320 100" style="display:block; background:rgba(255,255,255,0.04); border-radius:5px; margin-bottom:8px;">
+                  <!-- Aşama 1 -->
+                  <rect x="8" y="20" width="80" height="50" fill="#1565c0" rx="4"/>
+                  <text x="48" y="38" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">18.279 satır</text>
+                  <text x="48" y="52" font-size="8" fill="#bbdefb" text-anchor="middle">(tüm binalar)</text>
+                  <text x="48" y="65" font-size="7" fill="#90caf9" text-anchor="middle">GİRİŞ</text>
+                  <!-- Ok -->
+                  <text x="100" y="40" font-size="7" fill="#a5d6a7">&amp;&amp; (BBox)</text>
+                  <text x="100" y="50" font-size="7" fill="#a5d6a7">GiST</text>
+                  <path d="M95,40 L125,40 L120,36 M125,40 L120,44" stroke="#a5d6a7" stroke-width="1.5" fill="none"/>
+                  <!-- Aşama 2 -->
+                  <rect x="130" y="25" width="65" height="40" fill="#f9a825" rx="4"/>
+                  <text x="162" y="42" font-size="9" font-weight="700" fill="#000" text-anchor="middle">~200 aday</text>
+                  <text x="162" y="55" font-size="7" fill="#5d4037" text-anchor="middle">eleme sonrası</text>
+                  <!-- Ok -->
+                  <text x="205" y="40" font-size="7" fill="#ef9a9a">ST_Intersects</text>
+                  <text x="205" y="50" font-size="7" fill="#ef9a9a">(şekil)</text>
+                  <path d="M200,40 L230,40 L225,36 M230,40 L225,44" stroke="#ef9a9a" stroke-width="1.5" fill="none"/>
+                  <!-- Sonuç -->
+                  <rect x="235" y="28" width="78" height="36" fill="#66bb6a" rx="4"/>
+                  <text x="274" y="44" font-size="9" font-weight="700" fill="#000" text-anchor="middle">137 satır</text>
+                  <text x="274" y="55" font-size="7" fill="#1b5e20" text-anchor="middle">gerçek kesişim</text>
+                  <!-- Alt etiket -->
+                  <text x="160" y="88" font-size="8" fill="#ccc" text-anchor="middle">Saf <tspan fill="#a5d6a7">&amp;&amp;</tspan> %99'u eleyince <tspan fill="#ef9a9a">ST_Intersects</tspan> sadece %1'e hesap yapar</text>
+                </svg>
+
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- ▶ Sadece kutu filtresi (saf indeks, çok hızlı)
+SELECT id, ad FROM konya.mahalleler
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);
+-- ✓ Beklenen: ~100+ aday satır (kutu kesişimi)
+
+-- ▶ Kesin kesişim (&& sonra ST_Intersects ile hassas filtre)
+SELECT id, ad FROM konya.mahalleler
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326)
+  AND ST_Intersects(geom, ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326));
+-- ✓ Beklenen: kutudan az, gerçekten kesişen satırlar</div>
+                <div class="reveal-box" id="idx41c">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41c').classList.toggle('open')">Kritik Soru: &amp;&amp; neden vazgeçilmezdir? <span>▼</span></div>
+                  <div class="reveal-content">GiST sadece <strong>Bounding Box</strong>'ları anlar; gerçek poligon matematiği yapan <code>ST_Intersects</code> tek başına indeks kullanamaz, tablo taraması yapar. <code>&amp;&amp;</code> önce kutu ile veriyi %99 eler, indeks gücüyle çalışır. <code>ST_Intersects</code> sonra sadece kalan adaylar üzerinde çalışır → toplam maliyet milisaniyelere düşer.</div>
+                </div>
+                <div class="reveal-box" id="idx41d">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41d').classList.toggle('open')">Görev: Kutu / Şekil Farkını Ölç <span>▼</span></div>
+                  <div class="reveal-content">İki yöntemi <code>EXPLAIN ANALYZE</code> ile karşılaştırın; çıkan plan ve <strong>Execution Time</strong>'ı not edin:
+                    <div class="code-block" style="font-size:11px; margin-top:8px; padding:8px; line-height:1.4;">-- 1) Saf kutu (ÇOK HIZLI)
+EXPLAIN ANALYZE SELECT id FROM konya.osm_binalar
+WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
+
+-- 2) Hassas kesişim (DAHA YAVAŞ)
+EXPLAIN ANALYZE SELECT id FROM konya.osm_binalar
+WHERE ST_Intersects(geom, ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326));</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 4: 4.1.3 PARTIAL VE FUNCTIONAL İNDEKSLER -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.1.3 — Partial ve Functional İndeksler: Hedefli Hız</div>
+              <div class="slide-header-num">04 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Akıllı <span>İndeksler</span></div>
+                <div class="s-sub-tech">Tüm tabloyu indekslemek yerine — sadece kritik satırları ya da fonksiyon çıktısını indeksle.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🔪 Partial Index (Kısmi)</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>WHERE kategori='Eczane'</code> koşuluyla sadece o satırları indeksler. 258 eczane için minik indeks; binlerce diğer POI'yi şişirmez. INSERT/UPDATE de sadece eczaneleri günceller.</div>
+                  </div>
+                  <div style="background:#f3e5f5; padding:11px; border-radius:4px; border-left:4px solid #6a1b9a;">
+                    <div style="font-weight:bold; color:#4a148c; font-size:13px;">⚙️ Functional Index (Fonksiyonel)</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Fonksiyon sonucunu önceden hesaplayıp saklar. <code>ST_Transform(geom, 3857)</code> indekslenirse, sorgudaki her <code>ST_Transform</code> bu indeksi kullanır — dönüşüm tekrar yapılmaz.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📐 Ne Zaman Hangi?</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Tablonun <strong>küçük alt kümesini</strong> sık sorguluyorsan → Partial.<br>Sorgularda <strong>aynı fonksiyonu</strong> tekrarlıyorsan → Functional.</div>
+                  </div>
+                  <div style="background:#fffbe6; padding:10px; border-radius:4px; border-left:4px solid #FFC107;">
+                    <div style="font-size:11px; color:#6b5900;">💡 İkisi de normal indeksten <strong>küçük</strong>, dolayısıyla disk ve RAM'de hafif. Aşırı indeks yerine hedefli kalın.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- Maliyet karşılaştırma -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Disk Maliyeti Karşılaştırması</div>
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                  <div style="flex:1; background:#fce4ec; border:1px solid #ef9a9a; padding:9px; border-radius:5px;">
+                    <div style="font-size:10px; font-weight:700; color:#b71c1c;">❌ Tüm POI üzerinde GiST</div>
+                    <div style="font-size:9px; color:#444; margin:3px 0;">14.000 satır × geom</div>
+                    <div style="font-size:14px; font-weight:900; color:#b71c1c;">~12 MB</div>
+                  </div>
+                  <div style="flex:1; background:#e8f5e9; border:1px solid #a5d6a7; padding:9px; border-radius:5px;">
+                    <div style="font-size:10px; font-weight:700; color:#1b5e20;">✅ Partial (sadece Eczane)</div>
+                    <div style="font-size:9px; color:#444; margin:3px 0;">258 satır × geom</div>
+                    <div style="font-size:14px; font-weight:900; color:#1b5e20;">~0.2 MB</div>
+                  </div>
+                </div>
+
+                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) PARTIAL INDEX — Sadece eczaneleri indeksle
+CREATE INDEX idx_eczane_geom
+  ON konya.poi USING SPGIST(geom)
+  WHERE kategori = 'Eczane';
+
+-- 2) FUNCTIONAL INDEX — ST_Transform önceden hesaplanır
+CREATE INDEX idx_bina_3857
+  ON konya.osm_binalar USING GIST(ST_Transform(geom, 3857));
+
+-- 3) Doğrulama: indeks boyutunu görüntüle
+SELECT indexrelname,
+       pg_size_pretty(pg_relation_size(indexrelid)) AS boyut
+FROM pg_stat_user_indexes
+WHERE schemaname = 'konya' AND (indexrelname LIKE 'idx_eczane%' OR indexrelname LIKE 'idx_bina_3857');</div>
+                <div class="reveal-box" id="idx41e">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41e').classList.toggle('open')">Kritik Soru: Partial İndeks ne kazandırır? <span>▼</span></div>
+                  <div class="reveal-content">Milyonlarca POI'nin %1'i "Eczane" ise tüm tabloyu indekslemek RAM, disk ve INSERT hızını sömürür. Partial indeks sadece o %1'i indeksler → arama uçar, alakasız INSERT'ler indeksi güncellemekle vakit kaybetmez.</div>
+                </div>
+                <div class="reveal-box" id="idx41f">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41f').classList.toggle('open')">Görev: Fonksiyonel İndeksi Yaz <span>▼</span></div>
+                  <div class="reveal-content"><code>konya.osm_binalar</code> tablosunda her binanın merkezini (<code>ST_Centroid</code>) indeksleyen fonksiyonel indeksi yazın.
+                    <div class="code-block" style="font-size:11px; margin-top:8px; padding:8px;">CREATE INDEX idx_bina_merkez
+  ON konya.osm_binalar USING GIST(ST_Centroid(geom));</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 5: 4.1.4 ANALYZE -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.1.4 — ANALYZE: Query Planner'ın Pusulası</div>
+              <div class="slide-header-num">05 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Sorgu <span>Pusulası</span></div>
+                <div class="s-sub-tech">PostgreSQL sorgu planlarken veri dağılımını bilmek zorunda — ANALYZE bu istatistiği toplar.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🗺️ Query Planner Nedir?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Her SQL çalışmadan önce PostgreSQL en hızlı yolu seçer: <em>"Index mi kullansam, Seq Scan mı?"</em> Karar için <strong>tablonun veri profilini</strong> bilmek şarttır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">📊 ANALYZE Ne Yapar?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Tablodan örnek satırlar okur; sütun başına <strong>histogram</strong> (değer dağılımı), n_distinct ve null_frac istatistiklerini <code>pg_statistic</code>'e yazar.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">⚠️ Ne Zaman Zorunlu?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Toplu yükleme (<code>COPY</code>, <code>INSERT ... SELECT</code>) sonrası. Eski boş tablo istatistikleriyle planner felç olur — yanlış plan seçer.</div>
+                  </div>
+                  <div style="background:rgba(255,193,7,0.12); padding:9px; border-radius:4px; border-left:4px solid #FFC107;">
+                    <div style="font-size:11px; color:#ffe082;">💡 <strong>autovacuum</strong> normalde ANALYZE'ı otomatik tetikler. Büyük toplu yüklemelerden hemen sonra manuel çalıştırmak güvenli alışkanlıktır.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — İstatistikleri topla</div>
+                <div class="code-block" style="font-size:10.5px; margin-bottom:5px;">-- Toplu yüklemeden sonra ZORUNLU
+ANALYZE konya.osm_binalar;
+ANALYZE konya.mahalleler;
+ANALYZE konya.poi;
+-- ✓ Beklenen: Saniyeler içinde tamamlanır</div>
+
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 2 — Toplanan istatistiği gör</div>
+                <div class="code-block" style="font-size:10.5px; margin-bottom:5px;">SELECT attname AS sutun, n_distinct, null_frac, correlation
+FROM pg_stats
+WHERE schemaname='konya' AND tablename='osm_binalar';
+-- ✓ Beklenen: tip, mahalle_id, kat_sayisi, geom satırları</div>
+
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 3 — Plan değişti mi?</div>
+                <div class="code-block" style="font-size:10.5px; margin-bottom:5px;">EXPLAIN ANALYZE
+SELECT * FROM konya.osm_binalar
+WHERE tip = 'residential';
+-- ✓ Önce: Seq Scan (planner kötü tahmin)
+-- ✓ ANALYZE sonrası: Index Scan (doğru plan)</div>
+
+                <div class="reveal-box" id="idx41g">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41g').classList.toggle('open')">Kritik Soru: ANALYZE yapmazsam ne olur? <span>▼</span></div>
+                  <div class="reveal-content">1 milyon yeni satır eklediniz ve ANALYZE çalıştırmadınız → PostgreSQL hâlâ "tablo boş" sanır, küçük tablo planı seçer, Seq Scan zorlar. Sorgular dakikalarca sürer. <code>ANALYZE</code> = "Haritayı Güncelle!" komutudur.</div>
+                </div>
+                <div class="reveal-box" id="idx41h">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41h').classList.toggle('open')">Görev: Tüm Şemayı Pusulala <span>▼</span></div>
+                  <div class="reveal-content"><code>VACUUM ANALYZE konya;</code> tek komutu ile şemadaki tüm tabloların hem ölü satırlarını topla hem istatistiklerini güncelle. Ardından <code>pg_stat_user_indexes</code>'tan <code>idx_scan</code> değerlerini gözlemleyin.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 6: 4.1.5 ÖLÜ İNDEKS AVI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.1.5 — Ölü İndeks Avı: pg_stat_user_indexes</div>
+              <div class="slide-header-num">06 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Ölü <span>İndeks</span> Avı</div>
+                <div class="s-sub-tech">Kurulan her indeks yararlı mı? Yoksa disk yiyip INSERT hızını mı sömürüyor?</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📊 pg_stat_user_indexes</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">PostgreSQL her indeksin kaç kez okunduğunu <code>idx_scan</code> sayacında tutar. Sunucu yeniden başlatılana dek birikir.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #c62828;">
+                    <div style="font-weight:bold; color:#b71c1c; font-size:13px;">💀 idx_scan = 0 Ne Demek?</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Bu indeks kurulduğundan beri <strong>hiç okunmadı</strong>. Disk kaplar, ama hiçbir sorguya katkı yapmadı.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">🐢 Ölü İndeksin Gizli Maliyeti</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Hiç okunmasa da her <code>INSERT</code> / <code>UPDATE</code> bu indeksi güncellemek zorundadır. Yazma hızını <strong>doğrudan yavaşlatır</strong>.</div>
+                  </div>
+                  <div style="background:#fffbe6; padding:10px; border-radius:4px; border-left:4px solid #FFC107;">
+                    <div style="font-size:11px; color:#6b5900;">💡 Eğitim sonunda bu sorguyu çalıştırın. Listede çıkanları <code>DROP INDEX</code> ile temizleyin — veritabanı rahatlar.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ Ölü indeksleri bul</div>
+                <div class="code-block" style="font-size:11px; margin-bottom:5px;">SELECT indexrelname AS indeks_adi,
+       pg_size_pretty(pg_relation_size(indexrelid)) AS bosuna_kapladigi_yer,
+       idx_scan AS kullanim_sayisi
+FROM pg_stat_user_indexes
+WHERE schemaname = 'konya'
+  AND idx_scan = 0
+ORDER BY pg_relation_size(indexrelid) DESC;
+-- ✓ Beklenen: Hiç kullanılmamış indekslerin listesi</div>
+
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ En çok kullanılan indeksler (sağlıklı)</div>
+                <div class="code-block" style="font-size:11px; margin-bottom:5px;">SELECT indexrelname,
+       idx_scan,
+       pg_size_pretty(pg_relation_size(indexrelid)) AS boyut
+FROM pg_stat_user_indexes
+WHERE schemaname = 'konya'
+ORDER BY idx_scan DESC
+LIMIT 10;
+-- ✓ Beklenen: En çok okunmuş indeksler</div>
+
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ Ölü indeksi temizle</div>
+                <div class="code-block" style="font-size:11px; margin-bottom:5px;">DROP INDEX IF EXISTS konya.idx_eski_kullanilmayan;
+-- Veya CONCURRENTLY ile (canlı sistemde):
+-- DROP INDEX CONCURRENTLY konya.idx_eski_kullanilmayan;</div>
+
+                <div class="reveal-box" id="idx41i">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41i').classList.toggle('open')">Kritik Soru: Hiç kullanılmayan indeksi neden silmeliyim? <span>▼</span></div>
+                  <div class="reveal-content">Sadece disk kaplamakla kalmaz! Tabloya her yeni veri (INSERT/UPDATE) geldiğinde PostgreSQL bu "işe yaramaz" indeksi de güncellemek zorundadır. Yazma performansı doğrudan etkilenir. Mümkün olan <strong>en az indeksle</strong> yola devam edin — disiplinli DBA, az ama doğru indeks kurar.</div>
+                </div>
+                <div class="reveal-box" id="idx41j">
+                  <div class="reveal-trigger" onclick="document.getElementById('idx41j').classList.toggle('open')">Görev: Çöpü Dışarı Çıkar <span>▼</span></div>
+                  <div class="reveal-content">Yukarıdaki SQL'i çalıştırın. <code>idx_scan = 0</code> ile çıkan herhangi bir kendi kurduğunuz indeksi <code>DROP INDEX</code> ile silin (sistem indekslerine — primary key vb. — dokunmayın). Tekrar sorguya gözlemleyin: daha temiz bir liste.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- BÖLÜM 4.2 — VERİTABANI GÜVENLİĞİ                                  -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+
+      <!-- SLAYT 7: 4.2.0 GÜVENLİK KATMANLARI (YENİ GİRİŞ SLAYTI) -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.2.0 — Güvenlik Katmanları ve Minimum Yetki Prensibi</div>
+              <div class="slide-header-num">07 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">5 Katman <span>Güvenlik</span></div>
+                <div class="s-sub-tech">PostgreSQL erişim kontrolü çok katmanlı bir piramittir. Her katman bir önceki üzerinde durur — biri çökerse diğeri devreye girer.</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">1️⃣ Network — pg_hba.conf</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:3px;">Hangi IP'den, hangi yöntemle (md5, scram, peer) bağlanılabilir? Veritabanına ulaşmadan önce kapıdaki güvenlik.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">2️⃣ Rol / Kullanıcı — CREATE ROLE</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:3px;">Her kullanıcı bir rol. Roller gruplandırılır (fen_isleri, planlama). LOGIN, SUPERUSER, CREATEDB attribütleri.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">3️⃣ Şema / Tablo — GRANT</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:3px;">Roller hangi şemayı (<code>USAGE</code>), hangi tabloyu (<code>SELECT/INSERT/UPDATE/DELETE</code>) görebilir? Nesne bazlı izin.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">4️⃣ Satır — Row Level Security</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:3px;">Aynı tabloda, kullanıcıya göre farklı satır seti. <code>ST_Intersects</code> politikası ile mekansal filtre.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">5️⃣ Sütun — Column Privileges</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:3px;"><code>GRANT SELECT (ad, geom) ON ...</code> ile hassas sütunları gizle. Maaş, TC kimlik gibi alanlar için.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: Güvenlik katmanları piramidi -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Güvenlik Katmanları Piramidi</div>
+                <svg width="100%" viewBox="0 0 320 200" style="display:block; background:rgba(255,255,255,0.04); border-radius:5px; margin-bottom:8px;">
+                  <!-- Katman 1: Network -->
+                  <polygon points="20,180 300,180 280,155 40,155" fill="#4fc3f7" opacity="0.85"/>
+                  <text x="160" y="173" font-size="11" font-weight="700" fill="#000" text-anchor="middle">Network — pg_hba.conf (IP / SSL)</text>
+                  <!-- Katman 2: Rol -->
+                  <polygon points="40,155 280,155 260,130 60,130" fill="#a5d6a7" opacity="0.85"/>
+                  <text x="160" y="148" font-size="11" font-weight="700" fill="#000" text-anchor="middle">Rol / Kullanıcı — CREATE ROLE</text>
+                  <!-- Katman 3: Şema/Tablo -->
+                  <polygon points="60,130 260,130 240,105 80,105" fill="#ffcc80" opacity="0.85"/>
+                  <text x="160" y="123" font-size="11" font-weight="700" fill="#000" text-anchor="middle">Şema / Tablo — GRANT</text>
+                  <!-- Katman 4: RLS -->
+                  <polygon points="80,105 240,105 220,80 100,80" fill="#ce93d8" opacity="0.9"/>
+                  <text x="160" y="98" font-size="11" font-weight="700" fill="#000" text-anchor="middle">Satır — Row Level Security</text>
+                  <!-- Katman 5: Sütun -->
+                  <polygon points="100,80 220,80 200,55 120,55" fill="#ef9a9a" opacity="0.9"/>
+                  <text x="160" y="73" font-size="10" font-weight="700" fill="#000" text-anchor="middle">Sütun — Column Privileges</text>
+                  <!-- Tepe: Veri -->
+                  <polygon points="120,55 200,55 180,30 140,30" fill="#fff176"/>
+                  <text x="160" y="48" font-size="10" font-weight="800" fill="#5d4037" text-anchor="middle">🔒 Veri</text>
+                  <!-- Etiket: Minimum Yetki -->
+                  <text x="160" y="22" font-size="10" font-weight="700" fill="#ffe082" text-anchor="middle">Minimum Yetki Prensibi</text>
+                  <!-- Yan ok -->
+                  <text x="305" y="190" font-size="7" fill="#ccc" text-anchor="end">geniş</text>
+                  <text x="305" y="25" font-size="7" fill="#ccc" text-anchor="end">dar</text>
+                </svg>
+
+                <div style="background:rgba(255,193,7,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #FFC107; margin-top:6px;">
+                  <div style="font-weight:bold; color:#ffe082; font-size:12px; margin-bottom:4px;">🎯 Minimum Yetki Prensibi</div>
+                  <div style="font-size:10.5px; color:#ddd; line-height:1.6;">Her role <strong>sadece işi için gereken</strong> izin verilir. <code>DELETE</code> yetkisi olmayan kullanıcı kazara silemez; <code>UPDATE</code> yoksa veriyi bozamaz. Belediye ölçeğinde bu prensip ihlal edilirse — bir kullanıcı bile riskli kalır.</div>
+                </div>
+
+                <div class="reveal-box" id="sec42a">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42a').classList.toggle('open')">Kritik Soru: Neden 5 katman? Tek katman yeterli değil mi? <span>▼</span></div>
+                  <div class="reveal-content"><strong>Defense-in-depth</strong> prensibi: bir katman çökerse diğeri devreye girer. Örnek: Web uygulaması SQL injection ile hacklenirse (sütun seviyesi yetersiz), ama <strong>read-only kullanıcı</strong> (rol katmanı) kullanılıyorsa veri değişemez. RLS aktifse, hacklenen kullanıcı sadece kendi ilçe verisini görür. Her katman bir önceki güvensizleştiğinde son savunma.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 8: 4.2.1 GRANT NESNE İZİNLERİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.2.1 — GRANT: Nesne İzinleri (USAGE, SELECT, INSERT...)</div>
+              <div class="slide-header-num">08 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Nesne <span>İzinleri</span></div>
+                <div class="s-sub-tech">Şema, tablo, sütun — her nesne için ayrı bir izin katmanı.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📋 İzin Hiyerarşisi</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Önce <code>GRANT USAGE ON SCHEMA</code> — şemaya girmek için şart. Sonra tabloya <code>SELECT / INSERT / UPDATE / DELETE</code>. USAGE olmadan tablo izni işe yaramaz.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🎯 Minimum Yetki</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Her role sadece işi için gerekli izni verin. <code>DELETE</code> yoksa kazara silme imkansız. <code>ALL PRIVILEGES</code> sadece nesne sahibine yakışır.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">🔮 Gelecek Tablolar</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>GRANT ON ALL TABLES</code> sadece <strong>mevcut</strong> tabloları kapsar. Sonradan eklenen tablolar için <code>ALTER DEFAULT PRIVILEGES</code> şarttır.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                    <div style="font-weight:bold; color:#880e4f; font-size:13px;">🔍 İzinleri Sorgula</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>\dp konya.osm_binalar</code> (psql) veya <code>information_schema.role_table_grants</code> sorgusu.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — Salt-Okuyucu Rol Kur</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;">-- Rol oluştur (LOGIN yok = grup rolü)
+CREATE ROLE okuyucu_rol;
+
+-- ZORUNLU: Şemaya giriş izni
+GRANT USAGE ON SCHEMA konya TO okuyucu_rol;
+
+-- Tablo bazlı SELECT
+GRANT SELECT ON konya.mahalleler TO okuyucu_rol;
+GRANT SELECT ON konya.poi TO okuyucu_rol;
+-- ✓ Beklenen: GRANT</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 2 — Yazma Yetkisi (DELETE Hariç)</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;">-- Fen İşleri: yolları okusun, ekleyebilsin, güncelleyebilsin
+CREATE ROLE fen_isleri_rol;
+GRANT USAGE ON SCHEMA konya TO fen_isleri_rol;
+GRANT SELECT, INSERT, UPDATE
+  ON konya.osm_yollar TO fen_isleri_rol;
+
+-- Kaza kayıtlarını ekleyebilsin ama silemesin
+GRANT USAGE ON SCHEMA analiz TO fen_isleri_rol;
+GRANT SELECT, INSERT ON analiz.kazalar TO fen_isleri_rol;</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 3 — Gelecek Tablolar İçin Default</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;">-- Bundan sonra konya şemasına eklenen TÜM tablolar
+-- otomatik olarak okuyucu_rol'e SELECT verir
+ALTER DEFAULT PRIVILEGES IN SCHEMA konya
+  GRANT SELECT ON TABLES TO okuyucu_rol;
+-- ✓ Beklenen: ALTER DEFAULT PRIVILEGES</div>
+
+                <div class="reveal-box" id="sec42b">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42b').classList.toggle('open')">Kritik Soru: USAGE olmadan SELECT yeterli mi? <span>▼</span></div>
+                  <div class="reveal-content"><strong>Hayır.</strong> <code>GRANT SELECT ON konya.mahalleler TO okuyucu_rol</code> versek bile <code>GRANT USAGE ON SCHEMA konya</code> olmadan kullanıcı şemaya giremez — sorgu <em>"şema yok veya erişim yok"</em> hatası verir. Her zaman önce USAGE, sonra tablo izni.</div>
+                </div>
+                <div class="reveal-box" id="sec42c">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42c').classList.toggle('open')">Görev: İzleme Rolü Kur <span>▼</span></div>
+                  <div class="reveal-content"><code>izleme_rol</code> adında bir rol oluşturun. <code>konya.osm_binalar</code> ve <code>konya.mahalleler</code> tablolarında yalnızca SELECT yetkisi verin. <code>ALTER DEFAULT PRIVILEGES</code> ile sonradan eklenecek konya tablolarını da kapsayın. Doğrulama: <code>\dp konya.*</code></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 9: 4.2.2 ROL ÜYELİĞİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.2.2 — Rol Üyeliği ve İzin Devri (WITH GRANT OPTION)</div>
+              <div class="slide-header-num">09 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Rol <span>Üyeliği</span></div>
+                <div class="s-sub-tech">Kullanıcıyı gruba ekle — gruptaki tüm izinler anında devralınır. Tek kişiye 50 GRANT yerine 1 GROUP membership.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">👥 Rol Hiyerarşisi</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Bir role başka bir rolü üye yapabilirsin. <code>GRANT fen_isleri_rol TO ali</code> → Ali, rolün tüm izinlerini devralır. Onlarca kullanıcıyı tek rol üzerinden yönet.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔑 WITH GRANT OPTION</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">İzni alan kişi başkasına da devredebilir. Tehlikeli — yetki zinciri kontrolden çıkabilir. Yalnızca güvenilen birim yöneticilerine verin.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">⛔ REVOKE CASCADE</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">WITH GRANT OPTION ile dağıtılan izinleri geri almak için CASCADE şart. Yoksa sadece doğrudan verilen izin gider; devredilenler kalır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">🧪 SET ROLE ile Test</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;"><code>SET ROLE fen_isleri_rol;</code> ile o role bürün, izinleri test et. <code>RESET ROLE;</code> ile geri dön. Production öncesi zorunlu adım.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — Grup Rol ve Kullanıcılar</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;">-- Grup rolü (Slayt 8'de zaten oluşturduysan bu satırı atla)
+-- CREATE ROLE fen_isleri_rol;
+GRANT USAGE ON SCHEMA konya TO fen_isleri_rol;
+GRANT SELECT, INSERT, UPDATE ON konya.osm_yollar TO fen_isleri_rol;
+
+-- Bireysel kullanıcılar (LOGIN var)
+CREATE ROLE ali LOGIN PASSWORD 'ali2024';
+CREATE ROLE ayse LOGIN PASSWORD 'ayse2024';
+
+-- Tek seferde gruba ekle
+GRANT fen_isleri_rol TO ali, ayse;
+-- ✓ Ali ve Ayşe artık fen_isleri yetkilerinin tümüne sahip</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 2 — WITH GRANT OPTION (Devir)</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;">-- Önce planlama_rol oluştur (yoksa SET ROLE başarısız olur)
+CREATE ROLE planlama_rol;
+CREATE ROLE mehmet LOGIN PASSWORD 'mehmet2024';
+-- ⚠️ USAGE olmadan başka rol adına GRANT yapılamaz
+GRANT USAGE ON SCHEMA konya TO planlama_rol;
+
+-- Planlama müdürü başkalarına da izin verebilsin
+GRANT SELECT ON konya.ilce_sinirlari
+  TO planlama_rol WITH GRANT OPTION;
+
+-- Planlama rolüne sahip kullanıcı bu izni başkasına verebilir
+SET ROLE planlama_rol;
+GRANT SELECT ON konya.ilce_sinirlari TO mehmet;
+RESET ROLE;</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 3 — REVOKE ve CASCADE</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;">-- Sadece ali'yi rolden çıkar (ayşe etkilenmez)
+REVOKE fen_isleri_rol FROM ali;
+
+-- WITH GRANT OPTION zincirini de temizle
+REVOKE SELECT ON konya.ilce_sinirlari
+  FROM planlama_rol CASCADE;
+-- ✓ Mehmet'in dolaylı izni de iptal olur</div>
+
+                <div class="reveal-box" id="sec42d">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42d').classList.toggle('open')">Kritik Soru: Kullanıcıya mı, role mi izin verilmeli? <span>▼</span></div>
+                  <div class="reveal-content">Her zaman <strong>role</strong> verin, kullanıcıya değil. Ali ayrılırsa <code>REVOKE fen_isleri_rol FROM ali</code> yeterli — onlarca tabloyu tek tek temizlemek yok. Yeni gelen Veli'ye sadece <code>GRANT fen_isleri_rol TO veli</code>. Rol = yetki şablonu.</div>
+                </div>
+                <div class="reveal-box" id="sec42e">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42e').classList.toggle('open')">Görev: Birim Yönetimi Senaryosu <span>▼</span></div>
+                  <div class="reveal-content"><code>imar_rol</code> oluşturun: <code>konya.mahalleler</code> SELECT, <code>konya.ilce_sinirlari</code> SELECT + INSERT yetkisi. İki test kullanıcısı oluşturup role ekleyin. Birini <code>REVOKE</code> ile çıkarıp <code>SET ROLE imar_rol</code> ile diğerinin izinlerini doğrulayın.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 10: 4.2.3 RLS MEKANSAL -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.2.3 — Mekansal Row Level Security (RLS)</div>
+              <div class="slide-header-num">10 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Bölge <span>Bazlı</span> Kısıt</div>
+                <div class="s-sub-tech">Meram personeli yalnızca Meram'ı görür — otomatik, şeffaf, kullanıcı farkında bile değil.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🔒 RLS Nedir?</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Row Level Security — her kullanıcı sorgusuna otomatik WHERE koşulu eklenir. <code>SELECT * FROM tablo</code> dese bile arka planda <code>WHERE ...</code> uygulanır.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🗺️ Mekansal RLS</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Politikanın <code>USING</code> koşuluna <code>ST_Intersects(geom, ilce_sinirlari)</code> yazılır. Kullanıcı sadece kendi ilçesindeki kayıtları görür.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">⚡ Performans Notu</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;">Her sorguda <code>ST_Intersects</code> çalışır → GiST indeksi <strong>zorunlu</strong>. İndeks varsa etki milisaniyeler düzeyindedir.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:11px; border-radius:4px; border-left:4px solid #880e4f;">
+                    <div style="font-weight:bold; color:#880e4f; font-size:13px;">🧪 SET ROLE ile Doğrula</div>
+                    <div style="font-size:11px; color:#444; margin-top:4px;"><code>SET ROLE meram_calisani;</code> ile mevcut oturumda o kullanıcı gibi davran, satır sayısını kontrol et, sonra <code>RESET ROLE</code>.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: Harita üzerinde RLS filtre görselleştirmesi -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">RLS Görselleştirmesi</div>
+                <svg width="100%" viewBox="0 0 320 90" style="display:block; background:#f7f9fc; border-radius:5px; margin-bottom:8px;">
+                  <!-- Admin: tüm bina noktaları -->
+                  <text x="10" y="12" font-size="9" font-weight="700" fill="#1565c0">Admin görür → 18.279 bina</text>
+                  <rect x="10" y="18" width="140" height="60" fill="#e3f2fd" stroke="#90caf9" stroke-width="1" rx="3"/>
+                  <!-- Konya ilçeleri -->
+                  <polygon points="20,28 60,30 70,55 35,68 18,55" fill="rgba(255,204,128,0.4)" stroke="#e65100" stroke-width="0.8"/>
+                  <polygon points="60,30 110,32 115,52 70,55" fill="rgba(165,214,167,0.4)" stroke="#2e7d32" stroke-width="0.8"/>
+                  <polygon points="110,32 140,40 142,68 115,72 115,52" fill="rgba(206,147,216,0.4)" stroke="#6a1b9a" stroke-width="0.8"/>
+                  <!-- Bina noktaları (her ilçede) -->
+                  <g fill="#0d47a1">
+                    <circle cx="30" cy="42" r="1.5"/><circle cx="42" cy="55" r="1.5"/><circle cx="48" cy="38" r="1.5"/>
+                    <circle cx="78" cy="40" r="1.5"/><circle cx="88" cy="48" r="1.5"/><circle cx="95" cy="38" r="1.5"/>
+                    <circle cx="120" cy="48" r="1.5"/><circle cx="130" cy="60" r="1.5"/><circle cx="128" cy="38" r="1.5"/>
+                  </g>
+                  <text x="35" y="80" font-size="6" fill="#bf360c">Meram</text>
+                  <text x="80" y="80" font-size="6" fill="#1b5e20">Karatay</text>
+                  <text x="125" y="80" font-size="6" fill="#6a1b9a">Selçuklu</text>
+                  <!-- Meram personeli görür -->
+                  <text x="170" y="12" font-size="9" font-weight="700" fill="#bf360c">meram_calisani görür → 25 bina</text>
+                  <rect x="170" y="18" width="140" height="60" fill="#fff3e0" stroke="#ffcc80" stroke-width="1" rx="3"/>
+                  <!-- Sadece Meram dolu -->
+                  <polygon points="180,28 220,30 230,55 195,68 178,55" fill="rgba(255,204,128,0.85)" stroke="#e65100" stroke-width="1.2"/>
+                  <polygon points="220,30 270,32 275,52 230,55" fill="rgba(200,200,200,0.25)" stroke="#aaa" stroke-width="0.6" stroke-dasharray="2,2"/>
+                  <polygon points="270,32 300,40 302,68 275,72 275,52" fill="rgba(200,200,200,0.25)" stroke="#aaa" stroke-width="0.6" stroke-dasharray="2,2"/>
+                  <g fill="#bf360c">
+                    <circle cx="190" cy="42" r="2"/><circle cx="202" cy="55" r="2"/><circle cx="208" cy="38" r="2"/>
+                  </g>
+                  <text x="195" y="80" font-size="6" fill="#bf360c" font-weight="700">Meram ✓</text>
+                  <text x="240" y="80" font-size="6" fill="#999">Karatay ✗</text>
+                  <text x="285" y="80" font-size="6" fill="#999">Selçuklu ✗</text>
+                </svg>
+
+                <div class="code-block" style="font-size:10px; line-height:1.4;">-- ▶ ADIM 1: Rol + temel yetki
+CREATE ROLE meram_calisani LOGIN PASSWORD 'meram2024';
+GRANT USAGE ON SCHEMA konya TO meram_calisani;
+GRANT SELECT ON konya.osm_binalar TO meram_calisani;
+GRANT SELECT ON konya.ilce_sinirlari TO meram_calisani;
+
+-- ▶ ADIM 2: RLS aç + politika
+ALTER TABLE konya.osm_binalar ENABLE ROW LEVEL SECURITY;
+CREATE POLICY meram_only ON konya.osm_binalar
+  AS PERMISSIVE FOR SELECT TO meram_calisani
+  USING (ST_Intersects(geom,
+    (SELECT geom FROM konya.ilce_sinirlari WHERE ad = 'Meram')));
+
+-- ▶ ADIM 3: Test
+SELECT count(*) FROM konya.osm_binalar;    -- 18279 (admin)
+SET ROLE meram_calisani;
+SELECT count(*) FROM konya.osm_binalar;    -- ~25 (RLS aktif)
+RESET ROLE;</div>
+                <div class="reveal-box" id="sec42f">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42f').classList.toggle('open')">Kritik Soru: RLS performansı etkiler mi? <span>▼</span></div>
+                  <div class="reveal-content">Evet, her sorguya otomatik <code>ST_Intersects</code> filtresi eklenir. Ama <code>geom</code> kolonunda GiST indeksi varsa etki milisaniyeler düzeyindedir. <strong>Önce indeks kontrol</strong>: <code>\d konya.osm_binalar</code> komutunda GiST indeksini görmelisiniz.</div>
+                </div>
+                <div class="reveal-box" id="sec42g">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42g').classList.toggle('open')">Görev: Selçuklu Politikası <span>▼</span></div>
+                  <div class="reveal-content">Selçuklu personeli için sadece Selçuklu sınırları içindeki binaları gösteren bir RLS politikası yazın. İpucu: aynı yapı, sadece <code>WHERE ad = 'Selçuklu'</code>.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 11: 4.2.4 READ-ONLY WEB KULLANICISI -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.2.4 — Read-Only Web Kullanıcısı (GeoServer / API)</div>
+              <div class="slide-header-num">11 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Web <span>Güvenliği</span></div>
+                <div class="s-sub-tech">GeoServer / REST API sadece okusun, asla yazmasın — en basit ve en etkili güvenlik katmanı.</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🌐 Neden Read-Only?</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Web uygulaması SQL Injection ile hacklenirse, saldırgan sadece SELECT çekebilir → veri değişemez, silinmez. Hasar sıfır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔒 default_transaction_read_only</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Kullanıcının <strong>her oturumu otomatik read-only başlar</strong>. INSERT/UPDATE/DELETE denemesi <code>ERROR: cannot execute ... in a read-only transaction</code> verir.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">📋 GRANT ON ALL TABLES</div>
+                    <div style="font-size:11px; color:#ccc; margin-top:4px;">Tek komutla şemadaki tüm tablolara SELECT verir. Sonra eklenenler için <code>ALTER DEFAULT PRIVILEGES</code> ekle — otomatik kapsama.</div>
+                  </div>
+                </div>
+
+                <div style="background:rgba(255,193,7,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #FFC107; margin-top:10px;">
+                  <div style="font-weight:bold; color:#ffe082; font-size:12px; margin-bottom:5px;">🛡️ Production Güvenlik Checklist</div>
+                  <div style="font-size:10.5px; color:#ddd; line-height:1.6;">
+                    ☑️ Web uygulaması <strong>asla</strong> <code>postgres</code> superuser ile bağlanmıyor<br>
+                    ☑️ Her uygulamanın kendi LOGIN rolü var<br>
+                    ☑️ <code>default_transaction_read_only</code> aktif (web için)<br>
+                    ☑️ <code>pg_hba.conf</code>'da yalnızca app IP'sine izin var<br>
+                    ☑️ SSL (<code>sslmode=require</code>) bağlantı zorunlu<br>
+                    ☑️ Parolalar <code>md5</code> değil <code>scram-sha-256</code>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — Kullanıcı Oluştur</div>
+                <div class="code-block" style="font-size:10px; margin-bottom:5px;">CREATE ROLE geoserver LOGIN PASSWORD 'geo2024';
+
+-- Şema erişimi + tüm tablolarda SELECT
+GRANT USAGE ON SCHEMA konya TO geoserver;
+GRANT USAGE ON SCHEMA analiz TO geoserver;
+GRANT SELECT ON ALL TABLES IN SCHEMA konya TO geoserver;
+GRANT SELECT ON ALL TABLES IN SCHEMA analiz TO geoserver;
+
+-- Gelecek tabloları da kapsa
+ALTER DEFAULT PRIVILEGES IN SCHEMA konya
+  GRANT SELECT ON TABLES TO geoserver;</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 2 — Salt-Okunur Kilitle</div>
+                <div class="code-block" style="font-size:10px; margin-bottom:5px;">-- Her oturum otomatik read-only başlar
+ALTER USER geoserver SET default_transaction_read_only = on;
+-- ✓ Beklenen: ALTER ROLE</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 3 — Test (SQL Injection Senaryosu)</div>
+                <div class="code-block" style="font-size:10px; margin-bottom:5px;">SET ROLE geoserver;
+
+-- ✓ Bu çalışır
+-- ⚠️ Slayt 10'daki RLS aktifse count 0 döner; önce:
+--   ALTER TABLE konya.osm_binalar DISABLE ROW LEVEL SECURITY;
+SELECT count(*) FROM konya.osm_binalar;  -- 18279 (RLS kapalıysa)
+
+-- ✗ Bunlar hata verir — saldırgan boşuna uğraşır
+UPDATE konya.osm_binalar SET tip = 'silindi';
+-- ERROR: cannot execute UPDATE in a read-only transaction
+
+DELETE FROM konya.osm_binalar WHERE id = 1;
+-- ERROR: cannot execute DELETE in a read-only transaction
+
+INSERT INTO konya.osm_binalar (id) VALUES (99999);
+-- ERROR: cannot execute INSERT in a read-only transaction
+
+RESET ROLE;</div>
+
+                <div class="reveal-box" id="sec42h">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42h').classList.toggle('open')">Kritik Soru: Neden bu kadar agresif? <span>▼</span></div>
+                  <div class="reveal-content">Web uygulaması üzerinden SQL Injection saldırısı olsa bile saldırgan veriyi değiştiremez veya silemez. <code>default_transaction_read_only</code> bağlantı açılırken devreye girer; bağlandıktan sonra kullanıcı bunu DEĞİŞTİREMEZ (sunucu seviyesinde zorlanır). Web tarafında değil DB tarafında kilit.</div>
+                </div>
+                <div class="reveal-box" id="sec42i">
+                  <div class="reveal-trigger" onclick="document.getElementById('sec42i').classList.toggle('open')">Görev: Yetkiyi Doğrula <span>▼</span></div>
+                  <div class="reveal-content">DBeaver'da yeni bir bağlantı açın: <code>geoserver / geo2024</code>. <code>SELECT count(*) FROM konya.osm_yollar</code> çalıştırın → sayı dönmeli. Sonra <code>UPDATE konya.osm_yollar SET ad = 'test' WHERE id = 1;</code> deneyin → hata almalısınız. Senaryo doğrulanır.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- BÖLÜM 4.3 — YEDEKLEME VE KURTARMA                                 -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+
+      <!-- SLAYT 12: 4.3.1 pg_dump & pg_restore -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.1 — pg_dump ve pg_restore: Veri Sigortası</div>
+              <div class="slide-header-num">12 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veri <span>Sigortası</span></div>
+                <div class="s-sub-tech">🔑 <strong>Analoji:</strong> Veritabanı canlı bir resim, <code>pg_dump</code> o resmin fotoğrafını çekmek, <code>pg_restore</code> fotoğrafı yeni bir çerçeveye koymaktır.</div>
+                <div style="display:flex; flex-direction:column; gap:7px; margin-top:9px;">
+                  <div style="background:#e3f2fd; padding:9px 11px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:12px;">💾 pg_dump -Fc (Custom Format)</div>
+                    <div style="font-size:10.5px; color:#444; margin-top:3px;">Binary (sıkıştırılmış) yedek formatı. SQL metnine göre <strong>~10× küçük</strong> ve <code>pg_restore</code> ile <strong>seçici geri yükleme</strong> (tek tablo, tek şema) yapılabilir. Üretim için standart.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:9px 11px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:12px;">♻️ pg_restore --no-owner</div>
+                    <div style="font-size:10.5px; color:#444; margin-top:3px;">Farklı bir sunucuya geri yüklerken <strong>sahiplik (owner) çakışmasını</strong> önler. Üretim → test geçişlerinde zorunlu (kullanıcı isimleri eşleşmez).</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:9px 11px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:12px;">🗂️ Yedeğin İçinde Ne Var?</div>
+                    <div style="font-size:10.5px; color:#444; margin-top:3px;">Tablolar + indeksler + sequence + fonksiyon + PostGIS uzantı kaydı + view. Sadece <strong>şema</strong> için <code>-s</code>, sadece <strong>veri</strong> için <code>-a</code>.</div>
+                  </div>
+                  <div style="background:#f3e5f5; padding:9px 11px; border-radius:4px; border-left:4px solid #6a1b9a;">
+                    <div style="font-weight:bold; color:#4a148c; font-size:12px;">⏰ Otomatik Yedek (cron)</div>
+                    <div style="font-size:10.5px; color:#444; margin-top:3px;">Linux'ta <code>crontab</code> ile her gece yedek + retention. Belediye sistemleri için kritik — manuel yedek unutulur.</div>
+                  </div>
+                </div>
+                <div style="margin-top:10px; background:#fffde7; padding:9px 11px; border-radius:4px; border-left:4px solid #f9a825;">
+                  <div style="font-weight:bold; color:#5d4037; font-size:11px; margin-bottom:3px;">📘 pg_dump vs pg_dumpall</div>
+                  <div style="font-size:10px; color:#555; line-height:1.55;"><code>pg_dump</code> <strong>tek bir veritabanını</strong> yedekler. <code>pg_dumpall</code> <strong>tüm cluster'ı</strong> (tüm DB + roller + grant + tablespace) yedekler. Standart pratik: günlük <code>pg_dump</code> + haftalık <code>pg_dumpall</code>.</div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="background:rgba(245,197,24,0.08); padding:8px 10px; border-left:3px solid #f9a825; border-radius:3px; margin-bottom:7px; font-size:10.5px; color:#5d4037;">
+                  <strong>⚠️ NEREDE çalışır?</strong> <code>pg_dump</code> ve <code>pg_restore</code> <strong>terminal / CMD</strong> komutlarıdır — DBeaver SQL editöründe ÇALIŞMAZ. Docker için <code>docker exec</code> ile gönderilir.
+                </div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ Yedekleme (Terminal / CMD)</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;"># 1) Docker içinden YEDEK al (-Fc = custom format)
+docker exec konya_postgis_db pg_dump \
+  -U egitim -Fc -n konya konya_egitim \
+  &gt; konya_yedek.dump
+
+# 2) Dosya boyutu kontrolü
+ls -lh konya_yedek.dump
+# ✓ Beklenen: ~50-150 MB (sıkıştırılmış)
+
+# 3) Tüm cluster (roller + tüm DB'ler)
+docker exec konya_postgis_db pg_dumpall \
+  -U postgres &gt; full_cluster.sql</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ Geri Yükleme</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;"># Yeni bir DB'ye geri yükle
+docker exec -i konya_postgis_db pg_restore \
+  -U egitim -d konya_egitim_test \
+  --no-owner -Fc &lt; konya_yedek.dump
+
+# Sadece tek tablo geri yükle (-t)
+docker exec -i konya_postgis_db pg_restore \
+  -U egitim -d konya_egitim -t osm_binalar \
+  --no-owner -Fc &lt; konya_yedek.dump</div>
+
+                <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ Otomatik Gece Yedeği (crontab -e)</div>
+                <div class="code-block" style="font-size:9.5px; margin-bottom:5px;"># Her gece 02:00'de yedek + 7 günden eskiyi sil
+0 2 * * * docker exec konya_postgis_db pg_dump \
+  -U egitim -Fc konya_egitim \
+  &gt; /yedek/konya_$(date +\%F).dump \
+  &amp;&amp; find /yedek -name "konya_*.dump" \
+       -mtime +7 -delete</div>
+
+                <div class="reveal-box" id="bak43a">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43a').classList.toggle('open')">Kritik Soru: SQL formatı mı Binary format mı? <span>▼</span></div>
+                  <div class="reveal-content">Binary (<code>-Fc</code>) ~10× daha küçük, <code>pg_restore</code> ile seçici geri yükleme yapılabilir (tek tablo, tek şema, paralel restore). SQL formatı (<code>-Fp</code>) sadece okunabilirlik için tercih edilir. Gerçek üretim yedekleri için her zaman <code>-Fc</code>.</div>
+                </div>
+                <div class="reveal-box" id="bak43b">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43b').classList.toggle('open')">Görev: Yedek Al ve Geri Yükle <span>▼</span></div>
+                  <div class="reveal-content"><strong>1)</strong> Üstteki komutla konya şemasını yedekle.<br><strong>2)</strong> <code>docker exec konya_postgis_db psql -U egitim -c "CREATE DATABASE test_geri"</code><br><strong>3)</strong> Yedeği <code>test_geri</code>'ye yükle.<br><strong>4)</strong> <code>SELECT count(*) FROM konya.osm_binalar</code> ile bina sayısını doğrula.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 13: 4.3.2 VERİ KURTARMA HİYERARŞİSİ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.2 — Veri Kurtarma Hiyerarşisi (4 Savunma Hattı)</div>
+              <div class="slide-header-num">13 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">4 Savunma <span>Hattı</span></div>
+                <div class="s-sub-tech">🔑 <strong>Analoji:</strong> Yangın çıktı. İlk söndürücü → kapı yanındaki tüp. İkinci → koridordaki tüp. Üçüncü → itfaiye. <em>Hangisi mevcutsa onu kullan</em>, her biri kendi senaryosuna göre tasarlanmıştır.</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:9px;">
+                  <div style="background:rgba(165,214,167,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #66bb6a;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🟢 1) ROLLBACK — Saniyeler</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Transaction hâlâ açık, <code>COMMIT</code> denmemiş → tek satırla geri al.<br><span style="color:#a5d6a7;">📌</span> <code>BEGIN; DELETE ...; ROLLBACK;</code></div>
+                  </div>
+                  <div style="background:rgba(255,235,59,0.10); padding:10px 12px; border-radius:4px; border-left:4px solid #fdd835;">
+                    <div style="font-weight:bold; color:#fff59d; font-size:13px;">🟡 2) pg_dirtyread — Dakikalar–Saatler</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Commit edildi ama <strong>VACUUM çalışmadıysa</strong> ölü satırlar diskte. <br><span style="color:#fff59d;">📌</span> 10 dk önce silinen, autovacuum dokunmamış.</div>
+                  </div>
+                  <div style="background:rgba(255,152,0,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #fb8c00;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🟠 3) PITR — Sınırsız Zaman</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">WAL arşivi varsa, geçmişte <strong>herhangi bir saniyeye</strong> dönülebilir.<br><span style="color:#ffcc80;">📌</span> 3 gün önce 02:14'teki UPDATE → tam o ana dön.</div>
+                  </div>
+                  <div style="background:rgba(244,143,177,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #e91e63;">
+                    <div style="font-weight:bold; color:#f48fb1; font-size:13px;">🔴 4) pg_dump Restore — Son Çare</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Yedekten sonraki güncel veri kaybedilir.<br><span style="color:#f48fb1;">📌</span> Sunucu çöktü, son 6 saat kayıp — kabul edilir.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: Kurtarma piramidi (RPO/RTO) -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">RPO / RTO Hiyerarşisi</div>
+                <svg width="100%" viewBox="0 0 320 130" style="display:block; background:rgba(255,255,255,0.04); border-radius:5px; margin-bottom:8px;">
+                  <!-- 4 kademe çubuk -->
+                  <!-- Rollback -->
+                  <rect x="10" y="105" width="60" height="20" fill="#66bb6a" rx="2"/>
+                  <text x="40" y="119" font-size="9" font-weight="700" fill="#000" text-anchor="middle">ROLLBACK</text>
+                  <text x="75" y="119" font-size="8" fill="#a5d6a7">RPO=0s · RTO=1s</text>
+                  <!-- pg_dirtyread -->
+                  <rect x="10" y="80" width="100" height="20" fill="#fdd835" rx="2"/>
+                  <text x="60" y="94" font-size="9" font-weight="700" fill="#000" text-anchor="middle">pg_dirtyread</text>
+                  <text x="115" y="94" font-size="8" fill="#fff59d">RPO=dakika · RTO=dakika</text>
+                  <!-- PITR -->
+                  <rect x="10" y="55" width="150" height="20" fill="#fb8c00" rx="2"/>
+                  <text x="85" y="69" font-size="9" font-weight="700" fill="#000" text-anchor="middle">PITR (WAL arşivi)</text>
+                  <text x="165" y="69" font-size="8" fill="#ffcc80">RPO=1s · RTO=10dk</text>
+                  <!-- pg_dump restore -->
+                  <rect x="10" y="30" width="240" height="20" fill="#e91e63" rx="2"/>
+                  <text x="130" y="44" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">pg_dump restore</text>
+                  <text x="255" y="44" font-size="8" fill="#f48fb1">RPO=24sa · RTO=1sa</text>
+                  <!-- Üst etiket -->
+                  <text x="160" y="15" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">Hangi Veri Kaybı Kabul Edilebilir? ↓</text>
+                  <!-- Açıklama -->
+                  <text x="10" y="125" font-size="6" fill="#888">RPO = kabul edilen veri kaybı süresi · RTO = kabul edilen restore süresi</text>
+                </svg>
+
+                <div style="font-size:13px; font-weight:bold; color:#fff; margin-bottom:6px;">Felaket Anı — Karar Ağacı</div>
+                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:11px; font-size:10.5px; color:#eee; line-height:1.5;">
+                  <div style="background:#0d47a1; color:#fff; padding:4px 9px; border-radius:3px; display:inline-block; font-weight:700;">❓ Az önce mi oldu? Transaction açık mı?</div>
+                  <div style="margin:4px 0 4px 14px;"><span style="color:#a5d6a7; font-weight:700;">EVET</span> → <span style="background:#66bb6a; color:#000; padding:1px 6px; border-radius:2px; font-weight:700;">ROLLBACK</span></div>
+                  <div style="margin:4px 0 4px 14px;"><span style="color:#ef9a9a; font-weight:700;">HAYIR</span> ↓</div>
+                  <div style="margin-left:28px; background:#0d47a1; color:#fff; padding:4px 9px; border-radius:3px; display:inline-block; font-weight:700;">❓ VACUUM çalıştı mı?</div>
+                  <div style="margin:4px 0 4px 42px;"><span style="color:#a5d6a7;">HAYIR</span> → <span style="background:#fdd835; color:#000; padding:1px 6px; border-radius:2px; font-weight:700;">pg_dirtyread</span></div>
+                  <div style="margin:4px 0 4px 42px;"><span style="color:#ef9a9a;">EVET</span> ↓</div>
+                  <div style="margin-left:56px; background:#0d47a1; color:#fff; padding:4px 9px; border-radius:3px; display:inline-block; font-weight:700;">❓ WAL arşivi var mı?</div>
+                  <div style="margin:4px 0 4px 70px;"><span style="color:#a5d6a7;">EVET</span> → <span style="background:#fb8c00; color:#000; padding:1px 6px; border-radius:2px; font-weight:700;">PITR</span></div>
+                  <div style="margin:4px 0 4px 70px;"><span style="color:#ef9a9a;">HAYIR</span> → <span style="background:#e91e63; color:#fff; padding:1px 6px; border-radius:2px; font-weight:700;">pg_dump restore</span></div>
+                </div>
+
+                <div class="reveal-box" id="bak43c">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43c').classList.toggle('open')">Neden Tek Araç Değil, Katmanlı Strateji? <span>▼</span></div>
+                  <div class="reveal-content">Her aracın ön koşulu ve zaman penceresi farklı. PITR önceden kurulmamışsa işe yaramaz. pg_dirtyread VACUUM sonrası ölü. ROLLBACK transaction kapandıktan sonra geçersiz. <strong>Defense-in-depth</strong> prensibi: aynı veriyi 3-4 katmanla koruyun → hangisi mevcutsa onu kullanın. "Tek yedek mekanizması" felaket reçetesidir.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 14: 4.3.3 PITR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.3 — PITR: Felaket Anında Zamanı Geri Al</div>
+              <div class="slide-header-num">14 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Zaman <span>Makinesi</span></div>
+                <div class="s-sub-tech">"Dün saat 14:32'deki duruma geri dön" — saniyeler içinde.<br>🔑 <strong>Analoji:</strong> WAL = banka dekontu defteri. Her hareket bir dekont; defter yanmadıysa bakiyeni dakikası dakikasına yeniden çıkartabilirsin.</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:9px;">
+                  <div style="background:#e3f2fd; padding:10px 12px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">⏪ PITR Nedir?</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Point-In-Time Recovery. Yanlış DELETE veya hatalı migrasyon sonrası DB'yi tam o ana döndürür. Granülerlik <strong>saniye</strong> seviyesinde.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:10px 12px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">📜 WAL (Write-Ahead Log)</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Her INSERT/UPDATE/DELETE diske işlenmeden önce WAL'a yazılır. <strong>Base backup + WAL arşivi</strong> birlikte → herhangi bir ana gidiş.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:10px 12px; border-radius:4px; border-left:4px solid #880e4f;">
+                    <div style="font-weight:bold; color:#880e4f; font-size:13px;">⚠️ Ön Koşul</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;"><code>wal_level = replica</code>, <code>archive_mode = on</code> <strong>önceden</strong> ayarlı olmalı. Felaket sonrası açmak çalışmaz — WAL kaybolur.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:10px 12px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">🔁 Geri Dönüş Akışı</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px; line-height:1.6;">
+                      <strong>1.</strong> Base backup'ı geri yükle<br>
+                      <strong>2.</strong> <code>recovery.signal</code> oluştur<br>
+                      <strong>3.</strong> <code>restore_command</code> ile WAL uygula<br>
+                      <strong>4.</strong> <code>recovery_target_time</code>'da dur, promote
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: WAL zaman çizelgesi -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">WAL Zaman Çizelgesi (PITR)</div>
+                <svg width="100%" viewBox="0 0 320 80" style="display:block; background:#f7f9fc; border-radius:5px; margin-bottom:8px;">
+                  <!-- Zaman çizgisi -->
+                  <line x1="15" y1="50" x2="305" y2="50" stroke="#666" stroke-width="2"/>
+                  <!-- Base backup -->
+                  <rect x="20" y="35" width="40" height="30" fill="#1565c0" rx="3"/>
+                  <text x="40" y="53" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">Base</text>
+                  <text x="40" y="76" font-size="7" fill="#666" text-anchor="middle">Pzt 02:00</text>
+                  <!-- WAL segmentleri -->
+                  <g fill="#a5d6a7">
+                    <rect x="65" y="42" width="22" height="16" rx="2"/>
+                    <rect x="89" y="42" width="22" height="16" rx="2"/>
+                    <rect x="113" y="42" width="22" height="16" rx="2"/>
+                    <rect x="137" y="42" width="22" height="16" rx="2"/>
+                    <rect x="161" y="42" width="22" height="16" rx="2"/>
+                    <rect x="185" y="42" width="22" height="16" rx="2"/>
+                  </g>
+                  <text x="135" y="38" font-size="7" fill="#1b5e20" text-anchor="middle">WAL segmentleri (16 MB)</text>
+                  <text x="135" y="78" font-size="7" fill="#666" text-anchor="middle">archive_command kopyalar</text>
+                  <!-- Felaket noktası -->
+                  <line x1="220" y1="20" x2="220" y2="65" stroke="#c62828" stroke-width="2" stroke-dasharray="3,2"/>
+                  <text x="220" y="17" font-size="7" font-weight="700" fill="#c62828" text-anchor="middle">⚠ Felaket 14:32</text>
+                  <!-- Hedef noktası -->
+                  <line x1="208" y1="28" x2="208" y2="60" stroke="#2e7d32" stroke-width="2"/>
+                  <text x="208" y="25" font-size="7" font-weight="700" fill="#2e7d32" text-anchor="middle">✓ Hedef 14:31:59</text>
+                  <!-- Ok -->
+                  <path d="M280,50 L300,50 L295,46 M300,50 L295,54" stroke="#666" stroke-width="1" fill="none"/>
+                  <text x="305" y="48" font-size="6" fill="#666" text-anchor="end">zaman →</text>
+                </svg>
+
+                <div class="code-block" style="font-size:10px; line-height:1.42;">-- ▶ 1) ÖNCEDEN: postgresql.conf — WAL arşivlemeyi AÇ
+wal_level     = replica
+archive_mode  = on
+archive_command = 'cp %p /arsiv/wal/%f'
+-- ⚠️ Değişiklik sonrası: pg_ctl restart (RELOAD yetmez)
+
+-- ▶ 2) HAFTALIK: Base backup
+pg_basebackup -D /yedek/base_$(date +%F) -Ft -z -P -U replicator
+
+-- ▶ 3) FELAKET ANI: 14:31:59'a geri dön
+-- a) PostgreSQL'i durdur, data dizinini sil
+-- b) Base backup'ı aç
+tar -xzf /yedek/base_2026_05_20/base.tar.gz \
+    -C /var/lib/postgresql/data
+
+-- c) recovery.signal (boş dosya yeter)
+touch /var/lib/postgresql/data/recovery.signal
+
+-- d) postgresql.conf — recovery parametreleri
+restore_command        = 'cp /arsiv/wal/%f %p'
+recovery_target_time   = '2026-05-20 14:31:59'
+recovery_target_action = 'promote'
+
+-- e) Başlat → otomatik recovery, hedefte durur
+pg_ctl start</div>
+
+                <div class="reveal-box" id="bak43d">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43d').classList.toggle('open')">Kritik Soru: WAL nereye yazılır, ne kadar tutulur? <span>▼</span></div>
+                  <div class="reveal-content">WAL <strong>16 MB segmentler</strong> halinde <code>$PGDATA/pg_wal/</code>'a yazılır. Segment dolduğunda <code>archive_command</code> tetiklenir → dosya arşive (yerel disk, NFS, S3) kopyalanır. Granülerlik: her commit bir WAL kaydı → saniyenin altına gidilebilir.</div>
+                </div>
+                <div class="reveal-box" id="bak43e">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43e').classList.toggle('open')">Görev: 1 Dakika Önceye Dön <span>▼</span></div>
+                  <div class="reveal-content">Test ortamında <code>archive_mode = on</code> aç. Yanlışlıkla <code>DELETE FROM konya.poi WHERE kategori='Eczane';</code> çalıştır. Üstteki 5 adımı uygulayarak <code>recovery_target_time</code>'ı silmeden 30 saniye öncesine ayarla. Veritabanı açıldığında 258 eczane geri gelmiş olmalı. ✅</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 15: 4.3.4 pg_dirtyread + MVCC -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.4 — pg_dirtyread + MVCC: Diskteki Hayalet Satırlar</div>
+              <div class="slide-header-num">15 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Silinen <span>Hâlâ Diskte</span></div>
+                <div class="s-sub-tech">Oracle <code>FLASHBACK QUERY</code> karşılığı.<br>🔑 <strong>Analoji:</strong> MVCC = post-it. Üzerine "YENİ" yazıp eskisini çöpe atmıyorsun — yan yana yapıştırıyorsun. Eski not okunabilir kalır, ta ki temizlikçi (VACUUM) gelene kadar.</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:9px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">📜 MVCC Mantığı</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;"><code>UPDATE</code>/<code>DELETE</code> satırı diskten silmez. <strong>"Ölü (dead tuple)"</strong> işaretler. Yeni versiyon yanına yazılır. Eşzamanlı okumalar kilitlenmeden çalışır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">🧟 Ölü Satır = Hayalet</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">VACUUM gelene kadar diskte durur. Normal <code>SELECT</code> görmez, ama <strong>oradadır</strong> — doğru araçla okunur.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔌 pg_dirtyread Eklentisi</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;"><code>CREATE EXTENSION pg_dirtyread</code>. Çekirdek değil <strong>üçüncü taraf</strong> — kurulumdan sonra etkin olur.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🛡️ old_snapshot_threshold (PG 14+)</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">VACUUM'un temizliğini geciktirir → kurtarma penceresi açılır (ama disk şişer). <em>Not: vacuum_defer_cleanup_age PG 14'te kaldırıldı; yerine old_snapshot_threshold kullanılır.</em></div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:10.5px; line-height:1.45;">-- ▶ 1) Eklentiyi yükle
+-- ⚠️ pg_dirtyread çekirdek PostgreSQL'de yoktur.
+-- Ubuntu/Debian: apt install postgresql-16-pg-dirtyread
+CREATE EXTENSION pg_dirtyread;
+-- ✓ Beklenen: CREATE EXTENSION
+
+-- ▶ 2) FELAKET: Yanlışlıkla eczaneler silindi
+-- ⚠️ Eğitimde önce BEGIN; yazın — COMMIT'i sonunda siz verin!
+BEGIN;
+DELETE FROM konya.poi WHERE kategori = 'Eczane';
+-- 258 satır gitti. COMMIT edilmedi — henüz geri alınabilir!
+
+-- ▶ 3) KURTARMA: VACUUM çalışmadan önce ölü satırları oku
+-- ⚠️ Kolon tipleri tablodakiyle TAM eşleşmeli (varchar(200) vs text farkı hata verir)
+SELECT * FROM pg_dirtyread('konya.poi'::regclass)
+  AS t(id int, ad varchar(200), kategori varchar(100), geom geometry)
+WHERE kategori = 'Eczane';
+-- ✓ Beklenen: 258 satır (henüz disk temizlenmedi)
+
+-- ▶ 4) Geri yaz: çıktıyı tabloya tekrar INSERT et
+INSERT INTO konya.poi (id, ad, kategori, geom)
+SELECT id, ad, kategori, geom
+FROM pg_dirtyread('konya.poi'::regclass)
+  AS t(id int, ad varchar(200), kategori varchar(100), geom geometry)
+WHERE kategori = 'Eczane'
+ON CONFLICT (id) DO NOTHING;
+ROLLBACK; -- Eğitim bitince ROLLBACK ile geri al
+
+-- ▶ 5) GELECEK YATIRIM: old_snapshot_threshold ile kurtarma penceresi aç
+-- NOT: vacuum_defer_cleanup_age PostgreSQL 14'te kaldırıldı.
+-- Yerine old_snapshot_threshold kullanılır (ancak restart gerektirir).
+-- Örnek: postgresql.conf → old_snapshot_threshold = '10min'
+SELECT pg_reload_conf(); -- Sonra pg_ctl reload</div>
+
+                <div style="background:rgba(255,193,7,0.12); padding:9px 12px; border-radius:4px; border-left:4px solid #FFC107; margin-top:9px;">
+                  <div style="font-weight:bold; color:#ffe082; font-size:11px; margin-bottom:3px;">📘 Temel Kavram</div>
+                  <div style="font-size:10px; color:#ddd; line-height:1.55;">
+                    <strong>MVCC:</strong> Multi-Version Concurrency Control — satırın eski + yeni versiyonları yan yana, kilit yok.<br>
+                    <strong>Dead tuple:</strong> "Silindi" işaretli ama diskte duran eski satır.<br>
+                    <strong>VACUUM:</strong> Dead tuple toplayıp yer açan bakım (otomatik = autovacuum).<br>
+                    <strong>Tuple:</strong> PostgreSQL'de "satır" (kaynak kodu terimi).
+                  </div>
+                </div>
+
+                <div class="reveal-box" id="bak43f">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43f').classList.toggle('open')">VACUUM çalıştıysa veri tamamen gitti mi? <span>▼</span></div>
+                  <div class="reveal-content"><strong>Evet</strong>, pg_dirtyread o noktadan sonra işe yaramaz. Ölü satırların yeri <strong>fiziksel olarak yeni veriler için boşaltılmıştır</strong>. Hiyerarşide bir üst basamağa çıkın: <strong>PITR</strong> (WAL arşivi varsa) veya <strong>pg_dump restore</strong>. Bu yüzden büyük silmelerden sonra autovacuum'u manuel olarak geciktirme yeteneği değerlidir.</div>
+                </div>
+                <div class="reveal-box" id="bak43g">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43g').classList.toggle('open')">Görev: Sahte Silme + Kurtarma <span>▼</span></div>
+                  <div class="reveal-content"><strong>1)</strong> <code>SELECT COUNT(*) FROM konya.poi WHERE kategori='Eczane';</code> → başlangıç sayısını not al.<br><strong>2)</strong> Yukarıdaki DELETE'i çalıştır.<br><strong>3)</strong> Hemen pg_dirtyread sorgusu — 258 satır görüyor musun?<br><strong>4)</strong> Geri yaz, tekrar say. Eski sayıya ulaştın mı? ✅<br><strong>İleri:</strong> Adım 3'ten önce <code>VACUUM konya.poi;</code> çalıştır — dirtyread boş döner.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 16: 4.3.5 STREAMING REPLİKASYON -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.5 — Replikasyon: Streaming vs Logical</div>
+              <div class="slide-header-num">16 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Veri <span>Senkronizasyonu</span></div>
+                <div class="s-sub-tech">Ana sunucu değişince ikincil otomatik güncellenir.<br>🔑 <strong>Analoji:</strong> <em>Streaming</em> = banyo musluğu açık, herkes aynı suyu içiyor. <em>Logical</em> = sadece çocuklara su, büyüklere meşrubat (seçici akış).</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:9px;">
+                  <div style="background:#e3f2fd; padding:10px 12px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📡 Streaming Replication</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">WAL akışı — DB'nin byte-byte kopyası. Disaster recovery için. Replica sadece okur.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:10px 12px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🔀 Logical Replication</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Sadece seçili tablolar. Farklı PG versiyonları arası da çalışır. Mekansal veriler dahil.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:10px 12px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">📋 PUBLICATION / SUBSCRIPTION</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Ana: <code>CREATE PUBLICATION</code> → hangi tablolar. İkincil: <code>CREATE SUBSCRIPTION</code> → bağlan ve senkronize ol.</div>
+                  </div>
+                  <div style="background:#fffde7; padding:10px 12px; border-radius:4px; border-left:4px solid #f9a825;">
+                    <div style="font-weight:bold; color:#5d4037; font-size:13px;">🔗 Sıradaki için köprü</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Logical Replication <strong>replication slot</strong> kavramını getirir. Sonraki slayttaki <strong>Logical Decoding</strong> bu altyapıyı kullanır.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: Primary → Replica akışı -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Replikasyon Akış Diyagramı</div>
+                <svg width="100%" viewBox="0 0 320 110" style="display:block; background:#f7f9fc; border-radius:5px; margin-bottom:8px;">
+                  <!-- Primary -->
+                  <rect x="15" y="40" width="80" height="50" fill="#1565c0" rx="6"/>
+                  <text x="55" y="60" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">PRIMARY</text>
+                  <text x="55" y="74" font-size="8" fill="#bbdefb" text-anchor="middle">(yazılır + okunur)</text>
+                  <text x="55" y="85" font-size="7" fill="#90caf9" text-anchor="middle">WAL üretir</text>
+                  <!-- WAL stream ok -->
+                  <text x="130" y="50" font-size="8" fill="#a5d6a7" font-weight="700">WAL akışı</text>
+                  <text x="130" y="62" font-size="7" fill="#a5d6a7">(streaming)</text>
+                  <path d="M100,65 Q130,65 160,65 L155,61 M160,65 L155,69" stroke="#2e7d32" stroke-width="2" fill="none"/>
+                  <!-- Replica -->
+                  <rect x="165" y="40" width="80" height="50" fill="#2e7d32" rx="6"/>
+                  <text x="205" y="60" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">REPLICA</text>
+                  <text x="205" y="74" font-size="8" fill="#c8e6c9" text-anchor="middle">(sadece okunur)</text>
+                  <text x="205" y="85" font-size="7" fill="#a5d6a7" text-anchor="middle">WAL replay</text>
+                  <!-- Slot label -->
+                  <rect x="260" y="50" width="50" height="30" fill="#ce93d8" rx="4"/>
+                  <text x="285" y="65" font-size="8" font-weight="700" fill="#000" text-anchor="middle">Slot</text>
+                  <text x="285" y="75" font-size="7" fill="#000" text-anchor="middle">LSN</text>
+                  <!-- Üst etiket -->
+                  <text x="160" y="18" font-size="10" font-weight="700" fill="#333" text-anchor="middle">WAL Streaming</text>
+                  <text x="160" y="30" font-size="7" fill="#666" text-anchor="middle">Tüm DB byte-byte kopyalanır</text>
+                  <!-- Alt etiket -->
+                  <text x="160" y="105" font-size="7" fill="#666" text-anchor="middle">Failover: Replica → Primary'ye terfi</text>
+                </svg>
+
+                <div class="code-block" style="font-size:10px; line-height:1.42;">-- ▶ 1) STREAMING: postgresql.conf (Ana sunucuda)
+wal_level         = replica
+max_wal_senders   = 5
+-- pg_hba.conf'a 'replication' satırı
+
+-- ▶ 2) İkincil sunucu — base backup'tan ayağa kalk
+pg_basebackup -h ana_host -U replicator \
+  -D /var/lib/postgresql/data -Fp -Xs -P -R
+-- -R: standby.signal + primary_conninfo otomatik
+
+-- ▶ 3) LOGICAL: Sadece seçili tabloları yayınla
+-- ⚠️ Önkoşul: postgresql.conf → wal_level = logical (sonra restart)
+-- ANA — Publication
+CREATE PUBLICATION konya_pub
+  FOR TABLE konya.mahalleler, konya.osm_yollar;
+
+-- İKİNCİL — Subscription
+CREATE SUBSCRIPTION konya_sub
+  CONNECTION 'host=ana_host dbname=konya_egitim user=replicator'
+  PUBLICATION konya_pub;
+
+-- ▶ 4) Slot durumunu izle
+SELECT slot_name, plugin, active, restart_lsn
+FROM pg_replication_slots;</div>
+
+                <div class="reveal-box" id="bak43h">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43h').classList.toggle('open')">Kritik Soru: Mekansal veri Logical ile taşınır mı? <span>▼</span></div>
+                  <div class="reveal-content"><strong>Evet!</strong> <code>geometry</code> ve <code>geography</code> Logical Replication akışında sıradan bir sütun gibi davranır. Sadece <strong>değişen DIFF</strong> ağ üzerinden akar — bant genişliğini korur. PostGIS uzantısının iki sunucuda da kurulu olması yeterlidir.</div>
+                </div>
+                <div class="reveal-box" id="bak43i">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43i').classList.toggle('open')">Görev: Yayın Oluştur <span>▼</span></div>
+                  <div class="reveal-content">Sadece <code>konya.osm_yollar</code> için Logical Publication tanımlayın: <code>CREATE PUBLICATION yol_pub FOR TABLE konya.osm_yollar;</code><br>Sonra <code>SELECT * FROM pg_publication_tables;</code> ile yayını doğrulayın. <strong>İleri:</strong> Aynı sorguyu <code>pg_replication_slots</code> ile karşılaştırın — ikisi farklı katmanlardır.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 17: 4.3.6 LOGICAL DECODING — KAVRAM -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.6 — Logical Decoding: WAL'i Okuyup Ters Çevirmek</div>
+              <div class="slide-header-num">17 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">WAL'i <span>Tersine</span> Oku</div>
+                <div class="s-sub-tech">"Dün tam olarak hangi UPDATE'ler çalıştı?" sorusunun cevabı.<br>🔑 <strong>Analoji:</strong> WAL = ham veri (PostgreSQL iç dili). Logical Decoding = bu ham veriyi "Türkçe" okunabilir kayıtlara çeviren tercüman.</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:9px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔄 Logical Decoding Nedir?</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">WAL'in ham byte akışını <strong>okunabilir kayıt akışına</strong> çevirir. Her transaction'ın eski/yeni değerleri tek tek dışarı alınır.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🧩 Replication Slot</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">WAL'in geçmişe dönük korunması için tutamaç. Slot ilerlemediği sürece PostgreSQL o noktadan sonraki WAL'leri <strong>silmez</strong>. Slot YOK = geçmiş WAL YOK.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">🔌 Decoder Plugin</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">WAL byte'larını okunur formata çeviren modül. <code>wal2json</code> en yaygın (JSON çıktı). <code>pgoutput</code> standart replication için.</div>
+                  </div>
+                </div>
+                <div style="background:rgba(255,193,7,0.12); padding:9px 12px; border-radius:4px; border-left:4px solid #FFC107; margin-top:10px;">
+                  <div style="font-weight:bold; color:#ffe082; font-size:11px; margin-bottom:3px;">📘 Temel Kavram</div>
+                  <div style="font-size:10px; color:#ddd; line-height:1.55;">
+                    <strong>Undo SQL:</strong> Bir UPDATE'in tersi. INSERT'in tersi DELETE, DELETE'in tersi INSERT.<br>
+                    <strong>LSN (Log Sequence Number):</strong> WAL içinde bayt offset. Slot bunu tutar.<br>
+                    <strong>WAL'i okumak = geçmişi okumak</strong>, veriyi değil.
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:13px; font-weight:bold; color:#fff; margin-bottom:9px;">Kavramsal Akış</div>
+                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:14px; font-size:11.5px; color:#eee; line-height:1.7;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:#1565c0; color:#fff; padding:5px 11px; border-radius:4px; font-weight:700;">UPDATE</span>
+                    <span style="color:#a5d6a7;">→</span>
+                    <span style="background:#0d47a1; color:#fff; padding:5px 11px; border-radius:4px; font-weight:700;">WAL</span>
+                    <span style="color:#aaa; font-size:10px;">(ham byte)</span>
+                  </div>
+                  <div style="margin:0 0 8px 14px; border-left:2px dashed #ce93d8; padding-left:14px;">
+                    <span style="color:#ce93d8;">↓</span> <em>Replication Slot</em> akışı tutar
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span style="background:#6a1b9a; color:#fff; padding:5px 11px; border-radius:4px; font-weight:700;">Decoder Plugin</span>
+                    <span style="color:#ce93d8;">→</span>
+                    <span style="background:#311b92; color:#fff; padding:5px 11px; border-radius:4px; font-weight:700;">JSON kayıt</span>
+                  </div>
+                  <div style="margin:0 0 8px 14px; border-left:2px dashed #ffcc80; padding-left:14px;">
+                    <span style="color:#ffcc80;">↓</span> Script <code>OLD</code> ve <code>NEW</code>'i ayıklar
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="background:#e65100; color:#fff; padding:5px 11px; border-radius:4px; font-weight:700;">Tersleyici</span>
+                    <span style="color:#ffcc80;">→</span>
+                    <span style="background:#66bb6a; color:#000; padding:5px 11px; border-radius:4px; font-weight:700;">UNDO SQL</span>
+                  </div>
+                </div>
+                <div style="background:rgba(244,143,177,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #e91e63; margin-top:11px;">
+                  <div style="font-size:11px; color:#f48fb1;"><strong>⚠️ Kritik:</strong> Replication slot <strong>olay öncesi</strong> kurulmalı. Slot yoksa eski WAL'ler silinmiştir — geçmişe dönülemez. Bu yüzden audit trigger (sonraki slayt) bir B planı olarak kurulur.</div>
+                </div>
+                <div class="reveal-box" id="bak43j">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43j').classList.toggle('open')">Slot yoksa eski WAL'ler neden silinir? <span>▼</span></div>
+                  <div class="reveal-content">PostgreSQL WAL'leri sınırsız tutamaz — disk dolar. "Hiç kimse okumak istemiyor" olan WAL silinir. Slot, <em>"ben bunu okumak istiyorum"</em> işareti koyar; primary o WAL'i silmeye cesaret edemez. Slot yoksa retention sadece <code>wal_keep_size</code> kadardır — varsayılan birkaç saat. Logical Decoding <strong>retrospektif değil proaktif</strong>: kurmadıysan geçmişe dönemez.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 18: 4.3.7 LOGICAL DECODING — ARAÇLAR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.7 — Logical Decoding Araçları: wal2json, log_statement, EDB</div>
+              <div class="slide-header-num">18 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">3 Yol, <span>Aynı Hedef</span></div>
+                <div class="s-sub-tech">"Eski veriyi geri getir" görevine üç farklı pratik araç.<br>🔑 <strong>Analoji:</strong> Aynı hedefe 3 farklı yol — biri otoban (lisanslı), biri devlet yolu (config), biri tüneli kendi kazıyorsun (plugin).</div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:9px;">
+                  <div style="background:#f3e5f5; padding:10px 12px; border-radius:4px; border-left:4px solid #6a1b9a;">
+                    <div style="font-weight:bold; color:#4a148c; font-size:13px;">🧪 wal2json + pg_recvlogical</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Açık kaynak plugin + CLI ikilisi. JSON çıktı veren çözücü. Slot'tan WAL'i çekip <strong>gerçek undo SQL</strong> üretir. <em>En kapsamlı çözüm</em>.</div>
+                  </div>
+                  <div style="background:#e3f2fd; padding:10px 12px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">📝 log_statement = 'all'</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Tüm SQL komutlarını metin log dosyasına yazar. Forensic analiz için elle taranır. <em>Sadece veri yoksa son çare</em> — %5–15 yavaşlatır.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:10px 12px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">🏢 EDB Postgres Advanced Server</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Oracle uyumluluğu için ticari sürüm. <strong>Native</strong> <code>FLASHBACK TABLE</code> ve <code>FLASHBACK QUERY</code>. Lisans bedeli var; tek komutla çözer.</div>
+                  </div>
+                </div>
+                <div style="background:#fffde7; padding:9px 12px; border-radius:4px; border-left:4px solid #f9a825; margin-top:10px;">
+                  <div style="font-weight:bold; color:#5d4037; font-size:11px; margin-bottom:4px;">⚖️ Karşılaştırma</div>
+                  <table style="width:100%; font-size:10px; border-collapse:collapse; color:#555;">
+                    <thead><tr style="background:rgba(0,0,0,0.05);"><th style="padding:3px 5px; text-align:left;">Yöntem</th><th style="padding:3px 5px;">Maliyet</th><th style="padding:3px 5px;">Kurulum</th></tr></thead>
+                    <tbody>
+                      <tr style="border-top:1px solid #eee;"><td style="padding:3px 5px; color:#6a1b9a; font-weight:700;">wal2json</td><td style="padding:3px 5px; text-align:center;">Düşük</td><td style="padding:3px 5px; text-align:center;">Plugin</td></tr>
+                      <tr style="border-top:1px solid #eee;"><td style="padding:3px 5px; color:#0d47a1; font-weight:700;">log_statement</td><td style="padding:3px 5px; text-align:center;">%5-15 I/O</td><td style="padding:3px 5px; text-align:center;">Tek config</td></tr>
+                      <tr style="border-top:1px solid #eee;"><td style="padding:3px 5px; color:#bf360c; font-weight:700;">EDB</td><td style="padding:3px 5px; text-align:center;">Native</td><td style="padding:3px 5px; text-align:center;">Ticari $</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:10.5px; line-height:1.45;">-- ▶ 1) ÖNCEDEN (postgresql.conf): WAL mantıksal yayın
+-- ⚠️ Önkoşul: postgresql.conf → wal_level = logical + restart
+wal_level = logical
+max_replication_slots = 5
+
+-- ▶ 2) wal2json slot'u oluştur (olay ÖNCESİ!)
+-- ⚠️ wal2json: apt install postgresql-16-wal2json
+SELECT pg_create_logical_replication_slot(
+  'flashback_slot', 'wal2json'
+);
+-- ✓ Beklenen: (flashback_slot, ...)
+
+-- ▶ 3) OLAY ANI: WAL'i JSON olarak çek
+-- (terminal / bash)
+pg_recvlogical -d konya_egitim \
+  --slot flashback_slot --start -f - \
+  --plugin=wal2json &gt; /tmp/wal_dump.json
+
+-- ▶ 4) JSON'dan ters SQL üret
+-- Örnek wal2json çıktısı:
+-- {
+--   "action":"U", "schema":"konya", "table":"poi",
+--   "identity":[{"name":"id","value":42}],
+--   "columns":[
+--     {"name":"kategori","value":"YENİ","oldvalue":"Eczane"}
+--   ]
+-- }
+-- Tersleme:
+--   UPDATE konya.poi SET kategori='Eczane' WHERE id=42;
+
+-- ▶ 5) ALTERNATİF: log_statement loglarını tara
+-- postgresql.conf: log_statement = 'all'
+-- → /var/log/postgresql/*.log içinde tail -f
+-- ⚠️ Sadece kritik forensic dönemler için aç!</div>
+
+                <div class="reveal-box" id="bak43k">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43k').classList.toggle('open')">log_statement='all' performansı nasıl etkiler? <span>▼</span></div>
+                  <div class="reveal-content">Her SQL komutu (binlerce/saniye) disk loguna yazılır → <strong>%5–15 I/O artışı</strong> ve disk şişer. Sadece <strong>kritik forensic dönemler</strong> için kısa süreli açılır, sonra <code>log_statement = 'none'</code> yapılır. Sürekli açık tutmak yerine logical decoding çok daha verimlidir.</div>
+                </div>
+                <div class="reveal-box" id="bak43l">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43l').classList.toggle('open')">Hangi yöntemi seçmeliyim? <span>▼</span></div>
+                  <div class="reveal-content"><strong>Hazırlıklı sistem (üretim):</strong> wal2json + slot — slot olay öncesi kurulur, en az maliyet.<br><strong>Acil durum (sistem hazır değil):</strong> log_statement aç, sonradan kapat — ama eski olay için işe yaramaz.<br><strong>Oracle göçü:</strong> EDB — native FLASHBACK ile minimum eğitim.<br><br><em>Kıdemli DBA önerisi:</em> wal2json + audit trigger (sonraki slayt) ikilisi → defense-in-depth.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 19: 4.3.8 AUDIT TRIGGER PATTERN -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.3.8 — Audit Trigger: Her Değişikliğin Kara Kutusu</div>
+              <div class="slide-header-num">19 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Geleceğe <span>Yatırım</span></div>
+                <div class="s-sub-tech">🔑 <em>Audit log = güvenlik kamerası. Hiçbir değişiklik kameraya yansımadan veritabanına işlenmiyor.</em></div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #4fc3f7;">
+                    <div style="font-weight:bold; color:#4fc3f7; font-size:13px;">🎯 Neden Trigger?</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Eklenti veya WAL arşivi gerektirmez. Herhangi bir PostgreSQL kurulumunda çalışır. <strong>Tüm değişiklikler</strong> ayrı bir <code>audit_log</code> tablosuna düşer — silinen veri asla kaybolmaz.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ce93d8;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:13px;">📊 OLD ve NEW Nedir?</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Trigger fonksiyonu içinde iki özel değişken: <code>OLD</code> = değişiklikten önceki satır, <code>NEW</code> = sonraki satır. <code>DELETE</code>'de sadece OLD, <code>INSERT</code>'te sadece NEW. <code>row_to_json()</code> ile JSONB → tek audit tablosu tüm tablolar için.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🔁 BEFORE vs AFTER</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;"><strong style="color:#fff;">BEFORE:</strong> İşlemden önce; değişikliği iptal/değiştirebilir (doğrulama için).<br><strong style="color:#fff;">AFTER:</strong> İşlem bitince çalışır; sadece kayıt → audit log için <strong>doğru seçim</strong>.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">📈 Hacim Kontrolü</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Audit tablosu sürekli büyür. Çözüm: <strong>partitioning</strong> (aylık) veya <strong>rolling retention</strong> (90 günden eskileri sil).</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div class="code-block" style="font-size:10px; line-height:1.4;">-- ▶ 1) Audit tablosu — tüm şema için tek tablo
+CREATE TABLE konya.audit_log (
+  id          BIGSERIAL PRIMARY KEY,
+  tablo       TEXT NOT NULL,
+  islem       TEXT NOT NULL,   -- INSERT/UPDATE/DELETE
+  eski_veri   JSONB,           -- OLD satır
+  yeni_veri   JSONB,           -- NEW satır
+  kullanici   TEXT DEFAULT current_user,
+  zaman       TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_audit_tablo_zaman
+  ON konya.audit_log (tablo, zaman DESC);
+
+-- ▶ 2) Generic trigger function (tüm tablolar için tek)
+CREATE OR REPLACE FUNCTION konya.audit_trigger()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO konya.audit_log (tablo, islem, eski_veri, yeni_veri)
+  VALUES (
+    TG_TABLE_NAME, TG_OP,
+    CASE WHEN TG_OP IN ('UPDATE','DELETE')
+         THEN row_to_json(OLD)::jsonb END,
+    CASE WHEN TG_OP IN ('UPDATE','INSERT')
+         THEN row_to_json(NEW)::jsonb END
+  );
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- ▶ 3) Trigger'ı tabloya bağla
+CREATE TRIGGER trg_audit_poi
+  AFTER INSERT OR UPDATE OR DELETE ON konya.poi
+  FOR EACH ROW EXECUTE FUNCTION konya.audit_trigger();
+
+-- ▶ 4) KURTARMA: Silinen kaydı audit'ten geri getir
+INSERT INTO konya.poi
+SELECT (jsonb_populate_record(NULL::konya.poi, eski_veri)).*
+FROM konya.audit_log
+WHERE tablo = 'poi' AND islem = 'DELETE'
+  AND zaman &gt; NOW() - INTERVAL '1 hour';</div>
+
+                <div class="reveal-box" id="bak43m">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43m').classList.toggle('open')">Audit'ten tek bir satırı nasıl geri getiririm? <span>▼</span></div>
+                  <div class="reveal-content"><code>jsonb_populate_record</code> JSONB'yi tablo satırına çevirir. id=42 silindiyse: <code>INSERT INTO konya.poi SELECT (jsonb_populate_record(NULL::konya.poi, eski_veri)).* FROM konya.audit_log WHERE tablo='poi' AND islem='DELETE' AND (eski_veri-&gt;&gt;'id')::int = 42;</code> JSONB'deki tüm sütunlar otomatik eşleşir.</div>
+                </div>
+                <div class="reveal-box" id="bak43n">
+                  <div class="reveal-trigger" onclick="document.getElementById('bak43n').classList.toggle('open')">Görev: poi tablosuna audit kur <span>▼</span></div>
+                  <div class="reveal-content"><strong>1)</strong> Üstteki 3 SQL bloğunu sırayla çalıştır.<br><strong>2)</strong> <code>UPDATE konya.poi SET ad = 'TEST' WHERE id = 1;</code><br><strong>3)</strong> <code>SELECT * FROM konya.audit_log ORDER BY zaman DESC LIMIT 5;</code> — JSON'u gör.<br><strong>4)</strong> Adım 4'teki kurtarma sorgusuyla eski haline döndür.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- BÖLÜM 4.4 — BAĞLANTI VE KAYNAK YÖNETİMİ                           -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+
+      <!-- SLAYT 20: 4.4.1 PgBOUNCER — NEDEN -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.4.1 — PgBouncer: Bağlantı Maliyeti ve Havuzlama</div>
+              <div class="slide-header-num">20 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Neden <span>PgBouncer?</span></div>
+                <div class="s-sub-tech">🔑 <em>Restoran rezervasyonu. 1000 müşteri ama 20 masa. PgBouncer = hostes; gelene masa ayarlar, biri kalkınca diğerini oturtur.</em></div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+                  <div style="background:#e3f2fd; padding:10px 12px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#0d47a1; font-size:13px;">🎯 Problem: Her Bağlantı Bir Process</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">PostgreSQL'de her bağlantı OS'de ayrı bir <strong>process</strong> açar. Process başına ~<strong>10 MB RAM</strong>. 1000 eş zamanlı kullanıcı = 10 GB sadece bağlantıya gider → sunucu çöker.</div>
+                  </div>
+                  <div style="background:#fce4ec; padding:10px 12px; border-radius:4px; border-left:4px solid #c62828;">
+                    <div style="font-weight:bold; color:#b71c1c; font-size:13px;">💀 Idle Connection Tuzağı</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Uygulama açık ama o an iş yapmayan bağlantı = <strong>idle connection</strong>. Process RAM'de yaşamaya devam eder. Web uygulamaları bazen yüzlerce idle bağlantı tutar — tüm bu RAM boşa gider.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:10px 12px; border-radius:4px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:bold; color:#1b5e20; font-size:13px;">🏊 Havuzlama Mantığı</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">PgBouncer, uygulama ile PostgreSQL arasında durur. 1000 web isteği PgBouncer'a gelir, PgBouncer <strong>sadece 20 gerçek bağlantı</strong> açar ve paylaştırır. PostgreSQL 20 process görür → rahat çalışır.</div>
+                  </div>
+                  <div style="background:#fff3e0; padding:10px 12px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#bf360c; font-size:13px;">🛤️ PgBouncer'ın Konumu</div>
+                    <div style="font-size:11px; color:#444; margin-top:3px;">Uygulama artık PostgreSQL'e (5432) değil PgBouncer'a (6432) bağlanır. PgBouncer arka planda gerçek bağlantıyı yönetir — uygulama kodu değişmez.</div>
+                  </div>
+                </div>
+                <div style="margin-top:10px; background:#fffde7; border:1px solid #f9a825; border-radius:6px; padding:10px 12px;">
+                  <div style="font-weight:bold; color:#f57f17; font-size:12px; margin-bottom:6px;">📘 Temel Kavram</div>
+                  <div style="font-size:10.5px; color:#333; line-height:1.6;">
+                    <strong>Connection:</strong> Uygulamanın PostgreSQL'e açtığı kanal. Her biri sunucuda bir UNIX süreci başlatır.<br>
+                    <strong>Process:</strong> OS seviyesinde RAM tüketen iş birimi (~10 MB / bağlantı).<br>
+                    <strong>Idle Connection:</strong> Açık ama iş yapmayan bağlantı — process RAM'i kullanmaya devam eder.<br>
+                    <strong>Connection Pooler:</strong> Az sayıda gerçek bağlantıyla çok sayıda istemciyi karşılayan ara katman.
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <!-- SVG: PgBouncer akış diyagramı -->
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px;">Bağlantı Akış Diyagramı</div>
+                <svg width="100%" viewBox="0 0 320 180" style="display:block; background:#f7f9fc; border-radius:5px; margin-bottom:8px;">
+                  <!-- 1000 web kullanıcısı (sol) -->
+                  <g>
+                    <!-- Çoklu kutucuklar -->
+                    <g fill="#bbdefb" stroke="#1565c0" stroke-width="0.5">
+                      <rect x="10" y="20" width="14" height="10" rx="2"/>
+                      <rect x="26" y="20" width="14" height="10" rx="2"/>
+                      <rect x="42" y="20" width="14" height="10" rx="2"/>
+                      <rect x="58" y="20" width="14" height="10" rx="2"/>
+                      <rect x="74" y="20" width="14" height="10" rx="2"/>
+                      <rect x="10" y="32" width="14" height="10" rx="2"/>
+                      <rect x="26" y="32" width="14" height="10" rx="2"/>
+                      <rect x="42" y="32" width="14" height="10" rx="2"/>
+                      <rect x="58" y="32" width="14" height="10" rx="2"/>
+                      <rect x="74" y="32" width="14" height="10" rx="2"/>
+                      <rect x="10" y="44" width="14" height="10" rx="2"/>
+                      <rect x="26" y="44" width="14" height="10" rx="2"/>
+                      <rect x="42" y="44" width="14" height="10" rx="2"/>
+                      <rect x="58" y="44" width="14" height="10" rx="2"/>
+                      <rect x="74" y="44" width="14" height="10" rx="2"/>
+                      <rect x="10" y="56" width="14" height="10" rx="2"/>
+                      <rect x="26" y="56" width="14" height="10" rx="2"/>
+                      <rect x="42" y="56" width="14" height="10" rx="2"/>
+                      <rect x="58" y="56" width="14" height="10" rx="2"/>
+                      <rect x="74" y="56" width="14" height="10" rx="2"/>
+                    </g>
+                    <text x="49" y="14" font-size="9" font-weight="700" fill="#0d47a1" text-anchor="middle">🌐 1000 İstemci</text>
+                    <text x="49" y="78" font-size="7" fill="#666" text-anchor="middle">web / API / mobil</text>
+                  </g>
+
+                  <!-- Oklar -->
+                  <g stroke="#999" stroke-width="0.8" fill="none">
+                    <path d="M93,30 L130,82 L125,80 M130,82 L128,75"/>
+                    <path d="M93,40 L130,85"/>
+                    <path d="M93,50 L130,88"/>
+                    <path d="M93,60 L130,91"/>
+                  </g>
+
+                  <!-- PgBouncer (orta) -->
+                  <rect x="130" y="75" width="80" height="50" fill="#fff9c4" stroke="#f9a825" stroke-width="2" rx="6"/>
+                  <text x="170" y="93" font-size="10" font-weight="700" fill="#e65100" text-anchor="middle">PgBouncer</text>
+                  <text x="170" y="105" font-size="8" fill="#5d4037" text-anchor="middle">port 6432</text>
+                  <text x="170" y="117" font-size="7" fill="#666" text-anchor="middle">20 havuz slotu</text>
+
+                  <!-- Tek ok -->
+                  <path d="M215,100 L245,100 L240,96 M245,100 L240,104" stroke="#e65100" stroke-width="2" fill="none"/>
+
+                  <!-- PostgreSQL (sağ) -->
+                  <rect x="248" y="75" width="62" height="50" fill="#c8e6c9" stroke="#2e7d32" stroke-width="2" rx="6"/>
+                  <text x="279" y="93" font-size="10" font-weight="700" fill="#1b5e20" text-anchor="middle">PostgreSQL</text>
+                  <text x="279" y="105" font-size="8" fill="#1b5e20" text-anchor="middle">port 5432</text>
+                  <text x="279" y="117" font-size="7" fill="#666" text-anchor="middle">20 process</text>
+
+                  <!-- Karşılaştırma alt -->
+                  <line x1="10" y1="142" x2="310" y2="142" stroke="#ddd" stroke-width="1" stroke-dasharray="3,2"/>
+                  <text x="160" y="155" font-size="9" font-weight="700" fill="#333" text-anchor="middle">1000 istemci → 20 gerçek bağlantı → sunucu rahat</text>
+                  <text x="160" y="170" font-size="8" fill="#c62828" text-anchor="middle">PgBouncer olmadan: 1000 × 10MB = 10 GB RAM 💀</text>
+                </svg>
+
+                <div class="reveal-box" id="ops44a">
+                  <div class="reveal-trigger" onclick="document.getElementById('ops44a').classList.toggle('open')">PgBouncer Olmadan Ne Olur? <span>▼</span></div>
+                  <div class="reveal-content">Doğrudan 500+ bağlantı açılırsa PostgreSQL yavaşlar, sonra <code>FATAL: sorry, too many clients already</code> hatası verir. Uygulamalar bağlanamaz, tüm sistem durur. CBS web haritaları yüklenemez. PgBouncer bu senaryoyu tamamen ortadan kaldırır.</div>
+                </div>
+                <div class="reveal-box" id="ops44b">
+                  <div class="reveal-trigger" onclick="document.getElementById('ops44b').classList.toggle('open')">Görev: max_connections'ı kontrol et <span>▼</span></div>
+                  <div class="reveal-content">Mevcut PostgreSQL ayarını gör: <code>SHOW max_connections;</code> (genellikle 100). <code>SELECT count(*) FROM pg_stat_activity;</code> ile aktif bağlantı sayısını gör. Eğer 80'i geçtiğiniz olduysa, PgBouncer artık zorunlu.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 21: 4.4.2 PgBOUNCER — KURULUM VE MOD'LAR -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.4.2 — PgBouncer Kurulum ve pool_mode Seçimi</div>
+              <div class="slide-header-num">21 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Hangi <span>Mod?</span></div>
+                <div class="s-sub-tech">🔑 <em>3 farklı servis modeli: 'Müşteri masadan kalkmadan yemek alır' (session), 'Yemek arası masa boşalır' (transaction), 'Her lokmada masa değişir' (statement).</em></div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:13px;">🟢 session mode — En Güvenli</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Bağlantı kapanana kadar aynı PG bağlantısı ayrılır. SET, PREPARE, advisory lock, geçici tablo — hepsi sorunsuz. Dezavantaj: havuz uzun süre meşgul.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ffcc80;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🟡 transaction mode — CBS İçin İdeal</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Her <code>COMMIT</code>/<code>ROLLBACK</code> sonrası bağlantı havuza döner. Bağlantı sadece işlem süresince meşgul → verimlilik yüksek. CBS web haritaları ve REST API'ler için ideal.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ef9a9a;">
+                    <div style="font-weight:bold; color:#ef9a9a; font-size:13px;">🔴 statement mode — Çok Agresif</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Her SQL biter bitmez bağlantı havuza döner. En yüksek verimlilik ama kırılgan: multi-statement transaction, <code>PREPARE/EXECUTE</code>, <code>SET</code> — hiçbiri çalışmaz. Neredeyse hiç kullanılmaz.</div>
+                  </div>
+                  <div style="background:rgba(255,219,68,0.12); padding:10px 12px; border-radius:4px; border-left:4px solid #ffd700;">
+                    <div style="font-weight:bold; color:#ffd700; font-size:13px;">⚠️ Sık Hata: Prepared Statement</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Transaction mode'da <code>PREPARE ... EXECUTE</code> kullanırsanız hata alırsınız (farklı bağlantıya düşer). Çözüm: ya <code>session</code> mode ya da uygulama tarafında prepared statement'ı devre dışı bırak.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 1 — pgbouncer.ini</div>
+                <div class="code-block" style="font-size:10px; line-height:1.5; margin-bottom:5px;">[databases]
+konya_egitim = host=localhost port=5432 dbname=konya_egitim
+
+[pgbouncer]
+listen_port        = 6432
+listen_addr        = *
+auth_type          = scram-sha-256
+auth_file          = /etc/pgbouncer/userlist.txt
+pool_mode          = transaction
+max_client_conn    = 1000   ; toplam istemci
+default_pool_size  = 20     ; DB başına gerçek PG bağlantısı
+min_pool_size      = 5
+server_idle_timeout = 600</div>
+
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 2 — userlist.txt + başlat</div>
+                <div class="code-block" style="font-size:10px; line-height:1.5; margin-bottom:5px;"># /etc/pgbouncer/userlist.txt
+"egitim" "SCRAM-SHA-256$4096:..."
+
+# Başlat
+sudo systemctl restart pgbouncer
+sudo systemctl status pgbouncer
+# ✓ Beklenen: active (running)</div>
+
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 3 — Bağlan ve izle</div>
+                <div class="code-block" style="font-size:10px; line-height:1.5; margin-bottom:5px;"># Port 6432 üzerinden bağlan
+psql -h localhost -p 6432 -U egitim konya_egitim
+
+# Havuz durumunu izle (pgbouncer admin DB)
+psql -h localhost -p 6432 -U egitim pgbouncer
+
+SHOW POOLS;     -- her DB için havuz doluluğu
+SHOW CLIENTS;   -- bağlı istemciler
+SHOW SERVERS;   -- gerçek PG bağlantıları
+SHOW STATS;     -- toplam istek / saniye</div>
+
+                <div class="reveal-box" id="ops44c">
+                  <div class="reveal-trigger" onclick="document.getElementById('ops44c').classList.toggle('open')">max_client_conn Değerini Nasıl Seçerim? <span>▼</span></div>
+                  <div class="reveal-content">Kural: <code>default_pool_size × 10 MB ≤ PostgreSQL'e ayrılan RAM</code>. Örnek: 4 GB PG RAM → max 400 MB bağlantı → <code>default_pool_size = 40</code>. <code>max_client_conn</code> ise bu havuzu paylaşan uygulama sayısı; 500–2000 arası güvenli. <em>İstemci sayısı çok, gerçek bağlantı az</em> mantığı.</div>
+                </div>
+                <div class="reveal-box" id="ops44d">
+                  <div class="reveal-trigger" onclick="document.getElementById('ops44d').classList.toggle('open')">Görev: PgBouncer Kur ve Bağlan <span>▼</span></div>
+                  <div class="reveal-content"><strong>1)</strong> <code>sudo apt install pgbouncer</code> (Ubuntu) veya Docker imajı.<br><strong>2)</strong> <code>/etc/pgbouncer/pgbouncer.ini</code>'yi yukarıdaki örnekle düzenle.<br><strong>3)</strong> userlist.txt'e SCRAM hash ekle.<br><strong>4)</strong> <code>systemctl restart pgbouncer</code>.<br><strong>5)</strong> <code>psql -p 6432 -U egitim konya_egitim</code>.<br><strong>6)</strong> <code>SHOW POOLS;</code> ile havuz doluluk oranını izle — production'da bu sayı 0'dan yüksek olmalı.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLAYT 22: 4.4.3 ÜRETİM CHECKLİST (YENİ ÖZET SLAYTI) -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">4.4.3 — Production'a Geçiş Checklist'i</div>
+              <div class="slide-header-num">22 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech">Launch <span>Checklist</span></div>
+                <div class="s-sub-tech">Bu eğitimin son ve en önemli özeti. Production'a geçmeden önce her madde <code>☑️</code> olmalı.</div>
+
+                <div style="background:#e3f2fd; border-left:4px solid #1565c0; border-radius:4px; padding:10px 12px; margin-top:12px;">
+                  <div style="font-weight:bold; color:#0d47a1; font-size:12px; margin-bottom:6px;">🚀 4.1 İndeks Stratejisi</div>
+                  <div style="font-size:10.5px; color:#444; line-height:1.7;">
+                    ☑️ Tüm geometri kolonlarında GiST veya SP-GiST indeksi<br>
+                    ☑️ Sık WHERE'lere partial index<br>
+                    ☑️ Toplu yüklemeden sonra <code>ANALYZE</code><br>
+                    ☑️ <code>idx_scan = 0</code> ölü indeks YOK
+                  </div>
+                </div>
+
+                <div style="background:#f3e5f5; border-left:4px solid #6a1b9a; border-radius:4px; padding:10px 12px; margin-top:8px;">
+                  <div style="font-weight:bold; color:#4a148c; font-size:12px; margin-bottom:6px;">🔒 4.2 Güvenlik</div>
+                  <div style="font-size:10.5px; color:#444; line-height:1.7;">
+                    ☑️ Web kullanıcısı <code>default_transaction_read_only = on</code><br>
+                    ☑️ Her birim için ayrı GRUP rolü, kullanıcıya direkt yetki yok<br>
+                    ☑️ Mekansal RLS politikaları (ilçe/birim bazlı)<br>
+                    ☑️ <code>pg_hba.conf</code>'da SSL + sınırlı IP<br>
+                    ☑️ Parola <code>scram-sha-256</code> (md5 değil)
+                  </div>
+                </div>
+              </div>
+
+              <div class="s-panel-right">
+                <div style="background:#e8f5e9; border-left:4px solid #2e7d32; border-radius:4px; padding:10px 12px;">
+                  <div style="font-weight:bold; color:#1b5e20; font-size:12px; margin-bottom:6px;">💾 4.3 Yedek ve Kurtarma</div>
+                  <div style="font-size:10.5px; color:#444; line-height:1.7;">
+                    ☑️ <code>pg_dump -Fc</code> günlük cron + 7 günlük retention<br>
+                    ☑️ <code>pg_dumpall</code> haftalık (roller dahil)<br>
+                    ☑️ <code>wal_level = replica</code> + <code>archive_mode = on</code> (PITR için)<br>
+                    ☑️ Replication slot kurulu (Logical Decoding için)<br>
+                    ☑️ Kritik tablolarda audit trigger<br>
+                    ☑️ Yedek <strong>geri yükleme</strong> test edilmiş (sadece yedek almak yetmez!)
+                  </div>
+                </div>
+
+                <div style="background:#fff3e0; border-left:4px solid #e65100; border-radius:4px; padding:10px 12px; margin-top:8px;">
+                  <div style="font-weight:bold; color:#bf360c; font-size:12px; margin-bottom:6px;">🏊 4.4 Bağlantı ve Ölçek</div>
+                  <div style="font-size:10.5px; color:#444; line-height:1.7;">
+                    ☑️ PgBouncer kurulu, uygulama 6432'ye bağlanıyor<br>
+                    ☑️ <code>pool_mode = transaction</code> (CBS için)<br>
+                    ☑️ <code>default_pool_size</code> = (PG RAM / 10MB)<br>
+                    ☑️ Streaming replikasyon kurulu (failover hazır)
+                  </div>
+                </div>
+
+                <div style="background:#fffde7; border:2px solid #f9a825; border-radius:6px; padding:11px 12px; margin-top:11px;">
+                  <div style="font-weight:bold; color:#5d4037; font-size:12px; margin-bottom:5px;">🧪 Bonus — Düzenli İzleme Sorguları</div>
+                  <div class="code-block" style="font-size:9px; padding:7px; line-height:1.4;">-- Aktif bağlantı sayısı
+SELECT count(*) FROM pg_stat_activity;
+
+-- Tablo şişme oranı (bloat)
+SELECT relname, n_dead_tup, n_live_tup
+FROM pg_stat_user_tables ORDER BY n_dead_tup DESC LIMIT 5;
+
+-- En yavaş sorgular
+-- ⚠️ Önce: CREATE EXTENSION pg_stat_statements
+-- (shared_preload_libraries='pg_stat_statements' + restart gerektirir)
+SELECT query, mean_exec_time, calls
+FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 5;
+
+-- Replikasyon gecikmesi
+SELECT client_addr,
+       pg_wal_lsn_diff(pg_current_wal_lsn(), flush_lsn) AS lag_bytes
+FROM pg_stat_replication;</div>
+                </div>
+
+                <div class="reveal-box" id="ops44e">
+                  <div class="reveal-trigger" onclick="document.getElementById('ops44e').classList.toggle('open')">Görev: Kendi Checklist'ini Doldur <span>▼</span></div>
+                  <div class="reveal-content">Mevcut Konya eğitim DB'sinde her maddeyi tek tek doğrula. <strong>Eksik olan ilk 3 maddeyi</strong> ekipte gündeme al ve plana çevir. <em>Production hazırlığı bu listenin %100'ünü tamamlamaktır</em> — eksik 1 madde bile felaket reçetesi olabilir.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════════ -->
+      <!-- KAPANIŞ — TEBRİKLER                                                -->
+      <!-- ════════════════════════════════════════════════════════════════ -->
+
+      <!-- SLAYT 23: ÖZET / TEBRİKLER -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark" style="background: linear-gradient(135deg, #111 0%, #000 100%);">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title" style="color:var(--theme-yellow); letter-spacing: 0.1em;">PRODUCTION'A HAZIRSINIZ</div>
+              <div class="slide-header-num">23 / 23</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech" style="font-size: 50px;">Artık<br><span style="color:var(--theme-yellow);">Production-Ready</span><br>PostGIS Uzmanısınız</div>
+                <div class="s-text-tech" style="font-size: 16px; line-height: 1.6; color: #ccc; margin-top:18px;">
+                  Bu bölümde sadece komutları değil, <em>üretim sistemini ayakta tutan disiplini</em> öğrendiniz. Konya'nın CBS altyapısı artık güvende — ve sizler bu altyapının mimarısınız.
+                </div>
+                <div style="margin-top: 24px; width: 60px; height: 3px; background: var(--theme-yellow);"></div>
+                <div style="margin-top:16px; font-size:13px; color:#aaa; line-height:1.7;">
+                  ✨ <strong>4.1</strong> — İndeks stratejisi → milisaniyelik sorgu<br>
+                  🔐 <strong>4.2</strong> — 5 katmanlı güvenlik mimarisi<br>
+                  💾 <strong>4.3</strong> — Defense-in-depth yedek hiyerarşisi<br>
+                  🏊 <strong>4.4</strong> — Ölçeklenebilir bağlantı havuzu
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="background:rgba(255,203,5,0.05); border:1px solid var(--theme-yellow); box-shadow:0 0 30px rgba(255,203,5,0.1); padding:24px; border-radius:6px;">
+                  <div style="font-weight:900; font-size:11px; color:var(--theme-yellow); letter-spacing:0.2em; margin-bottom:18px;">KAZANILAN YETKİNLİKLER</div>
+                  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 13px;">
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">GiST / SP-GiST<br><span style="color:#888; font-size:10px;">indeks seçimi</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">Partial / Functional<br><span style="color:#888; font-size:10px;">akıllı indeksler</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">GRANT / RLS<br><span style="color:#888; font-size:10px;">erişim kontrolü</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">Mekansal RLS<br><span style="color:#888; font-size:10px;">bölge bazlı filtre</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">pg_dump / restore<br><span style="color:#888; font-size:10px;">yedekleme</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">PITR / WAL<br><span style="color:#888; font-size:10px;">zaman makinesi</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">pg_dirtyread<br><span style="color:#888; font-size:10px;">silinen veri kurtarma</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">Logical Decoding<br><span style="color:#888; font-size:10px;">WAL → undo SQL</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">Audit Trigger<br><span style="color:#888; font-size:10px;">kara kutu kayıt</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">Replikasyon<br><span style="color:#888; font-size:10px;">streaming + logical</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">PgBouncer<br><span style="color:#888; font-size:10px;">connection pooling</span></div>
+                    <div style="font-size:12px; color:#fff; border-left:2px solid var(--theme-yellow); padding-left:9px;">Launch Checklist<br><span style="color:#888; font-size:10px;">üretim disiplini</span></div>
+                  </div>
+                </div>
+                <div style="margin-top:18px; font-family:Montserrat; font-size:14px; font-weight:800; color:#fff; text-align:center; letter-spacing:0.1em;">
+                  KONYA'NIN VERİSİ <span style="color:var(--theme-yellow);">EMİN ELLERDE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SON KAPANIŞ — MİNİMALİST -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-final" style="background: #000; overflow: hidden; position: relative;">
+            <div style="position:absolute; top:-100px; right:-100px; width:400px; height:400px; background:var(--theme-yellow); opacity:0.02; border-radius:50%;"></div>
+            <div class="s-final-body" style="padding: 60px; height: 100%; display: flex; align-items: center;">
+              <div class="s-final-left" style="flex: 1; padding-right: 60px;">
+                <div style="font-family:Montserrat; font-weight:900; font-size:72px; color:var(--theme-yellow); line-height: 1; letter-spacing: -0.02em;">TEBRİKLER!</div>
+                <div style="font-family:Montserrat; font-weight:800; font-size:26px; color:#fff; margin-top:24px; letter-spacing: -0.01em;">Production-Ready Bölümünü Tamamladınız.</div>
+                <div style="color:#888; font-size:20px; margin-top:32px; line-height: 1.6; max-width: 600px;">
+                  Mekansal verinin sadece görselleştirilmesi değil, <em>üretimde ayakta tutulması</em> da artık sizin uzmanlık alanınız. Konya'nın geleceğini şekillendiren mimarsınız.
+                </div>
+                <div style="margin-top: 60px; width: 60px; height: 2px; background: var(--theme-yellow);"></div>
+              </div>
+              <div class="s-final-right" style="width: 400px; height: 100%; background:var(--theme-yellow); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; box-shadow: -20px 0 50px rgba(0,0,0,0.5);">
+                <div style="padding: 40px; border: 4px solid var(--theme-black); display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                  <img src="https://www.konya.bel.tr/assets/images/logo.svg" style="height:80px;" />
+                  <div style="width: 30px; height: 2px; background: var(--theme-black);"></div>
+                  <div style="font-family: Montserrat; font-weight: 900; font-size: 18px; color: var(--theme-black); letter-spacing: 0.2em; text-transform: uppercase;">BENİM ŞEHRİM<br>KONYA</div>
+                </div>
+                <div style="margin-top:40px; font-size:14px; color:rgba(0,0,0,0.7); font-weight:800; font-family: Montserrat; letter-spacing: 0.1em;">TEŞEKKÜRLER</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-controls">
+    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg></a>
+    <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg></button>
+    <div class="nav-status" id="navStatus">1 / 24</div>
+    <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg></button>
+  </div>
+
+  <script>
+    (function () {
+      const track = document.getElementById('deckTrack');
+      const slides = document.querySelectorAll('.slide-outer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const status = document.getElementById('navStatus');
+      let currentIndex = 0;
+      function updateSlides() {
+        track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        document.querySelector('.deck-viewport').scrollTop = 0;
+        status.textContent = `${currentIndex + 1} / ${slides.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === slides.length - 1;
+      }
+      nextBtn.addEventListener('click', () => { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } });
+      prevBtn.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; updateSlides(); } });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { if (currentIndex > 0) { currentIndex--; updateSlides(); } }
+      });
+    })();
+  </script>
+
+</body>
+
+</html>
