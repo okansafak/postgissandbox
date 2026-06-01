@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PostGIS Akademi — Bölüm 5: AYKOME Veri Modeli</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .s1 { background: var(--theme-black); display: grid; grid-template-columns: 1fr 420px; min-height: var(--slide-h); }
+    .s1-left { display: flex; flex-direction: column; justify-content: space-between; padding: 56px 64px; }
+    .s1-logo-area { display: flex; align-items: center; gap: 0; }
+    .logo-benim { border: 2px solid var(--theme-white); padding: 10px 16px; font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 18px; color: var(--theme-white); line-height: 1.1; }
+    .logo-konya-box { background: var(--theme-yellow); padding: 8px 16px; display: flex; align-items: center; gap: 12px; }
+    .logo-konya-box img { height: 40px; }
+    .logo-divider { width: 3px; height: 44px; background: var(--theme-yellow); }
+    .s1-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 72px; color: var(--theme-white); line-height: 0.9; }
+    .s1-title span { color: var(--theme-yellow); }
+    .s1-right { background: var(--theme-yellow); display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-end; padding: 48px; position: relative; overflow: hidden; }
+    .s1-right-number { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 120px; color: var(--theme-black); opacity: 0.15; position: absolute; bottom: -20px; right: -10px; }
+
+    /* ─── VERİ SÖZLÜĞÜ TABLOLARI ─── */
+    .dict-body { padding: 22px 48px 44px; }
+    .dict-intro { font-size: 12.5px; color: #555; line-height: 1.65; margin-bottom: 16px; max-width: 1080px; }
+    .dict-intro strong { color: #1a1a1a; }
+    .dict-intro code { background: #f5f5f5; padding: 1px 5px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #c2410c; }
+    .dict-section { margin-bottom: 15px; }
+    .dict-caption { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
+    .dict-caption .tbl-dot { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+    .dict-caption .tbl-name { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; color: #1a1a1a; }
+    .dict-caption .tbl-desc { font-size: 11px; color: #999; }
+    .dict-caption .tbl-count { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #bbb; letter-spacing: 0.03em; }
+    .dict-table { width: 100%; border-collapse: collapse; font-family: 'Source Sans 3', sans-serif; border: 1px solid #e6e6e6; }
+    .dict-table th { background: #1f1f1f; color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.07em; text-align: left; padding: 6px 11px; }
+    .dict-table td { padding: 5px 11px; font-size: 11px; border-bottom: 1px solid #eee; color: #333; vertical-align: top; line-height: 1.4; }
+    .dict-table tr:last-child td { border-bottom: none; }
+    .dict-table .c-col { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #1a1a1a; white-space: nowrap; }
+    .dict-table .c-type { font-family: 'IBM Plex Mono', monospace; color: #0d47a1; white-space: nowrap; font-size: 10.5px; }
+    .dict-table .c-type.is-geom { color: #2e7d32; font-style: italic; }
+    .dict-table .c-key { line-height: 1.7; }
+    .dict-table .c-desc code { background: #f3f3f3; padding: 0 4px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #555; }
+    .dict-row-pk { background: #fffaef; }
+    .dict-row-fk { background: #f4f8fd; }
+    .dict-row-geom { background: #f1f8f1; }
+    .badge { color: #fff; padding: 1px 5px; border-radius: 3px; font-size: 8px; font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 0.03em; margin-right: 3px; display: inline-block; white-space: nowrap; }
+    .badge-pk { background: #f9a825; }
+    .badge-fk { background: #1565c0; }
+    .badge-uq { background: #7b1fa2; }
+    .badge-nn { background: #757575; }
+    .badge-df { background: #00897b; }
+    .badge-ix { background: #43a047; }
+    .c-key .ref { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #1565c0; display: block; margin-top: 2px; }
+    .c-key .dfval { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #00695c; }
+    .c-key .c-none { color: #ccc; }
+    .dict-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 11px; font-size: 10px; color: #888; align-items: center; }
+    .dict-legend .lg { display: flex; align-items: center; gap: 5px; }
+    .dict-legend .sw { width: 20px; height: 12px; border-radius: 2px; display: inline-block; border: 1px solid rgba(0,0,0,0.08); }
+  </style>
+</head>
+<body>
+
+  <div class="deck-viewport">
+    <div class="deck-track" id="deckTrack">
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 5: 5.2.1 — ERD DİYAGRAMI                         -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.2.1 — AYKOME Varlık-İlişki Diyagramı (ERD)</div>
+              <div class="slide-header-num">05 / 22</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech" style="font-size:38px;">7 Tablo,<br><span>1 Şema</span></div>
+                <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:14px;">Tüm AYKOME verileri <code style="background:#f5f5f5; padding:1px 5px; border-radius:3px;">aykome</code> şemasında toplanır. Her tablo tek bir sorumluluğa sahiptir.</div>
+                <div style="display:flex; flex-direction:column; gap:7px;">
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#f9a825; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>utility_company</strong> — Altyapı kurumları (KOSKİ, GAZNET…)</div></div>
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#1565c0; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>utility_line</strong> — Hat geometrileri (LINESTRINGZ)</div></div>
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#7b1fa2; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>manhole</strong> — Rögar / vana noktaları (POINTZ)</div></div>
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#e65100; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>excavation_permit</strong> — Kazı ruhsat başvuruları</div></div>
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#616161; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>permit_review</strong> — Kurum bazlı görüş/onay kayıtları</div></div>
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#2e7d32; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>mahalle</strong> — Mahalle idari sınır poligonları</div></div>
+                  <div style="display:flex; align-items:center; gap:8px;"><div style="width:12px; height:12px; background:#558b2f; border-radius:2px; flex-shrink:0;"></div><div style="font-size:12px; color:#333;"><strong>road_segment</strong> — Yol/cadde + asfalt garanti bilgisi</div></div>
+                </div>
+                <div class="reveal-box" id="erd01" style="margin-top:14px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('erd01').classList.toggle('open')">Neden 7 ayrı tablo? <span>▼</span></div>
+                  <div class="reveal-content"><strong>Normalizasyon:</strong> Kurum adı sadece <code>utility_company</code>'de tutulur; her hat satırı sadece <code>kurum_id</code> taşır. Bir kazı başvurusuna birden fazla kurum görüş yazabilir → <code>permit_review</code> ayrı tablo. <code>mahalle</code> hem hatlar hem izinlerle ortak referans.</div>
+                </div>
+              </div>
+              <div class="s-panel-right" style="padding:28px 32px;">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">Entity–Relationship Diyagramı — aykome şeması</div>
+                <svg width="100%" viewBox="0 0 500 290" style="display:block; background:#fafafa; border-radius:5px; border:1px solid #eee;">
+
+                  <!-- utility_company — SARI — ÜSTTE ORTA -->
+                  <rect x="160" y="8" width="175" height="72" fill="#fff9c4" stroke="#f9a825" stroke-width="1.5" rx="3"/>
+                  <rect x="160" y="8" width="175" height="17" fill="#f9a825" rx="3"/>
+                  <rect x="160" y="17" width="175" height="8" fill="#f9a825"/>
+                  <text x="247" y="21" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" font-weight="700" fill="#fff">utility_company</text>
+                  <text x="168" y="36" font-family="IBM Plex Mono" font-size="7" fill="#5d4037">🔑 id SERIAL PRIMARY KEY</text>
+                  <text x="168" y="47" font-family="IBM Plex Mono" font-size="7" fill="#5d4037">ad TEXT NOT NULL</text>
+                  <text x="168" y="58" font-family="IBM Plex Mono" font-size="7" fill="#5d4037">kisa_ad TEXT UNIQUE</text>
+                  <text x="168" y="69" font-family="IBM Plex Mono" font-size="7" fill="#5d4037">tip TEXT  |  renk TEXT</text>
+
+                  <!-- utility_line — MAVİ — SOL ORTA -->
+                  <rect x="5" y="118" width="160" height="88" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5" rx="3"/>
+                  <rect x="5" y="118" width="160" height="17" fill="#1565c0" rx="3"/>
+                  <rect x="5" y="127" width="160" height="8" fill="#1565c0"/>
+                  <text x="85" y="131" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" font-weight="700" fill="#fff">utility_line</text>
+                  <text x="12" y="147" font-family="IBM Plex Mono" font-size="7" fill="#0d47a1">🔑 id SERIAL PK</text>
+                  <text x="12" y="158" font-family="IBM Plex Mono" font-size="7" fill="#1976d2">🔗 kurum_id FK</text>
+                  <text x="12" y="169" font-family="IBM Plex Mono" font-size="7" fill="#0d47a1">tip | capi_mm | derinlik_m</text>
+                  <text x="12" y="180" font-family="IBM Plex Mono" font-size="7" fill="#0d47a1">malzeme | yapim_yili</text>
+                  <text x="12" y="191" font-family="IBM Plex Mono" font-size="7" fill="#0d47a1" font-style="italic">geom LINESTRINGZ(5255)</text>
+
+                  <!-- manhole — MOR — ORTA -->
+                  <rect x="175" y="118" width="145" height="88" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="1.5" rx="3"/>
+                  <rect x="175" y="118" width="145" height="17" fill="#7b1fa2" rx="3"/>
+                  <rect x="175" y="127" width="145" height="8" fill="#7b1fa2"/>
+                  <text x="247" y="131" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" font-weight="700" fill="#fff">manhole</text>
+                  <text x="182" y="147" font-family="IBM Plex Mono" font-size="7" fill="#4a148c">🔑 id SERIAL PK</text>
+                  <text x="182" y="158" font-family="IBM Plex Mono" font-size="7" fill="#7b1fa2">🔗 kurum_id FK</text>
+                  <text x="182" y="169" font-family="IBM Plex Mono" font-size="7" fill="#4a148c">tip | derinlik_m</text>
+                  <text x="182" y="180" font-family="IBM Plex Mono" font-size="7" fill="#4a148c">yapim_yili | durum</text>
+                  <text x="182" y="191" font-family="IBM Plex Mono" font-size="7" fill="#4a148c" font-style="italic">geom POINTZ(5255)</text>
+
+                  <!-- excavation_permit — TURUNCU — SAĞ ORTA -->
+                  <rect x="330" y="118" width="165" height="88" fill="#fff3e0" stroke="#e65100" stroke-width="1.5" rx="3"/>
+                  <rect x="330" y="118" width="165" height="17" fill="#e65100" rx="3"/>
+                  <rect x="330" y="127" width="165" height="8" fill="#e65100"/>
+                  <text x="412" y="131" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" font-weight="700" fill="#fff">excavation_permit</text>
+                  <text x="337" y="147" font-family="IBM Plex Mono" font-size="7" fill="#bf360c">🔑 id PK | basvuru_no</text>
+                  <text x="337" y="158" font-family="IBM Plex Mono" font-size="7" fill="#e65100">🔗 basvuran_kurum_id FK</text>
+                  <text x="337" y="169" font-family="IBM Plex Mono" font-size="7" fill="#e65100">🔗 mahalle_id FK</text>
+                  <text x="337" y="180" font-family="IBM Plex Mono" font-size="7" fill="#bf360c">durum | sebep | derinlik_m</text>
+                  <text x="337" y="191" font-family="IBM Plex Mono" font-size="7" fill="#bf360c" font-style="italic">geom POLYGON(5255)</text>
+
+                  <!-- mahalle — YEŞİL — ALTTA SOL -->
+                  <rect x="5" y="228" width="148" height="57" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5" rx="3"/>
+                  <rect x="5" y="228" width="148" height="17" fill="#2e7d32" rx="3"/>
+                  <rect x="5" y="237" width="148" height="8" fill="#2e7d32"/>
+                  <text x="79" y="241" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" font-weight="700" fill="#fff">mahalle</text>
+                  <text x="12" y="257" font-family="IBM Plex Mono" font-size="7" fill="#1b5e20">🔑 id SERIAL PK</text>
+                  <text x="12" y="268" font-family="IBM Plex Mono" font-size="7" fill="#1b5e20">ad TEXT | ilce TEXT</text>
+                  <text x="12" y="279" font-family="IBM Plex Mono" font-size="7" fill="#1b5e20" font-style="italic">geom POLYGON(5255)</text>
+
+                  <!-- road_segment — YEŞİL AÇIK — ALTTA ORTA -->
+                  <rect x="163" y="228" width="155" height="57" fill="#f1f8e9" stroke="#558b2f" stroke-width="1.5" rx="3"/>
+                  <rect x="163" y="228" width="155" height="17" fill="#558b2f" rx="3"/>
+                  <rect x="163" y="237" width="155" height="8" fill="#558b2f"/>
+                  <text x="240" y="241" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" font-weight="700" fill="#fff">road_segment</text>
+                  <text x="170" y="257" font-family="IBM Plex Mono" font-size="7" fill="#33691e">🔑 id PK | ad TEXT</text>
+                  <text x="170" y="268" font-family="IBM Plex Mono" font-size="7" fill="#558b2f">🔗 mahalle_id FK</text>
+                  <text x="170" y="279" font-family="IBM Plex Mono" font-size="7" fill="#33691e" font-style="italic">geom LINESTRING(5255)</text>
+
+                  <!-- permit_review — GRİ — ALTTA SAĞ -->
+                  <rect x="328" y="228" width="167" height="57" fill="#f5f5f5" stroke="#616161" stroke-width="1.5" rx="3"/>
+                  <rect x="328" y="228" width="167" height="17" fill="#616161" rx="3"/>
+                  <rect x="328" y="237" width="167" height="8" fill="#616161"/>
+                  <text x="411" y="241" text-anchor="middle" font-family="IBM Plex Mono" font-size="8.5" font-weight="700" fill="#fff">permit_review</text>
+                  <text x="335" y="257" font-family="IBM Plex Mono" font-size="7" fill="#212121">🔑 id SERIAL PK</text>
+                  <text x="335" y="268" font-family="IBM Plex Mono" font-size="7" fill="#616161">🔗 permit_id FK  🔗 reviewer_kurum_id FK</text>
+                  <text x="335" y="279" font-family="IBM Plex Mono" font-size="7" fill="#212121">gorus TEXT | tarih TIMESTAMPTZ</text>
+
+                  <!-- FK BAĞLANTILARI -->
+                  <!-- utility_line → utility_company -->
+                  <line x1="85" y1="118" x2="205" y2="80" stroke="#1565c0" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.75"/>
+                  <circle cx="85" cy="118" r="3" fill="#1565c0"/>
+                  <!-- manhole → utility_company -->
+                  <line x1="247" y1="118" x2="247" y2="80" stroke="#7b1fa2" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.75"/>
+                  <circle cx="247" cy="118" r="3" fill="#7b1fa2"/>
+                  <!-- excavation_permit → utility_company -->
+                  <line x1="372" y1="118" x2="313" y2="80" stroke="#e65100" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.75"/>
+                  <circle cx="372" cy="118" r="3" fill="#e65100"/>
+                  <!-- excavation_permit → mahalle -->
+                  <path d="M 370,206 L 370,216 L 79,216 L 79,228" stroke="#e65100" stroke-width="1.2" stroke-dasharray="4,2" fill="none" opacity="0.6"/>
+                  <circle cx="370" cy="206" r="3" fill="#e65100"/>
+                  <!-- permit_review → excavation_permit -->
+                  <line x1="411" y1="228" x2="411" y2="206" stroke="#616161" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.75"/>
+                  <circle cx="411" cy="228" r="3" fill="#616161"/>
+                  <!-- road_segment → mahalle -->
+                  <line x1="200" y1="256" x2="153" y2="256" stroke="#558b2f" stroke-width="1.2" stroke-dasharray="4,2" opacity="0.75"/>
+                  <circle cx="200" cy="256" r="3" fill="#558b2f"/>
+
+                  <!-- Lejant -->
+                  <line x1="8" y1="107" x2="35" y2="107" stroke="#555" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+                  <circle cx="8" cy="107" r="2" fill="#555" opacity="0.7"/>
+                  <text x="40" y="110" font-family="Source Sans 3" font-size="6.5" fill="#555">FK ilişkisi (kesikli çizgi + dolu nokta = kaynak tablo)</text>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 6: 5.2.2 — TASARIM KARARLARI                     -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.2.2 — Tasarım Kararları: EPSG, Z Koordinatı, Tip Kısıtlama</div>
+              <div class="slide-header-num">06 / 22</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech" style="font-size:40px;">3 Kritik<br><span>Karar</span></div>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
+                  <div style="background:#e3f2fd; padding:12px 14px; border-radius:5px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:900; color:#0d47a1; font-size:13px; font-family:'Montserrat',sans-serif;">📐 Karar 1: EPSG:5255 (TUREF / TM33)</div>
+                    <div style="font-size:11.5px; color:#333; margin-top:5px; line-height:1.6;">Konya ~32.49°E boylamında. TUREF TM33 zonu (merkez meridyen 33°E) Konya için doğru kesit. Metre cinsinden → uzunluk/alan hesapları doğrudan metre çıkar, dönüşüm gerekmez.<br><span style="color:#c62828;"><strong>⚠️</strong></span> <code style="background:#eaf2fb; padding:1px 4px;">ST_Length</code> WGS84'te derece, 5255'te <strong>metre</strong> döner.</div>
+                  </div>
+                  <div style="background:#f3e5f5; padding:12px 14px; border-radius:5px; border-left:4px solid #7b1fa2;">
+                    <div style="font-weight:900; color:#4a148c; font-size:13px; font-family:'Montserrat',sans-serif;">📏 Karar 2: Z Koordinatı (Derinlik)</div>
+                    <div style="font-size:11.5px; color:#333; margin-top:5px; line-height:1.6;">Altyapı hatları <em>yeraltındadır</em> — farklı derinliklerde çakışabilirler. <code style="background:#f5eaf8; padding:1px 4px;">LINESTRINGZ</code> / <code style="background:#f5eaf8; padding:1px 4px;">POINTZ</code> ile Z = derinlik (negatif = yeraltı).<br>Gaz -0.8m, fiber -0.3m: 2D'de üst üste görünür, <code>ST_3DDistance</code> ile 0.5m ayrım ölçülür.</div>
+                  </div>
+                  <div style="background:#e8f5e9; padding:12px 14px; border-radius:5px; border-left:4px solid #2e7d32;">
+                    <div style="font-weight:900; color:#1b5e20; font-size:13px; font-family:'Montserrat',sans-serif;">🔒 Karar 3: geometry(Tip, SRID) ile Kısıtlama</div>
+                    <div style="font-size:11.5px; color:#333; margin-top:5px; line-height:1.6;"><code style="background:#edf7ee; padding:1px 4px;">geom geometry(LINESTRINGZ, 5255)</code> → PostgreSQL yanlış tip veya SRID'li INSERT'i <strong>reddeder</strong>. Eski <code>AddGeometryColumn()</code> yaklaşımı artık kullanılmıyor.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Geometri Tipleri Özet Tablosu</div>
+                <div style="background:#fff; border:1px solid #e0e0e0; border-radius:4px; overflow:hidden; margin-bottom:12px;">
+                  <div style="display:grid; grid-template-columns:1.2fr 1fr 0.6fr; background:#f5f5f5; padding:6px 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:700; color:#555; gap:4px; border-bottom:1px solid #e0e0e0;">
+                    <span>Tablo</span><span>Geometri Tipi</span><span>SRID</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.2fr 1fr 0.6fr; padding:5px 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; gap:4px; border-bottom:1px solid #f5f5f5;">
+                    <span style="color:#1565c0; font-weight:600;">utility_line</span><span>LINESTRINGZ</span><span style="color:#e65100; font-weight:700;">5255</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.2fr 1fr 0.6fr; padding:5px 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; gap:4px; border-bottom:1px solid #f5f5f5; background:#fafafa;">
+                    <span style="color:#7b1fa2; font-weight:600;">manhole</span><span>POINTZ</span><span style="color:#e65100; font-weight:700;">5255</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.2fr 1fr 0.6fr; padding:5px 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; gap:4px; border-bottom:1px solid #f5f5f5;">
+                    <span style="color:#e65100; font-weight:600;">exc_permit</span><span>POLYGON</span><span style="color:#e65100; font-weight:700;">5255</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.2fr 1fr 0.6fr; padding:5px 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; gap:4px; border-bottom:1px solid #f5f5f5; background:#fafafa;">
+                    <span style="color:#558b2f; font-weight:600;">road_segment</span><span>LINESTRING</span><span style="color:#e65100; font-weight:700;">5255</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.2fr 1fr 0.6fr; padding:5px 10px; font-family:'IBM Plex Mono',monospace; font-size:9px; gap:4px;">
+                    <span style="color:#2e7d32; font-weight:600;">mahalle</span><span>POLYGON</span><span style="color:#e65100; font-weight:700;">5255</span>
+                  </div>
+                </div>
+                <div class="code-block" style="font-size:10px; line-height:1.5; margin-bottom:10px;">-- Tüm geometri sütunlarını listele
+SELECT f_table_name   AS tablo,
+       f_geometry_column AS sutun,
+       type,
+       srid
+FROM geometry_columns
+WHERE f_table_schema = 'aykome'
+ORDER BY f_table_name;</div>
+                <div style="background:#fff8e1; border:1px solid #f9a825; border-radius:4px; padding:10px 12px; margin-bottom:8px;">
+                  <div style="font-size:10.5px; font-weight:800; color:#e65100; margin-bottom:4px; font-family:'Montserrat',sans-serif;">🗺️ QGIS otomatik projeksiyon</div>
+                  <div style="font-size:10.5px; color:#5d4037; line-height:1.6;">Harita projesi EPSG:3857 bile olsa QGIS, PostGIS'ten 5255 sütununu okurken arka planda <code>ST_Transform</code> uygular — ek view oluşturmak zorunlu değil.</div>
+                </div>
+                <div class="reveal-box" id="tbl06a">
+                  <div class="reveal-trigger" onclick="document.getElementById('tbl06a').classList.toggle('open')">ST_3DDistance ne zaman kullanırım? <span>▼</span></div>
+                  <div class="reveal-content">İki hat 2D'de 0 mesafede (üst üste) ama farklı derinliklerde olabilir. <code>ST_3DDistance(gas.geom, fiber.geom)</code> gerçek uzaysal mesafeyi (örn. 0.5m) döner. Güvenlik koridoru ve çakışma analizinde kritik — sadece 2D baksaydın tüm hatlar çakışıyor görünürdü.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 8: 5.3.1 — DDL: ŞEMA + TEMEL TABLOLAR            -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.3.1 — DDL: Şema, Kurumlar Tablosu ve Mahalle</div>
+              <div class="slide-header-num">08 / 22</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech" style="font-size:40px;">Şema<br><span>Oluşturma</span></div>
+                <div style="font-size:13px; color:#ccc; line-height:1.6; margin-bottom:14px;">Her proje kendi şemasına girmeli. <code style="background:#2a2a2a; padding:1px 5px; border-radius:3px; color:#f9a825;">public</code>'e yazmak ekip çalışmasında karışıklık yaratır.</div>
+                <div style="display:flex; flex-direction:column; gap:9px;">
+                  <div style="background:rgba(255,255,255,0.07); padding:11px 13px; border-radius:4px; border-left:4px solid var(--theme-yellow);">
+                    <div style="font-weight:bold; color:var(--theme-yellow); font-size:12px; font-family:'Montserrat',sans-serif;">📦 CREATE SCHEMA aykome</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;">Tüm AYKOME tablolarını yalıtır. Farklı şemalar (<code>cbs</code>, <code>planlama</code>) ile çakışma olmaz. <code>SET search_path = aykome</code> ile şema adı yazmadan erişilir.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px 13px; border-radius:4px; border-left:4px solid #f9a825;">
+                    <div style="font-weight:bold; color:#f9a825; font-size:12px; font-family:'Montserrat',sans-serif;">🏢 utility_company — Referans Tablo</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;">Normalleştirmenin kalbi. Kurum adı <strong>bir kez</strong> burada; hatlar ve izinler yalnızca <code>kurum_id</code> taşır. Kurum adı değişirse tek satır güncellenir, tüm bağlantılar otomatik güncellenir.</div>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.07); padding:11px 13px; border-radius:4px; border-left:4px solid #a5d6a7;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:12px; font-family:'Montserrat',sans-serif;">🏘️ mahalle — Coğrafi Referans</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;">Konya'da 627 mahalle var. Kazı izinleri ve yol segmentleri bu tabloya FK ile bağlanır → mahalle bazlı istatistik ve rapor üretmek tek JOIN ile mümkün.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">SQL — Şema ve İlk İki Tablo</div>
+                <div class="code-block" style="font-size:10px; line-height:1.5;">-- ▶ 1) AYKOME şeması oluştur
+CREATE SCHEMA IF NOT EXISTS aykome;
+
+-- Oturum boyunca şema adı yazmadan erişim:
+-- SET search_path = aykome, public;
+
+-- ▶ 2) Altyapı kurumları referans tablosu
+CREATE TABLE aykome.utility_company (
+  id       SERIAL PRIMARY KEY,
+  ad       TEXT NOT NULL,
+  kisa_ad  TEXT NOT NULL UNIQUE,  -- 'KOSKI','GAZNET','MEDAS'
+  tip      TEXT NOT NULL,         -- 'SU','KANAL','GAZ','ELEKTRIK','TELEKOM'
+  renk     TEXT DEFAULT '#888888' -- harita görünümü için hex renk
+);
+
+COMMENT ON TABLE aykome.utility_company
+  IS 'AYKOME üyesi altyapı kurumları';
+COMMENT ON COLUMN aykome.utility_company.renk
+  IS 'QGIS katman rengi (hex, örn. #1565C0)';
+
+-- ▶ 3) Mahalle sınırları (coğrafi referans)
+CREATE TABLE aykome.mahalle (
+  id      SERIAL PRIMARY KEY,
+  ad      TEXT NOT NULL,
+  ilce    TEXT NOT NULL,   -- 'Selçuklu', 'Meram', 'Karatay'
+  nufus   INTEGER,
+  geom    geometry(POLYGON, 5255)
+);
+
+CREATE INDEX idx_mahalle_geom
+  ON aykome.mahalle USING GiST(geom);
+
+COMMENT ON TABLE aykome.mahalle
+  IS 'Konya mahalle idari sınırları (EPSG:5255 TUREF/TM33)';</div>
+                <div class="reveal-box" id="ddl08a" style="margin-top:8px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('ddl08a').classList.toggle('open')">COMMENT ON ne işe yarar pratikte? <span>▼</span></div>
+                  <div class="reveal-content"><code style="background:#1a1a1a; padding:1px 5px;">\d+ aykome.utility_company</code> veya pgAdmin'de tabloyu açtığında COMMENT görünür. QGIS DB Manager'da tooltip olarak çıkar. Farklı kurumların eriştiği ortak şemalarda ekip içi dokümantasyon için kritik — 6 ay sonra sütunun ne anlama geldiğini herkes okuyabilir.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 9: 5.3.2 — DDL: HAT + RÖGAR + YOL TABLOLARI     -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.3.2 — DDL: Altyapı Hatları, Rögarlar ve Yol Segmentleri</div>
+              <div class="slide-header-num">09 / 22</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech" style="font-size:40px;">Hat ve<br><span>Nokta</span></div>
+                <div style="font-size:13px; color:#ccc; line-height:1.6; margin-bottom:12px;">Tüm hat geometrileri <strong>LINESTRINGZ</strong>, nokta geometrileri <strong>POINTZ</strong> — Z ekseni yeraltı derinliğini taşır.</div>
+                <div style="display:flex; flex-direction:column; gap:9px;">
+                  <div style="background:rgba(33,150,243,0.12); padding:11px 13px; border-radius:4px; border-left:4px solid #1565c0;">
+                    <div style="font-weight:bold; color:#90caf9; font-size:12px; font-family:'Montserrat',sans-serif;">🔵 utility_line — Tüm Altyapı Hatları</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;">Su, kanal, gaz, elektrik, telekom tek tabloda — <code>tip</code> sütunuyla ayrılır. <code>capi_mm</code> boru çapı, <code>basinc_bar</code> gaz/su basıncı, <code>derinlik_m</code> yerden mesafe (negatif = yeraltı).</div>
+                  </div>
+                  <div style="background:rgba(123,31,162,0.12); padding:11px 13px; border-radius:4px; border-left:4px solid #7b1fa2;">
+                    <div style="font-weight:bold; color:#ce93d8; font-size:12px; font-family:'Montserrat',sans-serif;">🟣 manhole — Rögar ve Vanalar</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;"><code>tip</code>: <em>rögar, baca, vana, trafo_odasi, pompa_istasyonu</em>. Her bakım erişim noktası burada. Z koordinatı kapak kotunu (denizden yükseklik) veya derinliği taşır.</div>
+                  </div>
+                  <div style="background:rgba(46,125,50,0.12); padding:11px 13px; border-radius:4px; border-left:4px solid #4caf50;">
+                    <div style="font-weight:bold; color:#a5d6a7; font-size:12px; font-family:'Montserrat',sans-serif;">🟢 road_segment — Asfalt Garanti Takibi</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;"><code>son_asfalt_tarihi</code> + <code>garanti_bitisi</code> → kazı izni garanti ihlali sorgularında kullanılır. <code>mahalle_id FK</code> ile mahalle bazlı yol envanteri üretilir.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">SQL — Ana Geometri Tabloları</div>
+                <div class="code-block" style="font-size:9.5px; line-height:1.45;">-- ▶ 4) Altyapı hatları (su, kanal, gaz, elektrik, telekom)
+CREATE TABLE aykome.utility_line (
+  id          SERIAL PRIMARY KEY,
+  kurum_id    INTEGER NOT NULL
+                REFERENCES aykome.utility_company(id),
+  tip         TEXT NOT NULL,
+              -- 'su','kanal','dogalgaz','elektrik','fiber','data'
+  capi_mm     INTEGER,         -- boru/kablo çapı mm
+  derinlik_m  NUMERIC(4,2),    -- yerden derinlik (-0.80 = 80cm yeraltı)
+  basinc_bar  NUMERIC(5,2),    -- gaz/su için basınç (bar)
+  malzeme     TEXT,            -- 'PE','PVC','çelik','HDPE','betonarme'
+  yapim_yili  SMALLINT,
+  durum       TEXT DEFAULT 'aktif',
+              -- 'aktif', 'pasif', 'hasar', 'yenileniyor'
+  geom        geometry(LINESTRINGZ, 5255)
+);
+
+-- ▶ 5) Rögar, vana, baca, trafo noktaları
+CREATE TABLE aykome.manhole (
+  id          SERIAL PRIMARY KEY,
+  kurum_id    INTEGER NOT NULL
+                REFERENCES aykome.utility_company(id),
+  tip         TEXT NOT NULL,
+              -- 'rögar','baca','vana','trafo_odasi','pompa'
+  derinlik_m  NUMERIC(4,2),
+  yapim_yili  SMALLINT,
+  durum       TEXT DEFAULT 'aktif',
+  geom        geometry(POINTZ, 5255)
+);
+
+-- ▶ 6) Yol/cadde + asfalt garanti bilgisi
+CREATE TABLE aykome.road_segment (
+  id                 SERIAL PRIMARY KEY,
+  ad                 TEXT NOT NULL,  -- 'Mevlana Cad.', 'Alaaddin Blv.'
+  mahalle_id         INTEGER
+                       REFERENCES aykome.mahalle(id),
+  kaplama            TEXT DEFAULT 'asfalt',
+                     -- 'asfalt','parke','beton','stabilize'
+  son_asfalt_tarihi  DATE,
+  garanti_bitisi     DATE,  -- genellikle son_asfalt + 5 yıl
+  geom               geometry(LINESTRING, 5255)
+);</div>
+                <div class="reveal-box" id="ddl09a" style="margin-top:8px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('ddl09a').classList.toggle('open')">Neden tip bazlı ayrı tablolar değil, tek tablo? <span>▼</span></div>
+                  <div class="reveal-content">Ayrı tablo alternatifi (su_hatti, kanal_hatti, gaz_hatti…) şema kısıtı sağlar ama 6+ tablo × N sütun = bakım yükü artar. Genel sorgularda <code>UNION ALL</code> zorunlu olur. Tek tablo + <code>WHERE tip = 'dogalgaz'</code> AYKOMEBİS'in gerçek yaklaşımına uyar ve B-Tree indeksi (<code>idx_ul_tip</code>) ile hızlıdır.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 10: 5.3.3 — DDL: İZİN TABLOLARI + İNDEKSLER     -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-dark">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.3.3 — DDL: Kazı İzin Tabloları ve İndeks Stratejisi</div>
+              <div class="slide-header-num">10 / 22</div>
+            </div>
+            <div class="s-body-grid">
+              <div class="s-panel-left">
+                <div class="s-headline-tech" style="font-size:40px;">İzin +<br><span>İndeks</span></div>
+                <div style="font-size:13px; color:#ccc; line-height:1.6; margin-bottom:12px;">Kazı süreci iki tabloya ayrılır: başvuru (tek kayıt) + kurum görüşleri (N kayıt). İndeksler Bölüm 4'ten bilinen stratejiyle seçilir.</div>
+                <div style="display:flex; flex-direction:column; gap:9px;">
+                  <div style="background:rgba(230,81,0,0.12); padding:11px 13px; border-radius:4px; border-left:4px solid #e65100;">
+                    <div style="font-weight:bold; color:#ffcc80; font-size:12px; font-family:'Montserrat',sans-serif;">🟠 excavation_permit — Kazı Başvurusu</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;"><code>durum</code>: beklemede → onaylandi → tamamlandi (ya da reddedildi). <code>geom POLYGON</code> QGIS'te sayısallaştırılarak çizilecek. <code>basvuru_no UNIQUE</code> resmi takip numarası.</div>
+                  </div>
+                  <div style="background:rgba(97,97,97,0.15); padding:11px 13px; border-radius:4px; border-left:4px solid #9e9e9e;">
+                    <div style="font-weight:bold; color:#e0e0e0; font-size:12px; font-family:'Montserrat',sans-serif;">⚫ permit_review — Kurum Görüşleri</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;">Bir başvuruya her kurum (KOSKİ, GAZNET…) kendi görüşünü yazar. Tüm kurumlardan 'onay' gelince <code>excavation_permit.durum</code> güncellenebilir. <code>reviewer_kurum_id FK</code> hangi kurumun incelediğini tutar.</div>
+                  </div>
+                  <div style="background:rgba(245,197,24,0.1); padding:11px 13px; border-radius:4px; border-left:4px solid var(--theme-yellow);">
+                    <div style="font-weight:bold; color:var(--theme-yellow); font-size:12px; font-family:'Montserrat',sans-serif;">⚡ İndeks Seçimi (Bölüm 4 bağlantısı)</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:4px; line-height:1.5;">LINESTRING/POLYGON → <strong>GiST</strong>. Nokta → <strong>SP-GiST</strong>. Sadece 'beklemede' başvurular için <strong>Partial Index</strong> → indeks boyutu %90 küçülür.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="s-panel-right">
+                <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;">SQL — İzin Tabloları + Tüm İndeks Bloğu</div>
+                <div class="code-block" style="font-size:9px; line-height:1.42;">-- ▶ 7) Kazı ruhsat başvuruları
+CREATE TABLE aykome.excavation_permit (
+  id                 SERIAL PRIMARY KEY,
+  basvuru_no         TEXT UNIQUE,    -- örn. 'AYK-2024-00142'
+  basvuran_kurum_id  INTEGER NOT NULL
+                       REFERENCES aykome.utility_company(id),
+  mahalle_id         INTEGER
+                       REFERENCES aykome.mahalle(id),
+  basvuru_tarihi     DATE NOT NULL DEFAULT CURRENT_DATE,
+  durum              TEXT NOT NULL DEFAULT 'beklemede',
+                     -- 'beklemede','onaylandi','reddedildi','tamamlandi'
+  sebep              TEXT NOT NULL,
+  tahmini_sure_gun   INTEGER,
+  derinlik_m         NUMERIC(4,2),
+  geom               geometry(POLYGON, 5255)
+);
+
+-- ▶ 8) Kurum bazlı görüş / onay kayıtları
+CREATE TABLE aykome.permit_review (
+  id                 SERIAL PRIMARY KEY,
+  permit_id          INTEGER NOT NULL
+                       REFERENCES aykome.excavation_permit(id),
+  reviewer_kurum_id  INTEGER NOT NULL
+                       REFERENCES aykome.utility_company(id),
+  gorus              TEXT NOT NULL,
+                     -- 'onay', 'ret', 'kosullu_onay'
+  aciklama           TEXT,
+  tarih              TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ═══════════════════════════════════════
+-- İNDEKS STRATEJİSİ
+-- ═══════════════════════════════════════
+
+-- Mekansal GiST  (LINESTRING / POLYGON için doğru seçim)
+CREATE INDEX idx_ul_geom  ON aykome.utility_line       USING GiST(geom);
+CREATE INDEX idx_ep_geom  ON aykome.excavation_permit  USING GiST(geom);
+CREATE INDEX idx_rs_geom  ON aykome.road_segment       USING GiST(geom);
+CREATE INDEX idx_mh_geom  ON aykome.mahalle            USING GiST(geom);
+
+-- Mekansal SP-GiST  (sadece POINT — quad-tree daha sığ ağaç)
+CREATE INDEX idx_mnh_geom ON aykome.manhole            USING SPGIST(geom);
+
+-- B-Tree  (kurum ve tip filtreleri)
+CREATE INDEX idx_ul_kurum ON aykome.utility_line(kurum_id);
+CREATE INDEX idx_ul_tip   ON aykome.utility_line(tip);
+
+-- Partial Index  (sadece bekleyen başvurular — %90 küçük)
+CREATE INDEX idx_ep_durum ON aykome.excavation_permit(durum)
+  WHERE durum = 'beklemede';</div>
+                <div class="reveal-box" id="ddl10a" style="margin-top:6px;">
+                  <div class="reveal-trigger" onclick="document.getElementById('ddl10a').classList.toggle('open')">Partial index neden %90 küçülür? <span>▼</span></div>
+                  <div class="reveal-content">Binlerce başvurunun çoğu 'tamamlandi' veya 'reddedildi' durumundadır — artık sorgulanmazlar. Partial index sadece 'beklemede' olanları (onlarca satır) indeksler. Sorguda <code>WHERE durum = 'beklemede'</code> şartı varsa PostgreSQL bu küçük indeksi seçer → tam tablo tarama yerine anında sonuç.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 11: 5.3.4 — VERİ SÖZLÜĞÜ: KURUM / MAHALLE / YOL    -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.3.4 — Veri Sözlüğü: Kurum, Mahalle ve Yol Tabloları</div>
+              <div class="slide-header-num">11 / 22</div>
+            </div>
+            <div class="dict-body">
+              <div class="dict-intro">
+                Aşağıdaki üç tablo <code>aykome</code> şemasının <strong>referans ve idari katmanını</strong> oluşturur.
+                <strong>utility_company</strong> ve <strong>mahalle</strong>, diğer tüm tabloların yabancı anahtarla bağlandığı çekirdek referanslardır;
+                <strong>road_segment</strong> ise yol envanterini ve asfalt garanti takibini taşır. Her satır bir sütunu, veri tipini ve kısıtını eksiksiz tanımlar.
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#f9a825;"></div>
+                  <span class="tbl-name">aykome.utility_company</span>
+                  <span class="tbl-desc">— Altyapı kurumları referans tablosu (KOSKİ, GAZNET…)</span>
+                  <span class="tbl-count">5 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:168px"><col style="width:198px"><col style="width:208px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Otomatik artan birincil anahtar.</td></tr>
+                    <tr><td class="c-col">ad</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Kurumun resmi tam adı — örn. <code>Konya Su ve Kanalizasyon İdaresi</code>.</td></tr>
+                    <tr><td class="c-col">kisa_ad</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-uq">UNIQUE</span></td><td class="c-desc">Kısa kurum kodu — <code>KOSKI</code>, <code>GAZNET</code>, <code>MEDAS</code>. Tekrar edemez.</td></tr>
+                    <tr><td class="c-col">tip</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Altyapı kategorisi — <code>SU</code> · <code>KANAL</code> · <code>GAZ</code> · <code>ELEKTRIK</code> · <code>TELEKOM</code>.</td></tr>
+                    <tr><td class="c-col">renk</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-df">DEFAULT</span><span class="dfval">'#888888'</span></td><td class="c-desc">QGIS katman rengi (hex kod) — harita sembolojisi için.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#2e7d32;"></div>
+                  <span class="tbl-name">aykome.mahalle</span>
+                  <span class="tbl-desc">— Konya mahalle idari sınırları (627 mahalle)</span>
+                  <span class="tbl-count">5 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:168px"><col style="width:198px"><col style="width:208px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Birincil anahtar.</td></tr>
+                    <tr><td class="c-col">ad</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Mahalle adı.</td></tr>
+                    <tr><td class="c-col">ilce</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Bağlı ilçe — <code>Selçuklu</code> · <code>Meram</code> · <code>Karatay</code>.</td></tr>
+                    <tr><td class="c-col">nufus</td><td class="c-type">INTEGER</td><td class="c-key"><span class="c-none">— (opsiyonel)</span></td><td class="c-desc">Mahalle nüfusu — istatistik/raporlama için.</td></tr>
+                    <tr class="dict-row-geom"><td class="c-col">geom</td><td class="c-type is-geom">geometry(POLYGON, 5255)</td><td class="c-key"><span class="badge badge-ix">GiST</span></td><td class="c-desc">İdari sınır poligonu — EPSG:5255 (TUREF/TM33).</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#558b2f;"></div>
+                  <span class="tbl-name">aykome.road_segment</span>
+                  <span class="tbl-desc">— Yol/cadde segmentleri + asfalt garanti bilgisi</span>
+                  <span class="tbl-count">7 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:168px"><col style="width:198px"><col style="width:208px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Birincil anahtar.</td></tr>
+                    <tr><td class="c-col">ad</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Cadde / yol adı — <code>Mevlana Cad.</code>, <code>Alaaddin Blv.</code></td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">mahalle_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-fk">FK</span><span class="ref">→ aykome.mahalle(id)</span></td><td class="c-desc">Segmentin geçtiği mahalle. Mahalle bazlı yol envanteri için.</td></tr>
+                    <tr><td class="c-col">kaplama</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-df">DEFAULT</span><span class="dfval">'asfalt'</span></td><td class="c-desc">Kaplama türü — <code>asfalt</code> · <code>parke</code> · <code>beton</code> · <code>stabilize</code>.</td></tr>
+                    <tr><td class="c-col">son_asfalt_tarihi</td><td class="c-type">DATE</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">En son asfaltlama tarihi.</td></tr>
+                    <tr><td class="c-col">garanti_bitisi</td><td class="c-type">DATE</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Asfalt garanti bitiş tarihi — genelde son asfalt + 5 yıl. Kazı garanti ihlali sorgusunda kullanılır.</td></tr>
+                    <tr class="dict-row-geom"><td class="c-col">geom</td><td class="c-type is-geom">geometry(LINESTRING, 5255)</td><td class="c-key"><span class="badge badge-ix">GiST</span></td><td class="c-desc">Yol ekseni geometrisi (2B) — derinlik gerekmez.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-legend">
+                <span class="lg"><i class="sw" style="background:#fffaef;"></i> Birincil anahtar satırı</span>
+                <span class="lg"><i class="sw" style="background:#f4f8fd;"></i> Yabancı anahtar satırı</span>
+                <span class="lg"><i class="sw" style="background:#f1f8f1;"></i> Geometri sütunu</span>
+                <span class="lg"><span class="badge badge-nn">NOT NULL</span> zorunlu alan</span>
+                <span class="lg"><span class="badge badge-df">DEFAULT</span> varsayılan değer</span>
+                <span class="lg"><span class="badge badge-ix">GiST</span> mekansal indeks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 12: 5.3.5 — VERİ SÖZLÜĞÜ: HAT VE NOKTA TABLOLARI   -->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.3.5 — Veri Sözlüğü: Altyapı Hat ve Nokta Tabloları</div>
+              <div class="slide-header-num">12 / 22</div>
+            </div>
+            <div class="dict-body">
+              <div class="dict-intro">
+                Fiziksel altyapı varlıkları iki <strong>3B geometri tablosunda</strong> toplanır. <strong>utility_line</strong> tüm hat türlerini
+                (su, kanal, gaz, elektrik, telekom) tek tabloda <code>tip</code> sütunuyla ayırır; <strong>manhole</strong> bakım erişim noktalarını tutar.
+                Her ikisinde de geometri <code>Z</code> koordinatlıdır — Z ekseni yeraltı derinliğini taşır.
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#1565c0;"></div>
+                  <span class="tbl-name">aykome.utility_line</span>
+                  <span class="tbl-desc">— Tüm altyapı hatları (su · kanal · gaz · elektrik · telekom)</span>
+                  <span class="tbl-count">10 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:160px"><col style="width:206px"><col style="width:210px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Birincil anahtar.</td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">kurum_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-fk">FK</span><span class="ref">→ aykome.utility_company(id)</span></td><td class="c-desc">Hattı işleten altyapı kurumu.</td></tr>
+                    <tr><td class="c-col">tip</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Hat türü — <code>su</code> · <code>kanal</code> · <code>dogalgaz</code> · <code>elektrik</code> · <code>fiber</code> · <code>data</code>.</td></tr>
+                    <tr><td class="c-col">capi_mm</td><td class="c-type">INTEGER</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Boru veya kablo çapı (mm).</td></tr>
+                    <tr><td class="c-col">derinlik_m</td><td class="c-type">NUMERIC(4,2)</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Yerden derinlik — <code>-0.80</code> = 80 cm yeraltı (negatif değer).</td></tr>
+                    <tr><td class="c-col">basinc_bar</td><td class="c-type">NUMERIC(5,2)</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Gaz/su hattı işletme basıncı (bar).</td></tr>
+                    <tr><td class="c-col">malzeme</td><td class="c-type">TEXT</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Boru/kablo malzemesi — <code>PE</code> · <code>PVC</code> · <code>çelik</code> · <code>HDPE</code> · <code>betonarme</code>.</td></tr>
+                    <tr><td class="c-col">yapim_yili</td><td class="c-type">SMALLINT</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Hattın döşendiği yıl.</td></tr>
+                    <tr><td class="c-col">durum</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-df">DEFAULT</span><span class="dfval">'aktif'</span></td><td class="c-desc">İşletme durumu — <code>aktif</code> · <code>pasif</code> · <code>hasar</code> · <code>yenileniyor</code>.</td></tr>
+                    <tr class="dict-row-geom"><td class="c-col">geom</td><td class="c-type is-geom">geometry(LINESTRINGZ, 5255)</td><td class="c-key"><span class="badge badge-ix">GiST</span></td><td class="c-desc">3B hat geometrisi — Z ekseni = derinlik. <code>ST_3DDistance</code> ile çakışma analizi.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#7b1fa2;"></div>
+                  <span class="tbl-name">aykome.manhole</span>
+                  <span class="tbl-desc">— Rögar, vana, baca ve trafo noktaları</span>
+                  <span class="tbl-count">7 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:160px"><col style="width:206px"><col style="width:210px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Birincil anahtar.</td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">kurum_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-fk">FK</span><span class="ref">→ aykome.utility_company(id)</span></td><td class="c-desc">Noktayı işleten altyapı kurumu.</td></tr>
+                    <tr><td class="c-col">tip</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Nokta türü — <code>rögar</code> · <code>baca</code> · <code>vana</code> · <code>trafo_odasi</code> · <code>pompa</code>.</td></tr>
+                    <tr><td class="c-col">derinlik_m</td><td class="c-type">NUMERIC(4,2)</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Derinlik ya da kapak kotu (m).</td></tr>
+                    <tr><td class="c-col">yapim_yili</td><td class="c-type">SMALLINT</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Yapım yılı.</td></tr>
+                    <tr><td class="c-col">durum</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-df">DEFAULT</span><span class="dfval">'aktif'</span></td><td class="c-desc">İşletme durumu.</td></tr>
+                    <tr class="dict-row-geom"><td class="c-col">geom</td><td class="c-type is-geom">geometry(POINTZ, 5255)</td><td class="c-key"><span class="badge badge-ix">SP-GiST</span></td><td class="c-desc">3B nokta geometrisi — quad-tree indeks (nokta için daha sığ ağaç).</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-legend">
+                <span class="lg"><i class="sw" style="background:#fffaef;"></i> Birincil anahtar satırı</span>
+                <span class="lg"><i class="sw" style="background:#f4f8fd;"></i> Yabancı anahtar satırı</span>
+                <span class="lg"><i class="sw" style="background:#f1f8f1;"></i> Geometri sütunu</span>
+                <span class="lg"><span class="badge badge-nn">NOT NULL</span> zorunlu alan</span>
+                <span class="lg"><span class="badge badge-df">DEFAULT</span> varsayılan değer</span>
+                <span class="lg"><span class="badge badge-ix">GiST</span> mekansal indeks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════ -->
+      <!-- SLAYT 13: 5.3.6 — VERİ SÖZLÜĞÜ: KAZI İZİN SÜREÇ TABLOLARI-->
+      <!-- ════════════════════════════════════════════════════════ -->
+      <div class="slide-outer">
+        <div class="slide-wrapper">
+          <div class="s-tech-white">
+            <div class="slide-header">
+              <div class="header-logo-area">
+                <div class="logo-benim">BENİM<br>ŞEHRİM</div>
+                <div class="logo-divider"></div>
+                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
+              </div>
+              <div class="slide-header-title">5.3.6 — Veri Sözlüğü: Kazı İzin Süreç Tabloları</div>
+              <div class="slide-header-num">13 / 22</div>
+            </div>
+            <div class="dict-body">
+              <div class="dict-intro">
+                Kazı izin süreci <strong>bire-çok ilişki</strong> ile iki tabloya ayrılır: <strong>excavation_permit</strong> her başvuru için
+                <em>tek kayıt</em> tutar; <strong>permit_review</strong> ise o başvuruya ilgili her kurumun (KOSKİ, GAZNET…) yazdığı görüşü
+                <em>ayrı satırda</em> tutar. Tüm kurumlar <code>onay</code> verince <code>excavation_permit.durum</code> güncellenebilir.
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#e65100;"></div>
+                  <span class="tbl-name">aykome.excavation_permit</span>
+                  <span class="tbl-desc">— Kazı ruhsat başvuruları (başvuru başına tek kayıt)</span>
+                  <span class="tbl-count">10 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:172px"><col style="width:200px"><col style="width:222px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Birincil anahtar.</td></tr>
+                    <tr><td class="c-col">basvuru_no</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-uq">UNIQUE</span></td><td class="c-desc">Resmi başvuru numarası — örn. <code>AYK-2024-00142</code>. Kurumlar arası takip için.</td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">basvuran_kurum_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-fk">FK</span><span class="ref">→ aykome.utility_company(id)</span></td><td class="c-desc">Kazı başvurusunu yapan kurum.</td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">mahalle_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-fk">FK</span><span class="ref">→ aykome.mahalle(id)</span></td><td class="c-desc">Kazının yapılacağı mahalle.</td></tr>
+                    <tr><td class="c-col">basvuru_tarihi</td><td class="c-type">DATE</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-df">DEFAULT</span><span class="dfval">CURRENT_DATE</span></td><td class="c-desc">Başvurunun alındığı tarih.</td></tr>
+                    <tr><td class="c-col">durum</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-df">DEFAULT</span><span class="dfval">'beklemede'</span></td><td class="c-desc">Süreç durumu — <code>beklemede</code> → <code>onaylandi</code> / <code>reddedildi</code> → <code>tamamlandi</code>.</td></tr>
+                    <tr><td class="c-col">sebep</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Kazı gerekçesi — arıza, yeni hat, bakım vb.</td></tr>
+                    <tr><td class="c-col">tahmini_sure_gun</td><td class="c-type">INTEGER</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Tahmini kazı süresi (gün).</td></tr>
+                    <tr><td class="c-col">derinlik_m</td><td class="c-type">NUMERIC(4,2)</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Planlanan kazı derinliği (m).</td></tr>
+                    <tr class="dict-row-geom"><td class="c-col">geom</td><td class="c-type is-geom">geometry(POLYGON, 5255)</td><td class="c-key"><span class="badge badge-ix">GiST</span></td><td class="c-desc">Kazı alanı poligonu — QGIS'te sayısallaştırılarak çizilir.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-section">
+                <div class="dict-caption">
+                  <div class="tbl-dot" style="background:#616161;"></div>
+                  <span class="tbl-name">aykome.permit_review</span>
+                  <span class="tbl-desc">— Kurum bazlı görüş / onay kayıtları (başvuru başına N satır)</span>
+                  <span class="tbl-count">6 KOLON</span>
+                </div>
+                <table class="dict-table">
+                  <colgroup><col style="width:172px"><col style="width:200px"><col style="width:222px"><col></colgroup>
+                  <thead><tr><th>Kolon</th><th>Veri Tipi</th><th>Anahtar / Kısıt</th><th>Açıklama</th></tr></thead>
+                  <tbody>
+                    <tr class="dict-row-pk"><td class="c-col">id</td><td class="c-type">SERIAL</td><td class="c-key"><span class="badge badge-pk">PK</span></td><td class="c-desc">Birincil anahtar.</td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">permit_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-fk">FK</span><span class="ref">→ aykome.excavation_permit(id)</span></td><td class="c-desc">Görüşün ait olduğu kazı başvurusu.</td></tr>
+                    <tr class="dict-row-fk"><td class="c-col">reviewer_kurum_id</td><td class="c-type">INTEGER</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span><span class="badge badge-fk">FK</span><span class="ref">→ aykome.utility_company(id)</span></td><td class="c-desc">Görüşü bildiren altyapı kurumu.</td></tr>
+                    <tr><td class="c-col">gorus</td><td class="c-type">TEXT</td><td class="c-key"><span class="badge badge-nn">NOT NULL</span></td><td class="c-desc">Kurum görüşü — <code>onay</code> · <code>ret</code> · <code>kosullu_onay</code>.</td></tr>
+                    <tr><td class="c-col">aciklama</td><td class="c-type">TEXT</td><td class="c-key"><span class="c-none">—</span></td><td class="c-desc">Görüşün gerekçesi veya koşulları (serbest metin).</td></tr>
+                    <tr><td class="c-col">tarih</td><td class="c-type">TIMESTAMPTZ</td><td class="c-key"><span class="badge badge-df">DEFAULT</span><span class="dfval">NOW()</span></td><td class="c-desc">Görüşün kaydedildiği zaman damgası (zaman dilimli).</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="dict-legend">
+                <span class="lg"><i class="sw" style="background:#fffaef;"></i> Birincil anahtar satırı</span>
+                <span class="lg"><i class="sw" style="background:#f4f8fd;"></i> Yabancı anahtar satırı</span>
+                <span class="lg"><i class="sw" style="background:#f1f8f1;"></i> Geometri sütunu</span>
+                <span class="lg"><span class="badge badge-uq">UNIQUE</span> benzersiz değer</span>
+                <span class="lg"><span class="badge badge-df">DEFAULT</span> varsayılan değer</span>
+                <span class="lg"><span class="badge badge-ix">GiST</span> mekansal indeks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-controls">
+    <a href="index.html" class="nav-btn home-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></a>
+    <button class="nav-btn" id="prevBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <div class="nav-status" id="navStatus">1 / 8</div>
+    <button class="nav-btn" id="nextBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </div>
+
+  <script>
+    (function () {
+      const track = document.getElementById('deckTrack');
+      const slides = document.querySelectorAll('.slide-outer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const status = document.getElementById('navStatus');
+      let currentIndex = 0;
+      function updateSlides() {
+        track.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        document.querySelector('.deck-viewport').scrollTop = 0;
+        status.textContent = `${currentIndex + 1} / ${slides.length}`;
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === slides.length - 1;
+      }
+      nextBtn.addEventListener('click', () => { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } });
+      prevBtn.addEventListener('click', () => { if (currentIndex > 0) { currentIndex--; updateSlides(); } });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { if (currentIndex < slides.length - 1) { currentIndex++; updateSlides(); } }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { if (currentIndex > 0) { currentIndex--; updateSlides(); } }
+      });
+    })();
+  </script>
+
+</body>
+</html>

@@ -61,7 +61,7 @@
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — Veri Yükleme (CSV ve COPY)</div>
-              <div class="slide-header-num">02 / 21</div>
+              <div class="slide-header-num">02 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -136,7 +136,7 @@ SELECT * FROM konya.nufus_copy LIMIT 10;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — ogr2ogr ile Veri Taşıma</div>
-              <div class="slide-header-num">03 / 21</div>
+              <div class="slide-header-num">03 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -229,7 +229,7 @@ ogr2ogr -f "PostgreSQL" ^
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.1 — Veri Temizliği (Regex ve UPDATE)</div>
-              <div class="slide-header-num">04 / 21</div>
+              <div class="slide-header-num">04 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -313,7 +313,7 @@ WHERE ad LIKE '% Mah.';</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_Simplify ve ST_Smooth</div>
-              <div class="slide-header-num">05 / 21</div>
+              <div class="slide-header-num">05 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -403,7 +403,7 @@ FROM konya.ilce_sinirlari LIMIT 3;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_Subdivide: Performans Canavarı</div>
-              <div class="slide-header-num">06 / 21</div>
+              <div class="slide-header-num">06 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -487,7 +487,7 @@ FROM p;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — Doğrusal Referanslama (Linear Referencing)</div>
-              <div class="slide-header-num">07 / 21</div>
+              <div class="slide-header-num">07 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -565,7 +565,7 @@ WHERE id = 6;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.2 — ST_ClosestPoint ve ST_Azimuth</div>
-              <div class="slide-header-num">08 / 21</div>
+              <div class="slide-header-num">08 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -848,326 +848,6 @@ CREATE INDEX idx_poi_trgm     ON konya.poi USING GIN(ad gin_trgm_ops); -- %text%
         </div>
       </div>
 
-      <!-- SLAYT 9: 2.3 GIST/SP-GIST -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.3 — GiST ve SP-GIST İndeksleme</div>
-              <div class="slide-header-num">09 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">GiST <span>vs</span> SP-GiST</div>
-                <div class="s-sub-tech">Her geometri tipi için doğru indeksi seç — ikisi de mekansal ama çalışma mantıkları farklı.</div>
-
-                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
-                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1565c0;">
-                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">📦 GiST (R-Tree) — Klasör Mantığı</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">Geometrileri kapsayan <strong>Bounding Box</strong>'ları ağaç şeklinde üst üste koyar. Kutular birbirinin içine girebilir (iç içe klasörler). Poligon ve LineString için <strong>zorunludur</strong>.</div>
-                  </div>
-
-                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #6a1b9a;">
-                    <div style="font-weight: bold; color: #4a148c; font-size: 13px;">🔲 SP-GiST (Quad-tree) — Satranç Tahtası</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">Mekanı <strong>kesişmeyen hücrelere</strong> böler (satranç tahtası gibi). Noktalar kesişmez → çok daha derin ağaç olmaz → <strong>Point (POI, adres)</strong> sorgularında GiST'ten hızlı olabilir.</div>
-                  </div>
-
-                  <div style="background: #fff8e1; padding: 10px; border-radius: 4px; border-left: 4px solid #f9a825;">
-                    <div style="font-size: 11px; color: #5d4037;"><strong>📏 Kural:</strong> Poligon/LineString → <code>GIST</code>&nbsp;|&nbsp;Point → <code>SPGIST</code><br>Az veri (binler) → PostgreSQL yine de Seq Scan seçebilir. İndeksin farkı milyonlarca satırda görülür.</div>
-                  </div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) GiST (R-Tree): Poligon ve Çizgiler için mecburidir. (İç içe geçen kutular mantığı)
-CREATE INDEX IF NOT EXISTS idx_binalar_gist ON konya.osm_binalar USING GIST(geom);
-
--- 2) SP-GiST (Quad-tree): Birbiriyle kesişemeyen Noktalar (POI, Adres) için çok daha hızlıdır!
-CREATE INDEX IF NOT EXISTS idx_poi_spgist ON konya.poi USING SPGIST(geom);</div>
-                <div class="reveal-box" id="q27">
-                  <div class="reveal-trigger" onclick="document.getElementById('q27').classList.toggle('open')">Kritik Soru: Neden her şeye sadece GiST kurup geçmiyoruz? <span>▼</span></div>
-                  <div class="reveal-content">GiST, objeleri kapsayan 'Bounding Box'ları üst üste binebilen klasörler gibi tutar; geniş poligonlar için mecburidir. SP-GiST ise mekanı satranç tahtası gibi kesişmeyen hücrelere böler. Milyonlarca <strong>POI (Nokta)</strong> verisinde SP-GiST kullanmak ağaç derinliğini azalttığı için çok daha hızlı arama sağlar.</div>
-                </div>
-                <div class="reveal-box" id="g27">
-                  <div class="reveal-trigger" onclick="document.getElementById('g27').classList.toggle('open')">Görev: İndeks Kapışması (Performance Test) <span>▼</span></div>
-                  <div class="reveal-content">
-                    <code>konya.poi</code> tablosundaki mevcut GiST indeksini (<code>idx_poi_geom</code>) silin. Yerine <code>SPGIST</code> indeksi kurarak geniş bir alanda nokta sorgusu çalıştırın ve <code>EXPLAIN ANALYZE</code> ile süreyi kıyaslayın.
-                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP (Sırayla Çalıştırın):
--- 1. Mevcut GiST indeksini uçurun
-DROP INDEX IF EXISTS konya.idx_poi_geom;
-
--- 2. Yerine SP-GiST kurun
-CREATE INDEX idx_poi_spgist ON konya.poi USING SPGIST(geom);
-
--- 3. Hızı EXPLAIN ANALYZE ile test edin
-EXPLAIN ANALYZE 
-SELECT id, ad, kategori 
-FROM konya.poi 
-WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);</div>
-                  </div>
-                </div>
-                <div class="reveal-box" id="q28">
-                  <div class="reveal-trigger" onclick="document.getElementById('q28').classList.toggle('open')">Dikkat: Neden "Seq Scan" Yaptı? <span>▼</span></div>
-                  <div class="reveal-content">Eğer analizde <strong>Index Scan</strong> yerine <strong>Seq Scan</strong> görüyorsanız hata yapmadınız! PostgreSQL, veri sayısı çok az olduğunda (örn. 1000 satır) indeks ağacını dolaşmanın maliyetli olduğunu bilir ve tabloyu baştan sona okur. İndeksin gücü milyonlarca veride ortaya çıkar. (Zorlamak için: <code>SET enable_seqscan = OFF;</code>)</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 10: 2.3 && OPERATÖRÜ -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.3 — Bounding Box Operatörleri (&&)</div>
-              <div class="slide-header-num">10 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Kutu <span>Matematiği</span></div>
-                <div class="s-sub-tech">Her geometrinin etrafına gerilmiş sanal dikdörtgen — GiST indeksinin anladığı tek dil.</div>
-
-                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #4fc3f7;">
-                    <div style="font-weight: bold; color: #4fc3f7; font-size: 13px;">📦 Bounding Box nedir?</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">Her geometrinin tam üstüne gerilmiş <strong>en küçük dikdörtgen</strong>. Kıvrımlı mahalle sınırı olsun, dolambaçlı yol olsun — GiST indeksi içinde sadece bu kutu saklanır.</div>
-                  </div>
-
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #a5d6a7;">
-                    <div style="font-weight: bold; color: #a5d6a7; font-size: 13px;">⚡ <code>&amp;&amp;</code> — Kutu Kesişimi</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">İki geometrinin <strong>kutularının</strong> kesişip kesişmediğini sorar. Gerçek şekil hesabı yapmaz — saf indeks işlemi. <code>ST_Intersects</code>'ten yüzlerce kat hızlı.</div>
-                  </div>
-
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #ffcc80;">
-                    <div style="font-weight: bold; color: #ffcc80; font-size: 13px;">🗺️ ST_MakeEnvelope</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">Haritada <strong>(MinX, MinY, MaxX, MaxY)</strong> köşelerini vererek bir dikdörtgen kutu oluşturur. Ekran görünümü ya da bölge filtresi için hazır araç.</div>
-                  </div>
-
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #ef9a9a;">
-                    <div style="font-weight: bold; color: #ef9a9a; font-size: 13px;">⚠️ Kutu ≠ Şekil</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;"><code>&amp;&amp;</code> kutu kesişimini onaylar — şekil kesişimini <strong>garanti etmez</strong>. Kesin kontrol için arkasına <code>ST_Intersects</code> ekle. Ama önce <code>&amp;&amp;</code> ile ayıkla: %99'u elenince gerçek hesap sadece kalanlara gider.</div>
-                  </div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- ST_MakeEnvelope ile (MinX, MinY, MaxX, MaxY) bir kutu oluşturuyoruz.
--- &amp;&amp; operatörü bu sanal kutu ile kesişen mahalleleri anında bulur.
-SELECT id, ad
-FROM konya.mahalleler
-WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326);
--- → 104 mahalle (sadece kutu kontrolü, gerçek şekil hesabı yok)
-
--- Kesin kesişim için: &amp;&amp; + ST_Intersects birlikte (2 aşamalı filtre)
-SELECT id, ad
-FROM konya.mahalleler
-WHERE geom &amp;&amp; ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326)
-  AND ST_Intersects(geom, ST_MakeEnvelope(32.40, 37.80, 32.60, 37.90, 4326));</div>
-                <div class="reveal-box" id="q29">
-                  <div class="reveal-trigger" onclick="document.getElementById('q29').classList.toggle('open')">Kritik Soru: &amp;&amp; neden vazgeçilmezdir? <span>▼</span></div>
-                  <div class="reveal-content">İndeksler (GiST) arka planda şekillerin kıvrımlarını değil, sadece bu <strong>Bounding Box</strong>'ları anlar. Gerçek poligon matematiği yapan <code>ST_Intersects</code> tek başına indeks kullanamaz ve tüm tabloyu tarar. <code>&amp;&amp;</code> önce kutu ile veriyi %99 eleyip saf indeks gücüyle çalışır — <code>ST_Intersects</code> sonra sadece geriye kalan küçük adaylar üzerinde çalışır.</div>
-                </div>
-                <div class="reveal-box" id="g29">
-                  <div class="reveal-trigger" onclick="document.getElementById('g29').classList.toggle('open')">Görev: Kutu ve Şekil Farkını Ölç <span>▼</span></div>
-                  <div class="reveal-content">
-                    Aşağıdaki iki yöntemi <code>EXPLAIN ANALYZE</code> ile çalıştırın. Dönen satır sayısı farkına ve <strong>Execution Time</strong>'a bakın: kutu yöntemi fazla satır döndürür ama neden daha hızlıdır?
-                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- 1. YÖNTEM: Sadece kutu (ÇOK HIZLI — saf indeks)
-EXPLAIN ANALYZE
-SELECT id FROM konya.osm_binalar
-WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
-
--- 2. YÖNTEM: Kesin şekil kesişimi (DAHA YAVAŞ — indeks + matematik)
-EXPLAIN ANALYZE
-SELECT id FROM konya.osm_binalar
-WHERE ST_Intersects(geom, ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326));</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 11: 2.3 ÖZEL İNDEKSLER -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.3 — Partial ve Functional İndeksler</div>
-              <div class="slide-header-num">11 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Akıllı <span>İndeksler</span></div>
-                <div class="s-sub-tech">Tüm tabloyu indekslemek yerine — sadece gereken satırları veya fonksiyon sonucunu indeksle.</div>
-                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
-                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1565c0;">
-                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">🔪 Partial Index (Kısmi)</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;"><code>WHERE kategori = 'Eczane'</code> koşuluyla sadece o satırları indeksler. 258 eczane için kurulur, 1000+ diğer POI indeksi şişirmez. INSERT/UPDATE'de de sadece eczaneleri günceller.</div>
-                  </div>
-                  <div style="background: #f3e5f5; padding: 11px; border-radius: 4px; border-left: 4px solid #6a1b9a;">
-                    <div style="font-weight: bold; color: #4a148c; font-size: 13px;">⚙️ Functional Index (Fonksiyonel)</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">Fonksiyon sonucunu önceden hesaplayıp indeksler. <code>ST_Transform(geom, 3857)</code> indekslenirse, sorguda <code>ST_Transform</code> kullanan her WHERE bu indeksi kullanır — dönüşüm tekrar hesaplanmaz.</div>
-                  </div>
-                  <div style="background: #e8f5e9; padding: 11px; border-radius: 4px; border-left: 4px solid #2e7d32;">
-                    <div style="font-weight: bold; color: #1b5e20; font-size: 13px;">📐 Ne zaman kullan?</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">Tablonun <strong>küçük bir alt kümesini</strong> sık sorguluyorsan → Partial.<br>Sorgularda <strong>aynı fonksiyonu</strong> sürekli uyguluyorsan → Functional.</div>
-                  </div>
-                  <div style="background: #fffbe6; padding: 10px; border-radius: 4px; border-left: 4px solid #FFC107; margin-top:4px;">
-                    <div style="font-size: 11px; color: #6b5900;">💡 Her ikisi de normal indeksten <strong>daha küçük</strong>, dolayısıyla daha hızlı. Aşırı indeks kurmak yerine bu iki yöntemle hedefli kal.</div>
-                  </div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px; line-height:1.4;">-- 1) PARTIAL INDEX (Kısmi İndeks): Sadece 'Eczane' kategorisindeki POI'leri indeksler
--- Ram ve diskten devasa tasarruf sağlar, indeks güncellemelerini (INSERT/UPDATE) yavaşlatmaz.
-CREATE INDEX idx_eczane_geom ON konya.poi USING SPGIST(geom) WHERE kategori = 'Eczane';
-
--- 2) FUNCTIONAL INDEX (Fonksiyonel): Binaların EPSG:3857 (Metre) dönüşümünü indeksler
--- Sorgunuzda ST_Transform kullanırsanız, veritabanı bu hazır indeksi anında kullanır.
-CREATE INDEX idx_bina_3857 ON konya.osm_binalar USING GIST(ST_Transform(geom, 3857));</div>
-                <div class="reveal-box" id="q30">
-                  <div class="reveal-trigger" onclick="document.getElementById('q30').classList.toggle('open')">Kritik Soru: Partial İndeks veritabanını nasıl kurtarır? <span>▼</span></div>
-                  <div class="reveal-content">Milyonlarca POI kaydının sadece %1'i "Eczane" ise, haritada sadece eczaneleri arayan bir sorgu için tüm tabloyu indekslemek sistemi yorar. Partial indeks sadece o %1'lik küçük kısmı indeksler. Aramayı uçururken, alakasız yeni veriler eklendiğinde indeksi güncellemekle vakit kaybetmez.</div>
-                </div>
-                <div class="reveal-box" id="g30">
-                  <div class="reveal-trigger" onclick="document.getElementById('g30').classList.toggle('open')">Görev: Fonksiyonel İndeksi Test Et <span>▼</span></div>
-                  <div class="reveal-content">
-                    <code>konya.osm_binalar</code> tablosundaki her binanın merkez noktasını (<code>ST_Centroid</code>) fonksiyonel olarak indeksleyen bir SQL yazın.
-                    <div class="code-block" style="font-size:11px; margin-top:10px; padding:8px; line-height:1.4;">-- CEVAP:
-CREATE INDEX idx_bina_merkez ON konya.osm_binalar USING GIST(ST_Centroid(geom));</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 12: 2.3 ANALYZE -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-dark">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.3 — ANALYZE: Veritabanının Pusulası</div>
-              <div class="slide-header-num">12 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Sorgu <span>Pusulası</span></div>
-                <div class="s-sub-tech">PostgreSQL sorgu planlarken veri dağılımını bilmek zorunda — ANALYZE bu istatistikleri toplar.</div>
-                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #4fc3f7;">
-                    <div style="font-weight: bold; color: #4fc3f7; font-size: 13px;">🗺️ Query Planner nedir?</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">Her SQL çalışmadan önce PostgreSQL en hızlı yolu bulmaya çalışır: "Index mi kullansam, Seq Scan mı?" Kararı verebilmek için <strong>tabloda veri nasıl dağılmış</strong> bilgisi şart.</div>
-                  </div>
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #a5d6a7;">
-                    <div style="font-weight: bold; color: #a5d6a7; font-size: 13px;">📊 ANALYZE ne yapar?</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">Tablodaki satır örneklerini okur, sütun başına <strong>histogram</strong> (değer dağılımı) ve satır sayısı istatistiklerini <code>pg_statistic</code>'e yazar. Saniyeler alır, performansı kalıcı artırır.</div>
-                  </div>
-                  <div style="background: rgba(255,255,255,0.07); padding: 11px; border-radius: 4px; border-left: 4px solid #ef9a9a;">
-                    <div style="font-weight: bold; color: #ef9a9a; font-size: 13px;">⚠️ Ne zaman ZORUNLU?</div>
-                    <div style="font-size: 11px; color: #ccc; margin-top:4px;">Toplu veri yüklemesinden (<code>COPY</code>, <code>INSERT</code>) hemen sonra. PostgreSQL eski boş tablo istatistiklerine bakıp yanlış plan seçer, sorgular felç olur.</div>
-                  </div>
-                  <div style="background: rgba(255,193,7,0.12); padding: 9px; border-radius: 4px; border-left: 4px solid #FFC107; margin-top:4px;">
-                    <div style="font-size: 11px; color: #ffe082;">💡 <strong>Autovacuum</strong> normalde ANALYZE'ı otomatik çalıştırır. Büyük toplu yüklemelerden sonra manuel olarak çalıştırmak güvenli alışkanlıktır.</div>
-                  </div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="font-size:12px; line-height:1.4;">-- Tablodaki verilerin yoğunluk haritasını ve istatistiklerini çıkarır
--- Saniyeler sürer ama performansı kalıcı olarak artırır.
-ANALYZE konya.osm_binalar;
-ANALYZE konya.mahalleler;</div>
-                <div class="reveal-box" id="q31">
-                  <div class="reveal-trigger" onclick="document.getElementById('q31').classList.toggle('open')">Kritik Soru: ANALYZE yapmazsam ne olur? <span>▼</span></div>
-                  <div class="reveal-content">Veritabanına bir anda 1 milyon veri yüklerseniz, veritabanının bundan anında haberi olmaz. Hala eski (boş) tablonun kurallarına göre işlem yapmaya çalışır ve sorgular felç olur. Yeni veri yüklendiğinde veya büyük silinmeler yaşandığında PostgreSQL'e <strong>"Haritayı Güncelle!"</strong> demek için <code>ANALYZE</code> komutu kullanılır.</div>
-                </div>
-                <div class="reveal-box" id="g31">
-                  <div class="reveal-trigger" onclick="document.getElementById('g31').classList.toggle('open')">Görev: Haritayı Güncelle <span>▼</span></div>
-                  <div class="reveal-content">DBeaver üzerinden <code>konya.poi</code> tablosuna sağ tıklayıp "Analyze" seçeneğini bulun veya doğrudan SQL konsoluna <code>ANALYZE konya.poi;</code> yazıp çalıştırarak ne kadar hızlı bittiğini görün.<br><br>
-                    <b>Bonus:</b> Ardından index kullanımını doğrulayın:<br>
-                    <code>SELECT indexrelname, idx_scan FROM pg_stat_user_indexes WHERE schemaname = 'konya' ORDER BY idx_scan DESC;</code><br>
-                    <code>idx_scan &gt; 0</code> ise index sorgu planlamasına dahil edilmiş demektir. ✓</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SLAYT 12-B: 2.3 İNDEKS DEDEKTİFLİĞİ -->
-      <div class="slide-outer">
-        <div class="slide-wrapper">
-          <div class="s-tech-white">
-            <div class="slide-header">
-              <div class="header-logo-area">
-                <div class="logo-benim">BENİM<br>ŞEHRİM</div><div class="logo-divider"></div>
-                <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
-              </div>
-              <div class="slide-header-title">2.3 — İndeks Takibi (Dedektiflik)</div>
-              <div class="slide-header-num">13 / 21</div>
-            </div>
-            <div class="s-body-grid">
-              <div class="s-panel-left">
-                <div class="s-headline-tech">Ölü <span>İndeks</span> Avı</div>
-                <div class="s-sub-tech">Kurulan her indeks yararlı mı, yoksa diski ve INSERT hızını boşuna tüketiyor mu?</div>
-                <div style="display:flex; flex-direction:column; gap:9px; margin-top:14px;">
-                  <div style="background: #e3f2fd; padding: 11px; border-radius: 4px; border-left: 4px solid #1565c0;">
-                    <div style="font-weight: bold; color: #0d47a1; font-size: 13px;">📊 pg_stat_user_indexes</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">PostgreSQL her indeksin kaç kez kullanıldığını <strong>idx_scan</strong> sayacında tutar. Sunucu yeniden başlatılana kadar birikir.</div>
-                  </div>
-                  <div style="background: #fce4ec; padding: 11px; border-radius: 4px; border-left: 4px solid #c62828;">
-                    <div style="font-weight: bold; color: #b71c1c; font-size: 13px;">💀 idx_scan = 0 ne demek?</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">Bu indeks kurulduğundan beri <strong>hiç okunmadı</strong>. Disk alanı kaplar ama hiçbir sorguya katkısı yok.</div>
-                  </div>
-                  <div style="background: #fff3e0; padding: 11px; border-radius: 4px; border-left: 4px solid #e65100;">
-                    <div style="font-weight: bold; color: #bf360c; font-size: 13px;">🐢 Ölü indeksin gizli maliyeti</div>
-                    <div style="font-size: 11px; color: #444; margin-top:4px;">Kullanılmasa da her <code>INSERT</code> / <code>UPDATE</code> bu indeksi <strong>güncellemek zorunda</strong>. Tablo yazmalarını doğrudan yavaşlatır.</div>
-                  </div>
-                  <div style="background: #fffbe6; padding: 10px; border-radius: 4px; border-left: 4px solid #FFC107; margin-top:4px;">
-                    <div style="font-size: 11px; color: #6b5900;">💡 Eğitim sonunda bu sorguyu çalıştır. Listede çıkan indeksleri <code>DROP INDEX indeks_adi;</code> ile temizle — veritabanı rahatlar.</div>
-                  </div>
-                </div>
-              </div>
-              <div class="s-panel-right">
-                <div class="code-block" style="font-size:11px; line-height:1.4;">-- HİÇ kullanılmamış (idx_scan = 0) "çöp" indeksleri bulalım
-SELECT 
-  indexrelname AS indeks_adi, 
-  pg_size_pretty(pg_relation_size(indexrelid)) AS bosuna_kapladigi_yer
-FROM pg_stat_user_indexes
-WHERE schemaname = 'konya' 
-  AND idx_scan = 0; -- Kritik filtre: okuma sayısı sıfır olanlar</div>
-                <div class="reveal-box" id="q32">
-                  <div class="reveal-trigger" onclick="document.getElementById('q32').classList.toggle('open')">Kritik Soru: Kullanılmayan indeks neden zararlıdır? <span>▼</span></div>
-                  <div class="reveal-content">Sadece diskte yer kaplamakla kalmaz! Tabloya her yeni veri (INSERT/UPDATE) geldiğinde PostgreSQL bu "işe yaramaz" indeksi de güncellemek zorunda kalır. Yani ölü indeksler kayıt ekleme işlemlerinizi yavaşlatır. Mümkün olan <strong>en az sayıda</strong> indeksle yola devam edilmelidir.</div>
-                </div>
-                <div class="reveal-box" id="g32">
-                  <div class="reveal-trigger" onclick="document.getElementById('g32').classList.toggle('open')">Görev: Çöpü Dışarı Çıkar <span>▼</span></div>
-                  <div class="reveal-content">Yukarıdaki SQL kodunu çalıştırın. Listede daha önce kurduğunuz ama testlerde hiç kullanılmadığını (idx_scan=0) gördüğünüz bir indeks çıkarsa, onu <code>DROP INDEX indeks_adi;</code> ile silip veritabanını rahatlatın.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- SLAYT 13: 2.4 EXPLAIN ANALYZE -->
       <div class="slide-outer">
         <div class="slide-wrapper">
@@ -1178,7 +858,7 @@ WHERE schemaname = 'konya'
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — EXPLAIN ANALYZE Okuma Sanatı</div>
-              <div class="slide-header-num">14 / 21</div>
+              <div class="slide-header-num">09 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1256,7 +936,7 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.00, 37.70, 33.00, 38.40, 4326);</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — Seq Scan ve Index Scan Farkı</div>
-              <div class="slide-header-num">15 / 21</div>
+              <div class="slide-header-num">10 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1322,7 +1002,7 @@ WHERE ST_Intersects(geom,
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — ST_Distance Anti-Pattern</div>
-              <div class="slide-header-num">16 / 21</div>
+              <div class="slide-header-num">11 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1378,7 +1058,7 @@ WHERE ST_DWithin(geom, p, 500)</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.4 — EXPLAIN FORMAT (JSON, YAML)</div>
-              <div class="slide-header-num">17 / 21</div>
+              <div class="slide-header-num">12 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1439,7 +1119,7 @@ WHERE geom &amp;&amp; ST_MakeEnvelope(32.45, 37.85, 32.55, 37.95, 4326);
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — VACUUM ve Bloat Yönetimi</div>
-              <div class="slide-header-num">18 / 21</div>
+              <div class="slide-header-num">13 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1504,7 +1184,7 @@ VACUUM ANALYZE konya.mahalleler;</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — Tablo Bölümleme (Partitioning)</div>
-              <div class="slide-header-num">19 / 21</div>
+              <div class="slide-header-num">14 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">
@@ -1576,7 +1256,7 @@ WHERE i.ad ILIKE 'selçuklu';</div>
                 <div class="logo-konya-box"><img src="https://www.konya.bel.tr/assets/images/logo.svg" alt="Konya BB" /></div>
               </div>
               <div class="slide-header-title">2.5 — Partition Pruning (Ayıklama)</div>
-              <div class="slide-header-num">20 / 21</div>
+              <div class="slide-header-num">15 / 15</div>
             </div>
             <div class="s-body-grid">
               <div class="s-panel-left">

@@ -1011,7 +1011,7 @@ RESET ROLE;</div>
 
                 <div class="reveal-box" id="sec42h">
                   <div class="reveal-trigger" onclick="document.getElementById('sec42h').classList.toggle('open')">Kritik Soru: Neden bu kadar agresif? <span>▼</span></div>
-                  <div class="reveal-content">Web uygulaması üzerinden SQL Injection saldırısı olsa bile saldırgan veriyi değiştiremez veya silemez. <code>default_transaction_read_only</code> bağlantı açılırken devreye girer; bağlandıktan sonra kullanıcı bunu DEĞİŞTİREMEZ (sunucu seviyesinde zorlanır). Web tarafında değil DB tarafında kilit.</div>
+                  <div class="reveal-content"><strong>Asıl kilit GRANT'tir:</strong> <code>geoserver</code> rolüne yalnızca <code>SELECT</code> verildi — INSERT/UPDATE/DELETE yetkisi hiç yok, dolayısıyla saldırgan veriyi değiştiremez. <code>default_transaction_read_only = on</code> ise <strong>ikincil</strong> bir önlemdir (kazara yazmayı önler); kullanıcı bunu <code>SET default_transaction_read_only = off</code> veya <code>BEGIN READ WRITE</code> ile kendi oturumunda geçersiz kılabilir — kırılmaz bir kilit değildir. İki katman birlikte: derinlemesine savunma.</div>
                 </div>
                 <div class="reveal-box" id="sec42i">
                   <div class="reveal-trigger" onclick="document.getElementById('sec42i').classList.toggle('open')">Görev: Yetkiyi Doğrula <span>▼</span></div>
@@ -1084,7 +1084,7 @@ ls -lh konya_yedek.dump
 
 # 3) Tüm cluster (roller + tüm DB'ler)
 docker exec konya_postgis_db pg_dumpall \
-  -U postgres &gt; full_cluster.sql</div>
+  -U egitim &gt; full_cluster.sql</div>
 
                 <div style="font-size:8px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ Geri Yükleme</div>
                 <div class="code-block" style="font-size:9.5px; margin-bottom:5px;"># Yeni bir DB'ye geri yükle
@@ -1290,7 +1290,7 @@ pg_basebackup -D /yedek/base_$(date +%F) -Ft -z -P -U replicator
 -- ▶ 3) FELAKET ANI: 14:31:59'a geri dön
 -- a) PostgreSQL'i durdur, data dizinini sil
 -- b) Base backup'ı aç
-tar -xzf /yedek/base_2026_05_20/base.tar.gz \
+tar -xzf /yedek/base_2026-05-20/base.tar.gz \
     -C /var/lib/postgresql/data
 
 -- c) recovery.signal (boş dosya yeter)
@@ -1349,8 +1349,8 @@ pg_ctl start</div>
                     <div style="font-size:11px; color:#ddd; margin-top:3px;"><code>CREATE EXTENSION pg_dirtyread</code>. Çekirdek değil <strong>üçüncü taraf</strong> — kurulumdan sonra etkin olur.</div>
                   </div>
                   <div style="background:rgba(255,255,255,0.07); padding:10px 12px; border-radius:4px; border-left:4px solid #ffcc80;">
-                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🛡️ old_snapshot_threshold (PG 14+)</div>
-                    <div style="font-size:11px; color:#ddd; margin-top:3px;">VACUUM'un temizliğini geciktirir → kurtarma penceresi açılır (ama disk şişer). <em>Not: vacuum_defer_cleanup_age PG 14'te kaldırıldı; yerine old_snapshot_threshold kullanılır.</em></div>
+                    <div style="font-weight:bold; color:#ffcc80; font-size:13px;">🛡️ Kurtarma Penceresi = autovacuum</div>
+                    <div style="font-size:11px; color:#ddd; margin-top:3px;">Ölü satırlar yalnızca autovacuum (veya manuel VACUUM) tabloya dokununcaya kadar okunabilir. Büyük bir yanlış silmeden sonra zaman kazanmak için o tabloda autovacuum'u <strong>geçici</strong> kapatabilirsin (ama disk şişer).</div>
                   </div>
                 </div>
               </div>
@@ -1383,11 +1383,12 @@ WHERE kategori = 'Eczane'
 ON CONFLICT (id) DO NOTHING;
 ROLLBACK; -- Eğitim bitince ROLLBACK ile geri al
 
--- ▶ 5) GELECEK YATIRIM: old_snapshot_threshold ile kurtarma penceresi aç
--- NOT: vacuum_defer_cleanup_age PostgreSQL 14'te kaldırıldı.
--- Yerine old_snapshot_threshold kullanılır (ancak restart gerektirir).
--- Örnek: postgresql.conf → old_snapshot_threshold = '10min'
-SELECT pg_reload_conf(); -- Sonra pg_ctl reload</div>
+-- ▶ 5) KURTARMA PENCERESİNİ GENİŞLET: autovacuum'u geçici durdur
+-- Ölü satırlar yalnızca autovacuum (veya manuel VACUUM) tabloya
+-- dokununcaya kadar pg_dirtyread ile okunabilir kalır.
+ALTER TABLE konya.poi SET (autovacuum_enabled = false);
+-- ⚠️ Kurtarma bitince GERİ AÇ — yoksa tablo şişer:
+-- ALTER TABLE konya.poi SET (autovacuum_enabled = true);</div>
 
                 <div style="background:rgba(255,193,7,0.12); padding:9px 12px; border-radius:4px; border-left:4px solid #FFC107; margin-top:9px;">
                   <div style="font-weight:bold; color:#ffe082; font-size:11px; margin-bottom:3px;">📘 Temel Kavram</div>
@@ -1588,7 +1589,7 @@ FROM pg_replication_slots;</div>
                 </div>
                 <div class="reveal-box" id="bak43j">
                   <div class="reveal-trigger" onclick="document.getElementById('bak43j').classList.toggle('open')">Slot yoksa eski WAL'ler neden silinir? <span>▼</span></div>
-                  <div class="reveal-content">PostgreSQL WAL'leri sınırsız tutamaz — disk dolar. "Hiç kimse okumak istemiyor" olan WAL silinir. Slot, <em>"ben bunu okumak istiyorum"</em> işareti koyar; primary o WAL'i silmeye cesaret edemez. Slot yoksa retention sadece <code>wal_keep_size</code> kadardır — varsayılan birkaç saat. Logical Decoding <strong>retrospektif değil proaktif</strong>: kurmadıysan geçmişe dönemez.</div>
+                  <div class="reveal-content">PostgreSQL WAL'leri sınırsız tutamaz — disk dolar. "Hiç kimse okumak istemiyor" olan WAL silinir. Slot, <em>"ben bunu okumak istiyorum"</em> işareti koyar; primary o WAL'i silmeye cesaret edemez. Slot yoksa retention <code>wal_keep_size</code> ile sınırlıdır — varsayılanı 0, yani ekstra WAL hiç saklanmaz; eski segmentler checkpoint sonrası geri dönüştürülür. Logical Decoding <strong>retrospektif değil proaktif</strong>: kurmadıysan geçmişe dönemez.</div>
                 </div>
               </div>
             </div>
@@ -1655,8 +1656,8 @@ SELECT pg_create_logical_replication_slot(
 -- ▶ 3) OLAY ANI: WAL'i JSON olarak çek
 -- (terminal / bash)
 pg_recvlogical -d konya_egitim \
-  --slot flashback_slot --start -f - \
-  --plugin=wal2json &gt; /tmp/wal_dump.json
+  --slot flashback_slot --start \
+  -o format-version=2 -f - &gt; /tmp/wal_dump.json
 
 -- ▶ 4) JSON'dan ters SQL üret
 -- Örnek wal2json çıktısı:
@@ -1956,7 +1957,8 @@ pool_mode          = transaction
 max_client_conn    = 1000   ; toplam istemci
 default_pool_size  = 20     ; DB başına gerçek PG bağlantısı
 min_pool_size      = 5
-server_idle_timeout = 600</div>
+server_idle_timeout = 600
+admin_users        = egitim ; SHOW POOLS/CLIENTS yetkisi</div>
 
                 <div style="font-size:9px; font-weight:800; color:var(--theme-yellow); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px;">▶ ADIM 2 — userlist.txt + başlat</div>
                 <div class="code-block" style="font-size:10px; line-height:1.5; margin-bottom:5px;"># /etc/pgbouncer/userlist.txt
